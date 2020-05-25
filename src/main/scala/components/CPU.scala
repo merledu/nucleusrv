@@ -1,0 +1,168 @@
+package components
+import chisel3._
+
+class CPU extends Module {
+  val io = IO(new Bundle {
+    val pin = Input(Bool())
+  })
+  io.pin := DontCare
+
+  //Pipeline Registers
+  //******************
+  // IF-ID Registers
+  val if_reg_pc = RegInit(0.U(64.W))
+  val if_reg_ins = RegInit(0.U(32.W))
+
+  // ID-EX Registers
+  val id_reg_pc = RegInit(0.U(64.W))
+  val id_reg_rd1 = RegInit(0.U(64.W))
+  val id_reg_rd2 = RegInit(0.U(64.W))
+  val id_reg_imm = RegInit(0.U(64.W))
+  val id_reg_wra = RegInit(0.U(5.W))
+  val id_reg_f7 = RegInit(0.U(1.W))
+  val id_reg_f3 = RegInit(0.U(3.W))
+  val id_reg_ins = RegInit(0.U(32.W))
+  val id_reg_ctl_aluSrc = RegInit(false.B)
+  val id_reg_ctl_memToReg = RegInit(0.U(2.W))
+  val id_reg_ctl_regWrite = RegInit(false.B)
+  val id_reg_ctl_memRead = RegInit(false.B)
+  val id_reg_ctl_memWrite = RegInit(false.B)
+  val id_reg_ctl_branch = RegInit(false.B)
+  val id_reg_ctl_aluOp = RegInit(0.U(2.W))
+  val id_reg_ctl_jump = RegInit(0.U(2.W))
+
+  // EX-MEM Registers
+  val ex_reg_branch = RegInit(0.U(64.W))
+  val ex_reg_zero = RegInit(0.U(64.W))
+  val ex_reg_result = RegInit(0.U(64.W))
+  val ex_reg_wd = RegInit(0.U(64.W))
+  val ex_reg_wra = RegInit(0.U(5.W))
+  val ex_reg_ins = RegInit(0.U(32.W))
+  val ex_reg_ctl_memToReg = RegInit(0.U(2.W))
+  val ex_reg_ctl_regWrite = RegInit(false.B)
+  val ex_reg_ctl_memRead = RegInit(false.B)
+  val ex_reg_ctl_memWrite = RegInit(false.B)
+  val ex_reg_ctl_branch_taken = RegInit(false.B)
+  val ex_reg_pc = RegInit(0.U(64.W))
+
+  // MEM-WB Registers
+  val mem_reg_rd = RegInit(0.U(64.W))
+  val mem_reg_ins = RegInit(0.U(32.W))
+  val mem_reg_result = RegInit(0.U(64.W))
+  val mem_reg_branch = RegInit(0.U(64.W))
+  val mem_reg_wra = RegInit(0.U(5.W))
+  val mem_reg_ctl_memToReg = RegInit(0.U(2.W))
+  val mem_reg_ctl_regWrite = RegInit(false.B)
+  val mem_reg_pc = RegInit(0.U(64.W))
+
+  //Stage Implementations
+  //*********************
+  val IF = Module(new InstructionFetch).io
+  val ID = Module(new InstructionDecode).io
+  val EX = Module(new Execute).io
+  val MEM = Module(new MemoryFetch).io
+
+  //Instruction Fetch Stage
+  when(ID.hdu_if_reg_write) {
+    if_reg_pc := IF.PC
+    if_reg_ins := IF.instruction
+  }
+  when(ID.ifid_flush) {
+    if_reg_ins := 0.U
+  }
+
+  //Instruction Decode
+
+  id_reg_rd1 := ID.readData1
+  id_reg_rd2 := ID.readData2
+  id_reg_imm := ID.immediate
+  id_reg_wra := ID.writeRegAddress
+  id_reg_f3 := ID.func3
+  id_reg_f7 := ID.func7
+  id_reg_ins := if_reg_ins
+  id_reg_pc := if_reg_pc
+  id_reg_ctl_aluSrc := ID.ctl_aluSrc
+  id_reg_ctl_memToReg := ID.ctl_memToReg
+  id_reg_ctl_regWrite := ID.ctl_regWrite
+  id_reg_ctl_memRead := ID.ctl_memRead
+  id_reg_ctl_memWrite := ID.ctl_memWrite
+  id_reg_ctl_branch := ID.ctl_branch
+  id_reg_ctl_aluOp := ID.ctl_aluOp
+  id_reg_ctl_jump := ID.ctl_jump
+  IF.PcWrite := ID.hdu_pcWrite
+  ID.instruction := if_reg_ins
+  ID.pcAddress := if_reg_pc
+  IF.PcSrc := ID.pcSrc
+  IF.PCPlusOffset := ID.pcPlusOffset
+  ID.ex_mem_ins := ex_reg_ins
+  ID.mem_wb_ins := mem_reg_ins
+  ID.ex_mem_result := ex_reg_result
+  ID.mem_wb_result := mem_reg_result
+
+  //Execute Stage
+
+  //ex_reg_branch := EX.branchAddress
+  ex_reg_wd := EX.writeData
+  ex_reg_result := EX.ALUresult
+  //ex_reg_ctl_branch_taken := EX.branch_taken
+  EX.immediate := id_reg_imm
+  EX.readData1 := id_reg_rd1
+  EX.readData2 := id_reg_rd2
+  EX.pcAddress := id_reg_pc
+  EX.func3 := id_reg_f3
+  EX.func7 := id_reg_f7
+  EX.ctl_aluSrc := id_reg_ctl_aluSrc
+  EX.ctl_aluOp := id_reg_ctl_aluOp
+  //EX.ctl_branch := id_reg_ctl_branch
+  //EX.ctl_jump := id_reg_ctl_jump
+  ex_reg_pc := id_reg_pc
+  ex_reg_wra := id_reg_wra
+  ex_reg_ins := id_reg_ins
+  ex_reg_ctl_memToReg := id_reg_ctl_memToReg
+  ex_reg_ctl_regWrite := id_reg_ctl_regWrite
+  ex_reg_ctl_memRead := id_reg_ctl_memRead
+  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+  ID.id_ex_mem_read := id_reg_ctl_memRead
+  //EX.ex_mem_regWrite := ex_reg_ctl_regWrite
+  //EX.mem_wb_regWrite := mem_reg_ctl_regWrite
+  EX.id_ex_ins := id_reg_ins
+  EX.ex_mem_ins := ex_reg_ins
+  EX.mem_wb_ins := mem_reg_ins
+  ID.id_ex_rd := id_reg_ins(11, 7)
+
+  //Memory Stage
+  mem_reg_rd := MEM.readData
+  MEM.aluResultIn := ex_reg_result
+  MEM.writeData := ex_reg_wd
+  MEM.readEnable := ex_reg_ctl_memRead
+  MEM.writeEnable := ex_reg_ctl_memWrite
+  //MEM.ctl_branch_taken := ex_reg_ctl_branch_taken
+  //IF.PCPlusOffset := ex_reg_branch // Branch Offset writeback
+  //IF.PcSrc := MEM.ctl_PcSrc
+  EX.mem_result := ex_reg_result
+  mem_reg_result := ex_reg_result
+  mem_reg_wra := ex_reg_wra
+  mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+  mem_reg_ctl_regWrite := ex_reg_ctl_regWrite
+  mem_reg_ins := ex_reg_ins
+  mem_reg_pc := ex_reg_pc
+  EX.ex_mem_regWrite := ex_reg_ctl_regWrite
+
+  //Write Back Stage
+  val wb_data = Wire(UInt(64.W))
+
+  when(mem_reg_ctl_memToReg === 1.U) {
+    wb_data := mem_reg_rd
+  }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
+      wb_data := mem_reg_pc
+    }
+    .otherwise {
+      wb_data := mem_reg_result
+    }
+
+  ID.writeData := wb_data
+  EX.wb_result := wb_data
+  EX.mem_wb_regWrite := mem_reg_ctl_regWrite
+  ID.writeReg := mem_reg_wra
+  ID.ctl_writeEnable := mem_reg_ctl_regWrite
+}
