@@ -3,29 +3,43 @@ import chisel3._
 
 class HazardUnit extends Module {
   val io = IO(new Bundle {
-    val memRead = Input(Bool())
-    val rd = Input(UInt(5.W))
+    val id_ex_memRead = Input(Bool())
+    val ex_mem_memRead = Input(Bool())
+    val id_ex_rd = Input(UInt(5.W))
+    val ex_mem_rd = Input(UInt(5.W))
     val rs1 = Input(UInt(5.W))
     val rs2 = Input(UInt(5.W))
     val taken = Input(Bool())
     val jump = Input(UInt(2.W))
+    val branch = Input(Bool())
 
     val if_reg_write = Output(Bool())
     val pc_write = Output(Bool())
     val ctl_mux = Output(Bool())
     val ifid_flush = Output(Bool())
-
+    val take_branch = Output(Bool())
   })
 
+  io.ctl_mux := true.B
+  io.pc_write := true.B
+  io.if_reg_write := true.B
+  io.take_branch := true.B
+  
+
   //load-use hazard
-  when(io.memRead && (io.rd === io.rs1 || io.rd === io.rs2)) {
+  when((io.id_ex_memRead || io.branch) && (io.id_ex_rd === io.rs1 || io.id_ex_rd === io.rs2))
+  {
     io.ctl_mux := false.B
     io.pc_write := false.B
     io.if_reg_write := false.B
-  }.otherwise {
-    io.ctl_mux := true.B
-    io.pc_write := true.B
-    io.if_reg_write := true.B
+    io.take_branch := false.B
+  }
+
+  when(io.ex_mem_memRead && io.branch && (io.ex_mem_rd === io.rs1 || io.ex_mem_rd === io.rs2)){
+    io.ctl_mux := false.B
+    io.pc_write := false.B
+    io.if_reg_write := false.B
+    io.take_branch := false.B
   }
 
   //branch hazard

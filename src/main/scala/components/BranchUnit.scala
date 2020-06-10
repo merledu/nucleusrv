@@ -7,8 +7,9 @@ class BranchUnit extends Module {
   val io = IO(new Bundle {
     val branch = Input(Bool())
     val funct3 = Input(UInt(3.W))
-    val rd1 = Input(UInt(64.W))
-    val rd2 = Input(UInt(64.W))
+    val rd1 = Input(UInt(32.W))
+    val rd2 = Input(UInt(32.W))
+    val take_branch = Input(Bool())
 
     val taken = Output(Bool())
   })
@@ -27,6 +28,6 @@ class BranchUnit extends Module {
     is(7.U) { check := (io.rd1 >= io.rd2) } // bgeu
   }
 
-  io.taken := check & io.branch
+  io.taken := check & io.branch & io.take_branch
 
 }

@@ -6,11 +6,11 @@ class Registers() extends Module {
     val readAddress = Input(Vec(2, UInt(5.W)))
     val writeEnable = Input(Bool())
     val writeAddress = Input(UInt(5.W))
-    val writeData = Input(UInt(64.W))
+    val writeData = Input(UInt(32.W))
 
-    val readData = Output(Vec(2, UInt(64.W)))
+    val readData = Output(Vec(2, UInt(32.W)))
   })
-  val reg = RegInit(VecInit(Seq.fill(32)(0.U(64.W))))
+  val reg = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
 
   when(io.writeEnable) {
     reg(io.writeAddress) := io.writeData

@@ -4,7 +4,7 @@ import chisel3.util.experimental.loadMemoryFromFile
 
 class InstructionMemory extends Module {
   val io = IO(new Bundle {
-    val address = Input(UInt(64.W))
+    val address = Input(UInt(32.W))
     val instruction = Output(UInt(32.W))
   })
 

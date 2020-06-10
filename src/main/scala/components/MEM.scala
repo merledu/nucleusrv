@@ -3,13 +3,13 @@ import chisel3._
 
 class MemoryFetch extends Module {
   val io = IO(new Bundle {
-    val aluResultIn = Input(UInt(64.W))
-    val writeData = Input(UInt(64.W))
+    val aluResultIn = Input(UInt(32.W))
+    val writeData = Input(UInt(32.W))
     val writeEnable = Input(Bool())
     val readEnable = Input(Bool())
     //val ctl_branch_taken = Input(Bool())
 
-    val readData = Output(UInt(64.W))
+    val readData = Output(UInt(32.W))
     //val ctl_PcSrc = Output(Bool())
   })
 
