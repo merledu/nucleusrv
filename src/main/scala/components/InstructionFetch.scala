@@ -1,23 +1,24 @@
+
 package components
 import chisel3._
 
 class InstructionFetch extends Module {
   val io = IO(new Bundle {
-    val PCPlusOffset = Input(UInt(32.W))
-    val PcSrc = Input(Bool())
-    val instruction = Output(UInt(32.W))
-    val PC = Output(UInt(32.W))
-    val PcWrite = Input(Bool())
+    val PCPlusOffset: UInt = Input(UInt(32.W))
+    val PcSrc: Bool = Input(Bool())
+    val instruction: UInt = Output(UInt(32.W))
+    val PC: UInt = Output(UInt(32.W))
+    val PcWrite: Bool = Input(Bool())
   })
 
-  val IMEM = Module(new InstructionMemory)
-  val PC = RegInit(0.U(32.W))
+  val IMEM: InstructionMemory = Module(new InstructionMemory)
+  val PC: UInt = RegInit(0.U(32.W))
 
   IMEM.io.address := io.PC >> 2
   io.instruction := IMEM.io.instruction
 
   // Program Counter implementation
-  val PCPlusFour = PC + 4.U
+  val PCPlusFour: UInt = PC + 4.U
 
   when(io.PcWrite) {
     when(io.PcSrc) {

@@ -1,9 +1,10 @@
+
 package components
 import chisel3._
 
 class CPU extends Module {
   val io = IO(new Bundle {
-    val pin = Input(Bool())
+    val pin: Bool = Input(Bool())
   })
   io.pin := DontCare
 
@@ -164,7 +165,7 @@ class CPU extends Module {
       wb_data := mem_reg_result
     }
 
-  ID.mem_wb_result := wb_data  
+  ID.mem_wb_result := wb_data
   ID.writeData := wb_data
   EX.wb_result := wb_data
   EX.mem_wb_regWrite := mem_reg_ctl_regWrite
