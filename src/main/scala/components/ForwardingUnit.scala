@@ -1,3 +1,4 @@
+
 package components
 import chisel3._
 
@@ -16,31 +17,7 @@ class ForwardingUnit extends Module {
 
   io.forwardA := DontCare
   io.forwardB := DontCare
-
-  // // From EX
-  // when(io.ex_regWrite && io.ex_reg_rd =/= 0.U) {
-  //   when(io.ex_reg_rd === io.reg_rs1) { io.forwardA := 2.U }
-  //     .otherwise {
-  //       io.forwardA := 0.U
-  //     }
-  //   when(io.ex_reg_rd === io.reg_rs2) { io.forwardB := 2.U }
-  //     .otherwise {
-  //       io.forwardB := 0.U
-  //     }
-  // }
-
-  // // From MEM
-  // when(
-  //   io.mem_regWrite && io.mem_reg_rd =/= 0.U && !io.ex_regWrite && io.ex_reg_rd =/= 0.U
-  // ) {
-  //   when(io.ex_reg_rd === io.reg_rs1 && io.mem_reg_rd === io.reg_rs1) {
-  //     io.forwardA := 1.U
-  //   }.otherwise { io.forwardA := 0.U }
-
-  //   when(io.ex_reg_rd === io.reg_rs2 && io.mem_reg_rd === io.reg_rs2) {
-  //     io.forwardB := 1.U
-  //   }.otherwise { io.forwardB := 0.U }
-  // }
+  
   when(io.reg_rs1 === io.ex_reg_rd && io.ex_reg_rd =/= 0.U && io.ex_regWrite) {
     io.forwardA := 1.U
   }.elsewhen(

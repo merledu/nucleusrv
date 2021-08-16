@@ -1,22 +1,22 @@
-package components
 
+package components
 import chisel3._
 import chisel3.util._
 
 class BranchUnit extends Module {
   val io = IO(new Bundle {
-    val branch = Input(Bool())
-    val funct3 = Input(UInt(3.W))
-    val rd1 = Input(UInt(32.W))
-    val rd2 = Input(UInt(32.W))
-    val take_branch = Input(Bool())
+    val branch: Bool = Input(Bool())
+    val funct3: UInt = Input(UInt(3.W))
+    val rd1: UInt = Input(UInt(32.W))
+    val rd2: UInt = Input(UInt(32.W))
+    val take_branch: Bool = Input(Bool())
 
-    val taken = Output(Bool())
+    val taken: Bool = Output(Bool())
   })
 
   io.taken := DontCare
 
-  val check = Wire(Bool())
+  val check: Bool = Wire(Bool())
   check := DontCare
 
   switch(io.funct3) {
