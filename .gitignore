@@ -1,6 +1,12 @@
 ### Project Specific stuff
 test_run_dir/*
 .metals/*
+.bsp/*
+.bloop/*
+.idea/*
+tools/out/main.o
+tools/out/main.dump
+tools/main.hex
 ### XilinxISE template
 # intermediate build files
 *.bgn

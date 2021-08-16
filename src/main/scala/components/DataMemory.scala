@@ -12,7 +12,8 @@ class DataMemory extends Module {
     val readData = Output(UInt(32.W))
   })
 
-  val mem = Mem(4096, UInt(32.W))
+  val size: Int = 4096
+  val mem: SyncReadMem[UInt] = SyncReadMem(size, UInt(32.W))
 
   io.readData := DontCare
   when(io.writeEnable) {

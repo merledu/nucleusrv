@@ -11,6 +11,7 @@ class InstructionMemory extends Module {
 
   val size: Int = 4096
   val imem: Mem[UInt] = Mem(size, UInt(32.W))
-  loadMemoryFromFile(imem, "/home/usman/Documents/test.txt")
+//  loadMemoryFromFile(imem, "/home/usman/Documents/test.txt")
+  loadMemoryFromFile(imem, "/home/usman/Documents/riscv-pipelined/tools/main.hex")
   io.instruction := imem(io.address)
 }
