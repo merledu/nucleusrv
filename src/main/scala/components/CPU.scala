@@ -4,9 +4,8 @@ import chisel3._
 
 class CPU extends Module {
   val io = IO(new Bundle {
-    val pin: Bool = Input(Bool())
+    val pin: UInt = Output(UInt(32.W))
   })
-  io.pin := DontCare
 
   //Pipeline Registers
   //******************
@@ -93,7 +92,8 @@ class CPU extends Module {
   id_reg_ctl_jump := ID.ctl_jump
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
   IF.PcWrite := ID.hdu_pcWrite
-  ID.instruction := if_reg_ins
+  ID.id_instruction := if_reg_ins
+  ID.if_instruction := IF.instruction
   ID.pcAddress := if_reg_pc
   IF.PcSrc := ID.pcSrc
   IF.PCPlusOffset := ID.pcPlusOffset
@@ -171,4 +171,5 @@ class CPU extends Module {
   EX.mem_wb_regWrite := mem_reg_ctl_regWrite
   ID.writeReg := mem_reg_wra
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
+  io.pin := wb_data
 }
