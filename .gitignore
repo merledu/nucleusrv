@@ -7,6 +7,7 @@ test_run_dir/*
 tools/out/main.o
 tools/out/main.dump
 tools/main.hex
+.vscode/*
 ### XilinxISE template
 # intermediate build files
 *.bgn
