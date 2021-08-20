@@ -38,13 +38,6 @@ class HazardUnit extends Module {
     io.take_branch := false.B
   }
 
-  when((io.id_ex_memRead) && (io.id_ex_rd === io.if_rs1 || io.id_ex_rd === io.if_rs2)){
-    io.ctl_mux := false.B
-    io.pc_write := false.B
-    io.if_reg_write := false.B
-    io.take_branch := false.B
-  }
-
   when(io.ex_mem_memRead && io.branch && (io.ex_mem_rd === io.id_rs1 || io.ex_mem_rd === io.id_rs2)){
     io.ctl_mux := false.B
     io.pc_write := false.B

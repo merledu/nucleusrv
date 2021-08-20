@@ -157,7 +157,7 @@ class CPU extends Module {
   val wb_data = Wire(UInt(32.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
-    wb_data := mem_reg_rd
+    wb_data := MEM.readData
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
       wb_data := mem_reg_pc
     }
