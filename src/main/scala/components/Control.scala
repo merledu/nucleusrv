@@ -94,6 +94,18 @@ class Control extends Module {
         0.U, // aluOp
         1.U
       ),
+      // auipc
+      BitPat("b0010111") -> List(
+        true.B, // aluSrc
+        0.U, // memToReg
+        true.B, // regWrite
+        false.B, // memRead
+        false.B, // memWrite
+        false.B, // branch
+        0.U, // jump
+        0.U, // aluOp
+        1.U  // aluSrc1
+      ),
       // jal
       BitPat("b1101111") -> List(
         false.B, // aluSrc

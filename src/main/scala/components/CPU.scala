@@ -58,15 +58,29 @@ class CPU extends Module {
 
   //Stage Implementations
   //*********************
-  val IF = Module(new InstructionFetch).io
+//  val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute).io
   val MEM = Module(new MemoryFetch).io
 
   //Instruction Fetch Stage
+  val IMEM: InstructionMemory = Module(new InstructionMemory)
+  val pc: UInt = RegInit(0.U(32.W))
+  val PCPlusFour: UInt = Wire(UInt(32.W))
+  val pcNext: SInt = WireInit(0.S(32.W))
+
+//  pcNext := pc
+  pc := pcNext.asUInt()
+  val instruction: UInt =  IMEM.io.instruction
+  PCPlusFour := pc + 4.U
+
+  pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc).asSInt()
+
+  IMEM.io.address := pcNext.asUInt() >> 2
+
   when(ID.hdu_if_reg_write) {
-    if_reg_pc := IF.PC
-    if_reg_ins := IF.instruction
+    if_reg_pc := pc
+    if_reg_ins := instruction
   }
   when(ID.ifid_flush) {
     if_reg_ins := 0.U
@@ -91,12 +105,12 @@ class CPU extends Module {
   id_reg_ctl_aluOp := ID.ctl_aluOp
   id_reg_ctl_jump := ID.ctl_jump
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
-  IF.PcWrite := ID.hdu_pcWrite
+//  IF.PcWrite := ID.hdu_pcWrite
   ID.id_instruction := if_reg_ins
-  ID.if_instruction := IF.instruction
+  ID.if_instruction := instruction
   ID.pcAddress := if_reg_pc
-  IF.PcSrc := ID.pcSrc
-  IF.PCPlusOffset := ID.pcPlusOffset
+//  IF.PcSrc := ID.pcSrc
+//  IF.PCPlusOffset := ID.pcPlusOffset
   ID.ex_mem_ins := ex_reg_ins
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
