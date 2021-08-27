@@ -67,7 +67,7 @@ class CPU extends Module {
   val IMEM: InstructionMemory = Module(new InstructionMemory)
   val pc: UInt = RegInit(0.U(32.W))
   val PCPlusFour: UInt = Wire(UInt(32.W))
-  val pcNext: SInt = WireInit(0.S(32.W))
+  val pcNext: SInt = WireDefault(0.S(32.W))
 
 //  pcNext := pc
   pc := pcNext.asUInt()
