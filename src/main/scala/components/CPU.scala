@@ -76,7 +76,7 @@ class CPU extends Module {
 
   pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc).asSInt()
 
-  IMEM.io.address := pcNext.asUInt() >> 2
+    IMEM.io.address := pcNext.asUInt() >> 2
 
   when(ID.hdu_if_reg_write) {
     if_reg_pc := pc
