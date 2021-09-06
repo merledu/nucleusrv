@@ -8,6 +8,7 @@ OFLAGS=--disassemble-all --section=.text
 
 # $(CC) $(LFLAGS) -o main.a start.S main.o
 main: main.c
+	@mkdir -p out
 	$(CC) $(CFLAGS) -o out/main.o main.c
 	$(OBJDUMP) $(OFLAGS) out/main.o > out/main.dump
 	$(HEX) --bit-width 32 --input out/main.o --output main.hex
