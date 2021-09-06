@@ -4,7 +4,8 @@ import chisel3._
 
 class InstructionDecode extends Module {
   val io = IO(new Bundle {
-    val instruction = Input(UInt(32.W))
+    val id_instruction = Input(UInt(32.W))
+    val if_instruction = Input(UInt(32.W))
     val writeData = Input(UInt(32.W))
     val writeReg = Input(UInt(5.W))
     val pcAddress = Input(UInt(32.W))
@@ -48,8 +49,10 @@ class InstructionDecode extends Module {
   hdu.io.ex_mem_memRead := io.ex_mem_mem_read
   hdu.io.id_ex_rd := io.id_ex_rd
   hdu.io.ex_mem_rd := io.ex_mem_rd
-  hdu.io.rs1 := io.instruction(19, 15)
-  hdu.io.rs2 := io.instruction(24, 20)
+  hdu.io.id_rs1 := io.id_instruction(19, 15)
+  hdu.io.id_rs2 := io.id_instruction(24, 20)
+  hdu.io.if_rs1 := io.if_instruction(19, 15)
+  hdu.io.if_rs2 := io.if_instruction(24, 20)
   hdu.io.jump := io.ctl_jump
   hdu.io.branch := io.ctl_branch
   io.hdu_pcWrite := hdu.io.pc_write
@@ -57,7 +60,7 @@ class InstructionDecode extends Module {
 
   //Control Unit
   val control = Module(new Control)
-  control.io.in := io.instruction(6, 0)
+  control.io.in := io.id_instruction(6, 0)
   io.ctl_aluOp := control.io.aluOp
   io.ctl_aluSrc := control.io.aluSrc
   io.ctl_aluSrc1 := control.io.aluSrc1
@@ -77,8 +80,8 @@ class InstructionDecode extends Module {
   //Register File
   val registers = Module(new Registers)
   val registerRd = io.writeReg
-  val registerRs1 = io.instruction(19, 15)
-  val registerRs2 = io.instruction(24, 20)
+  val registerRs1 = io.id_instruction(19, 15)
+  val registerRs2 = io.id_instruction(24, 20)
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
   registers.io.writeEnable := io.ctl_writeEnable
@@ -107,7 +110,7 @@ class InstructionDecode extends Module {
   
 
   val immediate = Module(new ImmediateGen)
-  immediate.io.instruction := io.instruction
+  immediate.io.instruction := io.id_instruction
   io.immediate := immediate.io.out
 
   // Branch Forwarding
@@ -134,7 +137,7 @@ class InstructionDecode extends Module {
   //Branch Unit
   val bu = Module(new BranchUnit)
   bu.io.branch := io.ctl_branch
-  bu.io.funct3 := io.instruction(14, 12)
+  bu.io.funct3 := io.id_instruction(14, 12)
   bu.io.rd1 := input1
   bu.io.rd2 := input2
   bu.io.take_branch := hdu.io.take_branch
@@ -159,7 +162,7 @@ class InstructionDecode extends Module {
   //Instruction Flush
   io.ifid_flush := hdu.io.ifid_flush
 
-  io.writeRegAddress := io.instruction(11, 7)
-  io.func3 := io.instruction(14, 12)
-  io.func7 := io.instruction(30)
+  io.writeRegAddress := io.id_instruction(11, 7)
+  io.func3 := io.id_instruction(14, 12)
+  io.func7 := io.id_instruction(30)
 }
