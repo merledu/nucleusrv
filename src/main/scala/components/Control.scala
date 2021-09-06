@@ -92,7 +92,19 @@ class Control extends Module {
         false.B, // branch
         0.U, // jump
         0.U, // aluOp
-        1.U
+        0.U
+      ),
+      // auipc
+      BitPat("b0010111") -> List(
+        true.B, // aluSrc
+        0.U, // memToReg
+        true.B, // regWrite
+        false.B, // memRead
+        false.B, // memWrite
+        false.B, // branch
+        0.U, // jump
+        0.U, // aluOp
+        1.U  // aluSrc1
       ),
       // jal
       BitPat("b1101111") -> List(
@@ -104,7 +116,7 @@ class Control extends Module {
         false.B, // branch
         1.U, // jump
         0.U, // aluOp
-        1.U
+        0.U
       ),
       // jalr
       BitPat("b1100111") -> List(
