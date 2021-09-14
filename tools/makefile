@@ -4,11 +4,32 @@ OBJDUMP=$(RISCV)objdump
 HEX=$(RISCV)elf2hex
 CFLAGS=-c -march=rv32i -mabi=ilp32 -ffreestanding -fomit-frame-pointer
 OFLAGS=--disassemble-all --section=.text
-# LFLAGS = -march=rv32im -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
+LFLAGS = -march=rv32im -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
 
-# $(CC) $(LFLAGS) -o main.a start.S main.o
-main: main.c
-	@mkdir -p out
-	$(CC) $(CFLAGS) -o out/main.o main.c
-	$(OBJDUMP) $(OFLAGS) out/main.o > out/main.dump
-	$(HEX) --bit-width 32 --input out/main.o --output main.hex
+PROGRAM ?= hello_world
+TEST_DIR = tests/$(PROGRAM)
+BUILD_DIR = out/$(TEST_DIR)
+
+SRCS=$(wildcard $(TEST_DIR)/*.c)
+OBJS=$(patsubst %.c,%.o,$(SRCS))
+
+.PHONY: setup build clean
+
+all: setup build
+
+setup:
+	@mkdir -p $(BUILD_DIR)
+
+build: $(OBJS)
+	$(CC) $(LFLAGS) start.S $(OBJS) -o out/program.elf
+	$(OBJDUMP) $(OFLAGS) out/program.elf > out/program.dump
+	$(HEX) --bit-width 32 --input out/program.elf --output out/program.hex
+
+clean: 
+	rm -rf out
+
+# main: main.c
+# 	$(CC) $(CFLAGS) -o out/main.o $(PROGRAM)/*.c
+# 	$(OBJDUMP) $(OFLAGS) out/main.o > out/main.dump
+# 	$(HEX) --bit-width 32 --input out/main.o --output main.hex
+
