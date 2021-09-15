@@ -41,25 +41,25 @@ static int verifyDouble(int n, const volatile double* test, const double* verify
   return 0;
 }
 
-static void __attribute__((noinline)) barrier(int ncores)
-{
-  static volatile int sense;
-  static volatile int count;
-  static __thread int threadsense;
+// static void __attribute__((noinline)) barrier(int ncores)
+// {
+//   static volatile int sense;
+//   static volatile int count;
+//   static __thread int threadsense;
 
-  __sync_synchronize();
+//   __sync_synchronize();
 
-  threadsense = !threadsense;
-  if (__sync_fetch_and_add(&count, 1) == ncores-1)
-  {
-    count = 0;
-    sense = threadsense;
-  }
-  else while(sense != threadsense)
-    ;
+//   threadsense = !threadsense;
+//   if (__sync_fetch_and_add(&count, 1) == ncores-1)
+//   {
+//     count = 0;
+//     sense = threadsense;
+//   }
+//   else while(sense != threadsense)
+//     ;
 
-  __sync_synchronize();
-}
+//   __sync_synchronize();
+// }
 
 static uint64_t lfsr(uint64_t x)
 {
