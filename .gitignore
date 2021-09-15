@@ -6,6 +6,7 @@ test_run_dir/*
 .idea/*
 tools/out/*
 tools/main.hex
+generated-src/*
 .vscode/*
 ### XilinxISE template
 # intermediate build files
