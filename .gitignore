@@ -4,8 +4,7 @@ test_run_dir/*
 .bsp/*
 .bloop/*
 .idea/*
-tools/out/main.o
-tools/out/main.dump
+tools/out/*
 tools/main.hex
 .vscode/*
 ### XilinxISE template
