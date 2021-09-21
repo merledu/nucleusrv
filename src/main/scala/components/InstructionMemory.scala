@@ -1,7 +1,7 @@
 
 package components
 import chisel3._
-import chisel3.util.experimental.loadMemoryFromFile
+import chisel3.util.experimental.loadMemoryFromFileInline
 
 class InstructionMemory extends Module {
   val io = IO(new Bundle {
@@ -9,9 +9,11 @@ class InstructionMemory extends Module {
     val instruction: UInt = Output(UInt(32.W))
   })
 
+
   val size: Int = 4096
   val imem: SyncReadMem[UInt] = SyncReadMem(size, UInt(32.W))
-//  loadMemoryFromFile(imem, "/home/usman/Documents/test.txt")
-  loadMemoryFromFile(imem, "/home/usman/Documents/riscv-pipelined/tools/main.hex")
+
+  loadMemoryFromFileInline(imem, "/home/usman/Documents/riscv-pipelined/tools/out/program.hex")
+
   io.instruction := imem(io.address)
 }

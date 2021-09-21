@@ -115,7 +115,10 @@ class CPU extends Module {
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  //Execute Stage
+
+  /*****************
+   * Execute Stage *
+  ******************/
 
   //ex_reg_branch := EX.branchAddress
   ex_reg_wd := EX.writeData
@@ -186,4 +189,8 @@ class CPU extends Module {
   ID.writeReg := mem_reg_wra
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
+
+  printf("PC: %x, INST: %x, REG[%d] <- %x\n", ex_reg_pc, ex_reg_ins,
+    Mux(mem_reg_ctl_regWrite, mem_reg_wra, 0.U),
+    Mux(mem_reg_ctl_regWrite, wb_data, 0.U))
 }
