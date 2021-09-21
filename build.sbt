@@ -41,14 +41,18 @@ resolvers ++= Seq(
 
 // Provide a managed dependency on X if -DXVersion="" is supplied on the command line.
 val defaultVersions = Map(
-  "chisel3" -> "3.2.+",
-  "chisel-iotesters" -> "1.3.+"
+  "chisel3"          -> "3.4.3",
+  "chisel-iotesters" -> "1.5.3",
+  "chiseltest"       -> "0.3.3",
+  "scalatest"        -> "3.2.9"
   )
 
 libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
   dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep)) }
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % defaultVersions("scalatest") % "test"
+
+addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % defaultVersions("chisel3") cross CrossVersion.full)
 
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 
