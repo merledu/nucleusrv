@@ -7,6 +7,7 @@ _start:
     .option push
     .option norelax 
     .option pop
+    nop
     la sp, __stack_top
     add s0, sp, zero
     jal zero, main
