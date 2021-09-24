@@ -67,16 +67,16 @@ class CPU extends Module {
   val IMEM: InstructionMemory = Module(new InstructionMemory)
   val pc: UInt = RegInit(0.U(32.W))
   val PCPlusFour: UInt = Wire(UInt(32.W))
-  val pcNext: SInt = WireDefault(0.S(32.W))
+  val pcNext: UInt = RegInit(0.U(32.W))
 
 //  pcNext := pc
   pc := pcNext.asUInt()
-  val instruction: UInt =  IMEM.io.instruction
   PCPlusFour := pc + 4.U
 
-  pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc).asSInt()
+  pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc)
 
-    IMEM.io.address := pcNext.asUInt() >> 2
+  IMEM.io.address := pcNext >> 2
+  val instruction: UInt = IMEM.io.instruction
 
   when(ID.hdu_if_reg_write) {
     if_reg_pc := pc
@@ -190,7 +190,9 @@ class CPU extends Module {
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
 
-  printf("PC: %x, INST: %x, REG[%d] <- %x\n", ex_reg_pc, ex_reg_ins,
-    Mux(mem_reg_ctl_regWrite, mem_reg_wra, 0.U),
-    Mux(mem_reg_ctl_regWrite, wb_data, 0.U))
+//  when(ex_reg_ins =/= 0.U && ex_reg_pc =/= 0.U ) {
+    printf("PC: %x, INST: %x, REG[%d] <- %x\n", ex_reg_pc, ex_reg_ins,
+      Mux(mem_reg_ctl_regWrite, mem_reg_wra, 0.U),
+      Mux(mem_reg_ctl_regWrite, wb_data, 0.U))
+//  }
 }
