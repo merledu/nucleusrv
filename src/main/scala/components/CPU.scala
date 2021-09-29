@@ -1,10 +1,20 @@
 
 package components
 import chisel3._
+import chisel3.util._ 
 
-class CPU extends Module {
+import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
+
+class CPU(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
+
+    val dmemReq = Decoupled(req)
+    val dmemRsp = Flipped(Decoupled(rsp))
+
+    val imemReq = Decoupled(req)
+    val imemRsp = Flipped(Decoupled(rsp))
+
   })
 
   //Pipeline Registers
@@ -61,13 +71,18 @@ class CPU extends Module {
 //  val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute).io
-  val MEM = Module(new MemoryFetch).io
+  val MEM = Module(new MemoryFetch(req,rsp))
+
+  
 
   //Instruction Fetch Stage
-  val IMEM: InstructionMemory = Module(new InstructionMemory)
+  val IMEM: InstructionMemory = Module(new InstructionMemory(req,rsp))
   val pc: UInt = RegInit(0.U(32.W))
   val PCPlusFour: UInt = Wire(UInt(32.W))
   val pcNext: SInt = WireDefault(0.S(32.W))
+
+  io.imemReq <> IMEM.io.coreInstrReq
+  IMEM.io.coreInstrResp <> io.imemRsp
 
 //  pcNext := pc
   pc := pcNext.asUInt()
@@ -150,11 +165,11 @@ class CPU extends Module {
   ID.ex_mem_rd := ex_reg_ins(11, 7)
 
   //Memory Stage
-  mem_reg_rd := MEM.readData
-  MEM.aluResultIn := ex_reg_result
-  MEM.writeData := ex_reg_wd
-  MEM.readEnable := ex_reg_ctl_memRead
-  MEM.writeEnable := ex_reg_ctl_memWrite
+  mem_reg_rd := MEM.io.readData
+  MEM.io.aluResultIn := ex_reg_result
+  MEM.io.writeData := ex_reg_wd
+  MEM.io.readEnable := ex_reg_ctl_memRead
+  MEM.io.writeEnable := ex_reg_ctl_memWrite
   //MEM.ctl_branch_taken := ex_reg_ctl_branch_taken
   //IF.PCPlusOffset := ex_reg_branch // Branch Offset writeback
   //IF.PcSrc := MEM.ctl_PcSrc
@@ -171,13 +186,16 @@ class CPU extends Module {
   val wb_data = Wire(UInt(32.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
-    wb_data := MEM.readData
+    wb_data := MEM.io.readData
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
       wb_data := mem_reg_pc
     }
     .otherwise {
       wb_data := mem_reg_result
     }
+
+  io.dmemReq <> MEM.io.dccmReq
+  MEM.io.dccmRsp <> io.dmemRsp
 
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data

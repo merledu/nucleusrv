@@ -1,8 +1,11 @@
 
 package components
 import chisel3._
+import chisel3.util._ 
 
-class InstructionFetch extends Module {
+import caravan.bus.common.{BusConfig, AbstrRequest, AbstrResponse}
+
+class InstructionFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val PCPlusOffset: UInt = Input(UInt(32.W))
     val PcSrc: Bool = Input(Bool())
@@ -12,7 +15,7 @@ class InstructionFetch extends Module {
     val PcWrite: Bool = Input(Bool())
   })
 
-  val IMEM: InstructionMemory = Module(new InstructionMemory)
+  val IMEM: InstructionMemory = Module(new InstructionMemory(req,rsp))
 
   //  val PC: UInt = RegInit(0.U(32.W))
 //  val counter: SInt = RegInit(-4.S(32.W))
