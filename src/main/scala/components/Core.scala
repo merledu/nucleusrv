@@ -1,7 +1,7 @@
 
 package components
 import chisel3._
-import chisel3.util._ 
+import chisel3.util._
 
 import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
 
@@ -77,24 +77,18 @@ class CPU(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusCo
 
   //Instruction Fetch Stage
   val IMEM: InstructionMemory = Module(new InstructionMemory(req,rsp))
-  val pc: UInt = RegInit(0.U(32.W))
-  val PCPlusFour: UInt = Wire(UInt(32.W))
-  val pcNext: SInt = WireDefault(0.S(32.W))
-
+  val pc = Module(new PC)
+  
   io.imemReq <> IMEM.io.coreInstrReq
   IMEM.io.coreInstrResp <> io.imemRsp
 
-//  pcNext := pc
-  pc := pcNext.asUInt()
-  val instruction: UInt =  IMEM.io.instruction
-  PCPlusFour := pc + 4.U
+  IMEM.io.address := pc.io.in.asUInt() >> 2
+  val instruction = IMEM.io.instruction
 
-  pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc).asSInt()
-
-    IMEM.io.address := pcNext.asUInt() >> 2
+  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
   when(ID.hdu_if_reg_write) {
-    if_reg_pc := pc
+    if_reg_pc := pc.io.out.asUInt()
     if_reg_ins := instruction
   }
   when(ID.ifid_flush) {
@@ -130,7 +124,10 @@ class CPU(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusCo
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  //Execute Stage
+
+  /*****************
+   * Execute Stage *
+  ******************/
 
   //ex_reg_branch := EX.branchAddress
   ex_reg_wd := EX.writeData
@@ -165,6 +162,8 @@ class CPU(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusCo
   ID.ex_mem_rd := ex_reg_ins(11, 7)
 
   //Memory Stage
+  io.dmemReq <> MEM.io.dccmReq
+  MEM.io.dccmRsp <> io.dmemRsp
   mem_reg_rd := MEM.io.readData
   MEM.io.aluResultIn := ex_reg_result
   MEM.io.writeData := ex_reg_wd
@@ -194,9 +193,6 @@ class CPU(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusCo
       wb_data := mem_reg_result
     }
 
-  io.dmemReq <> MEM.io.dccmReq
-  MEM.io.dccmRsp <> io.dmemRsp
-
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data
   EX.wb_result := wb_data
@@ -204,4 +200,10 @@ class CPU(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusCo
   ID.writeReg := mem_reg_wra
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
+
+//  when(ex_reg_ins =/= 0.U && ex_reg_pc =/= 0.U ) {
+    printf("PC: %x, INST: %x, REG[%d] <- %x\n", ex_reg_pc, ex_reg_ins,
+      Mux(mem_reg_ctl_regWrite, mem_reg_wra, 0.U),
+      Mux(mem_reg_ctl_regWrite, wb_data, 0.U))
+//  }
 }

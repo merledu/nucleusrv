@@ -11,10 +11,8 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
     val writeData: UInt = Input(UInt(32.W))
     val writeEnable: Bool = Input(Bool())
     val readEnable: Bool = Input(Bool())
-    //val ctl_branch_taken = Input(Bool())
-
     val readData: UInt = Output(UInt(32.W))
-    //val ctl_PcSrc = Output(Bool())
+
     val dccmReq = Decoupled(req)
     val dccmRsp = Flipped(Decoupled(rsp))
   })
@@ -36,8 +34,6 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
 
   // io.dccmReq <> dataMem.io.coreDccmReq
   // dataMem.io.coreDccmRsp <> io.dccmRsp
-
-  //io.ctl_PcSrc := io.ctl_branch_taken
 
   io.readData := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare) //dataMem.io.readData
 }

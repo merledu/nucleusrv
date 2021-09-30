@@ -6,7 +6,10 @@ test_run_dir/*
 .idea/*
 tools/out/*
 tools/main.hex
+generated-src/*
 .vscode/*
+dump.vcd
+VCPU
 ### XilinxISE template
 # intermediate build files
 *.bgn

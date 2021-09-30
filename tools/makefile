@@ -6,7 +6,7 @@ CFLAGS=-c -march=rv32i -mabi=ilp32 -ffreestanding -fomit-frame-pointer
 OFLAGS=--disassemble-all --section=.text
 LFLAGS = -march=rv32im -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
 
-PROGRAM ?= median
+PROGRAM ?= fibonacci
 TEST_DIR = tests/$(PROGRAM)
 BUILD_DIR = out/$(TEST_DIR)
 
