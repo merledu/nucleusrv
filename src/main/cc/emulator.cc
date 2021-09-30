@@ -14,7 +14,7 @@ double sc_time_stamp () { // Called by $time in Verilog
                           // what SystemC does
 }
 
-VCPU* top; // target design
+VTop* top; // target design
 VerilatedFstC* tfp;
 
 // TODO Provide command-line options like vcd filename, timeout count, etc.
@@ -34,7 +34,7 @@ void tick() {
 
 int main(int argc, char** argv) {
   Verilated::commandArgs(argc, argv);   // Remember args
-  top = new VCPU; // target design
+  top = new VTop; // target design
 
   Verilated::traceEverOn(true);	// Verilator must compute traced signals
   VL_PRINTF("Enabling waves...\n");

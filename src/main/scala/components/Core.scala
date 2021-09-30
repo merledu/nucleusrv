@@ -2,10 +2,10 @@
 package components
 import chisel3._
 
-class CPU extends Module {
-  val io = IO(new Bundle {
-    val pin: UInt = Output(UInt(32.W))
-  })
+
+
+class Core extends Module {
+  val io = IO()
 
   //Pipeline Registers
   //******************
@@ -188,7 +188,6 @@ class CPU extends Module {
   EX.mem_wb_regWrite := mem_reg_ctl_regWrite
   ID.writeReg := mem_reg_wra
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
-  io.pin := wb_data
 
 //  when(ex_reg_ins =/= 0.U && ex_reg_pc =/= 0.U ) {
     printf("PC: %x, INST: %x, REG[%d] <- %x\n", ex_reg_pc, ex_reg_ins,
