@@ -2,10 +2,14 @@
 package components
 import chisel3._
 
-class CPU extends Module {
-  val io = IO(new Bundle {
-    val pin: UInt = Output(UInt(32.W))
-  })
+class CoreIO extends Bundle {
+  val imem = Flipped(new IMemIO)
+  val dmem = Flipped(new DMemIO)
+  val pin = Output(UInt(32.W))
+}
+
+class Core extends Module {
+  val io = IO(new CoreIO)
 
   //Pipeline Registers
   //******************
@@ -64,22 +68,27 @@ class CPU extends Module {
   val MEM = Module(new MemoryFetch).io
 
   //Instruction Fetch Stage
-  val IMEM: InstructionMemory = Module(new InstructionMemory)
-  val pc: UInt = RegInit(0.U(32.W))
-  val PCPlusFour: UInt = Wire(UInt(32.W))
-  val pcNext: SInt = WireDefault(0.S(32.W))
 
-//  pcNext := pc
-  pc := pcNext.asUInt()
-  val instruction: UInt =  IMEM.io.instruction
-  PCPlusFour := pc + 4.U
+//  val pc: UInt = RegInit(0.U(32.W))
+//  val PCPlusFour: UInt = Wire(UInt(32.W))
+//  val pcNext: UInt = Wire(UInt(32.W))
+//
+//  pc := pcNext.asUInt()
+//  PCPlusFour := pc + 4.U
+//  pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc)
+//
+//  io.imem.address := pcNext >> 2
+//  val instruction: UInt = io.imem.instruction
 
-  pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc).asSInt()
+  val pc = Module(new PC)
 
-    IMEM.io.address := pcNext.asUInt() >> 2
+  io.imem.address := pc.io.in.asUInt() >> 2
+  val instruction = io.imem.instruction
+
+  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
   when(ID.hdu_if_reg_write) {
-    if_reg_pc := pc
+    if_reg_pc := pc.io.out.asUInt()
     if_reg_ins := instruction
   }
   when(ID.ifid_flush) {
@@ -115,7 +124,10 @@ class CPU extends Module {
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  //Execute Stage
+
+  /*****************
+   * Execute Stage *
+  ******************/
 
   //ex_reg_branch := EX.branchAddress
   ex_reg_wd := EX.writeData
@@ -150,6 +162,7 @@ class CPU extends Module {
   ID.ex_mem_rd := ex_reg_ins(11, 7)
 
   //Memory Stage
+  MEM.dmem <> io.dmem
   mem_reg_rd := MEM.readData
   MEM.aluResultIn := ex_reg_result
   MEM.writeData := ex_reg_wd
@@ -186,4 +199,10 @@ class CPU extends Module {
   ID.writeReg := mem_reg_wra
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
+
+//  when(ex_reg_ins =/= 0.U && ex_reg_pc =/= 0.U ) {
+    printf("PC: %x, INST: %x, REG[%d] <- %x\n", ex_reg_pc, ex_reg_ins,
+      Mux(mem_reg_ctl_regWrite, mem_reg_wra, 0.U),
+      Mux(mem_reg_ctl_regWrite, wb_data, 0.U))
+//  }
 }

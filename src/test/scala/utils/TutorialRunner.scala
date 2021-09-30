@@ -38,7 +38,7 @@ object TutorialRunner {
           println(s"Starting tutorial $testName")
           try {
             optionsManager.setTopName(testName)
-            optionsManager.setTargetDirName(s"test_run_dir/$section/$testName")
+            optionsManager.setTargetDirName(s"generated-src/$testName")
             if(test(optionsManager)) {
               successful += 1
             }
