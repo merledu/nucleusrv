@@ -3,11 +3,13 @@ package components
 import chisel3._
 import chisel3.util.experimental.loadMemoryFromFileInline
 
+class IMemIO extends Bundle {
+  val address: UInt = Input(UInt(32.W))
+  val instruction: UInt = Output(UInt(32.W))
+}
+
 class InstructionMemory extends Module {
-  val io = IO(new Bundle {
-    val address: UInt = Input(UInt(32.W))
-    val instruction: UInt = Output(UInt(32.W))
-  })
+  val io = IO(new IMemIO)
 
 
   val size: Int = 4096

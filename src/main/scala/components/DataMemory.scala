@@ -2,15 +2,17 @@
 package components
 import chisel3._
 
-class DataMemory extends Module {
-  val io = IO(new Bundle {
-    val address = Input(UInt(32.W))
-    val writeData = Input(UInt(32.W))
-    val writeEnable = Input(Bool())
-    val readEnable = Input(Bool())
+class DMemIO extends Bundle {
+  val address = Input(UInt(32.W))
+  val writeData = Input(UInt(32.W))
+  val writeEnable = Input(Bool())
+  val readEnable = Input(Bool())
 
-    val readData = Output(UInt(32.W))
-  })
+  val readData = Output(UInt(32.W))
+}
+
+class DataMemory extends Module {
+  val io = IO(new DMemIO)
 
   val size: Int = 4096
   val mem: SyncReadMem[UInt] = SyncReadMem(size, UInt(32.W))
