@@ -1,6 +1,6 @@
 import chisel3._ 
 import chisel3.util._
-import components.CPU
+import components.Core
 import caravan.bus.wishbone.{WishboneConfig, WishboneDevice, WishboneHost, WBRequest, WBResponse, WishboneSlave}
 import caravan.bus.common.BusConfig
 import jigsaw.rams.fpga.BlockRam
@@ -17,7 +17,7 @@ class WishboneHarness(programFile:Option[String])(implicit val config:WishboneCo
     val wb_dmem_slave = Module(new WishboneDevice())
     val imem_ctrl = Module(BlockRam.createNonMaskableRAM(programFile, bus=config, rows=1024))
     val dmem_ctrl = Module(BlockRam.createMaskableRAM(bus=config, rows=1024))
-    val core = Module(new CPU(new WBRequest, new WBResponse))
+    val core = Module(new Core(new WBRequest, new WBResponse))
 
     wb_imem_host.io.wbMasterTransmitter <> wb_imem_slave.io.wbMasterReceiver
     wb_imem_slave.io.wbSlaveTransmitter <> wb_imem_host.io.wbSlaveReceiver

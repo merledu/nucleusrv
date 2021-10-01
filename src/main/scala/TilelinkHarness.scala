@@ -1,6 +1,6 @@
 import chisel3._ 
 import chisel3.util._ 
-import components.CPU
+import components.Core
 import caravan.bus.tilelink.{TilelinkConfig, TilelinkDevice, TilelinkHost, TLRequest, TLResponse, TilelinkSlave}
 import caravan.bus.common.BusConfig
 import jigsaw.rams.fpga.BlockRam
@@ -17,7 +17,7 @@ class TilelinkHarness(programFile:Option[String])(implicit val config:TilelinkCo
     val tl_dmem_slave = Module(new TilelinkDevice())
     val imem_ctrl = Module(BlockRam.createNonMaskableRAM(programFile, bus=config, rows=1024))
     val dmem_ctrl = Module(BlockRam.createMaskableRAM(bus=config, rows=1024))
-    val core = Module(new CPU(new TLRequest, new TLResponse))
+    val core = Module(new Core(new TLRequest, new TLResponse))
 
     tl_imem_host.io.tlMasterTransmitter <> tl_imem_slave.io.tlMasterReceiver
     tl_imem_slave.io.tlSlaveTransmitter <> tl_imem_host.io.tlSlaveReceiver
