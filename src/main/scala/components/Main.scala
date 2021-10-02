@@ -1,6 +1,6 @@
-package components
-import chisel3.stage.ChiselStage
+// package components
+// import chisel3.stage.ChiselStage
 
-object Main extends App {
-  (new ChiselStage).emitVerilog(new Top, args)
-}
+// object Main extends App {
+//   (new ChiselStage).emitVerilog(new Top, args)
+// }
