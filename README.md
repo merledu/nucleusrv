@@ -11,6 +11,12 @@ A riscv 5-stage pipelined cpu design, implementing 32-bit version of the ISA (in
 
 ## Build Instructions
 
+#### Direct SBT
+Run this command is SBT Shell
+```bash
+testOnly components.TopTest -- -DwriteVcd=1 -DmemFile=/path/to/Instruction/hex.txt
+```
+
 * In `tools` directory, write c program in the `main.c` file
 * Edit the `make` file to set riscv32-unknown-elf or riscv64-unknown-elf
 * Build the program with `make` command
