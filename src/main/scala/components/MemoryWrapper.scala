@@ -29,18 +29,23 @@ class MemoryWrapper(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val co
         // feed these pins into the BLACK BOX of SRAM/Peripheral
         mem.io.din0 := data.asUInt                     // ye data hy 
         mem.io.addr0 := io.request.bits.addrRequest     // ye address hay
-        mem.io.web0 := io.request.bits.isWrite         // ye write enable hy
+        mem.io.web0 := ~io.request.bits.isWrite         // ye write enable hy
+        mem.io.csb0 := 1.B
 
     }.elsewhen(io.request.fire() & ~io.request.bits.isWrite){                                // if req is of read
         
         mem.io.din0 := io.request.bits.addrRequest     // ye address hy
         mem.io.addr0 := io.request.bits.dataRequest     // ye data hy, but kisi kaam ka nahi
-        mem.io.web0 := io.request.bits.isWrite         // ye write enable h, low hga read k lye
+        mem.io.web0 := ~io.request.bits.isWrite         // ye write enable h, low hga read k lye
+        mem.io.csb0 := 1.B
 
     }.otherwise{
         mem.io.din0 := DontCare
         mem.io.addr0 := DontCare  
         mem.io.web0 := DontCare
+        mem.io.csb0 := DontCare
+
+        
 
     }
 
