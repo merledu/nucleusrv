@@ -13,13 +13,11 @@ class IOR extends Bundle{
     val dout0 = Output(UInt(32.W))
 
 }
-
 class sram extends BlackBox with HasBlackBoxResource{
     val io = IO(new IOR)
     addResource("/sram.v")
     
 }
-
 class SRam extends Module{
 
     val io = IO(new Bundle{
@@ -31,7 +29,6 @@ class SRam extends Module{
         val dout0 = Output(UInt(32.W))
 
     })
-
     val a = Module(new sram)
     val clk0 = WireInit(clock.asUInt()(0))
     a.io.clk0 := ~clk0
@@ -39,8 +36,6 @@ class SRam extends Module{
     a.io.web0 := io.web0
     a.io.addr0 := io.addr0
     a.io.din0 := io.din0
-
-
     io.dout0 := a.io.dout0
 
 

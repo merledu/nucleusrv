@@ -18,7 +18,7 @@ module sram(
   parameter DELAY = 3 ;
   parameter VERBOSE = 1 ; //Set to 0 to only display warnings
   parameter T_HOLD = 1 ; //Delay to hold dout value after posedge. Value is arbitrary
-  parameter IFILE = "/home/fizza/file" ;
+  parameter IFILE = "/home/fizza/instructions.mem" ;
 
 `ifdef USE_POWER_PINS
     inout vdd;
@@ -54,7 +54,7 @@ module sram(
 reg [DATA_WIDTH-1:0]    mem [0:RAM_DEPTH-1];
 initial begin
   if (IFILE != "") begin
-    $readmemh({IFILE,".hex"}, mem);
+    $readmemh({IFILE}, mem);
   end
 end
 
