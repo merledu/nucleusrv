@@ -81,8 +81,9 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   IF.coreInstrResp <> io.imemRsp
 
   IF.address := pc.io.in.asUInt() >> 2
-  val instruction = IF.instruction
+  val instruction = Mux(io.imemRsp.valid, IF.instruction, "h00000013".U(32.W))
 
+  pc.io.halt := Mux(io.imemRsp.valid, 0.B, 1.B)
   pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
   when(ID.hdu_if_reg_write) {
