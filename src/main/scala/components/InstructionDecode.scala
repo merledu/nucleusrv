@@ -5,13 +5,14 @@ import chisel3._
 class InstructionDecode extends Module {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
-    val if_instruction = Input(UInt(32.W))
     val writeData = Input(UInt(32.W))
     val writeReg = Input(UInt(5.W))
     val pcAddress = Input(UInt(32.W))
     val ctl_writeEnable = Input(Bool())
     val id_ex_mem_read = Input(Bool())
+    val ex_mem_mem_write = Input(Bool())
     val ex_mem_mem_read = Input(Bool())
+    val dmem_resp_valid = Input(Bool())
     val id_ex_rd = Input(UInt(5.W))
     val ex_mem_rd = Input(UInt(5.W))
     //for forwarding
@@ -45,14 +46,14 @@ class InstructionDecode extends Module {
 
   //Hazard Detection Unit
   val hdu = Module(new HazardUnit)
+  hdu.io.dmem_resp_valid := io.dmem_resp_valid
   hdu.io.id_ex_memRead := io.id_ex_mem_read
+  hdu.io.ex_mem_memWrite := io.ex_mem_mem_write
   hdu.io.ex_mem_memRead := io.ex_mem_mem_read
   hdu.io.id_ex_rd := io.id_ex_rd
   hdu.io.ex_mem_rd := io.ex_mem_rd
   hdu.io.id_rs1 := io.id_instruction(19, 15)
   hdu.io.id_rs2 := io.id_instruction(24, 20)
-  hdu.io.if_rs1 := io.if_instruction(19, 15)
-  hdu.io.if_rs2 := io.if_instruction(24, 20)
   hdu.io.jump := io.ctl_jump
   hdu.io.branch := io.ctl_branch
   io.hdu_pcWrite := hdu.io.pc_write

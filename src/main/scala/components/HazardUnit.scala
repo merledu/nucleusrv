@@ -6,12 +6,12 @@ class HazardUnit extends Module {
   val io = IO(new Bundle {
     val id_ex_memRead = Input(Bool())
     val ex_mem_memRead = Input(Bool())
+    val ex_mem_memWrite = Input(Bool())
     val id_ex_rd = Input(UInt(5.W))
     val ex_mem_rd = Input(UInt(5.W))
     val id_rs1 = Input(UInt(5.W))
     val id_rs2 = Input(UInt(5.W))
-    val if_rs1 = Input(UInt(5.W))
-    val if_rs2 = Input(UInt(5.W))
+    val dmem_resp_valid = Input(Bool())
     val taken = Input(Bool())
     val jump = Input(UInt(2.W))
     val branch = Input(Bool())
@@ -27,9 +27,8 @@ class HazardUnit extends Module {
   io.pc_write := true.B
   io.if_reg_write := true.B
   io.take_branch := true.B
-  
 
-  //load-use hazard
+//  load-use hazard
   when((io.id_ex_memRead || io.branch) && (io.id_ex_rd === io.id_rs1 || io.id_ex_rd === io.id_rs2))
   {
     io.ctl_mux := false.B
