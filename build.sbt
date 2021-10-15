@@ -34,6 +34,13 @@ scalaVersion := "2.12.10"
 
 crossScalaVersions := Seq("2.12.10", "2.11.12")
 
+lazy val caravan = project in file("caravan")
+
+lazy val jigsaw = (project in file("jigsaw")).dependsOn(caravan)
+
+dependsOn(caravan, jigsaw)
+
+
 resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots"),
   Resolver.sonatypeRepo("releases")
@@ -41,19 +48,23 @@ resolvers ++= Seq(
 
 // Provide a managed dependency on X if -DXVersion="" is supplied on the command line.
 val defaultVersions = Map(
-  "chisel3"          -> "3.4.3",
-  "chisel-iotesters" -> "1.5.3",
-  "chiseltest"       -> "0.3.3",
-  "scalatest"        -> "3.2.9"
+  "chisel3" -> "3.4.2",
+  "chisel-iotesters" -> "1.5.0"
   )
 
 libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
   dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep)) }
 
-libraryDependencies += "org.scalatest" %% "scalatest" % defaultVersions("scalatest") % "test"
+libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.3.2" % "test"
 
-addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % defaultVersions("chisel3") cross CrossVersion.full)
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+
+logBuffered in Test := false
+
+parallelExecution in Test := false
 
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
+
+trapExit := false

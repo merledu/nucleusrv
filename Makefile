@@ -4,7 +4,7 @@ gen_dir    = $(base_dir)/generated-src
 out_dir    = $(base_dir)/outputs
 
 SBT       = sbt
-SBT_FLAGS =
+SBT_FLAGS = -DmemFile=tools/out/program.hex -DwriteVcd=1
 
 CXXFLAGS += -std=c++11 -Wall -Wno-unused-variable
 
@@ -14,7 +14,11 @@ VERILATOR_FLAGS = --assert -Wno-STMTDLY -O3 --trace --trace-fst \
 	--top-module Top -Mdir $(gen_dir)/VTop.csrc \
 	-CFLAGS "$(CXXFLAGS) -include $(gen_dir)/VTop.csrc/VTop.h"
 
-default: clean verilator
+# default: clean verilator
+default: clean compile
+
+compile:
+	$(SBT) "testOnly components.TopTest -- $(SBT_FLAGS)"
 
 $(gen_dir)/Top.v: $(wildcard $(src_dir)/scala/*.scala)
 	$(SBT) $(SBT_FLAGS) "run -td $(gen_dir)"

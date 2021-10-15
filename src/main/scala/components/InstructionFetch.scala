@@ -1,52 +1,27 @@
 
 package components
 import chisel3._
+import chisel3.util._ 
 
-class InstructionFetch extends Module {
+import caravan.bus.common.{BusConfig, AbstrRequest, AbstrResponse}
+
+class InstructionFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
-    val PCPlusOffset: UInt = Input(UInt(32.W))
-    val PcSrc: Bool = Input(Bool())
+    val address: UInt = Input(UInt(32.W))
     val instruction: UInt = Output(UInt(32.W))
-    val PC: UInt = Output(UInt(32.W))
-//    val PCounter: UInt = Output(UInt(32.W))
-    val PcWrite: Bool = Input(Bool())
+
+    val coreInstrReq = Decoupled(req)
+    val coreInstrResp = Flipped(Decoupled(rsp))
   })
 
-  val IMEM: InstructionMemory = Module(new InstructionMemory)
+  io.coreInstrResp.ready := true.B
 
-  //  val PC: UInt = RegInit(0.U(32.W))
-//  val counter: SInt = RegInit(-4.S(32.W))
-//  IMEM.io.address := PC >> 2
-//  io.instruction := IMEM.io.instruction
+  io.coreInstrReq.bits.activeByteLane := "b1111".U
+  io.coreInstrReq.bits.isWrite := false.B
+  io.coreInstrReq.bits.dataRequest := DontCare
 
-  //Program Counter Implementation
-  val PCPlusFour: UInt = io.PC + 4.U
-  val pcNext: UInt = Wire(UInt(32.W))
+  io.coreInstrReq.bits.addrRequest := io.address
+  io.coreInstrReq.valid := Mux(io.coreInstrReq.ready, true.B, false.B)
 
-  pcNext := Mux(io.PcWrite, io.PC, Mux(io.PcSrc, io.PCPlusOffset, PCPlusFour))
-  IMEM.io.address := pcNext
-
-  io.instruction := IMEM.io.instruction
-
-  io.PC := pcNext
-
-
-  // Program Counter implementation
-//  val PCPlusFour: UInt = PC + 4.U
-//  val counterPlusFour: SInt = counter + 4.S
-//
-//  when(io.PcWrite) {
-//    when(io.PcSrc) {
-//      PC := io.PCPlusOffset
-//      counter := io.PCPlusOffset.asSInt() - 4.S
-//    }.otherwise {
-//      PC := PCPlusFour
-//      counter := counterPlusFour
-//    }
-//  }.otherwise {
-//    PC := io.PCounter
-//    counter := io.PC.asSInt()
-//  }
-//  io.PCounter := PC
-//  io.PC:= counter.asUInt()
+  io.instruction := Mux(io.coreInstrResp.valid, io.coreInstrResp.bits.dataResponse, DontCare)
 }

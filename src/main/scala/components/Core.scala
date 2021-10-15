@@ -1,18 +1,22 @@
 
 package components
 import chisel3._
+import chisel3.util._
 
-class CoreIO extends Bundle {
-  val imem = Flipped(new IMemIO)
-  val dmem = Flipped(new DMemIO)
-  val pin = Output(UInt(32.W))
-}
+import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
 
-class Core extends Module {
-  val io = IO(new CoreIO)
+class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
+  val io = IO(new Bundle {
+    val pin: UInt = Output(UInt(32.W))
 
-  //Pipeline Registers
-  //******************
+    val dmemReq = Decoupled(req)
+    val dmemRsp = Flipped(Decoupled(rsp))
+
+    val imemReq = Decoupled(req)
+    val imemRsp = Flipped(Decoupled(rsp))
+
+  })
+
   // IF-ID Registers
   val if_reg_pc = RegInit(0.U(32.W))
   val if_reg_ins = RegInit(0.U(32.W))
@@ -60,31 +64,26 @@ class Core extends Module {
   val mem_reg_ctl_regWrite = RegInit(false.B)
   val mem_reg_pc = RegInit(0.U(32.W))
 
-  //Stage Implementations
-  //*********************
-//  val IF = Module(new InstructionFetch).io
+  //Pipeline Units
+  val IF = Module(new InstructionFetch(req, rsp)).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute).io
-  val MEM = Module(new MemoryFetch).io
+  val MEM = Module(new MemoryFetch(req,rsp))
 
-  //Instruction Fetch Stage
 
-//  val pc: UInt = RegInit(0.U(32.W))
-//  val PCPlusFour: UInt = Wire(UInt(32.W))
-//  val pcNext: UInt = Wire(UInt(32.W))
-//
-//  pc := pcNext.asUInt()
-//  PCPlusFour := pc + 4.U
-//  pcNext := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset, PCPlusFour), pc)
-//
-//  io.imem.address := pcNext >> 2
-//  val instruction: UInt = io.imem.instruction
+  /*****************
+   * Fetch Stage *
+   ******************/
 
   val pc = Module(new PC)
+  
+  io.imemReq <> IF.coreInstrReq
+  IF.coreInstrResp <> io.imemRsp
 
-  io.imem.address := pc.io.in.asUInt() >> 2
-  val instruction = io.imem.instruction
+  IF.address := pc.io.in.asUInt()
+  val instruction = IF.instruction
 
+//  pc.io.halt := Mux(io.imemRsp.valid, 0.B, 1.B)
   pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
   when(ID.hdu_if_reg_write) {
@@ -95,7 +94,10 @@ class Core extends Module {
     if_reg_ins := 0.U
   }
 
-  //Instruction Decode
+
+  /****************
+   * Decode Stage *
+   ****************/
 
   id_reg_rd1 := ID.readData1
   id_reg_rd2 := ID.readData2
@@ -161,13 +163,17 @@ class Core extends Module {
   ID.id_ex_rd := id_reg_ins(11, 7)
   ID.ex_mem_rd := ex_reg_ins(11, 7)
 
-  //Memory Stage
-  MEM.dmem <> io.dmem
-  mem_reg_rd := MEM.readData
-  MEM.aluResultIn := ex_reg_result
-  MEM.writeData := ex_reg_wd
-  MEM.readEnable := ex_reg_ctl_memRead
-  MEM.writeEnable := ex_reg_ctl_memWrite
+  /****************
+   * Memory Stage *
+   ****************/
+
+  io.dmemReq <> MEM.io.dccmReq
+  MEM.io.dccmRsp <> io.dmemRsp
+  mem_reg_rd := MEM.io.readData
+  MEM.io.aluResultIn := ex_reg_result
+  MEM.io.writeData := ex_reg_wd
+  MEM.io.readEnable := ex_reg_ctl_memRead
+  MEM.io.writeEnable := ex_reg_ctl_memWrite
   //MEM.ctl_branch_taken := ex_reg_ctl_branch_taken
   //IF.PCPlusOffset := ex_reg_branch // Branch Offset writeback
   //IF.PcSrc := MEM.ctl_PcSrc
@@ -180,11 +186,14 @@ class Core extends Module {
   mem_reg_pc := ex_reg_pc
   EX.ex_mem_regWrite := ex_reg_ctl_regWrite
 
-  //Write Back Stage
+  /********************
+   * Write Back Stage *
+   ********************/
+
   val wb_data = Wire(UInt(32.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
-    wb_data := MEM.readData
+    wb_data := MEM.io.readData
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
       wb_data := mem_reg_pc
     }
