@@ -27,6 +27,7 @@ class HazardUnit extends Module {
   io.pc_write := true.B
   io.if_reg_write := true.B
   io.take_branch := true.B
+  io.ifid_flush := false.B
 
 //  load-use hazard
   when((io.id_ex_memRead || io.branch) && (io.id_ex_rd === io.id_rs1 || io.id_ex_rd === io.id_rs2))
