@@ -13,5 +13,4 @@ class PC extends Module{
   pc_reg := io.in
   io.out := pc_reg
   io.pc4 := Mux(io.halt, pc_reg, pc_reg + 4.S)
-  io.pc4 := pc_reg + 4.S
 }
