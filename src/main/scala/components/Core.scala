@@ -86,6 +86,7 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   pc.io.halt := Mux(io.imemReq.valid, 0.B, 1.B)
   pc.io.in := Mux(ID.hdu_pcWrite && !MEM.io.stall, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
+
   when(ID.hdu_if_reg_write && !MEM.io.stall) {
     if_reg_pc := pc.io.out.asUInt()
     if_reg_ins := instruction
