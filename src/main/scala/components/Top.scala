@@ -1,4 +1,4 @@
-package components
+package nucleusrv.components
 import chisel3._
 import caravan.bus.common.{BusConfig, AbstrRequest, AbstrResponse, BusHost, BusDevice}
 import caravan.bus.wishbone.{WishboneConfig, WBRequest, WBResponse}

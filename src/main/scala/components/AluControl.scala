@@ -15,7 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package components
+package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
