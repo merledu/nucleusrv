@@ -81,12 +81,13 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   IF.coreInstrResp <> io.imemRsp
 
   IF.address := pc.io.in.asUInt()
-  val instruction = IF.instruction
+  val instruction = Mux(io.imemRsp.valid, IF.instruction, "h00000013".U(32.W))
 
-//  pc.io.halt := Mux(io.imemRsp.valid, 0.B, 1.B)
-  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
+  pc.io.halt := Mux(io.imemReq.valid, 0.B, 1.B)
+  pc.io.in := Mux(ID.hdu_pcWrite && !MEM.io.stall, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
-  when(ID.hdu_if_reg_write) {
+
+  when(ID.hdu_if_reg_write && !MEM.io.stall) {
     if_reg_pc := pc.io.out.asUInt()
     if_reg_ins := instruction
   }
@@ -118,8 +119,8 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
 //  IF.PcWrite := ID.hdu_pcWrite
   ID.id_instruction := if_reg_ins
-  ID.if_instruction := instruction
   ID.pcAddress := if_reg_pc
+  ID.dmem_resp_valid := io.dmemRsp.valid
 //  IF.PcSrc := ID.pcSrc
 //  IF.PCPlusOffset := ID.pcPlusOffset
   ID.ex_mem_ins := ex_reg_ins
@@ -151,10 +152,11 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   ex_reg_ins := id_reg_ins
   ex_reg_ctl_memToReg := id_reg_ctl_memToReg
   ex_reg_ctl_regWrite := id_reg_ctl_regWrite
-  ex_reg_ctl_memRead := id_reg_ctl_memRead
-  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+//  ex_reg_ctl_memRead := id_reg_ctl_memRead
+//  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
   ID.id_ex_mem_read := id_reg_ctl_memRead
   ID.ex_mem_mem_read := ex_reg_ctl_memRead
+  ID.ex_mem_mem_write := ex_reg_ctl_memWrite
   //EX.ex_mem_regWrite := ex_reg_ctl_regWrite
   //EX.mem_wb_regWrite := mem_reg_ctl_regWrite
   EX.id_ex_ins := id_reg_ins
@@ -169,43 +171,66 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
 
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
-  mem_reg_rd := MEM.io.readData
+//  val stall = Wire(Bool())
+//  stall := (ex_reg_ctl_memWrite || ex_reg_ctl_memRead) && !io.dmemRsp.valid
+  when(MEM.io.stall){
+    mem_reg_rd := mem_reg_rd
+    mem_reg_result := mem_reg_result
+//    mem_reg_wra := mem_reg_wra
+    ex_reg_wra := ex_reg_wra
+    ex_reg_ctl_memToReg := ex_reg_ctl_memToReg
+//    mem_reg_ctl_memToReg := mem_reg_ctl_memToReg
+    mem_reg_ctl_regWrite := mem_reg_ctl_regWrite
+    mem_reg_ins := mem_reg_ins
+    mem_reg_pc := mem_reg_pc
+
+    ex_reg_ctl_memRead := ex_reg_ctl_memRead
+    ex_reg_ctl_memWrite := ex_reg_ctl_memWrite
+
+  } otherwise{
+    mem_reg_rd := MEM.io.readData
+    mem_reg_result := ex_reg_result
+//    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+    mem_reg_ctl_regWrite := ex_reg_ctl_regWrite
+    mem_reg_ins := ex_reg_ins
+    mem_reg_pc := ex_reg_pc
+    mem_reg_wra := ex_reg_wra
+    ex_reg_ctl_memRead := id_reg_ctl_memRead
+    ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+  }
+  mem_reg_wra := ex_reg_wra
+  mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+  EX.ex_mem_regWrite := ex_reg_ctl_regWrite
   MEM.io.aluResultIn := ex_reg_result
   MEM.io.writeData := ex_reg_wd
   MEM.io.readEnable := ex_reg_ctl_memRead
   MEM.io.writeEnable := ex_reg_ctl_memWrite
-  //MEM.ctl_branch_taken := ex_reg_ctl_branch_taken
-  //IF.PCPlusOffset := ex_reg_branch // Branch Offset writeback
-  //IF.PcSrc := MEM.ctl_PcSrc
   EX.mem_result := ex_reg_result
-  mem_reg_result := ex_reg_result
-  mem_reg_wra := ex_reg_wra
-  mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
-  mem_reg_ctl_regWrite := ex_reg_ctl_regWrite
-  mem_reg_ins := ex_reg_ins
-  mem_reg_pc := ex_reg_pc
-  EX.ex_mem_regWrite := ex_reg_ctl_regWrite
 
   /********************
    * Write Back Stage *
    ********************/
 
   val wb_data = Wire(UInt(32.W))
+  val wb_addr = Wire(UInt(4.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
     wb_data := MEM.io.readData
+    wb_addr := Mux(io.dmemRsp.valid, mem_reg_wra, 0.U)
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
       wb_data := mem_reg_pc
+      wb_addr := mem_reg_wra
     }
     .otherwise {
       wb_data := mem_reg_result
+      wb_addr := mem_reg_wra
     }
 
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data
   EX.wb_result := wb_data
   EX.mem_wb_regWrite := mem_reg_ctl_regWrite
-  ID.writeReg := mem_reg_wra
+  ID.writeReg := wb_addr
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
 

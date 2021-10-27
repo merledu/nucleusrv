@@ -12,6 +12,7 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
     val writeEnable: Bool = Input(Bool())
     val readEnable: Bool = Input(Bool())
     val readData: UInt = Output(UInt(32.W))
+    val stall: Bool = Output(Bool())
 
     val dccmReq = Decoupled(req)
     val dccmRsp = Flipped(Decoupled(rsp))
@@ -31,6 +32,7 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
   io.dccmReq.bits.isWrite := io.writeEnable
   io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
 
+  io.stall := (io.writeEnable || io.readEnable) && !io.dccmRsp.valid
 
   // io.dccmReq <> dataMem.io.coreDccmReq
   // dataMem.io.coreDccmRsp <> io.dccmRsp
