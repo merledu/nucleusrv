@@ -16,7 +16,7 @@ class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module,
   val core: Core = Module(new Core(/*req, rsp*/ new TLRequest /*WBRequest*/,new TLResponse /*WBResponse*/))
   val imemAdapter = Module(new TilelinkAdapter() /*WishboneAdapter()*/) //instrAdapter
   val dmemAdapter = Module(new TilelinkAdapter() /*WishboneAdapter()*/) //dmemAdapter
-
+                                                                                                            
   // TODO: Make RAMs generic
   val imemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 1024))
   val dmemCtrl = Module(BlockRam.createMaskableRAM(config, 1024))
