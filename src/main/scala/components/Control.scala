@@ -2,6 +2,20 @@
 package nucleusrv.components
 import chisel3._
 import chisel3.util._
+import nucleusrv.components.Control._
+
+object Control {
+  val R_TYPE = BitPat("b0110011")
+  val I_TYPE = BitPat("b0010011")
+  val LOAD = BitPat("b0000011")
+  val STORE = BitPat("b0100011")
+  val SB_TYPE = BitPat("b1100011")
+  val LUI = BitPat("b0110111")
+  val AUIPC = BitPat("b0010111")
+  val JAL = BitPat("b1101111")
+  val JALR = BitPat("b1100111")
+  val CSR = BitPat("b1110011")
+}
 
 class Control extends Module {
   val io = IO(new Bundle {
@@ -19,120 +33,23 @@ class Control extends Module {
 
   val signals = ListLookup(
     io.in,
-    /*   aluSrc  ToReg regWrite memRead  memWrite branch  jump  aluOp aluSrc1*/
-    List(false.B, 0.U, false.B, false.B, false.B, false.B, 0.U, 0.U, 0.U),
+    /*                aluSrc  ToReg regWrite memRead  memWrite branch  jump aluOp aluSrc1*/
+    List(/*         */false.B, 0.U, false.B, false.B, false.B, false.B, 0.U, 0.U, 0.U),
     Array(
-      // R-Type
-      BitPat("b0110011") -> List(
-        true.B, // aluSrc
-        0.U, // memToReg
-        true.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        0.U, // jump
-        2.U, // aluOp
-        0.U // aluSrc1
-      ),
-      // I-Type
-      BitPat("b0010011") -> List(
-        false.B, // aluSrc
-        0.U, // memToReg
-        true.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        0.U, // jump
-        2.U, // aluOp
-        0.U
-      ),
-      // Load
-      BitPat("b0000011") -> List(
-        false.B, // aluSrc
-        1.U, // memToReg
-        true.B, // regWrite
-        true.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        0.U, // jump
-        0.U, // aluOp
-        0.U
-      ),
-      // Store
-      BitPat("b0100011") -> List(
-        false.B, // aluSrc
-        0.U, // memToReg
-        false.B, // regWrite
-        false.B, // memRead
-        true.B, // memWrite
-        false.B, // branch
-        0.U, // jump
-        0.U, // aluOp
-        0.U
-      ),
-      // SB-Type
-      BitPat("b1100011") -> List(
-        true.B, // aluSrc
-        0.U, // memToReg
-        false.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        true.B, // branch
-        0.U, // jump
-        0.U, // aluOp
-        0.U
-      ),
-      // lui
-      BitPat("b0110111") -> List(
-        false.B, // aluSrc
-        0.U, // memToReg
-        true.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        0.U, // jump
-        0.U, // aluOp
-        0.U
-      ),
-      // auipc
-      BitPat("b0010111") -> List(
-        true.B, // aluSrc
-        0.U, // memToReg
-        true.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        0.U, // jump
-        0.U, // aluOp
-        1.U  // aluSrc1
-      ),
-      // jal
-      BitPat("b1101111") -> List(
-        false.B, // aluSrc
-        2.U, // memToReg
-        true.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        1.U, // jump
-        0.U, // aluOp
-        0.U
-      ),
-      // jalr
-      BitPat("b1100111") -> List(
-        false.B, // aluSrc
-        2.U, // memToReg
-        true.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        2.U, // jump
-        0.U, // aluOp
-        0.U
-      )
+      R_TYPE  -> List(true.B,  0.U, true.B,  false.B, false.B, false.B, 0.U, 2.U, 0.U),
+      I_TYPE  -> List(false.B, 0.U, true.B,  false.B, false.B, false.B, 0.U, 2.U, 0.U),
+      LOAD    -> List(false.B, 1.U, true.B,  true.B,  false.B, false.B, 0.U, 0.U, 0.U),
+      STORE   -> List(false.B, 0.U, false.B, false.B, true.B,  false.B, 0.U, 0.U, 0.U),
+      SB_TYPE -> List(true.B,  0.U, false.B, false.B, false.B, true.B,  0.U, 0.U, 0.U),
+      LUI     -> List(false.B, 0.U, true.B,  false.B, false.B, false.B, 0.U, 0.U, 0.U),
+      AUIPC   -> List(true.B,  0.U, true.B,  false.B, false.B, false.B, 0.U, 0.U, 1.U),
+      JAL     -> List(false.B, 2.U, true.B,  false.B, false.B, false.B, 1.U, 0.U, 0.U),
+      JALR    -> List(false.B, 2.U, true.B,  false.B, false.B, false.B, 2.U, 0.U, 0.U),
+      CSR     -> List(false.B, 0.U, false.B, false.B, false.B, false.B, 0.U, 0.U, 0.U)
+
     )
   )
-  io.aluSrc := signals(0)
+  io.aluSrc := signals.head
   io.memToReg := signals(1)
   io.regWrite := signals(2)
   io.memRead := signals(3)
