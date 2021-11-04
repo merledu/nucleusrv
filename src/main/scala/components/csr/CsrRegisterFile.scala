@@ -39,11 +39,15 @@ class CsrRegisterFile extends Module {
   val w_data = MuxLookup(io.csr_cmd, 0.U, Seq(
     W -> io.csr_in,
     S -> (io.out | io.csr_in),
-    C -> (io.out | io.csr_in)
+    C -> (io.out & !io.csr_in)
   ))
 
   when(io.csr_addr === CsrAddressMap.mstatus){
-    
+    TW := w_data(21)
+    MPRV := w_data(17)
+    MPP := w_data(12,11)
+    MPIE := w_data(7)
+    MIE := w_data(3)
   }
 
 }
