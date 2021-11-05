@@ -6,7 +6,7 @@ CFLAGS=-c -march=rv32i -mabi=ilp32 -ffreestanding -fomit-frame-pointer
 OFLAGS=--disassemble-all --section=.text
 LFLAGS = -march=rv32im -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
 
-PROGRAM ?= fibonacci
+PROGRAM ?= csrs
 TEST_DIR = tests/$(PROGRAM)
 BUILD_DIR = out/$(TEST_DIR)
 
@@ -21,7 +21,7 @@ setup: clean
 	@mkdir -p out
 
 build: $(OBJS)
-	$(CC) $(LFLAGS) start.S $(OBJS) -o out/program.elf -lgcc
+	$(CC) $(LFLAGS) $(OBJS) -o out/program.elf -lgcc
 	$(OBJDUMP) $(OFLAGS) out/program.elf > out/program.dump
 	$(HEX) --bit-width 32 --input out/program.elf --output out/program.hex
 
