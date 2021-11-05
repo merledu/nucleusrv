@@ -5,7 +5,6 @@ import chisel3.util._
 class CsrRegisterFile extends Module {
   val io = IO(new Bundle {
     val csr_addr = Input(UInt(12.W))
-    val rs1_addr = Input(UInt(5.W))
     val csr_cmd = Input(UInt(3.W))
     val csr_in = Input(UInt(32.W))
 

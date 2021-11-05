@@ -78,6 +78,17 @@ class InstructionDecode extends Module {
     io.ctl_regWrite := false.B
   }
 
+  //CSR Unit
+  val csr = Module(new CSR)
+  csr.io.func3 := io.func3
+  csr.io.csr_addr := io.id_instruction(31, 20)
+  csr.io.imm := io.immediate
+  csr.io.rs1_data := io.readData1
+
+  val out = dontTouch(Wire(UInt(32.W)))
+  out := csr.io.out
+
+
   //Register File
   val registers = Module(new Registers)
   val registerRd = io.writeReg
