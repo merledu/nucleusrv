@@ -9,8 +9,6 @@ import chisel3.experimental.BundleLiterals._
 import chiseltest.experimental.TestOptionBuilder._
 import chiseltest.internal.VerilatorBackendAnnotation
 
-
-
 class MDUTests extends FreeSpec with ChiselScalatestTester {
 
   "MULTIPLICATION AND DIVISION UNIT" in {

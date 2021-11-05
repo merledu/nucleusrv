@@ -35,6 +35,7 @@ module mdu
   wire sign_unsign_mul =  i_mdu_op[0]; 
   wire is_mulh         = (|i_mdu_op) & is_mul;
 
+
   always @(posedge i_clk) begin
     if (valid & is_mul) begin
       mul_en <= valid;
@@ -51,12 +52,14 @@ module mdu
     end
   end
 
+
   always @(posedge i_clk) begin
     if (!i_rst & is_mul & mul_en) begin
       rd <= $signed(rdata_a)*$signed(rdata_b);
     end
     mul_done <= mul_en;
   end
+
 
   assign mul_ready = mul_done & valid;
   assign mul_rd = is_mulh ? rd[(2*WIDTH)-1:WIDTH] : rd[WIDTH-1:0];
@@ -72,6 +75,7 @@ module mdu
 
   reg  div_ready;
   reg  running;
+
 
   wire is_div = i_mdu_op[2] & (!i_mdu_op[1]);
   wire is_rem = i_mdu_op[2] & i_mdu_op[1];

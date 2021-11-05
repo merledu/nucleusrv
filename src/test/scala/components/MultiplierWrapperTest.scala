@@ -19,6 +19,8 @@ class MultiplierWrapperTest extends FreeSpec with ChiselScalatestTester {
             c.io.request.bits.activeByteLane.poke("b1111".U)
             c.io.request.valid.poke(true.B)
             c.clock.step(10)
+
         }
+        
     }
 }

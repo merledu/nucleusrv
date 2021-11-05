@@ -10,6 +10,8 @@
 
 //module up_counter(input clk, reset, output[3:0] counter
 
+//THIS IS MULTIPLICATION AND DIVISION UNIT USING BLACKBOX
+//MULTIPLIER FILE OF CHISEL ASSOCIATED WITH CORE IS Multiplier.scala
 package components
 
 import chisel3._
