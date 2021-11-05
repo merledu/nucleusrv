@@ -18,7 +18,7 @@ class CsrRegisterFile extends Module {
   // mstatus
   val TW = RegInit(0.U)
   val MPRV = RegInit(0.U)
-  val MPP = RegInit(UInt(2.W))
+  val MPP = RegInit(0.U(2.W))
   val MPIE = RegInit(0.U)
   val MIE = RegInit(0.U)
   val mstatus = Cat("b0".U(10.W), TW, "b0".U(3.W), MPRV, "b0".U(4.W),
