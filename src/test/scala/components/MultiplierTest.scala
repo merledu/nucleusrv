@@ -10,7 +10,7 @@ import chiseltest.internal.VerilatorBackendAnnotation
 
 class MultiplierTest extends FreeSpec with ChiselScalatestTester {
 
-  "Multiplier Gate Test" in {
+  "Multiplier Test" in {
     test(new Multiplier()).withAnnotations(Seq(VerilatorBackendAnnotation)) { c =>
       c.io.src_a.poke(5.S)
       c.io.src_b.poke(5.S)

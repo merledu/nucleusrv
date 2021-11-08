@@ -27,7 +27,6 @@ class ForwardingUnit extends Module {
     .otherwise {
       io.forwardA := 0.U
     }
-
   when(io.reg_rs2 === io.ex_reg_rd && io.ex_reg_rd =/= 0.U && io.ex_regWrite) {
     io.forwardB := 1.U
   }.elsewhen(
