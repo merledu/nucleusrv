@@ -14,7 +14,6 @@ class ForwardingUnit extends Module {
     val forwardA = Output(UInt(2.W))
     val forwardB = Output(UInt(2.W))
   })
-
   io.forwardA := DontCare
   io.forwardB := DontCare
   

@@ -10,8 +10,8 @@ class IOR extends Bundle{
     val web0 = Input(Bool())
     val addr0 = Input(UInt(7.W))
     val din0 = Input(UInt(32.W))
-    val dout0 = Output(UInt(32.W))
-
+    val dout0 = Output(UInt(32.W)) 
+    
 }
 class sram extends BlackBox with HasBlackBoxResource{
     val io = IO(new IOR)

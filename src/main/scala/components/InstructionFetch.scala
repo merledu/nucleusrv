@@ -15,7 +15,6 @@ class InstructionFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val
   })
 
   io.coreInstrResp.ready := true.B
-
   io.coreInstrReq.bits.activeByteLane := "b1111".U
   io.coreInstrReq.bits.isWrite := false.B
   io.coreInstrReq.bits.dataRequest := DontCare

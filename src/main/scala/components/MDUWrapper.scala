@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 import caravan.bus.common.{BusConfig, AbstrRequest, AbstrResponse}
 
-class MultiplierWrapper(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
+class MDUWrapper(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
     val io = IO(new Bundle{
         val request = Flipped(Decoupled(req))   
         val response = Decoupled(rsp)          

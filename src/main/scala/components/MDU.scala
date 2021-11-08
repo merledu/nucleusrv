@@ -27,6 +27,7 @@ class IOM extends Bundle{
     val i_mdu_valid= Input(Bool())
     val o_mdu_ready= Output(Bool())
     val o_mdu_rd= Output(UInt(32.W))
+
 }
 
 class mdu extends BlackBox with HasBlackBoxResource{
