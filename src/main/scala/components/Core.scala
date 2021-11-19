@@ -212,7 +212,7 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
    ********************/
 
   val wb_data = Wire(UInt(32.W))
-  val wb_addr = Wire(UInt(4.W))
+  val wb_addr = Wire(UInt(5.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
     wb_data := MEM.io.readData
