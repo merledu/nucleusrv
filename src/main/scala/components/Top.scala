@@ -1,14 +1,17 @@
 package nucleusrv.components
 import chisel3._
-import caravan.bus.common.{BusConfig, AbstrRequest, AbstrResponse, BusHost, BusDevice}
-import caravan.bus.wishbone.{WishboneConfig, WBRequest, WBResponse}
-import caravan.bus.tilelink.{TilelinkConfig, TLRequest, TLResponse}
+import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig, BusDevice, BusHost}
+import caravan.bus.wishbone.{WBRequest, WBResponse, WishboneConfig}
+import caravan.bus.tilelink.{TLRequest, TLResponse, TilelinkConfig}
+import components.RVFIPORT
 import jigsaw.rams.fpga.BlockRam
 
 class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module, val dataAdapter:Module ,*/ programFile:Option[String]) extends Module{
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
   })
+  val rvfi = IO(new RVFIPORT)
+
   implicit val config = WishboneConfig(32, 32) //WishboneConfig(32,32)
 
 //  val imem: InstructionMemory = Module(new InstructionMemory)
@@ -33,8 +36,7 @@ class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module,
   dmemCtrl.io.req <> dmemAdapter.io.reqOut
   dmemAdapter.io.rspIn <> dmemCtrl.io.rsp
 
-//  core.io.imem <> imem.io
-//  core.io.dmem <> dmem.io
+
   io.pin := core.io.pin
 
 }

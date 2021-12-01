@@ -70,7 +70,6 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   val EX = Module(new Execute).io
   val MEM = Module(new MemoryFetch(req,rsp))
 
-
   /*****************
    * Fetch Stage *
    ******************/
