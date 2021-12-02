@@ -1,7 +1,7 @@
 int main() {
 	 __asm__ __volatile__(
 	 	"li t0, 88;"
-	 	"csrrs zero, mstatus, t0;"
+	 	"csrrw zero, mtvec, t0;"
 	 );
 
 	 int x = 15;

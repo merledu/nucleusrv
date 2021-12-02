@@ -29,7 +29,7 @@ object CsrAddressMap {
   val mhartid  = 0xf10.U(12.W)
   // Machine Trap Setup
   val mstatus  = 0x300.U(12.W)
-  val mtvec    = 0x301.U(12.W)
+  val mtvec    = 0x305.U(12.W)
   val mtdeleg  = 0x302.U(12.W)
   val mie      = 0x304.U(12.W)
   val mtimecmp = 0x321.U(12.W)

@@ -1,4 +1,4 @@
-RISCV=riscv64-unknown-elf-
+RISCV=riscv32-unknown-elf-
 CC=$(RISCV)gcc
 OBJDUMP=$(RISCV)objdump
 HEX=$(RISCV)elf2hex
