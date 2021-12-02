@@ -14,7 +14,7 @@ class MDUWrapper(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val confi
 
     io.request.ready := true.B
     val data = Wire(Vec(4,UInt()))
-    val mul = Module(new MDU)
+    val mul = Module(new MDU_Blackbox)
 
     // for sending request
     when(io.request.fire() & io.request.bits.isWrite){                                      

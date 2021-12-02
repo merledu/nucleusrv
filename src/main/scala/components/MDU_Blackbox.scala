@@ -36,7 +36,7 @@ class mdu extends BlackBox with HasBlackBoxResource{
     
 }
 
-class MDU extends Module{
+class MDU_Blackbox extends Module{
 
     val io = IO(new Bundle{
     val i_mdu_rs1 = Input(UInt(32.W))
