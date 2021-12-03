@@ -1,4 +1,3 @@
-
 package components
 import chisel3._
 import chisel3.util.MuxCase
@@ -31,6 +30,8 @@ class Execute extends Module {
   val alu = Module(new ALU)
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit).io
+  val mdu = Module (new MDU_UNIT)
+
 
   // Forwarding Unt
 
@@ -80,10 +81,16 @@ class Execute extends Module {
   io.ALUresult := alu.io.result
 } */
 
+when (io.func7 === 1.U) {
+  alu.io.input1 := mdu.src_a
+  alu.io.input2 := mdu.src_b
+  alu.io.aluCtl := mduCtl.io.out
+  io.ALUresult := mdu.io.output
+}.elsewhen (
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
-  io.ALUresult := alu.io.result
+  io.ALUresult := alu.io.result)
 
   io.writeData := inputMux2
 }
