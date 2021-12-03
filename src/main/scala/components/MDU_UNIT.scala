@@ -10,7 +10,7 @@ class MDU_UNIT(n:Int = 32) extends Module{
         val op            = Input(UInt(5.W))
         val valid         = Input(Bool())
         val ready         = Output(Bool())
-
+        
         val output        = Valid(Output(SInt(32.W)))
     })
 
