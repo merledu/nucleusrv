@@ -66,6 +66,20 @@ class Execute extends Module {
   aluCtl.io.aluOp := io.ctl_aluOp
   aluCtl.io.aluSrc := io.ctl_aluSrc
 
+/* when f7 is equal to 1 {
+  pass aluin1 and aluin2 to mdu unit
+  alu.io.input1 := aluIn1
+  alu.io.input2 := aluIn2
+  alu.io.aluCtl := mduCtl.io.out
+  io.ALUresult := mdu.io.out
+} else{
+  pass aluin1 and aluin2 to alu unit
+  alu.io.input1 := aluIn1
+  alu.io.input2 := aluIn2
+  alu.io.aluCtl := aluCtl.io.out
+  io.ALUresult := alu.io.result
+} */
+
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
