@@ -2,10 +2,10 @@
 package nucleusrv.components
 import chisel3._
 import chisel3.util._
-
 import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
+import components.{RVFI, RVFIPORT}
 
-class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
+class Core(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Option[String])(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
 
@@ -14,6 +14,8 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
 
     val imemReq = Decoupled(req)
     val imemRsp = Flipped(Decoupled(rsp))
+
+    val rvfi = new RVFIPORT
 
   })
 
@@ -68,7 +70,7 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   val IF = Module(new InstructionFetch(req, rsp)).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute).io
-  val MEM = Module(new MemoryFetch(req,rsp))
+  val MEM = Module(new MemoryFetch(req,rsp, signatureFile))
 
   /*****************
    * Fetch Stage *
@@ -233,9 +235,21 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
 
-//  when(ex_reg_ins =/= 0.U && ex_reg_pc =/= 0.U ) {
-    printf("PC: %x, INST: %x, REG[%d] <- %x\n", ex_reg_pc, ex_reg_ins,
-      Mux(mem_reg_ctl_regWrite, mem_reg_wra, 0.U),
-      Mux(mem_reg_ctl_regWrite, wb_data, 0.U))
-//  }
+
+
+  val rvfi = Module(new RVFI)
+  rvfi.io.stall := MEM.io.stall
+  rvfi.io.pc := pc.io.out
+  rvfi.io.pc_src := ID.pcSrc
+  rvfi.io.pc_four := pc.io.pc4
+  rvfi.io.pc_offset := pc.io.in
+  rvfi.io.rd_wdata := wb_data
+  rvfi.io.rd_addr := wb_addr
+  rvfi.io.rs1_rdata := ID.readData1
+  rvfi.io.rs2_rdata := ID.readData2
+  rvfi.io.insn := if_reg_ins
+
+  io.rvfi <> rvfi.io.rvfi
+
+
 }
