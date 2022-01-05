@@ -130,7 +130,7 @@ class Control extends Module {
         0.U, // aluOp
         0.U
       )
-    )r
+    )
   )
   io.aluSrc := signals(0)
   io.memToReg := signals(1)
