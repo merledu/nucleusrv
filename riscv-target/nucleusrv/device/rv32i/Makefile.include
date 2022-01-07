@@ -7,7 +7,8 @@ endif
 
 RUN_TARGET=\
 	cd $(NUCLEUSRV) && sbt "testOnly nucleusrv.components.TopTest -- -DmemFile=$(<).hex -DwriteVcd=1 -DsignatureFile=$(*).signature.output" \
-	> $(*).signature.output;
+    > $(*).stdout; \
+    `grep '^[a-f0-9]\+$$' $(*).stdout > $(*).signature.output`;
 
 RISCV_PREFIX   ?= riscv32-unknown-elf-
 RISCV_GCC      ?= $(RISCV_PREFIX)gcc
