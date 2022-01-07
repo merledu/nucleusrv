@@ -40,7 +40,7 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Op
   io.readData := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare) //dataMem.io.readData
 
   if(signatureFile.isDefined){
-    when(io.writeEnable && io.aluResultIn(31, 28) =/= "h8".asUInt()){
+    when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
       printf("%x\n", io.writeData)
     }
   }

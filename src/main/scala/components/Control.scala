@@ -96,7 +96,7 @@ class Control extends Module {
       ),
       // auipc
       BitPat("b0010111") -> List(
-        true.B, // aluSrc
+        false.B, // aluSrc
         0.U, // memToReg
         true.B, // regWrite
         false.B, // memRead
