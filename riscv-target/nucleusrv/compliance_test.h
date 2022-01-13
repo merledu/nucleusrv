@@ -12,10 +12,6 @@
 // RV Compliance Macros
 //-----------------------------------------------------------------------
 
-#define TESTUTIL_BASE 0x20000
-#define TESTUTIL_ADDR_HALT (TESTUTIL_BASE + 0x0)
-#define TESTUTIL_ADDR_BEGIN_SIGNATURE (TESTUTIL_BASE + 0x4)
-#define TESTUTIL_ADDR_END_SIGNATURE (TESTUTIL_BASE + 0x8)
 
 #define RV_COMPLIANCE_HALT              \
 		la a0, data_begin;	 \
@@ -23,12 +19,12 @@
                 li a2, 0x80000000; \
         extract_data: \
         		lw a4, 0(a0); \
-        		addi a0, a0, 2; \
+        		beq a0, a1, extract_data; \
+        		addi a0, a0, 4; \
         		sw a4, 0(a2); \
-        		bne a0, a1, extract_data; \
-        		j halt; \
+        		j extract_data; \
         halt: \
-        		j halt; 
+        		j halt;
 
 #define RV_COMPLIANCE_RV32M 											\
 
@@ -37,7 +33,17 @@
         .section .text.init;                                            \
         .align  4;                                                      \
         .globl _start;                                                  \
-_start:                                                                 \
+        .globl init;                                                  \
+		_start:	\
+			la a0, data_begin;	\
+			la a1, data_end;	\
+			addi a1, a1, -4; \
+			li a2, 0xffffffff; \
+			print_data:	\
+				sw a2, 0(a0);	\
+				addi a0, a0, 4;	\
+				bne a0, a1, print_data;	\
+		init: \
 
 #define RV_COMPLIANCE_CODE_END
 
