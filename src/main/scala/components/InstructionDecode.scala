@@ -10,14 +10,17 @@ class InstructionDecode extends Module {
     val pcAddress = Input(UInt(32.W))
     val ctl_writeEnable = Input(Bool())
     val id_ex_mem_read = Input(Bool())
-    val ex_mem_mem_write = Input(Bool())
+//    val ex_mem_mem_write = Input(Bool())
     val ex_mem_mem_read = Input(Bool())
     val dmem_resp_valid = Input(Bool())
     val id_ex_rd = Input(UInt(5.W))
     val ex_mem_rd = Input(UInt(5.W))
+    val id_ex_branch = Input(Bool())
     //for forwarding
     val ex_mem_ins = Input(UInt(32.W))
     val mem_wb_ins = Input(UInt(32.W))
+    val ex_ins = Input(UInt(32.W))
+    val ex_result = Input(UInt(32.W))
     val ex_mem_result = Input(UInt(32.W))
     val mem_wb_result = Input(UInt(32.W))
     
@@ -48,9 +51,10 @@ class InstructionDecode extends Module {
   val hdu = Module(new HazardUnit)
   hdu.io.dmem_resp_valid := io.dmem_resp_valid
   hdu.io.id_ex_memRead := io.id_ex_mem_read
-  hdu.io.ex_mem_memWrite := io.ex_mem_mem_write
+//  hdu.io.ex_mem_memWrite := io.ex_mem_mem_write
   hdu.io.ex_mem_memRead := io.ex_mem_mem_read
   hdu.io.id_ex_rd := io.id_ex_rd
+  hdu.io.id_ex_branch := io.id_ex_branch
   hdu.io.ex_mem_rd := io.ex_mem_rd
   hdu.io.id_rs1 := io.id_instruction(19, 15)
   hdu.io.id_rs2 := io.id_instruction(24, 20)
@@ -144,11 +148,25 @@ class InstructionDecode extends Module {
   bu.io.take_branch := hdu.io.take_branch
   hdu.io.taken := bu.io.taken  
 
+  //Forwarding for Jump
+  val j_offset = Wire(UInt(32.W))
+    when(registerRs1 === io.ex_ins(11, 7)){
+      j_offset := io.ex_result
+    }.elsewhen(registerRs1 === io.ex_mem_ins(11, 7)) {
+    j_offset := io.ex_mem_result
+  }.elsewhen(registerRs1 === io.mem_wb_ins(11, 7)) {
+    j_offset := io.mem_wb_result
+  }.elsewhen(registerRs1 === io.ex_ins(11, 7)){
+    j_offset := io.ex_result
+  }.otherwise {
+      j_offset := io.readData1
+    }
+
   //Offset Calculation (Jump/Branch)
   when(io.ctl_jump === 1.U) {
     io.pcPlusOffset := io.pcAddress + io.immediate
   }.elsewhen(io.ctl_jump === 2.U) {
-      io.pcPlusOffset := io.pcAddress + input1
+      io.pcPlusOffset := j_offset + io.immediate
     }
     .otherwise {
       io.pcPlusOffset := io.pcAddress + immediate.io.out

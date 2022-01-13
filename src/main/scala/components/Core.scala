@@ -124,6 +124,7 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Option[St
   ID.dmem_resp_valid := io.dmemRsp.valid
 //  IF.PcSrc := ID.pcSrc
 //  IF.PCPlusOffset := ID.pcPlusOffset
+  ID.ex_ins := id_reg_ins
   ID.ex_mem_ins := ex_reg_ins
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
@@ -157,14 +158,17 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Option[St
 //  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
   ID.id_ex_mem_read := id_reg_ctl_memRead
   ID.ex_mem_mem_read := ex_reg_ctl_memRead
-  ID.ex_mem_mem_write := ex_reg_ctl_memWrite
+//  ID.ex_mem_mem_write := ex_reg_ctl_memWrite
   //EX.ex_mem_regWrite := ex_reg_ctl_regWrite
   //EX.mem_wb_regWrite := mem_reg_ctl_regWrite
   EX.id_ex_ins := id_reg_ins
   EX.ex_mem_ins := ex_reg_ins
   EX.mem_wb_ins := mem_reg_ins
   ID.id_ex_rd := id_reg_ins(11, 7)
+  ID.id_ex_branch := Mux(id_reg_ins(6,0) === "b1100011".asUInt(), true.B, false.B )
   ID.ex_mem_rd := ex_reg_ins(11, 7)
+  ID.ex_result := EX.ALUresult
+
 
   /****************
    * Memory Stage *
