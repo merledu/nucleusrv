@@ -26,4 +26,4 @@ COMPILE_TARGET=\
 		-o $$@; \
 	$$(RISCV_OBJCOPY) -O binary $$@  $$@.bin; \
 	$$(RISCV_OBJDUMP) -D $$@ > $$@.objdump; \
-	srec_cat $$(@).bin -binary -offset 0x0000 -byte-swap 4 -o $$(@).hex -vmem
+	python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.bin 2048 > $$@.hex;
