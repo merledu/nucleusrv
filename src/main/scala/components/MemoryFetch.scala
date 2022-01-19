@@ -5,7 +5,7 @@ import chisel3.util._
 
 import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
 
-class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Option[String])(implicit val config:BusConfig) extends Module {
+class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
     val writeData: UInt = Input(UInt(32.W))
@@ -39,9 +39,8 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Op
 
   io.readData := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare) //dataMem.io.readData
 
-  if(signatureFile.isDefined){
-    when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
-      printf("%x\n", io.writeData)
-    }
+  when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
+    printf("%x\n", io.writeData)
   }
+
 }

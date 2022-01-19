@@ -18,21 +18,12 @@ class TopTest extends FreeSpec with ChiselScalatestTester {
       None
     }
     }
-     def getSigFile: Option[String]  = {
-     if (scalaTestContext.value.get.configMap.contains("signatureFile")) {
-       Some(scalaTestContext.value.get.configMap("signatureFile").toString)
-
-     } else {
-       None
-     }
-   }
 
   "Top Test" in {
       // implicit val config = WishboneConfig(32,32) //getConfig
       val programFile = getFile
-    val signatureFile = getSigFile
       // test(new Top(new WBRequest(), new WBResponse(), Module(new WishboneAdapter()), Module(new WishboneAdapter()), programFile)).withAnnotation(Seq(VerilatorBackendAnnotation)){ c =>
-        test(new Top(programFile, signatureFile)).withAnnotations(Seq(VerilatorBackendAnnotation)){ c =>
+        test(new Top(programFile)).withAnnotations(Seq(VerilatorBackendAnnotation)){ c =>
           c.clock.setTimeout(0)
           c.clock.step(10000)
       }

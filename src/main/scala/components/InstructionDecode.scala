@@ -65,7 +65,7 @@ class InstructionDecode extends Module {
 
   //Control Unit
   val control = Module(new Control)
-  control.io.in := io.id_instruction(6, 0)
+  control.io.in := io.id_instruction
   io.ctl_aluOp := control.io.aluOp
   io.ctl_aluSrc := control.io.aluSrc
   io.ctl_aluSrc1 := control.io.aluSrc1

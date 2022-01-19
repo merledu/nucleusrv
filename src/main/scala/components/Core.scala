@@ -5,7 +5,7 @@ import chisel3.util._
 import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
 import components.{RVFI, RVFIPORT}
 
-class Core(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Option[String])(implicit val config:BusConfig) extends Module {
+class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
 
@@ -70,7 +70,7 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse, signatureFile: Option[St
   val IF = Module(new InstructionFetch(req, rsp)).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute).io
-  val MEM = Module(new MemoryFetch(req,rsp, signatureFile))
+  val MEM = Module(new MemoryFetch(req,rsp))
 
   /*****************
    * Fetch Stage *
