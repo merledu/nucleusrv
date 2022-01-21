@@ -22,18 +22,6 @@ class Control extends Module {
     /*   aluSrc  ToReg regWrite memRead  memWrite branch  jump  aluOp aluSrc1*/
     List(false.B, 0.U, false.B, false.B, false.B, false.B, 0.U, 0.U, 0.U),
     Array(
-      // NOP
-      BitPat("b00000000000000000000000000010011") -> List(
-        true.B, // aluSrc
-        0.U, // memToReg
-        false.B, // regWrite
-        false.B, // memRead
-        false.B, // memWrite
-        false.B, // branch
-        0.U, // jump
-        2.U, // aluOp
-        0.U // aluSrc1
-      ),
       // R-Type
       BitPat("b?????????????????????????0110011") -> List(
         true.B, // aluSrc
