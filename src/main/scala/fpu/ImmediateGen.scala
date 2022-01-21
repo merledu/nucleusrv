@@ -3,27 +3,26 @@ package fpu
 import chisel3._
 import chisel3.util._
 
-class ImmediateGen extends Module{
+class ImmediateGen extends Module with OpCodes {
 
   val io = IO(new Bundle {
     val instr = Input(UInt(32.W))
     val immediate = Output(UInt(12.W))
+    val immSel = Output(Bool())
   })
 
-/*
-   * 0000111 - LOAD FP
-   * 0100111 - STORE FP
-   * 1010011 - OP FP
- */
 
   io.immediate := 0.U
+  io.immSel := false.B
 
   switch(io.instr(6,0)){
-    is("b0000111".U){ // LOAD
+    is(LOAD){
         io.immediate := io.instr(31,20)
+        io.immSel := true.B
     }
-    is("b0100111".U){
+    is(STORE){
       io.immediate := Cat(io.instr(31,25), io.instr(11,7))
+      io.immSel := true.B
     }
   }
 
