@@ -3,7 +3,6 @@ package fpu
 import chisel3._
 import chisel3.util._
 import jdk.internal.module.IllegalAccessLogger.Mode
-import nucleusrv.fpu.RegFile
 
 class Top extends Module{
   val io = IO(new Bundle{
