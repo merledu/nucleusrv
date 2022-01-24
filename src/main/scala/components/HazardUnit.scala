@@ -33,6 +33,8 @@ class HazardUnit extends Module {
   when(
     (io.id_ex_memRead || io.branch) &&
       (io.id_ex_rd === io.id_rs1 || io.id_ex_rd === io.id_rs2 ) &&
+      ((io.id_ex_rd =/= 0.U && io.id_rs1 =/= 0.U) ||
+      (io.id_ex_rd =/= 0.U && io.id_rs2 =/= 0.U)) &&
       !io.id_ex_branch
   )
   {
