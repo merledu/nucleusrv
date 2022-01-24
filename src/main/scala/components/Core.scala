@@ -185,7 +185,8 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
     ex_reg_wra := ex_reg_wra
     ex_reg_ctl_memToReg := ex_reg_ctl_memToReg
 //    mem_reg_ctl_memToReg := mem_reg_ctl_memToReg
-    mem_reg_ctl_regWrite := mem_reg_ctl_regWrite
+    ex_reg_ctl_regWrite := ex_reg_ctl_regWrite
+    mem_reg_ctl_regWrite := ex_reg_ctl_regWrite
     mem_reg_ins := mem_reg_ins
     mem_reg_pc := mem_reg_pc
 
