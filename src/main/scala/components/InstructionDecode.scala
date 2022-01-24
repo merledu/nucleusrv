@@ -73,7 +73,7 @@ class InstructionDecode extends Module {
   io.ctl_memRead := control.io.memRead
   io.ctl_memToReg := control.io.memToReg
   io.ctl_jump := control.io.jump
-  when(hdu.io.ctl_mux) {
+  when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
     io.ctl_memWrite := control.io.memWrite
     io.ctl_regWrite := control.io.regWrite
 
