@@ -16,6 +16,7 @@ class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module,
 
 //  val imem: InstructionMemory = Module(new InstructionMemory)
 //  val dmem: DataMemory = Module(new DataMemory)
+
   val core: Core = Module(new Core(/*req, rsp*/ new WBRequest /*WBRequest*/,new WBResponse /*WBResponse*/))
   val imemAdapter = Module(new WishboneAdapter() /*TilelinkAdapter()*/) //instrAdapter
   val dmemAdapter = Module(new WishboneAdapter() /*WishboneAdapter()*/) //dmemAdapter
@@ -40,3 +41,8 @@ class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module,
   io.pin := core.io.pin
 
 }
+
+//ABCDEFGHIJKLMNOPQRSTUVWXYZ
+//abcdefghijk
+
+
