@@ -26,7 +26,7 @@ def javacOptionsVersion(scalaVersion: String): Seq[String] = {
   }
 }
 
-name := "riscv-pipelined"
+name := "nucleusrv"
 
 version := "3.2.0"
 

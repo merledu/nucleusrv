@@ -1,5 +1,5 @@
 
-package components
+package nucleusrv.components
 import chisel3._
 import chisel3.util.BitPat
 
