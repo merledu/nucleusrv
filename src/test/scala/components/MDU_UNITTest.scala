@@ -1,4 +1,4 @@
-package components
+package nucleusrv.components
 import chisel3._
 import org.scalatest._
 import chiseltest._
@@ -10,7 +10,7 @@ import chiseltest.internal.VerilatorBackendAnnotation
 class MultiplierTest extends FreeSpec with ChiselScalatestTester {
 
   "Multiplication and Division Operations" in {
-    test(new MDU_UNIT()).withAnnotations(Seq(VerilatorBackendAnnotation)) { c =>
+    test(new MDU()).withAnnotations(Seq(VerilatorBackendAnnotation)) { c =>
       c.io.src_a.poke(11.S)
       c.io.src_b.poke(2.S)
       c.io.valid.poke(1.B)

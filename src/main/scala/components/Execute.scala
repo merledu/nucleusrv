@@ -1,14 +1,14 @@
-package components
+package nucleusrv.components
 import chisel3._
 import chisel3.util.MuxCase
 
-class Execute extends Module {
+class Execute(M:Boolean = false) extends Module {
   val io = IO(new Bundle {
     val immediate = Input(UInt(32.W))
     val readData1 = Input(UInt(32.W))
     val readData2 = Input(UInt(32.W))
     val pcAddress = Input(UInt(32.W))
-    val func7 = Input(UInt(1.W))
+    val func7 = Input(UInt(7.W))
     val func3 = Input(UInt(3.W))
     val mem_result = Input(UInt(32.W))
     val wb_result = Input(UInt(32.W))
@@ -30,7 +30,7 @@ class Execute extends Module {
   val alu = Module(new ALU)
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit).io
-  val mdu = Module (new MDU_UNIT)
+  
 
 
   // Forwarding Unt
@@ -63,9 +63,14 @@ class Execute extends Module {
   val aluIn2 = Mux(io.ctl_aluSrc, inputMux2, io.immediate)
 
   aluCtl.io.f3 := io.func3
-  aluCtl.io.f7 := io.func7
+  aluCtl.io.f7 := io.func7(5)
   aluCtl.io.aluOp := io.ctl_aluOp
   aluCtl.io.aluSrc := io.ctl_aluSrc
+
+
+  alu.io.input1 := aluIn1
+  alu.io.input2 := aluIn2
+  alu.io.aluCtl := aluCtl.io.out
 
 /* when f7 is equal to 1 {
   pass aluin1 and aluin2 to mdu unit
@@ -80,17 +85,39 @@ class Execute extends Module {
   alu.io.aluCtl := aluCtl.io.out
   io.ALUresult := alu.io.result
 } */
+if (M){
+    val mdu = Module (new MDU)
+    val mduCtl = Module(new MduControl)
 
-when (io.func7 === 1.U) {
-  alu.io.input1 := mdu.src_a
-  alu.io.input2 := mdu.src_b
-  alu.io.aluCtl := mduCtl.io.out
-  io.ALUresult := mdu.io.output
-}.elsewhen (
-  alu.io.input1 := aluIn1
-  alu.io.input2 := aluIn2
-  alu.io.aluCtl := aluCtl.io.out
-  io.ALUresult := alu.io.result)
+    mduCtl.io.f3 := io.func3
+    mduCtl.io.f7 := io.func7
+    mduCtl.io.aluOp := io.ctl_aluOp
+    mduCtl.io.aluSrc := io.ctl_aluSrc
 
+    mdu.io.src_a := aluIn1.asSInt
+    mdu.io.src_b := aluIn2.asSInt
+    mdu.io.op := mduCtl.io.op
+    mdu.io.valid := true.B
+
+
+    when (io.func7 === 1.U && mdu.io.ready) {
+      // alu.io.input1 := mdu.src_a
+      // alu.io.input2 := mdu.src_b
+      // alu.io.aluCtl := mduCtl.io.out
+      // io.ALUresult := mdu.io.output
+
+      // mdu.io.src_a := aluIn1.asSInt
+      // mdu.io.src_b := aluIn2.asSInt
+      // mdu.io.op := mduCtl.io.op
+      // mdu.io.valid := true.B
+
+      io.ALUresult := (Mux(mdu.io.output.valid, mdu.io.output.bits, 0.S)).asUInt
+      }.otherwise {
+      // alu.io.input1 := aluIn1
+      // alu.io.input2 := aluIn2
+      // alu.io.aluCtl := aluCtl.io.out
+      io.ALUresult := alu.io.result.asUInt
+      }
+  }else{io.ALUresult := alu.io.result.asUInt}
   io.writeData := inputMux2
 }

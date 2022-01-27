@@ -12,7 +12,7 @@
 
 //THIS IS MULTIPLICATION AND DIVISION UNIT USING BLACKBOX
 //MULTIPLIER FILE OF CHISEL ASSOCIATED WITH CORE IS Multiplier.scala
-package components
+package nucleusrv.components
 
 import chisel3._
 import chisel3.util._

@@ -3,7 +3,7 @@ import chisel3._
 import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig, BusDevice, BusHost}
 import caravan.bus.wishbone.{WBRequest, WBResponse, WishboneConfig}
 import caravan.bus.tilelink.{TLRequest, TLResponse, TilelinkConfig}
-import components.RVFIPORT
+// import nucleusrv.components.RVFIPORT
 import jigsaw.rams.fpga.BlockRam
 
 class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module, val dataAdapter:Module ,*/ programFile:Option[String]) extends Module{
@@ -17,7 +17,7 @@ class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module,
 //  val imem: InstructionMemory = Module(new InstructionMemory)
 //  val dmem: DataMemory = Module(new DataMemory)
 
-  val core: Core = Module(new Core(/*req, rsp*/ new WBRequest /*WBRequest*/,new WBResponse /*WBResponse*/))
+  val core: Core = Module(new Core(/*req, rsp*/ new WBRequest /*WBRequest*/,new WBResponse /*WBResponse*/)(M = true))
   val imemAdapter = Module(new WishboneAdapter() /*TilelinkAdapter()*/) //instrAdapter
   val dmemAdapter = Module(new WishboneAdapter() /*WishboneAdapter()*/) //dmemAdapter
 

@@ -1,9 +1,9 @@
-package components
+package nucleusrv.components
 import chisel3._
 import chisel3.util._
 import chisel3.experimental._
 
-class MDU_UNIT(n:Int = 32) extends Module{
+class MDU(n:Int = 32) extends Module{
     val io = IO(new Bundle{
         val src_a         = Input(SInt(32.W))
         val src_b         = Input(SInt(32.W))  

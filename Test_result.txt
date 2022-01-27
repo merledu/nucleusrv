@@ -1,0 +1,18 @@
+rm -rf /home/talha/nucleusrv/generated-src /home/talha/nucleusrv/outputs test_run_dir
+sbt "testOnly components.TopTest -- -DmemFile=tools/out/program.hex -DwriteVcd=1"
+[info] welcome to sbt 1.5.5 (Private Build Java 1.8.0_232)
+[info] loading global plugins from /home/talha/.sbt/1.0/plugins
+[info] loading settings for project nucleusrv-build from metals.sbt,plugins.sbt ...
+[info] loading project definition from /home/talha/nucleusrv/project
+[info] loading settings for project caravan from build.sbt ...
+[info] loading settings for project jigsaw from build.sbt ...
+[info] loading settings for project caravan from build.sbt ...
+[info] loading settings for project nucleusrv from build.sbt ...
+[info] set current project to nucleusrv (in build file:/home/talha/nucleusrv/)
+[info] Passed: Total 0, Failed 0, Errors 0, Passed 0
+[info] Passed: Total 0, Failed 0, Errors 0, Passed 0
+[info] No tests to run for jigsaw / Test / testOnly
+[info] No tests to run for caravan / Test / testOnly
+[info] Passed: Total 0, Failed 0, Errors 0, Passed 0
+[info] No tests to run for Test / testOnly
+[success] Total time: 2 s, completed Jan 27, 2022 7:00:23 PM

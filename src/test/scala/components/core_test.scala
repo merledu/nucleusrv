@@ -1,5 +1,5 @@
 
-// package components
+// package nucleusrv.components
 
 // import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 // import org.scalatest._

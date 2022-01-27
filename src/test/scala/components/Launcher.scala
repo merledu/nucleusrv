@@ -1,5 +1,5 @@
 
-// package components
+// package nucleusrv.components
 
 // import chisel3.iotesters.{Driver, TesterOptionsManager}
 // import utils.TutorialRunner
