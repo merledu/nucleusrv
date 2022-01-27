@@ -1,5 +1,4 @@
-
-package nucleusrv.components
+package components
 import chisel3._
 import chisel3.util.MuxCase
 
@@ -31,6 +30,8 @@ class Execute extends Module {
   val alu = Module(new ALU)
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit).io
+  val mdu = Module (new MDU_UNIT)
+
 
   // Forwarding Unt
 
@@ -58,13 +59,7 @@ class Execute extends Module {
     )
   )
 
-  val aluIn1 = MuxCase(
-    inputMux1,
-    Array(
-      (io.ctl_aluSrc1 === 1.U) -> io.pcAddress,
-      (io.ctl_aluSrc1 === 2.U) -> 0.U
-    )
-  )
+  val aluIn1 = Mux(io.ctl_aluSrc1 === 1.U, io.pcAddress, inputMux1 )
   val aluIn2 = Mux(io.ctl_aluSrc, inputMux2, io.immediate)
 
   aluCtl.io.f3 := io.func3
@@ -72,10 +67,30 @@ class Execute extends Module {
   aluCtl.io.aluOp := io.ctl_aluOp
   aluCtl.io.aluSrc := io.ctl_aluSrc
 
+/* when f7 is equal to 1 {
+  pass aluin1 and aluin2 to mdu unit
+  alu.io.input1 := aluIn1
+  alu.io.input2 := aluIn2
+  alu.io.aluCtl := mduCtl.io.out
+  io.ALUresult := mdu.io.out
+} else{
+  pass aluin1 and aluin2 to alu unit
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
   io.ALUresult := alu.io.result
+} */
+
+when (io.func7 === 1.U) {
+  alu.io.input1 := mdu.src_a
+  alu.io.input2 := mdu.src_b
+  alu.io.aluCtl := mduCtl.io.out
+  io.ALUresult := mdu.io.output
+}.elsewhen (
+  alu.io.input1 := aluIn1
+  alu.io.input2 := aluIn2
+  alu.io.aluCtl := aluCtl.io.out
+  io.ALUresult := alu.io.result)
 
   io.writeData := inputMux2
 }
