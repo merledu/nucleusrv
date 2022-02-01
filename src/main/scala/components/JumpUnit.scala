@@ -5,7 +5,7 @@ import chisel3.util.BitPat
 
 class JumpUnit extends Module {
   val io = IO(new Bundle {
-    val func7: UInt = Input(UInt(32.W))
+    val func7: UInt = Input(UInt(7.W))
     val jump: UInt = Output(UInt(2.W))
   })
 
