@@ -3,13 +3,13 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util.MuxCase
 
-class Execute extends Module {
+class Execute(M:Boolean = true) extends Module {
   val io = IO(new Bundle {
     val immediate = Input(UInt(32.W))
     val readData1 = Input(UInt(32.W))
     val readData2 = Input(UInt(32.W))
     val pcAddress = Input(UInt(32.W))
-    val func7 = Input(UInt(1.W))
+    val func7 = Input(UInt(7.W))
     val func3 = Input(UInt(3.W))
     val mem_result = Input(UInt(32.W))
     val wb_result = Input(UInt(32.W))
@@ -68,14 +68,33 @@ class Execute extends Module {
   val aluIn2 = Mux(io.ctl_aluSrc, inputMux2, io.immediate)
 
   aluCtl.io.f3 := io.func3
-  aluCtl.io.f7 := io.func7
+  aluCtl.io.f7 := io.func7(5)
   aluCtl.io.aluOp := io.ctl_aluOp
   aluCtl.io.aluSrc := io.ctl_aluSrc
 
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
-  io.ALUresult := alu.io.result
+
+  if(M){
+    val mdu = Module (new MDU)
+    val mduCtl = Module(new MduControl)
+
+    mduCtl.io.f3 := io.func3
+    mduCtl.io.f7 := io.func7
+    mduCtl.io.aluOp := io.ctl_aluOp
+    mduCtl.io.aluSrc := io.ctl_aluSrc
+
+    mdu.io.src_a := aluIn1.asSInt
+    mdu.io.src_b := aluIn2.asSInt
+    mdu.io.op := mduCtl.io.op
+    mdu.io.valid := true.B
+
+    when (io.func7 === 1.U && mdu.io.ready){io.ALUresult := (Mux(mdu.io.output.valid, mdu.io.output.bits, 0.S)).asUInt}
+    .otherwise{io.ALUresult := alu.io.result}
+  }else{io.ALUresult := alu.io.result}
+
+  // io.ALUresult := alu.io.result
 
   io.writeData := inputMux2
 }
