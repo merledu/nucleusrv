@@ -8,6 +8,7 @@ import components.{RVFI, RVFIPORT}
 class Core(val req:AbstrRequest, val rsp:AbstrResponse)(M:Boolean = false)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
+    val stall:Bool = Input(Bool())
 
     val dmemReq = Decoupled(req)
     val dmemRsp = Flipped(Decoupled(rsp))
@@ -82,9 +83,9 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(M:Boolean = false)(impli
   IF.coreInstrResp <> io.imemRsp
 
   IF.address := pc.io.in.asUInt()
-  val instruction = Mux(io.imemRsp.valid, IF.instruction, "h00000013".U(32.W))
+  val instruction = Mux(io.stall, "h00000013".U(32.W), Mux(io.imemRsp.valid, IF.instruction, "h00000013".U(32.W)))
 
-  pc.io.halt := Mux(io.imemReq.valid, 0.B, 1.B)
+  pc.io.halt := Mux(io.stall, 1.B, Mux(io.imemReq.valid, 0.B, 1.B))
   pc.io.in := Mux(ID.hdu_pcWrite && !MEM.io.stall, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
 
