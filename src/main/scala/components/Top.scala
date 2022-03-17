@@ -10,7 +10,6 @@ class Top(programFile:Option[String]) extends Module{
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
     val rvfi = new RVFIPORT
-    val stall = Input(Bool())
   })
 
   implicit val config = WishboneConfig(32, 32) //WishboneConfig(32,32)
@@ -37,7 +36,7 @@ class Top(programFile:Option[String]) extends Module{
 
   io.rvfi <> core.io.rvfi
   io.pin := core.io.pin
-  core.io.stall := io.stall
+
 }
 //class Top(programFile:Option[String]) extends Module{
 //  val io = IO(new Bundle() {
