@@ -4,3 +4,6 @@
 [submodule "jigsaw"]
 	path = jigsaw
 	url = https://github.com/shahzaibk23/jigsaw
+[submodule "ccache"]
+	path = ccache
+	url = https://github.com/shahzaibk23/ccache
