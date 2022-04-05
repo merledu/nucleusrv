@@ -1,6 +1,4 @@
-[submodule "caravan"]
-	path = caravan
-	url = https://github.com/shahzaibk23/caravan
+
 [submodule "ccache"]
 	path = ccache
 	url = https://github.com/shahzaibk23/ccache
