@@ -23,7 +23,7 @@ class TopTest extends FreeSpec with ChiselScalatestTester {
       // implicit val config = WishboneConfig(32,32) //getConfig
       val programFile = getFile
       // test(new Top(new WBRequest(), new WBResponse(), Module(new WishboneAdapter()), Module(new WishboneAdapter()), programFile)).withAnnotation(Seq(VerilatorBackendAnnotation)){ c =>
-        test(new Top(programFile)).withAnnotations(Seq(VerilatorBackendAnnotation)){ c =>
+        test(new Top(programFile)){ c =>
           c.clock.setTimeout(0)
           c.clock.step(10000)
       }
