@@ -21,7 +21,7 @@ compile:
 	$(SBT) "testOnly components.TopTest -- $(SBT_FLAGS)"
 
 $(gen_dir)/Top.v: $(wildcard $(src_dir)/scala/*.scala)
-	$(SBT) $(SBT_FLAGS) "run -td $(gen_dir)"
+	$(SBT) "run -td $(gen_dir)"
 
 $(gen_dir)/VTop: $(gen_dir)/Top.v $(src_dir)/cc/emulator.cc
 	$(VERILATOR) $(VERILATOR_FLAGS) -o $@ $< $(word 2, $^) $(word 3, $^)

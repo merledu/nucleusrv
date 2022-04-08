@@ -5,7 +5,7 @@ import chisel3.util._
 
 class Control extends Module {
   val io = IO(new Bundle {
-    val in = Input(UInt(7.W))
+    val in = Input(UInt(32.W))
     val aluSrc = Output(Bool())
     val memToReg = Output(UInt(2.W))
     val regWrite = Output(Bool())
@@ -23,7 +23,7 @@ class Control extends Module {
     List(false.B, 0.U, false.B, false.B, false.B, false.B, 0.U, 0.U, 0.U),
     Array(
       // R-Type
-      BitPat("b0110011") -> List(
+      BitPat("b?????????????????????????0110011") -> List(
         true.B, // aluSrc
         0.U, // memToReg
         true.B, // regWrite
@@ -35,7 +35,7 @@ class Control extends Module {
         0.U // aluSrc1
       ),
       // I-Type
-      BitPat("b0010011") -> List(
+      BitPat("b?????????????????????????0010011") -> List(
         false.B, // aluSrc
         0.U, // memToReg
         true.B, // regWrite
@@ -47,7 +47,7 @@ class Control extends Module {
         0.U
       ),
       // Load
-      BitPat("b0000011") -> List(
+      BitPat("b?????????????????????????0000011") -> List(
         false.B, // aluSrc
         1.U, // memToReg
         true.B, // regWrite
@@ -59,7 +59,7 @@ class Control extends Module {
         0.U
       ),
       // Store
-      BitPat("b0100011") -> List(
+      BitPat("b?????????????????????????0100011") -> List(
         false.B, // aluSrc
         0.U, // memToReg
         false.B, // regWrite
@@ -71,7 +71,7 @@ class Control extends Module {
         0.U
       ),
       // SB-Type
-      BitPat("b1100011") -> List(
+      BitPat("b?????????????????????????1100011") -> List(
         true.B, // aluSrc
         0.U, // memToReg
         false.B, // regWrite
@@ -83,7 +83,7 @@ class Control extends Module {
         0.U
       ),
       // lui
-      BitPat("b0110111") -> List(
+      BitPat("b?????????????????????????0110111") -> List(
         false.B, // aluSrc
         0.U, // memToReg
         true.B, // regWrite
@@ -92,11 +92,11 @@ class Control extends Module {
         false.B, // branch
         0.U, // jump
         0.U, // aluOp
-        0.U
+        2.U  // aluSrc1
       ),
       // auipc
-      BitPat("b0010111") -> List(
-        true.B, // aluSrc
+      BitPat("b?????????????????????????0010111") -> List(
+        false.B, // aluSrc
         0.U, // memToReg
         true.B, // regWrite
         false.B, // memRead
@@ -107,7 +107,7 @@ class Control extends Module {
         1.U  // aluSrc1
       ),
       // jal
-      BitPat("b1101111") -> List(
+      BitPat("b?????????????????????????1101111") -> List(
         false.B, // aluSrc
         2.U, // memToReg
         true.B, // regWrite
@@ -119,7 +119,7 @@ class Control extends Module {
         0.U
       ),
       // jalr
-      BitPat("b1100111") -> List(
+      BitPat("b?????????????????????????1100111") -> List(
         false.B, // aluSrc
         2.U, // memToReg
         true.B, // regWrite
