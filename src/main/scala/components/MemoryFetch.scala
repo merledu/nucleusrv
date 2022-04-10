@@ -38,4 +38,9 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
   // dataMem.io.coreDccmRsp <> io.dccmRsp
 
   io.readData := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare) //dataMem.io.readData
+
+  when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
+    printf("%x\n", io.writeData)
+  }
+
 }

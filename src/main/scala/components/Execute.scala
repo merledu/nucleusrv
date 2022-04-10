@@ -58,7 +58,13 @@ class Execute extends Module {
     )
   )
 
-  val aluIn1 = Mux(io.ctl_aluSrc1 === 1.U, io.pcAddress, inputMux1 )
+  val aluIn1 = MuxCase(
+    inputMux1,
+    Array(
+      (io.ctl_aluSrc1 === 1.U) -> io.pcAddress,
+      (io.ctl_aluSrc1 === 2.U) -> 0.U
+    )
+  )
   val aluIn2 = Mux(io.ctl_aluSrc, inputMux2, io.immediate)
 
   aluCtl.io.f3 := io.func3
