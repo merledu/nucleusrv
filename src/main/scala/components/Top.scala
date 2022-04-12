@@ -20,7 +20,7 @@ class Top(programFile:Option[String]) extends Module{
 
   // TODO: Make RAMs generic
   val imemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
-  val dmemCtrl = Module(BlockRam.createMaskableRAM(config, 1024))
+  val dmemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
 
   /*  Imem Interceonnections  */
   imemAdapter.io.reqIn <> core.io.imemReq

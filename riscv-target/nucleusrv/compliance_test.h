@@ -33,17 +33,8 @@
         .section .text.init;                                            \
         .align  4;                                                      \
         .globl _start;                                                  \
-        .globl init;                                                  \
 		_start:	\
-			la a0, data_begin;	\
-			la a1, data_end;	\
-			addi a1, a1, -4; \
-			li a2, 0xffffffff; \
-			print_data:	\
-				sw a2, 0(a0);	\
-				addi a0, a0, 4;	\
-				bne a0, a1, print_data;	\
-		init: \
+
 
 #define RV_COMPLIANCE_CODE_END
 
