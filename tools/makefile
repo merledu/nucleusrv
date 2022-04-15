@@ -23,7 +23,8 @@ setup: clean
 build: $(OBJS)
 	$(CC) $(LFLAGS) start.S $(OBJS) -o out/program.elf -lgcc
 	$(OBJDUMP) $(OFLAGS) out/program.elf > out/program.dump
-	$(HEX) --bit-width 32 --input out/program.elf --output out/program.hex
+	srec_cat out/program.elf -binary -offset 0x0000 -byte-swap 4 -o out/program.hex -vmem
+#$(HEX) --bit-width 32 --input out/program.elf --output out/program.hex
 
 clean: 
 	rm -rf out

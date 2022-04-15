@@ -5,22 +5,19 @@ import chisel3.experimental._
 
 class MDU(n:Int = 32) extends Module{
     val io = IO(new Bundle{
-        val src_a         = Input(SInt(32.W))
-        val src_b         = Input(SInt(32.W))  
+        val src_a         = Input(UInt(32.W))
+        val src_b         = Input(UInt(32.W))
         val op            = Input(UInt(5.W))
         val valid         = Input(Bool())
         val ready         = Output(Bool())
         
-        val output        = Valid(Output(SInt(32.W)))
+        val output        = Valid(Output(UInt(32.W)))
     })
 
     // Multiplier
-    val cases = Array((io.op === 0.U || io.op === 1.U )     ->      io.src_a * io.src_b,
-                    (io.op === 2.U)                         ->      io.src_a * (io.src_b.asUInt).asSInt,
-                    (io.op === 3.U)                         ->      (io.src_a.asUInt * io.src_b.asUInt).asSInt)
 
-    val out_wire = Wire(SInt(64.W))
-    out_wire := MuxCase(0.S, cases)
+    val out_wire = Wire(UInt(64.W))
+    out_wire := io.src_a * io.src_b
 
     // Divider
     val r_ready    = RegInit(1.U(1.W))
@@ -51,16 +48,16 @@ class MDU(n:Int = 32) extends Module{
 
     io.ready     := r_ready
     when(io.op === 0.U){
-        io.output.bits := out_wire(31,0).asSInt
+        io.output.bits := out_wire(31,0)
         io.output.valid := 1.U
-    }.elsewhen(io.op === 1.U && io.op === 1.U && io.op === 2.U && io.op === 3.U){
-        io.output.bits := out_wire(63,32).asSInt
+    }.elsewhen(io.op === 1.U || io.op === 2.U || io.op === 3.U){
+        io.output.bits := out_wire(63,32)
         io.output.valid := 1.U
     }.elsewhen(io.op === 5.U){
-        io.output.bits := r_quotient.asSInt
+        io.output.bits := r_quotient
     }.elsewhen(io.op === 7.U){
-        io.output.bits := r_dividend.asSInt
+        io.output.bits := r_dividend
     }.otherwise{
-        io.output.bits := 0.S
+        io.output.bits := 0.U
     }
 }

@@ -12,7 +12,7 @@ class MduControl extends Module {
     val op: UInt = Output(UInt(4.W))
   })
 
-  when(io.f7 === 1.U && (io.f3 === 0.U || io.f3 === 1.U || io.f3 === 2.U || io.f3 === 3.U || io.f3 === 4.U || io.f3 === 5.U || io.f3 === 6.U || io.f3 === 7.U)){
+  when(io.f7 === 1.U){
       io.op := io.f3
   }
   .otherwise{
