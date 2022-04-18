@@ -5,3 +5,6 @@
 [submodule "caravan"]
 	path = caravan
 	url = https://github.com/merledu/caravan
+[submodule "cachefy"]
+	path = cachefy
+	url = https://github.com/merledu/cachefy
