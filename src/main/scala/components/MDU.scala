@@ -1,9 +1,22 @@
 package nucleusrv.components
 import chisel3._
 import chisel3.util._
+import nucleusrv.components.MDUOps._
 import chisel3.experimental._
 
-class MDU(n:Int = 32) extends Module{
+
+object  MDUOps {
+    val MUL     = 0.U
+    val MULH    = 1.U
+    val MULHSU  = 2.U
+    val MULHU   = 3.U
+    val DIV     = 4.U
+    val DIVU    = 5.U
+    val REM     = 6.U
+    val REMU    = 7.U
+}
+
+class MDU extends Module{
     val io = IO(new Bundle{
         val src_a         = Input(UInt(32.W))
         val src_b         = Input(UInt(32.W))
@@ -16,24 +29,29 @@ class MDU(n:Int = 32) extends Module{
 
     // Multiplier
 
-    val out_wire = Wire(UInt(64.W))
-    out_wire := io.src_a * io.src_b
+    val result = Wire(UInt(64.W))
+    result := MuxCase(0.U, Array(
+        (io.op === MUL || io.op === MULHU)  ->  io.src_a * io.src_b,
+        (io.op === MULHSU)                  ->  (io.src_a.asSInt * io.src_b).asUInt,
+        (io.op === MULH)                    ->  (io.src_a.asSInt * io.src_b.asSInt).asUInt
+    ))
+
 
     // Divider
     val r_ready    = RegInit(1.U(1.W))
-    val r_counter  = RegInit(n.U(6.W))
-    val r_dividend = RegInit(0.U(n.W))
-    val r_quotient = RegInit(0.U(n.W))
+    val r_counter  = RegInit(32.U(6.W))
+    val r_dividend = RegInit(0.U(32.W))
+    val r_quotient = RegInit(0.U(32.W))
 
     io.output.valid := 0.U
 
     // shift + substract
-    when(io.op === 5.U || io.op === 7.U){
-        val dividend  = WireInit(io.src_a.asUInt)
-        val divisor   = WireInit(io.src_b.asUInt)
+    when(io.op === DIVU || io.op === REMU){
+        val dividend  = WireInit(io.src_a)
+        val divisor   = WireInit(io.src_b)
         when(io.valid === 1.U) {
             r_ready    := 0.U
-            r_counter  := n.U
+            r_counter  := 32.U
             r_dividend := dividend
             r_quotient := 0.U
         }.elsewhen(r_counter =/= 0.U){
@@ -47,11 +65,11 @@ class MDU(n:Int = 32) extends Module{
     }
 
     io.ready     := r_ready
-    when(io.op === 0.U){
-        io.output.bits := out_wire(31,0)
+    when(io.op === MUL){
+        io.output.bits := result(31,0)
         io.output.valid := 1.U
-    }.elsewhen(io.op === 1.U || io.op === 2.U || io.op === 3.U){
-        io.output.bits := out_wire(63,32)
+    }.elsewhen(io.op === MULH || io.op === MULHU || io.op === MULHSU){
+        io.output.bits := result(63,32)
         io.output.valid := 1.U
     }.elsewhen(io.op === 5.U){
         io.output.bits := r_quotient

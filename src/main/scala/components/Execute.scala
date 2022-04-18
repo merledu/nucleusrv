@@ -78,21 +78,19 @@ class Execute(M:Boolean = true) extends Module {
 
   if(M){
     val mdu = Module (new MDU)
-    val mduCtl = Module(new MduControl)
-
-    mduCtl.io.f3 := io.func3
-    mduCtl.io.f7 := io.func7
-    mduCtl.io.aluOp := io.ctl_aluOp
-    mduCtl.io.aluSrc := io.ctl_aluSrc
 
     mdu.io.src_a := aluIn1
     mdu.io.src_b := aluIn2
-    mdu.io.op := mduCtl.io.op
+    mdu.io.op := io.func3
     mdu.io.valid := true.B
 
-    when (io.func7 === 1.U && mdu.io.ready){io.ALUresult := (Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U))}
+    when (io.func7 === 1.U && mdu.io.ready){
+      io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
+    }
     .otherwise{io.ALUresult := alu.io.result}
-  }else{io.ALUresult := alu.io.result}
+  } else {
+    io.ALUresult := alu.io.result
+  }
 
   // io.ALUresult := alu.io.result
 
