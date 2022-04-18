@@ -4,7 +4,7 @@ import caravan.bus.common.{BusConfig, AbstrRequest, AbstrResponse, BusHost, BusD
 import caravan.bus.wishbone.{WishboneConfig, WBRequest, WBResponse}
 import caravan.bus.tilelink.{TilelinkConfig, TLRequest, TLResponse}
 import jigsaw.rams.fpga.BlockRam
-import ccache.caches.DMCacheWrapper
+import ccache.caches.DMCacheWrapper2
 
 class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module, val dataAdapter:Module ,*/ programFile:Option[String]) extends Module{
   val io = IO(new Bundle() {
@@ -21,7 +21,7 @@ class Top(/*val req:AbstrRequest, val rsp:AbstrResponse,val instrAdapter:Module,
   // TODO: Make RAMs generic
   val imemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 1024))
   val dmemCtrl = Module(BlockRam.createMaskableRAM(config, 1024))
- val cache = Module(new DMCacheWrapper(4, 10, 32)(new WBRequest(), new WBResponse()))
+ val cache = Module(new DMCacheWrapper2(4, 10, 32)(new WBRequest(), new WBResponse()))
 
   /*  Imem Interceonnections  */
   imemAdapter.io.reqIn <> core.io.imemReq
