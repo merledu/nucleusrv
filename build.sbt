@@ -38,7 +38,7 @@ lazy val caravan = project in file("caravan")
 
 lazy val jigsaw = (project in file("jigsaw")).dependsOn(caravan)
 
-lazy val ccache = (project in file("ccache")).dependsOn(caravan, jigsaw)
+lazy val ccache = (project in file("cachefy")).dependsOn(caravan, jigsaw)
 
 dependsOn(caravan, jigsaw, ccache)
 
