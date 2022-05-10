@@ -1,6 +1,0 @@
-[submodule "caravan"]
-	path = caravan
-	url = https://github.com/shahzaibk23/caravan
-[submodule "jigsaw"]
-	path = jigsaw
-	url = https://github.com/shahzaibk23/jigsaw
