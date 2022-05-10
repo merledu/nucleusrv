@@ -15,6 +15,7 @@ class Top(programFile:Option[String]) extends Module{
   implicit val config = WishboneConfig(32, 32) //WishboneConfig(32,32)
 
   val core: Core = Module(new Core(/*req, rsp*/ new WBRequest /*WBRequest*/,new WBResponse /*WBResponse*/))
+  core.io.stall := false.B
   val imemAdapter = Module(new WishboneAdapter() /*TilelinkAdapter()*/) //instrAdapter
   val dmemAdapter = Module(new WishboneAdapter() /*WishboneAdapter()*/) //dmemAdapter
 
