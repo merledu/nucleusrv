@@ -214,6 +214,7 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   MEM.io.writeData := ex_reg_wd
   MEM.io.readEnable := ex_reg_ctl_memRead
   MEM.io.writeEnable := ex_reg_ctl_memWrite
+  MEM.io.func3 := ex_reg_ins(14,12)
   EX.mem_result := ex_reg_result
 
   /********************
