@@ -5,7 +5,7 @@ import caravan.bus.wishbone.{WBRequest, WBResponse, WishboneConfig}
 import caravan.bus.tilelink.{TLRequest, TLResponse, TilelinkConfig}
 import components.RVFIPORT
 import jigsaw.rams.fpga.BlockRam
-
+import jigsaw.rams.sram._
 class Top(programFile:Option[String]) extends Module{
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
@@ -22,6 +22,8 @@ class Top(programFile:Option[String]) extends Module{
   // TODO: Make RAMs generic
   val imemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
   val dmemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
+  // val dmemCtrl = Module(new SRAM1kb(new WBRequest, new WBResponse)(programFile))
+  // val imemCtrl = Module(new SRAM1kb(new WBRequest, new WBResponse)(programFile))
 
   /*  Imem Interceonnections  */
   imemAdapter.io.reqIn <> core.io.imemReq
