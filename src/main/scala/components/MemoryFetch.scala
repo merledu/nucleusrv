@@ -48,7 +48,23 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
   // io.dccmReq <> dataMem.io.coreDccmReq
   // dataMem.io.coreDccmRsp <> io.dccmRsp
 
-  io.readData := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare) //dataMem.io.readData
+  // io.readData := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare) //dataMem.io.readData
+  val readValue = Wire(UInt(32.W))
+  readValue := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare) //dataMem.io.readData
+  // val maskedData2 = Wire(Vec(4, UInt(8.W))) 
+  when(io.readEnable && io.func3 === "b000".U){
+    io.readData := Cat(Fill(24,io.dccmRsp.bits.dataResponse(7)),io.dccmRsp.bits.dataResponse(7,0))
+  }.elsewhen(io.readEnable && io.func3 === "b001".U){
+    io.readData := Cat(Fill(16,io.dccmRsp.bits.dataResponse(15)),io.dccmRsp.bits.dataResponse(15,0))
+  }.otherwise{
+    io.readData := io.dccmRsp.bits.dataResponse(31,0)//("b1111".U).asTypeOf(Vec(4, Bool())) map (Fill(8,_))
+  }
+  
+  // io.readData := maskedData2.asUInt & readValue
+
+
+  
+
 
   when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
     printf("%x\n", io.writeData)
