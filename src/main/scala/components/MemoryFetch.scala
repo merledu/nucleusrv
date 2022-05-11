@@ -13,6 +13,7 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
     val readEnable: Bool = Input(Bool())
     val readData: UInt = Output(UInt(32.W))
     val stall: Bool = Output(Bool())
+    val func3:UInt = Input(UInt(3.W))
 
     val dccmReq = Decoupled(req)
     val dccmRsp = Flipped(Decoupled(rsp))
@@ -26,8 +27,18 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
 
   io.dccmRsp.ready := true.B
 
+  val maskedData = Wire(Vec(4, UInt(8.W)))
+  
+  when(io.writeEnable && io.func3 === "b000".U){
+    maskedData := ("b0001".U).asTypeOf(Vec(4, Bool())) map (Fill(8,_))
+  }.elsewhen(io.writeEnable && io.func3 === "b001".U){
+    maskedData := ("b0011".U).asTypeOf(Vec(4, Bool())) map (Fill(8,_))
+  }.otherwise{
+    maskedData := ("b1111".U).asTypeOf(Vec(4, Bool())) map (Fill(8,_))
+  }
+
   io.dccmReq.bits.activeByteLane := "b1111".U
-  io.dccmReq.bits.dataRequest := io.writeData
+  io.dccmReq.bits.dataRequest := maskedData.asUInt & io.writeData
   io.dccmReq.bits.addrRequest := io.aluResultIn
   io.dccmReq.bits.isWrite := io.writeEnable
   io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
