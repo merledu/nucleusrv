@@ -20,7 +20,7 @@ class InstructionFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val
   io.coreInstrReq.bits.isWrite := false.B
   io.coreInstrReq.bits.dataRequest := DontCare
 
-  io.coreInstrReq.bits.addrRequest := io.address
+  io.coreInstrReq.bits.addrRequest := io.address >> 2
   io.coreInstrReq.valid := Mux(io.stall, false.B, Mux(io.coreInstrReq.ready, true.B, false.B))
 
   io.instruction := Mux(io.coreInstrResp.valid, io.coreInstrResp.bits.dataResponse, DontCare)
