@@ -1,4 +1,7 @@
 # NucleusRV
+
+[![Join the chat at https://gitter.im/merledu/nucleusrv](https://badges.gitter.im/merledu/nucleusrv.svg)](https://gitter.im/merledu/nucleusrv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A chisel based riscv 5-stage pipelined cpu design, implementing 32-bit version of the ISA (incomplete).
 
 
