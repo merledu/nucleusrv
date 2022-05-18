@@ -21,9 +21,9 @@ class Top(programFile:Option[String]) extends Module{
 
   // TODO: Make RAMs generic
   // val imemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
-  val dmemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
+  // val dmemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
   // val dmemCtrl = Module(BlockRam.createMaskableRAM(config, 8192))
-  // val dmemCtrl = Module(new SRAM1kb(new WBRequest, new WBResponse)(programFile))
+  val dmemCtrl = Module(new SRAM1kb(new WBRequest, new WBResponse)(programFile = None))
   val imemCtrl = Module(new SRAM1kb(new WBRequest, new WBResponse)(programFile))
 
   /*  Imem Interceonnections  */
