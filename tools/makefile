@@ -1,7 +1,7 @@
 RISCV=riscv32-unknown-elf-
 CC=$(RISCV)gcc
 OBJDUMP=$(RISCV)objdump
-HEX=$(RISCV)elf2hex
+OBJCOPY=$(RISCV)objcopy
 CFLAGS=-c -march=rv32i -mabi=ilp32 -ffreestanding -fomit-frame-pointer
 OFLAGS=--disassemble-all --section=.text
 LFLAGS = -march=rv32im -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
@@ -21,15 +21,9 @@ setup: clean
 	@mkdir -p out
 
 build: $(OBJS)
-	$(CC) $(LFLAGS) start.S $(OBJS) -o out/program.elf -lgcc
+	$(CC) $(LFLAGS) $(OBJS) -o out/program.elf -lgcc
 	$(OBJDUMP) $(OFLAGS) out/program.elf > out/program.dump
-	$(HEX) --bit-width 32 --input out/program.elf --output out/program.hex
+	python3 makehex.py out/program.elf 2048 > out/program.hex
 
 clean: 
 	rm -rf out
-
-# main: main.c
-# 	$(CC) $(CFLAGS) -o out/main.o $(PROGRAM)/*.c
-# 	$(OBJDUMP) $(OFLAGS) out/main.o > out/main.dump
-# 	$(HEX) --bit-width 32 --input out/main.o --output main.hex
-
