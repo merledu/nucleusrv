@@ -149,9 +149,28 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
         when(offset === "b00".U) {
           // addressing memory with 0,4,8...
           io.readData := Cat(Fill(16, 0.U),rdata(15,0))
+        } .elsewhen(offset === "b01".U) {
+          // addressing memory with 2,6,10...
+          io.readData := Cat(Fill(16, 0.U),rdata(23,8))
         } .elsewhen(offset === "b10".U) {
           // addressing memory with 2,6,10...
           io.readData := Cat(Fill(16, 0.U),rdata(31,16))
+        } .otherwise {
+          // this condition would never occur but using to avoid Chisel generating VOID errors
+          io.readData := DontCare
+        }
+      }
+      .elsewhen(funct3 === "b001".U) {
+        // load halfword
+        when(offset === "b00".U) {
+          // addressing memory with 0,4,8...
+          io.readData := Cat(Fill(16, rdata(15)),rdata(15,0))
+        } .elsewhen(offset === "b01".U) {
+          // addressing memory with 1,3,7...
+          io.readData := Cat(Fill(16, rdata(23)),rdata(23,8))
+        } .elsewhen(offset === "b10".U) {
+          // addressing memory with 2,6,10...
+          io.readData := Cat(Fill(16, rdata(31)),rdata(31,16))
         } .otherwise {
           // this condition would never occur but using to avoid Chisel generating VOID errors
           io.readData := DontCare
