@@ -6,7 +6,7 @@ ifeq ($(shell command -v $(TARGET_SIM) 2> /dev/null),)
 endif
 
 RUN_TARGET=\
-	cd $(NUCLEUSRV) && sbt "testOnly nucleusrv.components.TopTest -- -DmemFile=$(<).hex -DwriteVcd=1 -DsignatureFile=$(*).signature.output" \
+	cd $(NUCLEUSRV) && sbt "testOnly nucleusrv.components.TopTest -- -DprogramFile=$(<).program.hex -DwriteVcd=1 -DdataFile=$(<).data.hex" \
     > $(*).stdout; \
     `grep '^[a-f0-9]\+$$' $(*).stdout > $(*).signature.output`;
 
@@ -24,6 +24,8 @@ COMPILE_TARGET=\
 		-I$(TARGETDIR)/$(RISCV_TARGET)/ \
 		-T$(TARGETDIR)/$(RISCV_TARGET)/link.ld $$< \
 		-o $$@; \
-	$$(RISCV_OBJCOPY) -O binary $$@  $$@.bin; \
-	$$(RISCV_OBJDUMP) -D $$@ > $$@.objdump; \
-	python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.bin 2048 > $$@.hex;
+	$$(RISCV_OBJCOPY) -O binary -j .text.init $$@ $$@.text.bin; \
+    $$(RISCV_OBJCOPY) -O binary -j .data $$@ $$@.data.bin; \
+    $$(RISCV_OBJDUMP) -D $$@ > $$@.objdump; \
+    python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.text.bin 2048 > $$@.program.hex; \
+    python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.data.bin 2048 > $$@.data.hex

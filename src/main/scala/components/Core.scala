@@ -8,6 +8,7 @@ import components.{RVFI, RVFIPORT}
 class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
+    val stall: Bool = Input(Bool())
 
     val dmemReq = Decoupled(req)
     val dmemRsp = Flipped(Decoupled(rsp))
@@ -77,6 +78,8 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
    ******************/
 
   val pc = Module(new PC)
+
+  IF.stall := io.stall //stall signal from outside
   
   io.imemReq <> IF.coreInstrReq
   IF.coreInstrResp <> io.imemRsp
@@ -211,6 +214,7 @@ class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusC
   MEM.io.writeData := ex_reg_wd
   MEM.io.readEnable := ex_reg_ctl_memRead
   MEM.io.writeEnable := ex_reg_ctl_memWrite
+  MEM.io.f3 := ex_reg_ins(14,12)
   EX.mem_result := ex_reg_result
 
   /********************
