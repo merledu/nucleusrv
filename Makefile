@@ -4,7 +4,7 @@ gen_dir    = $(base_dir)/generated-src
 out_dir    = $(base_dir)/outputs
 
 SBT       = sbt
-SBT_FLAGS = -DmemFile=tools/out/program.hex -DwriteVcd=1
+SBT_FLAGS = -DprogramFile=tools/out/program.hex -DwriteVcd=1
 
 CXXFLAGS += -std=c++11 -Wall -Wno-unused-variable
 
@@ -14,11 +14,10 @@ VERILATOR_FLAGS = --assert -Wno-STMTDLY -O3 --trace --trace-fst \
 	--top-module Top -Mdir $(gen_dir)/VTop.csrc \
 	-CFLAGS "$(CXXFLAGS) -include $(gen_dir)/VTop.csrc/VTop.h"
 
-# default: clean verilator
 default: clean compile
 
 compile:
-	$(SBT) "testOnly components.TopTest -- $(SBT_FLAGS)"
+	$(SBT) "testOnly nucleusrv.components.TopTest -- $(SBT_FLAGS)"
 
 $(gen_dir)/Top.v: $(wildcard $(src_dir)/scala/*.scala)
 	$(SBT) "run -td $(gen_dir)"
@@ -29,10 +28,6 @@ $(gen_dir)/VTop: $(gen_dir)/Top.v $(src_dir)/cc/emulator.cc
 
 verilator: $(gen_dir)/VTop
 	$< 2> $(gen_dir)/core.log
-
-# verilator:
-# $(SBT) "test:runMain components.Launcher cpu --backend-name=verilator"
-
 
 clean:
 	rm -rf $(gen_dir) $(out_dir) test_run_dir
