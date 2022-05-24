@@ -183,5 +183,9 @@ class InstructionDecode extends Module {
 
   io.writeRegAddress := io.id_instruction(11, 7)
   io.func3 := io.id_instruction(14, 12)
-  io.func7 := io.id_instruction(31,25)
+  when(io.id_instruction(6,0) === "b0110011".U){
+    io.func7 := io.id_instruction(31,25)
+  }.otherwise{
+    io.func7 := 0.U
+  }
 }
