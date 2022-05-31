@@ -5,6 +5,7 @@ import chisel3.util._
 
 import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
 
+
 class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
@@ -15,8 +16,8 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
     val stall: Bool = Output(Bool())
     val f3 = Input(UInt(3.W))
 
-    val dccmReq = Decoupled(req)
-    val dccmRsp = Flipped(Decoupled(rsp))
+    val dccmReq = Decoupled(new MemRequestIO)
+    val dccmRsp = Flipped(Decoupled(new MemResponseIO))
   })
 
   io.dccmRsp.ready := true.B

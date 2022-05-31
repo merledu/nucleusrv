@@ -2,19 +2,18 @@
 package nucleusrv.components
 import chisel3._
 import chisel3.util._
-import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
-import components.{RVFI, RVFIPORT}
+import components.{RVFI, RVFIPORT }
 
-class Core(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
+class Core extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
 
-    val dmemReq = Decoupled(req)
-    val dmemRsp = Flipped(Decoupled(rsp))
+    val dmemReq = Decoupled()
+    val dmemRsp = Flipped(Decoupled())
 
-    val imemReq = Decoupled(req)
-    val imemRsp = Flipped(Decoupled(rsp))
+    val imemReq = Decoupled(new MemRequestIO)
+    val imemRsp = Flipped(Decoupled(new MemResponseIO))
 
     val rvfi = new RVFIPORT
 
