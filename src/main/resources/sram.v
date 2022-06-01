@@ -1,32 +1,51 @@
+// SPDX-FileCopyrightText: 2020 fabless Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
+
+//`default_nettype none
 // OpenRAM SRAM model
 // Words: 256
 // Word size: 32
 // Write size: 8
 
-module sram(
-`ifdef USE_POWER_PINS
-    vccd1,
-    vssd1,
-`endif
+module sram #(
+  parameter NUM_WMASKS = 4,
+  parameter DATA_WIDTH = 32,
+  parameter ADDR_WIDTH = 10,
+  parameter RAM_DEPTH = 1 << ADDR_WIDTH,
+  // FIXME: This delay is arbitrary.
+  parameter DELAY = 3,
+  parameter IZERO   = 0 , // binary / Initial RAM with zeros (has priority over INITFILE)
+  parameter IFILE   = ""
+)
+(
+/*`ifdef USE_POWER_PINS
+	vdd,
+	gnd,
+`endif */
 // Port 0: RW
     clk0,csb0,web0,wmask0,addr0,din0,dout0,
 // Port 1: R
     clk1,csb1,addr1,dout1
   );
 
-  parameter NUM_WMASKS = 4 ;
-  parameter DATA_WIDTH = 32 ;
-  parameter ADDR_WIDTH = 8 ;
-  parameter RAM_DEPTH = 1 << ADDR_WIDTH;
-  // FIXME: This delay is arbitrary.
-  parameter DELAY = 3 ;
-  parameter VERBOSE = 1 ; //Set to 0 to only display warnings
-  parameter T_HOLD = 1 ; //Delay to hold dout value after posedge. Value is arbitrary
 
-`ifdef USE_POWER_PINS
-    inout vccd1;
-    inout vssd1;
+/*`ifdef USE_POWER_PINS
+  inout vdd;
+  inout gnd;
 `endif
+  */
   input  clk0; // clock
   input   csb0; // active low chip select
   input  web0; // active low write control
@@ -54,12 +73,14 @@ module sram(
     wmask0_reg = wmask0;
     addr0_reg = addr0;
     din0_reg = din0;
-    #(T_HOLD) dout0 = 32'bx;
-    if ( !csb0_reg && web0_reg && VERBOSE )
+    //dout0 = 32'bx0;
+/*`ifdef DBG
+    if ( !csb0_reg && web0_reg )
       $display($time," Reading %m addr0=%b dout0=%b",addr0_reg,mem[addr0_reg]);
-    if ( !csb0_reg && !web0_reg && VERBOSE )
+    if ( !csb0_reg && !web0_reg )
       $display($time," Writing %m addr0=%b din0=%b wmask0=%b",addr0_reg,din0_reg,wmask0_reg);
-  end
+`endif
+*/   end
 
   reg  csb1_reg;
   reg [ADDR_WIDTH-1:0]  addr1_reg;
@@ -70,14 +91,21 @@ module sram(
   begin
     csb1_reg = csb1;
     addr1_reg = addr1;
+//`ifdef DBG
 //    if (!csb0 && !web0 && !csb1 && (addr0 == addr1))
-//       $display($time," WARNING: Writing and reading addr0=%b and addr1=%b simultaneously!",addr0,addr1);
-    #(T_HOLD) dout1 = 32'bx;
-//    if ( !csb1_reg && VERBOSE )
-//       $display($time," Reading %m addr1=%b dout1=%b",addr1_reg,mem[addr1_reg]);
-  end
-
+//         $display($time," WARNING: Writing and reading addr0=%b and addr1=%b simultaneously!",addr0,addr1);
+//    dout1 = 32'bx;
+//    if ( !csb1_reg )
+//      $display($time," Reading %m addr1=%b dout1=%b",addr1_reg,mem[addr1_reg]);
+//`endif
+   end
+integer i;
 reg [DATA_WIDTH-1:0]    mem [0:RAM_DEPTH-1];
+initial
+    if (IZERO)
+      for (i=0; i<RAM_DEPTH; i=i+1) mem[i] = {DATA_WIDTH{1'b0}};
+    else
+      if (IFILE != "") $readmemh(IFILE, mem);
 
   // Memory Write Block Port 0
   // Write Operation : When web0 = 0, csb0 = 0
@@ -104,11 +132,13 @@ reg [DATA_WIDTH-1:0]    mem [0:RAM_DEPTH-1];
   end
 
   // Memory Read Block Port 1
-  // Read Operation : When web1 = 1, csb1 = 0
-  always @ (negedge clk1)
+  // Read Operation : When web1 = 1, csb1 = 0/
+ always @ (negedge clk1)
   begin : MEM_READ1
-    if (!csb1_reg)
+   if (!csb1_reg)
        dout1 <= #(DELAY) mem[addr1_reg];
   end
 
 endmodule
+//`default_nettype wire
+
