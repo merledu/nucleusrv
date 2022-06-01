@@ -3,7 +3,6 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
 
-import caravan.bus.common.{BusConfig, AbstrRequest, AbstrResponse}
 
 class InstructionFetch extends Module {
   val io = IO(new Bundle {
