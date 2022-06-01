@@ -27,7 +27,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
 
   /*  Dmem Interconnections  */
-  core.io.dmemRsp <> dmemCtrl.io.rsp
+  core.io.dmemRsp <> dmem.io.rsp
   dmem.io.req <> core.io.dmemReq
 
 

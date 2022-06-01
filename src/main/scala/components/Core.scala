@@ -9,8 +9,8 @@ class Core extends Module {
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
 
-    val dmemReq = Decoupled()
-    val dmemRsp = Flipped(Decoupled())
+    val dmemReq = Decoupled(new MemRequestIO)
+    val dmemRsp = Flipped(Decoupled(new MemResponseIO))
 
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
@@ -67,10 +67,10 @@ class Core extends Module {
   val mem_reg_pc = RegInit(0.U(32.W))
 
   //Pipeline Units
-  val IF = Module(new InstructionFetch(req, rsp)).io
+  val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute).io
-  val MEM = Module(new MemoryFetch(req,rsp))
+  val MEM = Module(new MemoryFetch)
 
   /*****************
    * Fetch Stage *

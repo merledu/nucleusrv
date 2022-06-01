@@ -6,7 +6,7 @@ import chisel3.util._
 import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
 
 
-class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
+class MemoryFetch extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
     val writeData: UInt = Input(UInt(32.W))
