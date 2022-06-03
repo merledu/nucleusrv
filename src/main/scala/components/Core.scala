@@ -84,13 +84,13 @@ class Core extends Module {
   IF.coreInstrResp <> io.imemRsp
 
   IF.address := pc.io.in.asUInt()
-  val instruction = Mux(io.imemRsp.valid, IF.instruction, "h00000013".U(32.W))
+  val instruction = IF.instruction
 
   pc.io.halt := Mux(io.imemReq.valid, 0.B, 1.B)
-  pc.io.in := Mux(ID.hdu_pcWrite && !MEM.io.stall, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
+  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
 
-  when(ID.hdu_if_reg_write && !MEM.io.stall) {
+  when(ID.hdu_if_reg_write) {
     if_reg_pc := pc.io.out.asUInt()
     if_reg_ins := instruction
   }
@@ -137,8 +137,8 @@ class Core extends Module {
   ******************/
 
   //ex_reg_branch := EX.branchAddress
-  ex_reg_wd := EX.writeData
-  ex_reg_result := EX.ALUresult
+//  ex_reg_wd := EX.writeData
+//  ex_reg_result := EX.ALUresult
   //ex_reg_ctl_branch_taken := EX.branch_taken
   EX.immediate := id_reg_imm
   EX.readData1 := id_reg_rd1
@@ -180,22 +180,24 @@ class Core extends Module {
   MEM.io.dccmRsp <> io.dmemRsp
 //  val stall = Wire(Bool())
 //  stall := (ex_reg_ctl_memWrite || ex_reg_ctl_memRead) && !io.dmemRsp.valid
-  when(MEM.io.stall){
-    mem_reg_rd := mem_reg_rd
-    mem_reg_result := mem_reg_result
-//    mem_reg_wra := mem_reg_wra
-    ex_reg_wra := ex_reg_wra
-    ex_reg_ctl_memToReg := ex_reg_ctl_memToReg
-//    mem_reg_ctl_memToReg := mem_reg_ctl_memToReg
-    ex_reg_ctl_regWrite := ex_reg_ctl_regWrite
-    mem_reg_ctl_regWrite := ex_reg_ctl_regWrite
-    mem_reg_ins := mem_reg_ins
-    mem_reg_pc := mem_reg_pc
-
-    ex_reg_ctl_memRead := ex_reg_ctl_memRead
-    ex_reg_ctl_memWrite := ex_reg_ctl_memWrite
-
-  } otherwise{
+//  when(MEM.io.stall){
+//    mem_reg_rd := mem_reg_rd
+//    mem_reg_result := mem_reg_result
+////    mem_reg_wra := mem_reg_wra
+//    ex_reg_wra := ex_reg_wra
+//    ex_reg_ctl_memToReg := ex_reg_ctl_memToReg
+////    mem_reg_ctl_memToReg := mem_reg_ctl_memToReg
+//    ex_reg_ctl_regWrite := ex_reg_ctl_regWrite
+//    mem_reg_ctl_regWrite := ex_reg_ctl_regWrite
+//    mem_reg_ins := mem_reg_ins
+//    mem_reg_pc := mem_reg_pc
+//
+//    ex_reg_ctl_memRead := ex_reg_ctl_memRead
+//    ex_reg_ctl_memWrite := ex_reg_ctl_memWrite
+////    ex_reg_wd := ex_reg_wd
+////    ex_reg_result := 0.U
+//
+//  } otherwise{
     mem_reg_rd := MEM.io.readData
     mem_reg_result := ex_reg_result
 //    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
@@ -205,7 +207,9 @@ class Core extends Module {
     mem_reg_wra := ex_reg_wra
     ex_reg_ctl_memRead := id_reg_ctl_memRead
     ex_reg_ctl_memWrite := id_reg_ctl_memWrite
-  }
+    ex_reg_wd := EX.writeData
+    ex_reg_result := EX.ALUresult
+//  }
   mem_reg_wra := ex_reg_wra
   mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
   EX.ex_mem_regWrite := ex_reg_ctl_regWrite
@@ -225,7 +229,7 @@ class Core extends Module {
 
   when(mem_reg_ctl_memToReg === 1.U) {
     wb_data := MEM.io.readData
-    wb_addr := Mux(io.dmemRsp.valid, mem_reg_wra, 0.U)
+    wb_addr := mem_reg_wra
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
       wb_data := mem_reg_pc
       wb_addr := mem_reg_wra
