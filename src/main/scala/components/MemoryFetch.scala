@@ -27,13 +27,13 @@ class MemoryFetch extends Module {
   val funct3 = RegInit(0.U(3.W))
   val offsetSW = io.aluResultIn(1,0)
 
-//  when(io.aluResultIn =/= 0.U){
-//    funct3 := io.f3
-//    offset := io.aluResultIn(1,0)
-//  }.otherwise{
-//    funct3 := funct3
-//    offset := offset
-//  }
+  when(!io.dccmRsp.valid){
+    funct3 := io.f3
+    offset := io.aluResultIn(1,0)
+  }.otherwise{
+    funct3 := funct3
+    offset := offset
+  }
 
   wdata(0) := io.writeData(7,0)
   wdata(1) := io.writeData(15,8)
