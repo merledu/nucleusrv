@@ -11,8 +11,8 @@ class SRamTop(val programFile:Option[String] ) extends Module {
         val rsp = Decoupled(new MemResponseIO)
     })
 
-//    val validReg = RegInit(false.B)
-//    io.rsp.valid := validReg
+    val validReg = RegInit(false.B)
+    io.rsp.valid := validReg
     io.req.ready := true.B // assuming we are always ready to accept requests from device
 
     val rdata = Wire(UInt(32.W))
@@ -40,7 +40,7 @@ class SRamTop(val programFile:Option[String] ) extends Module {
         when(io.req.valid && !io.req.bits.isWrite) {
             // READ
             // rdata := mem.read(io.req.bits.addrRequest/4.U)
-            io.rsp.valid := true.B
+            validReg := true.B
             sram.io.csb_i := false.B
             sram.io.we_i := true.B
             sram.io.addr_i := io.req.bits.addrRequest
@@ -56,10 +56,10 @@ class SRamTop(val programFile:Option[String] ) extends Module {
             sram.io.wmask_i := io.req.bits.activeByteLane
             sram.io.addr_i := io.req.bits.addrRequest
             sram.io.wdata_i := io.req.bits.dataRequest
-            io.rsp.valid := true.B
+            validReg := true.B
             rdata := DontCare
         } .otherwise {
-            io.rsp.valid := false.B
+            validReg := false.B
             // rdata map (_ := DontCare)
             rdata := DontCare
         }
