@@ -2,7 +2,6 @@
 package nucleusrv.components
 import chisel3._
 import chisel3.util._
-import components.{RVFI, RVFIPORT }
 
 class Core extends Module {
   val io = IO(new Bundle {
@@ -14,8 +13,6 @@ class Core extends Module {
 
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
-
-    val rvfi = new RVFIPORT
 
   })
 
@@ -246,22 +243,6 @@ class Core extends Module {
   ID.writeReg := wb_addr
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
-
-
-
-  val rvfi = Module(new RVFI)
-  rvfi.io.stall := MEM.io.stall
-  rvfi.io.pc := pc.io.out
-  rvfi.io.pc_src := ID.pcSrc
-  rvfi.io.pc_four := pc.io.pc4
-  rvfi.io.pc_offset := pc.io.in
-  rvfi.io.rd_wdata := wb_data
-  rvfi.io.rd_addr := wb_addr
-  rvfi.io.rs1_rdata := ID.readData1
-  rvfi.io.rs2_rdata := ID.readData2
-  rvfi.io.insn := if_reg_ins
-
-  io.rvfi <> rvfi.io.rvfi
 
 
 }

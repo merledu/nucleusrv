@@ -1,14 +1,11 @@
 package nucleusrv.components
 import chisel3._
 
-import components.RVFIPORT
-
 
 class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
-    val rvfi = new RVFIPORT
   })
 
 
@@ -27,8 +24,5 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   core.io.dmemRsp <> dmem.io.rsp
   dmem.io.req <> core.io.dmemReq
 
-
-  io.rvfi <> core.io.rvfi
   io.pin := core.io.pin
-
 }
