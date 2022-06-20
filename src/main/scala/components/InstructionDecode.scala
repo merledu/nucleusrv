@@ -29,7 +29,7 @@ class InstructionDecode extends Module {
     val writeRegAddress = Output(UInt(5.W))
     val readData1 = Output(UInt(32.W))
     val readData2 = Output(UInt(32.W))
-    val func7 = Output(UInt(1.W))
+    val func7 = Output(UInt(7.W))
     val func3 = Output(UInt(3.W))
     val ctl_aluSrc = Output(Bool())
     val ctl_memToReg = Output(UInt(2.W))
@@ -183,5 +183,9 @@ class InstructionDecode extends Module {
 
   io.writeRegAddress := io.id_instruction(11, 7)
   io.func3 := io.id_instruction(14, 12)
-  io.func7 := io.id_instruction(30)
+  when(io.id_instruction(6,0) === "b0110011".U){
+    io.func7 := io.id_instruction(31,25)
+  }.otherwise{
+    io.func7 := 0.U
+  }
 }

@@ -7,7 +7,7 @@ import org.scalatest.FreeSpec
 import chiseltest.experimental.TestOptionBuilder._ 
 import chiseltest.internal.VerilatorBackendAnnotation
 
-import caravan.bus.common.BusConfig
+// import caravan.bus.common.BusConfig
 // import caravan.bus.wishbone.{WishboneConfig, WBRequest, WBResponse}
 
 class TopTest extends FreeSpec with ChiselScalatestTester {

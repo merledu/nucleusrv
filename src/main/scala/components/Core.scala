@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class Core extends Module {
+class Core(M:Boolean = false) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
@@ -26,7 +26,7 @@ class Core extends Module {
   val id_reg_rd2 = RegInit(0.U(32.W))
   val id_reg_imm = RegInit(0.U(32.W))
   val id_reg_wra = RegInit(0.U(5.W))
-  val id_reg_f7 = RegInit(0.U(1.W))
+  val id_reg_f7 = RegInit(0.U(7.W))
   val id_reg_f3 = RegInit(0.U(3.W))
   val id_reg_ins = RegInit(0.U(32.W))
   val id_reg_ctl_aluSrc = RegInit(false.B)
@@ -66,7 +66,7 @@ class Core extends Module {
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode).io
-  val EX = Module(new Execute).io
+  val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
 
   /*****************
