@@ -26,6 +26,8 @@ class Execute(M:Boolean = false) extends Module {
 
     val writeData = Output(UInt(32.W))
     val ALUresult = Output(UInt(32.W))
+
+    val stall = Output(Bool())
   })
 
   val alu = Module(new ALU)
@@ -76,21 +78,73 @@ class Execute(M:Boolean = false) extends Module {
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
 
-  if(M){
-    val mdu = Module (new MDU)
+  // val counter = RegInit(0.U(6.W))
+  //   dontTouch(counter)
+  //   when (counter < 32.U){
+  //     counter := counter + 1.U
+  //   }.otherwise{
+  //     counter := 0.U
+  //   }
 
+  // if(M){
+    val mdu = Module (new MDU)
     mdu.io.src_a := aluIn1
     mdu.io.src_b := aluIn2
-    mdu.io.op := io.func3
-    mdu.io.valid := true.B
+    mdu.io.op    := io.func3
+    // mdu.io.valid := true.B
+    io.stall := false.B
+    
+    val src_a_reg = RegInit(0.U(32.W))
+    val src_b_reg = RegInit(0.U(32.W))
+    val op_reg    = RegInit(0.U(3.W))
+    val div_en    = RegInit(false.B)
+    val f7_reg    = RegInit(0.U(6.W))
+    val counter = RegInit(0.U(6.W))
 
-    when (io.func7 === 1.U && mdu.io.ready){
+    when(io.func7 === 1.U && (io.func3 === 0.U || io.func3 === 1.U || io.func3 === 2.U || io.func3 === 3.U)){
+      mdu.io.valid := true.B
+    }otherwise{
+      mdu.io.valid := false.B
+    }
+    dontTouch(io.stall)
+    when(io.func7 === 1.U && ~div_en && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)){
+      mdu.io.valid := RegNext(true.B)
+      div_en := true.B
+      src_a_reg := aluIn1
+      src_b_reg := aluIn2
+      op_reg := io.func3
+      f7_reg := io.func7
+      io.stall := true.B
+      dontTouch(f7_reg)
+    }
+
+    when(div_en){
+      io.stall := true.B
+      when (counter < 32.U){
+        mdu.io.src_a := src_a_reg
+        mdu.io.src_b := src_b_reg
+        mdu.io.op    := op_reg
+        // mdu.io.valid := true.B
+        counter := counter + 1.U
+      }.otherwise{
+        mdu.io.valid := false.B
+        div_en       := false.B
+        mdu.io.op    := op_reg
+        counter := 0.U
+      }
+    }//.otherwise{io.stall := false.B}
+
+    when(div_en && f7_reg === 1.U && mdu.io.ready){
+      io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
+    }
+    .elsewhen (io.func7 === 1.U && mdu.io.ready){
       io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
     }
     .otherwise{io.ALUresult := alu.io.result}
-  } else {
-    io.ALUresult := alu.io.result
-  }
+  // } 
+  // else {
+  //   io.ALUresult := alu.io.result
+  // }
 
   // io.ALUresult := alu.io.result
 

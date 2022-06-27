@@ -45,6 +45,8 @@ class InstructionDecode extends Module {
     val pcSrc = Output(Bool())
     val pcPlusOffset = Output(UInt(32.W))
     val ifid_flush = Output(Bool())
+
+    val stall = Output(Bool())
   })
 
   //Hazard Detection Unit
@@ -188,4 +190,6 @@ class InstructionDecode extends Module {
   }.otherwise{
     io.func7 := 0.U
   }
+
+  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
 }

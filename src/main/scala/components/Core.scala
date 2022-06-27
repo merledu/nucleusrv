@@ -75,7 +75,7 @@ class Core(M:Boolean = false) extends Module {
 
   val pc = Module(new PC)
 
-  IF.stall := io.stall //stall signal from outside
+  IF.stall := io.stall || EX.stall || ID.stall //stall signal from outside
   
   io.imemReq <> IF.coreInstrReq
   IF.coreInstrResp <> io.imemRsp
@@ -83,7 +83,8 @@ class Core(M:Boolean = false) extends Module {
   IF.address := pc.io.in.asUInt()
   val instruction = IF.instruction
 
-  pc.io.halt := Mux(io.imemReq.valid, 0.B, 1.B)
+  // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
+  pc.io.halt := Mux(EX.stall || ID.stall || ~io.imemReq.valid, 1.B, 0.B)
   pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
 
