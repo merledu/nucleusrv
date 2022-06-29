@@ -119,8 +119,9 @@ class Execute(M:Boolean = false) extends Module {
     }
 
     when(div_en){
-      io.stall := true.B
+      // io.stall := true.B
       when (counter < 32.U){
+        io.stall := true.B
         mdu.io.src_a := src_a_reg
         mdu.io.src_b := src_b_reg
         mdu.io.op    := op_reg

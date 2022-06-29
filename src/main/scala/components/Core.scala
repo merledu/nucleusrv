@@ -75,7 +75,17 @@ class Core(M:Boolean = false) extends Module {
 
   val pc = Module(new PC)
 
-  IF.stall := io.stall || EX.stall || ID.stall //stall signal from outside
+  val func3 = IF.instruction(14, 12)
+  val func7 = Wire(UInt(6.W))
+  when(IF.instruction(6,0) === "b0110011".U){
+    func7 := IF.instruction(31,25)
+  }.otherwise{
+    func7 := 0.U
+  }
+
+  val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+
+  IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   io.imemReq <> IF.coreInstrReq
   IF.coreInstrResp <> io.imemRsp
@@ -84,7 +94,7 @@ class Core(M:Boolean = false) extends Module {
   val instruction = IF.instruction
 
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
-  pc.io.halt := Mux(EX.stall || ID.stall || ~io.imemReq.valid, 1.B, 0.B)
+  pc.io.halt := Mux(EX.stall || ID.stall || IF_stall || ~io.imemReq.valid, 1.B, 0.B)
   pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
 
