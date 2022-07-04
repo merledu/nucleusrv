@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class Core extends Module {
+class Core(M:Boolean = false) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
@@ -26,7 +26,7 @@ class Core extends Module {
   val id_reg_rd2 = RegInit(0.U(32.W))
   val id_reg_imm = RegInit(0.U(32.W))
   val id_reg_wra = RegInit(0.U(5.W))
-  val id_reg_f7 = RegInit(0.U(1.W))
+  val id_reg_f7 = RegInit(0.U(7.W))
   val id_reg_f3 = RegInit(0.U(3.W))
   val id_reg_ins = RegInit(0.U(32.W))
   val id_reg_ctl_aluSrc = RegInit(false.B)
@@ -66,7 +66,7 @@ class Core extends Module {
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode).io
-  val EX = Module(new Execute).io
+  val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
 
   /*****************
@@ -75,7 +75,17 @@ class Core extends Module {
 
   val pc = Module(new PC)
 
-  IF.stall := io.stall //stall signal from outside
+  val func3 = IF.instruction(14, 12)
+  val func7 = Wire(UInt(6.W))
+  when(IF.instruction(6,0) === "b0110011".U){
+    func7 := IF.instruction(31,25)
+  }.otherwise{
+    func7 := 0.U
+  }
+
+  val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+
+  IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   io.imemReq <> IF.coreInstrReq
   IF.coreInstrResp <> io.imemRsp
@@ -83,7 +93,8 @@ class Core extends Module {
   IF.address := pc.io.in.asUInt()
   val instruction = IF.instruction
 
-  pc.io.halt := Mux(io.imemReq.valid, 0.B, 1.B)
+  // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
+  pc.io.halt := Mux(EX.stall || ID.stall || IF_stall || ~io.imemReq.valid, 1.B, 0.B)
   pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
 

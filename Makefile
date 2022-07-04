@@ -31,3 +31,7 @@ verilator: $(gen_dir)/VTop
 
 clean:
 	rm -rf $(gen_dir) $(out_dir) test_run_dir
+	
+	
+compliance:
+	./script.sh $(TEST)
