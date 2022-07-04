@@ -97,10 +97,9 @@ class Core(M:Boolean = false) extends Module {
   pc.io.halt := Mux(EX.stall || ID.stall || IF_stall || ~io.imemReq.valid, 1.B, 0.B)
   pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
-
   when(ID.hdu_if_reg_write) {
     if_reg_pc := pc.io.out.asUInt()
-    if_reg_ins := instruction
+    if_reg_ins := instruction 
   }
   when(ID.ifid_flush) {
     if_reg_ins := 0.U
@@ -179,6 +178,10 @@ class Core(M:Boolean = false) extends Module {
   ID.ex_mem_rd := ex_reg_ins(11, 7)
   ID.ex_result := EX.ALUresult
 
+  when(EX.stall){
+    id_reg_wra := id_reg_wra
+    id_reg_ctl_regWrite := id_reg_ctl_regWrite
+  }
 
   /****************
    * Memory Stage *
