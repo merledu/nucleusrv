@@ -83,6 +83,7 @@ class sram_top(programFile:Option[String] ) extends BlackBox(
 ) with HasBlackBoxResource {
     val io = IO(new SRAMIO)
     addResource("/sram_top.v")
+    addResource("/sram.v")
 }
 
 //package nucleusrv.components
