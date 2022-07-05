@@ -78,15 +78,7 @@ class Execute(M:Boolean = false) extends Module {
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
 
-  // val counter = RegInit(0.U(6.W))
-  //   dontTouch(counter)
-  //   when (counter < 32.U){
-  //     counter := counter + 1.U
-  //   }.otherwise{
-  //     counter := 0.U
-  //   }
-
-  // if(M){
+  if(M){
     val mdu = Module (new MDU)
     mdu.io.src_a := aluIn1
     mdu.io.src_b := aluIn2
@@ -130,6 +122,8 @@ class Execute(M:Boolean = false) extends Module {
       }.otherwise{
         mdu.io.valid := false.B
         div_en       := false.B
+        mdu.io.src_a := src_a_reg
+        mdu.io.src_b := src_b_reg
         mdu.io.op    := op_reg
         counter := 0.U
       }
@@ -142,10 +136,10 @@ class Execute(M:Boolean = false) extends Module {
       io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
     }
     .otherwise{io.ALUresult := alu.io.result}
-  // } 
-  // else {
-  //   io.ALUresult := alu.io.result
-  // }
+  } 
+  else {
+    io.ALUresult := alu.io.result
+  }
 
   // io.ALUresult := alu.io.result
 

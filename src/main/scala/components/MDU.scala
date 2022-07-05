@@ -45,10 +45,11 @@ class MDU extends Module{
 
     io.output.valid := 0.U
 
-    // shift + substract
-    when(io.op === DIVU || io.op === REMU){
-        val dividend  = WireInit(io.src_a)
-        val divisor   = WireInit(io.src_b)
+    val is_div_rem_u = WireInit(io.op === DIVU || io.op === REMU) 
+    val is_div_rem_s = WireInit(io.op === DIV || io.op === REM) 
+    when(is_div_rem_s || is_div_rem_u){
+        val dividend  = Mux(is_div_rem_s && io.src_a(31), -io.src_a, io.src_a)  //WireInit(io.src_a)
+        val divisor   = Mux(is_div_rem_s && io.src_b(31), -io.src_b, io.src_b)  //WireInit(io.src_b)
         when(io.valid === 1.U) {
             r_ready    := 0.U
             r_counter  := 32.U
@@ -56,12 +57,16 @@ class MDU extends Module{
             r_quotient := 0.U
         }.elsewhen(r_counter =/= 0.U){
             when(r_dividend >= (divisor<<(r_counter-1.U))){
-            r_dividend    := r_dividend - (divisor<<(r_counter-1.U))
-            r_quotient    := r_quotient + (1.U<<(r_counter-1.U))
-            }.otherwise {r_ready := 1.U}
+                r_dividend    := r_dividend - (divisor<<(r_counter-1.U))
+                r_quotient    := r_quotient + (1.U<<(r_counter-1.U))
+            }.otherwise {
+                r_ready := 1.U
+            }
             r_counter  := r_counter - 1.U
             r_ready    := (r_counter === 1.U)
-        }.otherwise{io.output.valid := 1.U}
+        }.otherwise{
+            io.output.valid := 1.U
+        }
     }
 
     io.ready     := r_ready
@@ -71,8 +76,12 @@ class MDU extends Module{
     }.elsewhen(io.op === MULH || io.op === MULHU || io.op === MULHSU){
         io.output.bits := result(63,32)
         io.output.valid := 1.U
+    }.elsewhen(io.op === DIV){
+        io.output.bits := Mux(io.src_a(31) =/= io.src_b(31) & io.src_b.orR,-r_quotient, r_quotient)
     }.elsewhen(io.op === DIVU){
         io.output.bits := r_quotient
+    }.elsewhen(io.op === REM){
+        io.output.bits := Mux(io.src_a(31),-r_dividend, r_dividend)
     }.elsewhen(io.op === REMU){
         io.output.bits := r_dividend
     }.otherwise{
