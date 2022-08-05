@@ -34,4 +34,4 @@ clean:
 	
 	
 compliance:
-	./script.sh $(TEST)
+	./run_compliance.sh $(TEST)
