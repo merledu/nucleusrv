@@ -24,7 +24,7 @@ class InstructionFetch extends Module {
   io.coreInstrReq.bits.dataRequest := DontCare
 
   io.coreInstrReq.bits.addrRequest := io.address >> 2
-  io.coreInstrReq.valid := Mux(rst, false.B, true.B)
+  io.coreInstrReq.valid := Mux(rst || io.stall, false.B, true.B)
 
   io.instruction := Mux(io.coreInstrResp.valid, io.coreInstrResp.bits.dataResponse, DontCare)
 }
