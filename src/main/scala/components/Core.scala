@@ -65,6 +65,7 @@ class Core(M:Boolean = false) extends Module {
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
+  val RA = Module(new Realigner).io
   val CD = Module(new CompressedDecoder).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute(M = M)).io
@@ -78,12 +79,21 @@ class Core(M:Boolean = false) extends Module {
 
   io.imemReq <> IF.coreInstrReq
   IF.coreInstrResp <> io.imemRsp
-  IF.address := pc.io.in.asUInt()
+
+  /*****************
+   * Realingner *
+   ******************/
+  RA.ral_address_i     := pc.io.in.asUInt()
+  RA.ral_instruction_i := IF.instruction
+  RA.ral_jmp           := ID.pcSrc
+
+  IF.address           := RA.ral_address_o
+  val instruction_cd    = RA.ral_instruction_o
 
   /*************************************************
    * Compressed Decoder (Fully Combinational) *
    *************************************************/
-  CD.instruction_i := IF.instruction
+  CD.instruction_i := instruction_cd
   val instruction  = CD.instruction_o 
 
   val func3 = instruction(14, 12)
@@ -99,7 +109,7 @@ class Core(M:Boolean = false) extends Module {
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
-  pc.io.halt := Mux(EX.stall || ID.stall || IF_stall || ~io.imemReq.valid, 1.B, 0.B)
+  pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | RA.ral_halt_o), 1.B, 0.B)
   pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(CD.is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
 
   when(ID.hdu_if_reg_write) {
