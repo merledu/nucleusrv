@@ -10,6 +10,8 @@ generated-src/*
 .vscode/*
 dump.vcd
 VCPU
+Test_result.txt
+riscv-arch-test/
 ### XilinxISE template
 # intermediate build files
 *.bgn
