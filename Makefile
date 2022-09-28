@@ -34,4 +34,4 @@ clean:
 	
 	
 compliance:
-	./run_compliance.sh $(TEST)
+	./run_compliance.sh $(TEST) $(ISA)
