@@ -23,6 +23,7 @@ class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int) extends Module {
     val rs1Addr = if (RVFI) Some(Output(UInt(5.W))) else None
     val rs2Addr = if (RVFI) Some(Output(UInt(5.W))) else None
     val rdAddr = if (RVFI) Some(Output(UInt(5.W))) else None
+    val mem_reg_ctl_regWrite = if (RVFI) Some(Output(Bool())) else None
 
     val pc = if (RVFI) Some(Output(UInt(XLEN.W))) else None
     val npc = if (RVFI) Some(Output(UInt(XLEN.W))) else None
@@ -296,8 +297,8 @@ class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int) extends Module {
   Seq(
     io.mem_reg_ins,
 
-    io.id_reg_rd1, io.id_reg_rd2, io.wb_data, io.rs1_addr, io.rs2_addr,
-    io.wb_addr,
+    io.id_reg_rd1, io.id_reg_rd2,          io.wb_data, io.rs1_addr, io.rs2_addr,
+    io.wb_addr,    io.mem_reg_ctl_regWrite,
 
     io.mem_reg_pc, io.nextPC,
 
@@ -305,8 +306,8 @@ class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int) extends Module {
   ) zip Seq(
     mem_reg_ins,
 
-    id_reg_rd1, id_reg_rd2, wb_data, ID.rs1_addr, ID.rs2_addr,
-    wb_addr,
+    id_reg_rd1, id_reg_rd2,          wb_data, ID.rs1_addr, ID.rs2_addr,
+    wb_addr,    mem_reg_ctl_regWrite,
 
     mem_reg_pc, nextPC,
 
