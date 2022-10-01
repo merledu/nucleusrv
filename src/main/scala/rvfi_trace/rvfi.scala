@@ -60,7 +60,7 @@ class RVFI_IO(RVFI:Boolean=false, XLEN:Int, NRET:Int, ILEN:Int) extends Bundle {
   val rvfi_mem_wdata = if (RVFI) Some(Output(SInt((NRET * XLEN).W))) else None
 }
 
-class RVFIUnit(RVFI:Boolean=false, XLEN:Int, NRET:Int, ILEN:Int) extends Module {
+class RVFIUnit(RVFI:Boolean=false, XLEN:Int=32, NRET:Int=1, ILEN:Int=32) extends Module {
   // Initializing IO ports
   val io: RVFI_IO = IO(new RVFI_IO(RVFI, XLEN, NRET, ILEN))
 
