@@ -47,6 +47,9 @@ class InstructionDecode extends Module {
     val ifid_flush = Output(Bool())
 
     val stall = Output(Bool())
+
+    val rs1_addr = Output(UInt(5.W))
+    val rs2_addr = Output(UInt(5.W))
   })
 
   //Hazard Detection Unit
@@ -192,4 +195,13 @@ class InstructionDecode extends Module {
   }
 
   io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
+
+  // For RVFI output
+  Seq(
+    io.rs1_addr, io.rs2_addr
+  ) zip Seq(
+    registerRs1, registerRs2
+  ) foreach {
+    x => x._1 := x._2
+  }
 }
