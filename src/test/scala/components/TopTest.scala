@@ -29,7 +29,7 @@ class TopTest extends FreeSpec with ChiselScalatestTester {
       val programFile = getProgramFile
       val dataFile = getDataFile
       // test(new Top(new WBRequest(), new WBResponse(), Module(new WishboneAdapter()), Module(new WishboneAdapter()), programFile)).withAnnotation(Seq(VerilatorBackendAnnotation)){ c =>
-        test(new Top(programFile, dataFile)).withAnnotations(Seq(VerilatorBackendAnnotation)){ c =>
+        test(new Top(programFile, dataFile, true)).withAnnotations(Seq(VerilatorBackendAnnotation)){ c =>
           c.clock.setTimeout(0)
           c.clock.step(20)
       }

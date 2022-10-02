@@ -297,12 +297,12 @@ class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int) extends Module {
   Seq(
     io.mem_reg_ins,
 
-    io.id_reg_rd1, io.id_reg_rd2,          io.wb_data, io.rs1_addr, io.rs2_addr,
-    io.wb_addr,    io.mem_reg_ctl_regWrite,
+    io.id_reg_rd1, io.id_reg_rd2,          io.rdData, io.rs1Addr, io.rs2Addr,
+    io.rdAddr,     io.mem_reg_ctl_regWrite,
 
-    io.mem_reg_pc, io.nextPC,
+    io.pc, io.npc,
 
-    io.ex_reg_result, io.readData, io.ex_reg_wd, io.readEnable, io.writeEnable
+    io.memAddr, io.memRdata, io.memWdata, io.rEnable, io.wEnable
   ) zip Seq(
     mem_reg_ins,
 
