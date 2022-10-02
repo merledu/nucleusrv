@@ -1,27 +1,7 @@
-make[2]: Entering directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test'
 make  \
 	RISCV_TARGET=nucleusrv \
 	RISCV_DEVICE=rv32i \
-	RISCV_PREFIX=riscv64-unknown-elf- \
-	run -C /home/talha/Music/temp/nucleusrv/riscv-arch-test/riscv-test-suite/rv32im
-make[3]: Entering directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test/riscv-test-suite/rv32im'
-Compile /home/talha/Music/temp/nucleusrv/riscv-arch-test/work/rv32im/MUL.elf
-Execute /home/talha/Music/temp/nucleusrv/riscv-arch-test/work/rv32im/MUL.log
-make[3]: Leaving directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test/riscv-test-suite/rv32im'
-riscv-test-env/verify.sh
-
-
-Compare to reference files ... 
-
-Check                      DIV ... IGNORE
-Check                     DIVU ... IGNORE
-Check                     MULH ... IGNORE
-Check                   MULHSU ... IGNORE
-Check                    MULHU ... IGNORE
-Check                      MUL ... OK
-Check                      REM ... IGNORE
-Check                     REMU ... IGNORE
---------------------------------
-OK: 8/8 RISCV_TARGET=nucleusrv RISCV_DEVICE=rv32i RISCV_ISA=rv32im
-
-make[2]: Leaving directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test'
+	RISCV_PREFIX=riscv32-unknown-elf- \
+	run -C /home/cybergai/Repositories/other-repositories/nucleusrv/riscv-arch-test/riscv-test-suite/rv32imc
+make[1]: Entering directory '/home/cybergai/Repositories/other-repositories/nucleusrv/riscv-arch-test/riscv-test-suite/rv32imc'
+make[1]: Leaving directory '/home/cybergai/Repositories/other-repositories/nucleusrv/riscv-arch-test/riscv-test-suite/rv32imc'

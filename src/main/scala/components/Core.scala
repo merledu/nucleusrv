@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int) extends Module {
+class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int=32) extends Module {
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(XLEN.W))
     val stall: Bool = Input(Bool())
@@ -15,7 +15,7 @@ class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int) extends Module {
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
 
     // RVFI ports
-    val ins = if (RVFI) Some(Output(SInt(XLEN.W))) else None
+    val ins = if (RVFI) Some(Output(UInt(XLEN.W))) else None
 
     val rd1 = if (RVFI) Some(Output(SInt(XLEN.W))) else None
     val rd2 = if (RVFI) Some(Output(SInt(XLEN.W))) else None
@@ -294,27 +294,47 @@ class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int) extends Module {
   io.pin := wb_data
 
   // RVFI ports
-  Seq(
-    io.mem_reg_ins,
+  if (RVFI) Seq(
+    io.ins,
 
-    io.id_reg_rd1, io.id_reg_rd2,          io.rdData, io.rs1Addr, io.rs2Addr,
-    io.rdAddr,     io.mem_reg_ctl_regWrite,
+    io.rd1,
+    io.rd2,
+    io.rdData,
+    io.rs1Addr,
+    io.rs2Addr,
+    io.rdAddr,
+    io.mem_reg_ctl_regWrite,
 
-    io.pc, io.npc,
+    io.pc,
+    io.npc,
 
-    io.memAddr, io.memRdata, io.memWdata, io.rEnable, io.wEnable
+    io.memAddr,
+    io.memRdata,
+    io.memWdata,
+    io.rEnable,
+    io.wEnable
   ) zip Seq(
     mem_reg_ins,
 
-    id_reg_rd1, id_reg_rd2,          wb_data, ID.rs1_addr, ID.rs2_addr,
-    wb_addr,    mem_reg_ctl_regWrite,
+    id_reg_rd1.asSInt,
+    id_reg_rd2.asSInt,
+    wb_data.asSInt,
+    ID.rs1_addr,
+    ID.rs2_addr,
+    wb_addr,
+    mem_reg_ctl_regWrite,
 
-    mem_reg_pc, nextPC,
+    mem_reg_pc,
+    nextPC,
 
-    ex_reg_result, MEM.io.readData, ex_reg_wd, ex_reg_ctl_memRead, ex_reg_ctl_memWrite,
+    ex_reg_result,
+    MEM.io.readData.asSInt,
+    ex_reg_wd.asSInt,
+    ex_reg_ctl_memRead,
+    ex_reg_ctl_memWrite,
   ) foreach {
-    x => x._1 := x._2
-  }
+    x => x._1.get := x._2
+  } else None
 
   /*******************************
    * Log, in format of Spike-ISS *

@@ -2,7 +2,7 @@ package rvfi_trace
 
 import chisel3._
 
-class RVFI_IO(RVFI:Boolean=false, XLEN:Int, NRET:Int, ILEN:Int) extends Bundle {
+class RVFI_IO(RVFI:Boolean, XLEN:Int, NRET:Int, ILEN:Int) extends Bundle {
   // Input ports
 
   // - Instruction metadata
@@ -24,21 +24,21 @@ class RVFI_IO(RVFI:Boolean=false, XLEN:Int, NRET:Int, ILEN:Int) extends Bundle {
   // - Memory Access
   val ex_reg_result = if (RVFI) Some(Input(UInt(XLEN.W))) else None
   val readEnable    = if (RVFI) Some(Input(Bool())) else None
-  val writeEnable   = if (RVFI) Some(Input(Bool())) else None
+  val memWriteEnable   = if (RVFI) Some(Input(Bool())) else None
   val ex_reg_wd     = if (RVFI) Some(Input(SInt(XLEN.W))) else None
   val readData      = if (RVFI) Some(Input(SInt(XLEN.W))) else None
 
   // Output ports
 
   // - Instruction metadata
-  val rvfi_valid = if (RVFI) Some(Output(UInt(NRET.W))) else None
-  val rvfi_order = if (RVFI) Some(Output(UInt((NRET * 64).W))) else None
+  //val rvfi_valid = if (RVFI) Some(Output(UInt(NRET.W))) else None
+  //val rvfi_order = if (RVFI) Some(Output(UInt((NRET * 64).W))) else None
   val rvfi_insn  = if (RVFI) Some(Output(UInt((NRET * ILEN).W))) else None
-  val rvfi_trap  = if (RVFI) Some(Output(UInt(NRET.W))) else None
-  val rvfi_halt  = if (RVFI) Some(Output(UInt(NRET.W))) else None
-  val rvfi_intr  = if (RVFI) Some(Output(UInt(NRET.W))) else None
-  val rvfi_mode  = if (RVFI) Some(Output(UInt((NRET * 2).W))) else None
-  val rvfi_ixl   = if (RVFI) Some(Output(UInt((NRET * 2).W))) else None
+  //val rvfi_trap  = if (RVFI) Some(Output(UInt(NRET.W))) else None
+  //val rvfi_halt  = if (RVFI) Some(Output(UInt(NRET.W))) else None
+  //val rvfi_intr  = if (RVFI) Some(Output(UInt(NRET.W))) else None
+  //val rvfi_mode  = if (RVFI) Some(Output(UInt((NRET * 2).W))) else None
+  //val rvfi_ixl   = if (RVFI) Some(Output(UInt((NRET * 2).W))) else None
 
   // - Register read/write
   val rvfi_rs1_addr  = if (RVFI) Some(Output(UInt((NRET * 5).W))) else None
@@ -54,8 +54,8 @@ class RVFI_IO(RVFI:Boolean=false, XLEN:Int, NRET:Int, ILEN:Int) extends Bundle {
 
   // - Memory Access
   val rvfi_mem_addr  = if (RVFI) Some(Output(UInt((NRET * XLEN).W))) else None
-  val rvfi_mem_rmask = if (RVFI) Some(Output(UInt((NRET * XLEN / 8).W)) else None
-  val rvfi_mem_wmask = if (RVFI) Some(Output(UInt((NRET * XLEN / 8).W)) else None
+  //val rvfi_mem_rmask = if (RVFI) Some(Output(UInt((NRET * XLEN / 8).W)) else None
+  //val rvfi_mem_wmask = if (RVFI) Some(Output(UInt((NRET * XLEN / 8).W)) else None
   val rvfi_mem_rdata = if (RVFI) Some(Output(SInt((NRET * XLEN).W))) else None
   val rvfi_mem_wdata = if (RVFI) Some(Output(SInt((NRET * XLEN).W))) else None
 }
@@ -124,7 +124,7 @@ class RVFIUnit(RVFI:Boolean=false, XLEN:Int=32, NRET:Int=1, ILEN:Int=32) extends
     // RVFI output ports
     //
     // - Instruction metadata
-    mem_reg_ins, 
+    io.mem_reg_ins, 
 
     // - Register read
     mem_reg_rs1Addr, mem_reg_rs2Addr, mem_reg_rd1, mem_reg_rd2,
@@ -137,37 +137,40 @@ class RVFIUnit(RVFI:Boolean=false, XLEN:Int=32, NRET:Int=1, ILEN:Int=32) extends
     // - Instruction metadata
     //
     // - Register read
-    io.id_reg_rd1, id_reg_rd2,     ex_reg_rd1,     ex_reg_rd2,     io.rs1_addr,
+    io.id_reg_rd1, io.id_reg_rd2,     ex_reg_rd1,     ex_reg_rd2,     io.rs1_addr,
     io.rs2_addr,   id_reg_rs1Addr, id_reg_rs2Addr, ex_reg_rs1Addr, ex_reg_rs2Addr,
 
     // - Program Counter
     io.nextPC, if_reg_nPC, id_reg_nPC, ex_reg_nPC,
 
     // - Memory Access
-    ex_reg_result, ex_reg_wd, io.readEnable, io.writeEnable
+    io.ex_reg_result, io.ex_reg_wd, io.readEnable, io.writeEnable
 
   ) foreach {
-    x => x._1 := x._2
+    x => x._1.get := x._2.get
   } else None
 
   if (RVFI) Seq(
     // - Register write
-    io.rvfi_rd_addr, io.rvfi_rd_wdata,
+    io.rvfi_rd_addr,
+    io.rvfi_rd_wdata,
 
     // - Memory Access
-    io.rvfi_mem_addr, io.rvfi_mem_rdata, rvfi_mem_wdata
+    io.rvfi_mem_addr,
+    io.rvfi_mem_rdata,
+    io.rvfi_mem_wdata
 
   ) zip Seq(
     // - Register write
-    (io.writeEnable, io.wb_rd, 0.U),
-    (io.writeEnable, io.wb_data, 0.S),
+    (io.memWriteEnable.get, io.wb_rd, 0.U),
+    (io.memWriteEnable.get, io.wb_data, 0.S),
 
     // - Memory Access
-    (mem_reg_readEnable || mem_reg_writeEnable, mem_reg_result, 0.U),
-    (mem_reg_readEnable,                        io.readData,    0.S),
-    (mem_reg_writeEnable,                       mem_reg_wd,     0.S)
+    (mem_reg_readEnable.get || mem_reg_writeEnable.get, mem_reg_result, 0.U),
+    (mem_reg_readEnable.get,                            io.readData,    0.S),
+    (mem_reg_writeEnable.get,                           mem_reg_wd,     0.S)
 
   ) foreach {
-    x => x._1 := Mux(x._2._1, x._2._2, x._2._3)
+    x => x._1.get := Mux(x._2._1, x._2._2.get, x._2._3)
   } else None
 }

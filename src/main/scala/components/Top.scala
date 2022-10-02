@@ -10,8 +10,8 @@ class Top(programFile:Option[String], dataFile:Option[String], rvfi:Boolean=fals
   })
 
 
-  val core: Core = Module(new Core(M = true))
-  val tracer = if (rvfi) Module(new RVFIUnit(rvfi)) else None
+  val core: Core = Module(new Core(M = true, RVFI=rvfi))
+  val tracer = if (rvfi) Some(Module(new RVFIUnit(rvfi))) else None
   core.io.stall := false.B
 
   val dmem = Module(new SRamTop(dataFile))
@@ -31,27 +31,27 @@ class Top(programFile:Option[String], dataFile:Option[String], rvfi:Boolean=fals
   /*  RVFI Tracer Interconnections  */
   if (rvfi) Seq(
     // Instruction metadata
-    tracer.io.mem_reg_ins,
+    tracer.get.io.mem_reg_ins,
 
     // Register read/write
-    tracer.io.id_reg_rd1,
-    tracer.io.id_reg_rd2,
-    tracer.io.wb_rd,
-    tracer.io.rs1_addr,
-    tracer.io.rs2_addr,
-    tracer.io.wb_data,
-    tracer.io.writeEnable,
+    tracer.get.io.id_reg_rd1,
+    tracer.get.io.id_reg_rd2,
+    tracer.get.io.wb_rd,
+    tracer.get.io.rs1_addr,
+    tracer.get.io.rs2_addr,
+    tracer.get.io.wb_data,
+    tracer.get.io.writeEnable,
 
     // Program Counter
-    tracer.io.mem_reg_pc,
-    tracer.io.nextPC,
+    tracer.get.io.mem_reg_pc,
+    tracer.get.io.nextPC,
 
     // Memory Access
-    tracer.io.ex_reg_result,
-    tracer.io.readEnable,
-    tracer.io.writeEnable,
-    tracer.io.ex_reg_wd,
-    tracer.io.readData
+    tracer.get.io.ex_reg_result,
+    tracer.get.io.readEnable,
+    tracer.get.io.writeEnable,
+    tracer.get.io.ex_reg_wd,
+    tracer.get.io.readData
   ) zip Seq(
     // Instruction metadata
     core.io.ins,
@@ -76,6 +76,6 @@ class Top(programFile:Option[String], dataFile:Option[String], rvfi:Boolean=fals
     core.io.memWdata,
     core.io.memRdata
   ) foreach {
-    x => x._1 := x._2
+    x => x._1.get := x._2.get
   } else None
 }
