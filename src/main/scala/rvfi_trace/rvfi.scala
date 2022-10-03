@@ -9,8 +9,8 @@ class RVFI_IO(RVFI:Boolean, XLEN:Int, NRET:Int, ILEN:Int) extends Bundle {
   val mem_reg_ins = if (RVFI) Some(Input(UInt(XLEN.W))) else None
 
   // - Register read/write
-  val id_reg_rd1  = if (RVFI) Some(Input(UInt(XLEN.W))) else None
-  val id_reg_rd2  = if (RVFI) Some(Input(UInt(XLEN.W))) else None
+  val id_reg_rd1  = if (RVFI) Some(Input(SInt(XLEN.W))) else None
+  val id_reg_rd2  = if (RVFI) Some(Input(SInt(XLEN.W))) else None
   val wb_rd       = if (RVFI) Some(Input(UInt(5.W))) else None
   val rs1_addr    = if (RVFI) Some(Input(UInt(5.W))) else None
   val rs2_addr    = if (RVFI) Some(Input(UInt(5.W))) else None
@@ -89,9 +89,9 @@ class RVFIUnit(RVFI:Boolean=false, XLEN:Int=32, NRET:Int=1, ILEN:Int=32) extends
   // - Memory Access
   val mem_reg_result      = if (RVFI) Some(RegInit(0.U(XLEN.W))) else None
   //val mem_reg_readData    = if (RVFI) Some(RegInit(0.U(XLEN.W))) else None
-  val mem_reg_wd          = if (RVFI) Some(RegInit(0.U(XLEN.W))) else None
-  val mem_reg_readEnable  = if (RVFI) Some(RegInit(Bool())) else None
-  val mem_reg_writeEnable = if (RVFI) Some(RegInit(Bool())) else None
+  val mem_reg_wd          = if (RVFI) Some(RegInit(0.S(XLEN.W))) else None
+  val mem_reg_readEnable  = if (RVFI) Some(RegInit(0.B)) else None
+  val mem_reg_writeEnable = if (RVFI) Some(RegInit(0.B)) else None
 
   // Wiring to output ports
   if (RVFI) Seq(
@@ -162,7 +162,7 @@ class RVFIUnit(RVFI:Boolean=false, XLEN:Int=32, NRET:Int=1, ILEN:Int=32) extends
 
   ) zip Seq(
     // - Register write
-    (io.memWriteEnable.get, io.wb_rd, 0.U),
+    (io.memWriteEnable.get, io.wb_rd,   0.U),
     (io.memWriteEnable.get, io.wb_data, 0.S),
 
     // - Memory Access

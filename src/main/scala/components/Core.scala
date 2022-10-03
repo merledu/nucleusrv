@@ -325,7 +325,7 @@ class Core(M:Boolean = false, RVFI:Boolean=false, XLEN:Int=32) extends Module {
     mem_reg_ctl_regWrite,
 
     mem_reg_pc,
-    nextPC,
+    nextPC.asUInt,
 
     ex_reg_result,
     MEM.io.readData.asSInt,

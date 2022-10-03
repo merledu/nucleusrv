@@ -49,7 +49,7 @@ class Top(programFile:Option[String], dataFile:Option[String], rvfi:Boolean=fals
     // Memory Access
     tracer.get.io.ex_reg_result,
     tracer.get.io.readEnable,
-    tracer.get.io.writeEnable,
+    tracer.get.io.memWriteEnable,
     tracer.get.io.ex_reg_wd,
     tracer.get.io.readData
   ) zip Seq(
