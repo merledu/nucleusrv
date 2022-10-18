@@ -65,8 +65,6 @@ class Core(M:Boolean = false) extends Module {
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val RA = Module(new Realigner).io
-  val CD = Module(new CompressedDecoder).io
   val ID = Module(new InstructionDecode).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
@@ -77,29 +75,10 @@ class Core(M:Boolean = false) extends Module {
 
   val pc = Module(new PC)
 
-  io.imemReq <> IF.coreInstrReq
-  IF.coreInstrResp <> io.imemRsp
-
-  /*****************
-   * Realingner *
-   ******************/
-  RA.ral_address_i     := pc.io.in.asUInt()
-  RA.ral_instruction_i := IF.instruction
-  RA.ral_jmp           := ID.pcSrc
-
-  IF.address           := RA.ral_address_o
-  val instruction_cd    = RA.ral_instruction_o
-
-  /*************************************************
-   * Compressed Decoder (Fully Combinational) *
-   *************************************************/
-  CD.instruction_i := instruction_cd
-  val instruction  = CD.instruction_o 
-
-  val func3 = instruction(14, 12)
+  val func3 = IF.instruction(14, 12)
   val func7 = Wire(UInt(6.W))
-  when(instruction(6,0) === "b0110011".U){
-    func7 := instruction(31,25)
+  when(IF.instruction(6,0) === "b0110011".U){
+    func7 := IF.instruction(31,25)
   }.otherwise{
     func7 := 0.U
   }
@@ -108,9 +87,15 @@ class Core(M:Boolean = false) extends Module {
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
+  io.imemReq <> IF.coreInstrReq
+  IF.coreInstrResp <> io.imemRsp
+
+  IF.address := pc.io.in.asUInt()
+  val instruction = IF.instruction
+
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
-  pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | RA.ral_halt_o), 1.B, 0.B)
-  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(CD.is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  pc.io.halt := Mux(EX.stall || ID.stall || IF_stall || ~io.imemReq.valid, 1.B, 0.B)
+  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), pc.io.pc4), pc.io.out)
 
   when(ID.hdu_if_reg_write) {
     if_reg_pc := pc.io.out.asUInt()

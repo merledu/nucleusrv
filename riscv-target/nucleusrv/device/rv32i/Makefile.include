@@ -27,9 +27,5 @@ COMPILE_TARGET=\
 	$$(RISCV_OBJCOPY) -O binary -j .text.init $$@ $$@.text.bin; \
     $$(RISCV_OBJCOPY) -O binary -j .data $$@ $$@.data.bin; \
     $$(RISCV_OBJDUMP) -D $$@ > $$@.objdump; \
-    hexdump -v -e '1/4 "%08x\n"' $$@.text.bin > $$@.program.hex; \
-    hexdump -v -e '1/4 "%08x\n"' $$@.data.bin > $$@.data.hex;
-#$$(RISCV_OBJCOPY) -O srec -j .text.init $$@ $$@.program.hex; \
-#$$(RISCV_OBJCOPY) -O srec --change-section-lma .data=0x0 -j .data $$@ $$@.data.hex;
-#python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.text.bin 2048 > $$@.program.hex; \
-#python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.data.bin 2048 > $$@.data.hex;
+    python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.text.bin 2048 > $$@.program.hex; \
+    python3 $(TARGETDIR)/$(RISCV_TARGET)/makehex.py $$@.data.bin 2048 > $$@.data.hex
