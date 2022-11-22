@@ -272,12 +272,3 @@ class Core(M:Boolean = false) extends Module {
   ID.writeReg := wb_addr
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
-
-  /*******************************
-   * Log, in format of Spike-ISS *
-   *******************************/
-
-   printf("PC: %x, INST: %x, REG_NO: %d, REG_VAL: %x\n", ex_reg_pc, ex_reg_ins,
-      Mux(mem_reg_ctl_regWrite, mem_reg_wra, 0.U),
-      Mux(mem_reg_ctl_regWrite, wb_data, 0.U))
-}
