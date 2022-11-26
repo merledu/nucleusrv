@@ -9,7 +9,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   })
 
 
-  val core: Core = Module(new Core(M = true))
+  val core: Core = Module(new Core())
   core.io.stall := false.B
 
   val dmem = Module(new SRamTop(dataFile))
