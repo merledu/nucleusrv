@@ -34,6 +34,10 @@ scalaVersion := "2.12.10"
 
 crossScalaVersions := Seq("2.12.10", "2.11.12")
 
+lazy val tracer = project in file("tracer")
+
+dependsOn(tracer)
+
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots"),
