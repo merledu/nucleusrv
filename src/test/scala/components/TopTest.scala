@@ -24,12 +24,21 @@ class TopTest extends FreeSpec with ChiselScalatestTester {
     }
   }
 
+  def traceEn: Option[String] = {
+    if (scalaTestContext.value.get.configMap.contains("trace")) {
+      Some(scalaTestContext.value.get.configMap("trace").toString)
+    } else {
+      None
+    }
+  }
+
   "Top Test" in {
       // implicit val config = WishboneConfig(32,32) //getConfig
       val programFile = getProgramFile
       val dataFile = getDataFile
+      val trace = traceEn
       // test(new Top(new WBRequest(), new WBResponse(), Module(new WishboneAdapter()), Module(new WishboneAdapter()), programFile)).withAnnotation(Seq(VerilatorBackendAnnotation)){ c =>
-        test(new Top(programFile, dataFile)).withAnnotations(Seq(VerilatorBackendAnnotation)){ c =>
+        test(new Top(programFile, dataFile, trace)).withAnnotations(Seq(VerilatorBackendAnnotation)){ c =>
           c.clock.setTimeout(0)
           c.clock.step(10000)
       }

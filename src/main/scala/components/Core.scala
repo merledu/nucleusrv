@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class Core(implicit val config:Configs) extends Module{
+class Core(implicit val config:Configs, TRACE:Boolean=false) extends Module{
 
   val M      = config.M
   val C      = config.C
@@ -19,6 +19,12 @@ class Core(implicit val config:Configs) extends Module{
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
 
+    // RVFI pins
+    val rvfiUIntVec    = if (TRACE) Some(Output(Vec(4, UInt(32.W)))) else None
+    val rvfiRegAddrVec = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
+    val rvfiSIntVec    = if (TRACE) Some(Output(Vec(5, SInt(32.W)))) else None
+    val rvfiBoolVec    = if (TRACE) Some(Output(Vec(1, Bool()))) else None
+    val rvfi_mode      = if (TRACE) Some(Output(UInt(2.W))) else None
   })
 
   // IF-ID Registers
@@ -70,7 +76,7 @@ class Core(implicit val config:Configs) extends Module{
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val ID = Module(new InstructionDecode).io
+  val ID = Module(new InstructionDecode(TRACE)).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
 
@@ -136,7 +142,8 @@ class Core(implicit val config:Configs) extends Module{
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
   pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
-  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  pc.io.in := npc
 
   when(ID.hdu_if_reg_write) {
     if_reg_pc := pc.io.out.asUInt()
@@ -299,4 +306,58 @@ class Core(implicit val config:Configs) extends Module{
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
 
+  /*************
+   * RVFI Pins *
+   *************/
+
+  if (TRACE) {
+    // Delay Registers
+    val npc_delay = RegInit(VecInit(Seq.fill(4)(0.U(32.W))))
+    val rs_addr_delay = for (i <- 0 to 1) yield RegInit(VecInit(Seq.fill(3)(0.U(5.W))))
+    val rs_data_delay = for (i <- 0 to 1) yield RegInit(VecInit(Seq.fill(2)(0.S(32.W))))
+    val mem_wdata_delay = RegInit(0.S(32.W))
+    val valid_delay = RegInit(VecInit(Seq.fill(3)(0.B)))
+
+    for (i <- 0 to 2) {
+      npc_delay(i+1) := npc_delay(i)
+    }
+
+    for (i <- 0 to 1) {
+      // rs_addr
+      for (j <- 0 to 1) {
+        rs_addr_delay(i)(j+1) := rs_addr_delay(i)(j)
+      }
+      rs_addr_delay(i)(0) := ID.rs_addr.get(i)
+      io.rvfiRegAddrVec.get(i+1) := rs_addr_delay(i)(2)
+
+      // rs_data
+      rs_data_delay(i)(0) := id_reg_rd1.asSInt
+      rs_data_delay(i)(1) := rs_data_delay(i)(0)
+      io.rvfiSIntVec.get(i+1) := rs_data_delay(i)(1)
+
+      // valid
+      valid_delay(i+1) := valid_delay(i)
+    }
+
+    Seq(
+      (npc_delay(0), npc.asUInt),
+      (mem_wdata_delay, ex_reg_wd.asSInt),
+      (valid_delay(0), ID.hdu_if_reg_write),
+
+      (io.rvfiUIntVec.get(0), mem_reg_ins),
+      (io.rvfiUIntVec.get(1), mem_reg_pc),
+      (io.rvfiUIntVec.get(2), npc_delay(3)),
+      (io.rvfiUIntVec.get(3), mem_reg_result),
+
+      (io.rvfiRegAddrVec.get(0), wb_addr),
+
+      (io.rvfi_mode.get, 3.U),
+
+      (io.rvfiSIntVec.get(0), wb_data.asSInt),
+      (io.rvfiSIntVec.get(3), MEM.io.readData.asSInt),
+      (io.rvfiSIntVec.get(4), mem_wdata_delay),
+
+      (io.rvfiBoolVec.get(0), valid_delay(2))
+    ) map (tr => tr._1 := tr._2)
+  } else None
 }
