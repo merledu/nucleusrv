@@ -19,7 +19,7 @@ Run this command is SBT shell
 testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile=/path/to/instructions/hex
 ```
 #### Running Compliance Tests
-* Clone `riscv-arch-test` repo in root direcotry `git clone git@github.com:riscv-non-isa/riscv-arch-test.git -b 1.0`
+* Clone `riscv-arch-test` repo in nucleusrv root `git clone git@github.com:riscv-non-isa/riscv-arch-test.git -b 1.0`
 * Build the simulation executable as defined in "Building with SBT" section
 * Run `./run-compliance.sh` in root directory
 
