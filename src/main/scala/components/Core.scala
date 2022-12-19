@@ -272,3 +272,4 @@ class Core(M:Boolean = false) extends Module {
   ID.writeReg := wb_addr
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
+}
