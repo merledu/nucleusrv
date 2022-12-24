@@ -41,7 +41,7 @@ class Tracer extends Module {
     "valid" -> io.rvfiBool(0)
   )
 
-  when (boolWires("valid")) {
+  when (boolWires("valid") && (uintWires("insn") =/= 0.U)) {
     printf(
       "ClkCycle: %d, pc_rdata: %x, pc_wdata: %x, insn: %x, mode: %d, rs1_addr: %d, rs1_rdata: %x, rs2_addr: %d, rs2_rdata: %x, rd_addr: %d, rd_wdata: %x, mem_addr: %x, mem_rdata: %x, mem_wdata: %x\n",
       clkCycle, uintWires("pc_rdata"), uintWires("pc_wdata"), uintWires("insn"), uintWires("mode"),
