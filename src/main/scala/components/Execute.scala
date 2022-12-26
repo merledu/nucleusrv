@@ -78,20 +78,21 @@ class Execute(M:Boolean = false) extends Module {
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
 
+  io.stall := false.B
   if(M){
     val mdu = Module (new MDU)
     mdu.io.src_a := aluIn1
     mdu.io.src_b := aluIn2
     mdu.io.op    := io.func3
     // mdu.io.valid := true.B
-    io.stall := false.B
+    // io.stall := false.B
     
     val src_a_reg = RegInit(0.U(32.W))
     val src_b_reg = RegInit(0.U(32.W))
     val op_reg    = RegInit(0.U(3.W))
     val div_en    = RegInit(false.B)
     val f7_reg    = RegInit(0.U(6.W))
-    val counter = RegInit(0.U(6.W))
+    val counter   = RegInit(0.U(6.W))
 
     when(io.func7 === 1.U && (io.func3 === 0.U || io.func3 === 1.U || io.func3 === 2.U || io.func3 === 3.U)){
       mdu.io.valid := true.B

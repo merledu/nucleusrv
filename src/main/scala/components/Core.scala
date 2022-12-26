@@ -1,9 +1,15 @@
-
 package nucleusrv.components
+
 import chisel3._
 import chisel3.util._
 
-class Core(M:Boolean = false) extends Module {
+class Core(implicit val config:Configs) extends Module{
+
+  val M      = config.M
+  val C      = config.C
+  val XLEN   = config.XLEN
+  val TRACE  = config.TRACE
+
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
@@ -14,6 +20,12 @@ class Core(M:Boolean = false) extends Module {
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
 
+    // RVFI Pins
+    val rvfiUInt    = if (TRACE) Some(Output(Vec(4, UInt(32.W)))) else None
+    val rvfiSInt    = if (TRACE) Some(Output(Vec(5, SInt(32.W)))) else None
+    val rvfiBool    = if (TRACE) Some(Output(Vec(1, Bool()))) else None
+    val rvfiRegAddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
+    val rvfiMode    = if (TRACE) Some(Output(UInt(2.W))) else None
   })
 
   // IF-ID Registers
@@ -65,9 +77,7 @@ class Core(M:Boolean = false) extends Module {
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val RA = Module(new Realigner).io
-  val CD = Module(new CompressedDecoder).io
-  val ID = Module(new InstructionDecode).io
+  val ID = Module(new InstructionDecode(TRACE)).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
 
@@ -80,21 +90,44 @@ class Core(M:Boolean = false) extends Module {
   io.imemReq <> IF.coreInstrReq
   IF.coreInstrResp <> io.imemRsp
 
-  /*****************
-   * Realingner *
-   ******************/
-  RA.ral_address_i     := pc.io.in.asUInt()
-  RA.ral_instruction_i := IF.instruction
-  RA.ral_jmp           := ID.pcSrc
+  val instruction = Wire(UInt(32.W))
+  val ral_halt_o  = WireInit(false.B)
+  val is_comp     = WireInit(false.B)
 
-  IF.address           := RA.ral_address_o
-  val instruction_cd    = RA.ral_instruction_o
 
-  /*************************************************
-   * Compressed Decoder (Fully Combinational) *
-   *************************************************/
-  CD.instruction_i := instruction_cd
-  val instruction  = CD.instruction_o 
+  if (C) {
+
+    /*****************
+    * Realingner *
+    ******************/
+    val RA = Module(new Realigner).io
+
+    RA.ral_address_i     := pc.io.in.asUInt()
+    RA.ral_instruction_i := IF.instruction
+    RA.ral_jmp           := ID.pcSrc
+
+    IF.address           := RA.ral_address_o
+    val instruction_cd    = RA.ral_instruction_o
+
+    ral_halt_o           := RA.ral_halt_o
+
+    /*************************************************
+    * Compressed Decoder (Fully Combinational) *
+    *************************************************/
+    val CD = Module(new CompressedDecoder).io
+
+    CD.instruction_i := instruction_cd
+    instruction  := CD.instruction_o
+
+    is_comp := CD.is_comp
+
+  }
+  else {
+
+    IF.address := pc.io.in.asUInt()
+    instruction := IF.instruction
+
+  }
 
   val func3 = instruction(14, 12)
   val func7 = Wire(UInt(6.W))
@@ -109,8 +142,9 @@ class Core(M:Boolean = false) extends Module {
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
-  pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | RA.ral_halt_o), 1.B, 0.B)
-  pc.io.in := Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(CD.is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
+  val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  pc.io.in := npc
 
   when(ID.hdu_if_reg_write) {
     if_reg_pc := pc.io.out.asUInt()
@@ -257,7 +291,7 @@ class Core(M:Boolean = false) extends Module {
     wb_data := MEM.io.readData
     wb_addr := mem_reg_wra
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
-      wb_data := mem_reg_pc
+      wb_data := mem_reg_pc+4.U
       wb_addr := mem_reg_wra
     }
     .otherwise {
@@ -272,4 +306,58 @@ class Core(M:Boolean = false) extends Module {
   ID.writeReg := wb_addr
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   io.pin := wb_data
+
+  /**************
+  ** RVFI PINS **
+  **************/
+  if (TRACE) {
+    val npcDelay = Reg(Vec(4, UInt(32.W)))
+    val rsAddrDelay = for (i <- 0 until 2) yield Reg(Vec(3, UInt(5.W)))
+    val rsDataDelay = for (i <- 0 until 2) yield Reg(Vec(2, SInt(32.W)))
+    val memAddrDelay = RegInit(0.U(32.W))
+    val memWdataDelay = RegInit(0.S(32.W))
+    val stallDelay = Reg(Vec(4, Bool()))
+
+    for (i <- 0 until 2) {
+      for (j <- 0 until 2) {
+        rsAddrDelay(i)(j + 1) := rsAddrDelay(i)(j)
+      }
+      rsAddrDelay(i)(0) := ID.rs_addr.get(i)
+      io.rvfiRegAddr.get(i + 1) := rsAddrDelay(i)(2)
+
+      rsDataDelay(i)(1) := rsDataDelay(i)(0)
+      io.rvfiSInt.get(i + 1) := rsDataDelay(i)(1)
+    }
+    for (i <- 0 until 3) {
+      npcDelay(i + 1) := npcDelay(i)
+      stallDelay(i + 1) := stallDelay(i)
+    }
+
+
+    Seq(
+      (npcDelay(0), npc.asUInt),
+      (memAddrDelay, ex_reg_result),
+      (rsDataDelay(0)(0), id_reg_rd1.asSInt),
+      (rsDataDelay(1)(0), id_reg_rd2.asSInt),
+      (memWdataDelay, ex_reg_wd.asSInt),
+      (stallDelay(0), ID.hdu_if_reg_write),
+
+      (io.rvfiUInt.get(0), mem_reg_pc),
+      (io.rvfiUInt.get(1), npcDelay(3)),
+      (io.rvfiUInt.get(2), mem_reg_ins),
+      (io.rvfiUInt.get(3), memAddrDelay),
+
+      (io.rvfiMode.get, 3.U),
+
+      (io.rvfiRegAddr.get(0), wb_addr),
+
+      (io.rvfiSInt.get(0), wb_data.asSInt),
+      (io.rvfiSInt.get(3), MEM.io.readData.asSInt),
+      (io.rvfiSInt.get(4), memWdataDelay),
+
+      (io.rvfiBool.get(0), stallDelay(3))
+    ).map(
+      tr => tr._1 := tr._2
+    )
+  }
 }
