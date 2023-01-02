@@ -38,10 +38,15 @@ class Tracer extends Module {
   )
 
   val boolWires: Map[String, Bool] = Map(
-    "valid" -> io.rvfiBool(0)
+    "valid" -> Seq(io.rvfiBool(0),
+                (uintWires("insn") =/= 0.U),
+                (uintWires("insn")(6, 0) =/= 0x63.U)
+               ).reduce(
+                (m, n) => m && n
+               )
   )
 
-  when (boolWires("valid") && (uintWires("insn") =/= 0.U)) {
+  when (boolWires("valid")) {
     printf(
       "ClkCycle: %d, pc_rdata: %x, pc_wdata: %x, insn: %x, mode: %d, rs1_addr: %d, rs1_rdata: %x, rs2_addr: %d, rs2_rdata: %x, rd_addr: %d, rd_wdata: %x, mem_addr: %x, mem_rdata: %x, mem_wdata: %x\n",
       clkCycle, uintWires("pc_rdata"), uintWires("pc_wdata"), uintWires("insn"), uintWires("mode"),
