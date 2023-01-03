@@ -7,9 +7,6 @@ import org.scalatest.FreeSpec
 import chiseltest.experimental.TestOptionBuilder._ 
 import chiseltest.internal.VerilatorBackendAnnotation
 
-import caravan.bus.common.BusConfig
-// import caravan.bus.wishbone.{WishboneConfig, WBRequest, WBResponse}
-
 class TopTest extends FreeSpec with ChiselScalatestTester {
   def getProgramFile: Option[String] = {
     if (scalaTestContext.value.get.configMap.contains("programFile")) {
@@ -37,4 +34,5 @@ class TopTest extends FreeSpec with ChiselScalatestTester {
           c.clock.step(10000)
       }
   }
+  // printf("logs enclosed\n")
 }

@@ -3,9 +3,9 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
 
-import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig}
 
-class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val config:BusConfig) extends Module {
+
+class MemoryFetch extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
     val writeData: UInt = Input(UInt(32.W))
@@ -15,8 +15,8 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
     val stall: Bool = Output(Bool())
     val f3 = Input(UInt(3.W))
 
-    val dccmReq = Decoupled(req)
-    val dccmRsp = Flipped(Decoupled(rsp))
+    val dccmReq = Decoupled(new MemRequestIO)
+    val dccmRsp = Flipped(Decoupled(new MemResponseIO))
   })
 
   io.dccmRsp.ready := true.B
@@ -27,7 +27,7 @@ class MemoryFetch(val req:AbstrRequest, val rsp:AbstrResponse)(implicit val conf
   val funct3 = RegInit(0.U(3.W))
   val offsetSW = io.aluResultIn(1,0)
 
-  when(io.aluResultIn =/= 0.U){
+  when(!io.dccmRsp.valid){
     funct3 := io.f3
     offset := io.aluResultIn(1,0)
   }.otherwise{

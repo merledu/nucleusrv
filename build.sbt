@@ -34,12 +34,6 @@ scalaVersion := "2.12.10"
 
 crossScalaVersions := Seq("2.12.10", "2.11.12")
 
-lazy val caravan = project in file("caravan")
-
-lazy val jigsaw = (project in file("jigsaw")).dependsOn(caravan)
-
-dependsOn(caravan, jigsaw)
-
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots"),
