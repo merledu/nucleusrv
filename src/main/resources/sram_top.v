@@ -7,7 +7,7 @@ module sram_top #(
 
 // sram interface in
   input   logic        csb_i,
-  input   logic [11:0] addr_i,
+  input   logic [12:0] addr_i,
   input   logic [31:0] wdata_i,
   input   logic [3:0]  wmask_i,
   input   logic        we_i,
@@ -16,7 +16,7 @@ module sram_top #(
 );
 
 logic        csb;
-logic [11:0] addr_o;
+logic [12:0] addr_o;
 logic [31:0] wdata_o;
 logic [3:0]  wmask_o;
 logic        we_o;
