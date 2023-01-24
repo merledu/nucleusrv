@@ -14,7 +14,8 @@ class CSRRegFile extends Module{
     val io = IO(new CSRRegFileIO)
 
     // Registers
-    val MISA_REG = RegInit(0.U(32.W))
+    val MISA_REG = RegInit(10.U(32.W))
+    dontTouch(MISA_REG)
 
     // Wires
     val w_data = Wire(UInt(32.W))
@@ -25,7 +26,7 @@ class CSRRegFile extends Module{
     var READ,WRITE,SET,CLEAR = Wire(UInt(2.W))
     Seq(READ,WRITE,SET,CLEAR) zip Seq(csr_opr.READ, csr_opr.WRITE, csr_opr.SET, csr_opr.CLEAR) map (x => x._1 := x._2)
 
-    MISA_REG := io.MISA.i_value
+    // MISA_REG := io.MISA.i_value
 
     val READ_CASES = Array(
         AddressMap.MISA -> MISA_REG
@@ -44,9 +45,11 @@ class CSRRegFile extends Module{
         CLEAR -> clear_data
     ))
 
-    switch(io.CSR.i_addr){
-        is(AddressMap.MISA){
-            MISA_REG := w_data
+    when(io.CSR.i_w_en){
+        switch(io.CSR.i_addr){
+            is(AddressMap.MISA){
+                MISA_REG := w_data
+            }
         }
     }
 }

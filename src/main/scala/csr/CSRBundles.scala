@@ -12,6 +12,7 @@ class CSR_IO extends Bundle{
     val o_data = Output(UInt(32.W))
     val i_data = Input(UInt(32.W))
     val i_addr = Input(UInt(12.W))
+    val i_w_en = Input(Bool())
 }
 
 class CSRRegFileIO extends Bundle{
