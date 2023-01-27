@@ -8,12 +8,12 @@ import chisel3._
  * It will set these signals up in order to talk to the Host adapter of the relevant bus protocol
  */
 class MemRequestIO extends Bundle {
-  val addrRequest: UInt = Input(UInt(32.W))
-  val dataRequest: UInt = Input(UInt(32.W))
-  val activeByteLane: UInt = Input(UInt(4.W))
-  val isWrite: Bool = Input(Bool())
+  val addrRequest: UInt = Output(UInt(32.W))
+  val dataRequest: UInt = Output(UInt(32.W))
+  val activeByteLane: UInt = Output(UInt(4.W))
+  val isWrite: Bool = Output(Bool())
 }
 
 class MemResponseIO extends Bundle {
-  val dataResponse: UInt = Input(UInt(32.W))
+  val dataResponse: UInt = UInt(32.W)
 }

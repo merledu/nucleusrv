@@ -87,8 +87,12 @@ class Core(implicit val config:Configs) extends Module{
 
   val pc = Module(new PC)
 
+//  val ifetchReq = Wire(Flipped(Decoupled(new MemRequestIO)))
+//  ifetchReq <>
   io.imemReq <> IF.coreInstrReq
-  IF.coreInstrResp <> io.imemRsp
+
+  io.imemRsp.ready := true.B
+  val  valid_inst = Mux(io.imemRsp.valid, io.imemRsp.bits.dataResponse, DontCare)
 
   val instruction = Wire(UInt(32.W))
   val ral_halt_o  = WireInit(false.B)
@@ -103,7 +107,7 @@ class Core(implicit val config:Configs) extends Module{
     val RA = Module(new Realigner).io
 
     RA.ral_address_i     := pc.io.in.asUInt()
-    RA.ral_instruction_i := IF.instruction
+    RA.ral_instruction_i := valid_inst
     RA.ral_jmp           := ID.pcSrc
 
     IF.address           := RA.ral_address_o
@@ -125,7 +129,7 @@ class Core(implicit val config:Configs) extends Module{
   else {
 
     IF.address := pc.io.in.asUInt()
-    instruction := IF.instruction
+    instruction := valid_inst
 
   }
 
@@ -291,7 +295,7 @@ class Core(implicit val config:Configs) extends Module{
     wb_data := MEM.io.readData
     wb_addr := mem_reg_wra
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
-      wb_data := mem_reg_pc+4.U
+      wb_data := mem_reg_pc + 4.U
       wb_addr := mem_reg_wra
     }
     .otherwise {

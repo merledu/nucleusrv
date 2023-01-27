@@ -17,7 +17,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   val dmem = Module(new SRamTop(dataFile))
   val imem = Module(new SRamTop(programFile))
 
-  /*  Imem Interceonnections  */
+  /*  Imem Interconnections  */
   core.io.imemRsp <> imem.io.rsp
   imem.io.req <> core.io.imemReq
 

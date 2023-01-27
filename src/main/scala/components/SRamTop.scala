@@ -32,9 +32,6 @@ class SRamTop(val programFile:Option[String] ) extends Module {
     sram.io.addr_i := DontCare
     sram.io.wdata_i := DontCare
 
-
-
-
         dontTouch(io.req.valid)
 
         when(io.req.valid && !io.req.bits.isWrite) {
