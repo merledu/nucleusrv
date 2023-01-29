@@ -195,7 +195,8 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  ID.csr_i_misa := 5.U
+  ID.csr_i_misa    := DontCare
+  ID.csr_i_mhartid := DontCare
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
 

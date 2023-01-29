@@ -7,6 +7,10 @@ class MISA extends Bundle{
     val i_value = Input(UInt(32.W))
 }
 
+class MHARTID extends Bundle{
+    val i_value = Input(UInt(32.W))
+}
+
 class CSR_IO extends Bundle{
     val i_opr  = Input(UInt(2.W))
     val o_data = Output(UInt(32.W))
@@ -16,6 +20,7 @@ class CSR_IO extends Bundle{
 }
 
 class CSRRegFileIO extends Bundle{
-    val MISA = new MISA()
-    val CSR  = new CSR_IO()
+    val MISA    = new MISA()
+    val MHARTID = new MHARTID()
+    val CSR     = new CSR_IO()
 }
