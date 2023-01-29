@@ -71,6 +71,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   // CSR
   val csr = Module(new CSR())
   csr.io.i_misa_value := io.csr_i_misa
+  csr.io.i_imm        := io.id_instruction(19,15)
   csr.io.i_opr        := io.id_instruction(14,12)
   csr.io.i_addr       := io.id_instruction(31,20)
   csr.io.i_w_en       := io.is_csr && (io.id_instruction(19, 15) =/= 0.U)
