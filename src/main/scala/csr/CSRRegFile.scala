@@ -14,7 +14,8 @@ class CSRRegFile extends Module{
     val io = IO(new CSRRegFileIO)
 
     // Registers
-    val MISA_REG = RegInit(10.U(32.W))
+    val MISA_REG    = RegInit("b1111".U(32.W))
+    // val MHARTID_REG = RegInit(0.U(32.W))
     dontTouch(MISA_REG)
 
     // Wires
@@ -37,7 +38,7 @@ class CSRRegFile extends Module{
     io.CSR.o_data := r_data
 
     val set_data   = r_data |  io.CSR.i_data
-    val clear_data = r_data & !io.CSR.i_data
+    val clear_data = r_data & ~io.CSR.i_data
 
     w_data := MuxLookup(io.CSR.i_opr, DontCare, Array(
         WRITE -> io.CSR.i_data,
