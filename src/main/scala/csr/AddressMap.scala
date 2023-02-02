@@ -7,4 +7,5 @@ object AddressMap {
     // Machine trap setup
     val MISA             = "h301".U
     val MHARTID          = "hf14".U
+    val MSTATUS          = "h300".U
 }

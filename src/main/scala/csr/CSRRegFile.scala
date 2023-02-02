@@ -17,6 +17,13 @@ class CSRRegFile extends Module{
     // Registers
     val MISA_REG            = RegInit(0.U(32.W))
     val MHARTID_REG         = RegInit(0.U(32.W))
+    
+    // MSTATUS
+    val TW                  = RegInit(0.U(1.W))
+    val MPRV                = RegInit(0.U(1.W))
+    val MPP                 = RegInit(0.U(2.W))
+    val MPIE                = RegInit(0.U(1.W))
+    val MIE                 = RegInit(0.U(1.W))
 
     // Hardwired
     MISA_REG                := io.MISA.i_value
@@ -25,6 +32,7 @@ class CSRRegFile extends Module{
     // Wires
     val w_data              = Wire(UInt(32.W))
     val r_data              = Wire(UInt(32.W))
+    val MSTATUS_WIRE        = WireInit(Cat("b0".U(10.W), TW, "b0".U(3.W), MPRV, "b0".U(4.W), MPP, "b0".U(3.W), MPIE, "b0".U(3.W), MIE, "b0".U(3.W)))
 
     val csr_opr = CSROperations()
     /*************************************************/
@@ -35,7 +43,8 @@ class CSRRegFile extends Module{
 
     val READ_CASES = Array(
         AddressMap.MISA    -> MISA_REG,
-        AddressMap.MHARTID -> MHARTID_REG
+        AddressMap.MHARTID -> MHARTID_REG,
+        AddressMap.MSTATUS -> MSTATUS_WIRE
     )
 
     r_data := MuxLookup(io.CSR.i_addr, DontCare, READ_CASES)
@@ -57,8 +66,12 @@ class CSRRegFile extends Module{
     // Write to the register
     when(io.CSR.i_w_en){
         switch(io.CSR.i_addr){
-            is(AddressMap.MISA){
-                MISA_REG := w_data
+            is(AddressMap.MSTATUS){
+                TW   := w_data(21)
+                MPRV := w_data(17)
+                MPP  := w_data(12,11)
+                MPIE := w_data(7)
+                MIE  := w_data(3)
             }
         }
     }
