@@ -14,7 +14,7 @@ space:= $(empty) $(empty)
 
 export RISCV_TARGET       ?= riscvOVPsim
 export RISCV_DEVICE       ?= rv32i
-export RISCV_PREFIX       ?= riscv64-unknown-elf-
+export RISCV_PREFIX       ?= /merledu1/tools/riscv32/riscv/bin/riscv32-unknown-elf-
 export RISCV_TARGET_FLAGS ?=
 export RISCV_ASSERT       ?= 0
 

@@ -1,27 +1,65 @@
-make[2]: Entering directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test'
 make  \
 	RISCV_TARGET=nucleusrv \
 	RISCV_DEVICE=rv32i \
-	RISCV_PREFIX=riscv64-unknown-elf- \
-	run -C /home/talha/Music/temp/nucleusrv/riscv-arch-test/riscv-test-suite/rv32im
-make[3]: Entering directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test/riscv-test-suite/rv32im'
-Compile /home/talha/Music/temp/nucleusrv/riscv-arch-test/work/rv32im/MUL.elf
-Execute /home/talha/Music/temp/nucleusrv/riscv-arch-test/work/rv32im/MUL.log
-make[3]: Leaving directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test/riscv-test-suite/rv32im'
+	RISCV_PREFIX=/merledu1/tools/riscv32/riscv/bin/riscv32-unknown-elf- \
+	run -C /home/skashif/Documents/SoC-Now/complianceNRV/riscv-arch-test/riscv-test-suite/rv32i
+make[1]: Entering directory '/home/skashif/Documents/SoC-Now/complianceNRV/riscv-arch-test/riscv-test-suite/rv32i'
+Compile /home/skashif/Documents/SoC-Now/complianceNRV/riscv-arch-test/work/rv32i/I-ADD-01.elf
+Execute /home/skashif/Documents/SoC-Now/complianceNRV/riscv-arch-test/work/rv32i/I-ADD-01.log
+make[1]: Leaving directory '/home/skashif/Documents/SoC-Now/complianceNRV/riscv-arch-test/riscv-test-suite/rv32i'
 riscv-test-env/verify.sh
 
 
 Compare to reference files ... 
 
-Check                      DIV ... IGNORE
-Check                     DIVU ... IGNORE
-Check                     MULH ... IGNORE
-Check                   MULHSU ... IGNORE
-Check                    MULHU ... IGNORE
-Check                      MUL ... OK
-Check                      REM ... IGNORE
-Check                     REMU ... IGNORE
+Check                 I-ADD-01 ... OK
+Check                I-ADDI-01 ... IGNORE
+Check                 I-AND-01 ... IGNORE
+Check                I-ANDI-01 ... IGNORE
+Check               I-AUIPC-01 ... IGNORE
+Check                 I-BEQ-01 ... IGNORE
+Check                 I-BGE-01 ... IGNORE
+Check                I-BGEU-01 ... IGNORE
+Check                 I-BLT-01 ... IGNORE
+Check                I-BLTU-01 ... IGNORE
+Check                 I-BNE-01 ... IGNORE
+Check         I-DELAY_SLOTS-01 ... IGNORE
+Check              I-EBREAK-01 ... IGNORE
+Check               I-ECALL-01 ... IGNORE
+Check           I-ENDIANESS-01 ... IGNORE
+Check                  I-IO-01 ... IGNORE
+Check                 I-JAL-01 ... IGNORE
+Check                I-JALR-01 ... IGNORE
+Check                  I-LB-01 ... IGNORE
+Check                 I-LBU-01 ... IGNORE
+Check                  I-LH-01 ... IGNORE
+Check                 I-LHU-01 ... IGNORE
+Check                 I-LUI-01 ... IGNORE
+Check                  I-LW-01 ... IGNORE
+Check        I-MISALIGN_JMP-01 ... IGNORE
+Check       I-MISALIGN_LDST-01 ... IGNORE
+Check                 I-NOP-01 ... IGNORE
+Check                  I-OR-01 ... IGNORE
+Check                 I-ORI-01 ... IGNORE
+Check             I-RF_size-01 ... IGNORE
+Check            I-RF_width-01 ... IGNORE
+Check               I-RF_x0-01 ... IGNORE
+Check                  I-SB-01 ... IGNORE
+Check                  I-SH-01 ... IGNORE
+Check                 I-SLL-01 ... IGNORE
+Check                I-SLLI-01 ... IGNORE
+Check                 I-SLT-01 ... IGNORE
+Check                I-SLTI-01 ... IGNORE
+Check               I-SLTIU-01 ... IGNORE
+Check                I-SLTU-01 ... IGNORE
+Check                 I-SRA-01 ... IGNORE
+Check                I-SRAI-01 ... IGNORE
+Check                 I-SRL-01 ... IGNORE
+Check                I-SRLI-01 ... IGNORE
+Check                 I-SUB-01 ... IGNORE
+Check                  I-SW-01 ... IGNORE
+Check                 I-XOR-01 ... IGNORE
+Check                I-XORI-01 ... IGNORE
 --------------------------------
-OK: 8/8 RISCV_TARGET=nucleusrv RISCV_DEVICE=rv32i RISCV_ISA=rv32im
+OK: 48/48 RISCV_TARGET=nucleusrv RISCV_DEVICE=rv32i RISCV_ISA=rv32i
 
-make[2]: Leaving directory '/home/talha/Music/temp/nucleusrv/riscv-arch-test'
