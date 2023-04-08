@@ -12,4 +12,5 @@ object AddressMap {
     val MIE              = "h304".U
     val MCAUSE           = "h342".U
     val MEPC             = "h341".U
+    val FCSR             = "h003".U
 }

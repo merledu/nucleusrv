@@ -21,6 +21,7 @@ class CSRRegFile extends Module{
     val MTVEC_REG           = RegInit(0.U(32.W))
     val MEPC_REG            = RegInit(0.U(32.W))
     val MIE_REG             = RegInit(0.U(32.W))
+    val FCSR_REG            = RegInit(0.U(8.W))
     
     // MSTATUS
     val MSTATUS_TW_REG      = RegInit(0.U(1.W))
@@ -29,9 +30,25 @@ class CSRRegFile extends Module{
     val MSTATUS_MPIE_REG    = RegInit(0.U(1.W))
     val MSTATUS_MIE_REG     = RegInit(0.U(1.W))
 
+    //FCSR 
+    val FCSR_NX_REG         = RegInit(0.U(1.W))
+    val FCSR_UF_REG         = RegInit(0.U(1.W))
+    val FCSR_OF_REG         = RegInit(0.U(1.W))
+    val FCSR_DZ_REG         = RegInit(0.U(1.W))
+    val FCSR_NV_REG         = RegInit(0.U(1.W))
+    val FCSR_FRM_REG        = RegInit(0.U(3.W))
+
     // Hardwired
     MISA_REG                := io.MISA.i_value
     MHARTID_REG             := io.MHARTID.i_value
+
+
+    io.FCSR.nx              := FCSR_NX_REG
+    io.FCSR.uf              := FCSR_UF_REG
+    io.FCSR.of              := FCSR_OF_REG
+    io.FCSR.dz              := FCSR_DZ_REG
+    io.FCSR.nv              := FCSR_NV_REG
+    io.FCSR.frm             := FCSR_FRM_REG
 
     // Wires
     val w_data                  = Wire(UInt(32.W))
@@ -41,6 +58,7 @@ class CSRRegFile extends Module{
     val MCAUSE_INTERRUPT_WIRE   = WireInit(MCAUSE_REG(31))
     val MTVEC_MODE_WIRE         = WireInit(MTVEC_REG(1,0))
     val MTVEC_BASE_WIRE         = WireInit(MTVEC_REG(31,2))
+    val FCSR_WIRE               = WireInit(Cat("b0".U(24.W),FCSR_FRM_REG,FCSR_NV_REG,FCSR_DZ_REG,FCSR_OF_REG,FCSR_UF_REG,FCSR_NX_REG))
 
     val csr_opr = CSROperations()
     /*************************************************/
@@ -56,7 +74,8 @@ class CSRRegFile extends Module{
         AddressMap.MCAUSE  -> MCAUSE_REG,
         AddressMap.MTVEC   -> MTVEC_REG,
         AddressMap.MEPC    -> MEPC_REG,
-        AddressMap.MIE     -> MIE_REG
+        AddressMap.MIE     -> MIE_REG,
+        AddressMap.FCSR    -> FCSR_WIRE
     )
 
     r_data := MuxLookup(io.CSR.i_addr, DontCare, READ_CASES)
@@ -96,6 +115,14 @@ class CSRRegFile extends Module{
             }
             is(AddressMap.MIE){
                 MIE_REG          := w_data
+            }
+            is(AddressMap.FCSR){
+               FCSR_NX_REG       := w_data(0)
+               FCSR_UF_REG       := w_data(1)
+               FCSR_OF_REG       := w_data(2)
+               FCSR_DZ_REG       := w_data(3)
+               FCSR_NV_REG       := w_data(4)
+               FCSR_FRM_REG      := w_data(7,5)
             }
         }
     }
