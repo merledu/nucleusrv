@@ -21,7 +21,6 @@ class CSRRegFile extends Module{
     val MTVEC_REG           = RegInit(0.U(32.W))
     val MEPC_REG            = RegInit(0.U(32.W))
     val MIE_REG             = RegInit(0.U(32.W))
-    val FCSR_REG            = RegInit(0.U(8.W))
     
     // MSTATUS
     val MSTATUS_TW_REG      = RegInit(0.U(1.W))
