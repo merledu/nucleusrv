@@ -3,7 +3,9 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class InstructionDecode(TRACE:Boolean) extends Module {
+import nucleusrv.components.fpu._
+
+class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameters {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
     val writeData = Input(UInt(32.W))
@@ -58,6 +60,14 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val ifid_flush = Output(Bool())
 
     val stall = Output(Bool())
+
+    // F pins
+    val fWriteEn = if (F) Some(Input(Bool())) else None
+    val rm = if (F) Some(Output(UInt(roundModeWidth.W))) else None
+    val fAluCtl = if (F) Some(Output(UInt((f5Width + 7).W))) else None
+    val frs2 = if (F) Some(Output(UInt(5.W))) else None
+    val readData3 = if (F) Some(Output(UInt(flen.W))) else None
+    val fctl_regWrite = if (F) Some(Output(Bool())) else None
 
     // CSR pins
     val csr_i_misa        = Input(UInt(32.W))
@@ -125,9 +135,15 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     io.ctl_memWrite := control.io.memWrite
     io.ctl_regWrite := control.io.regWrite
 
+    if (F) {
+      io.fctl_regWrite.get := (io.id_instruction(6, 0) === "b1010011".U)
+    }
+
   }.otherwise {
     io.ctl_memWrite := false.B
     io.ctl_regWrite := false.B
+
+    io.fctl_regWrite.get := 0.B
   }
 
   //Register File
@@ -141,24 +157,85 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   registers.io.writeAddress := registerRd
   registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
 
-  //Forwarding to fix structural hazard
-  when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
-    when(registerRs1 === 0.U){
-      io.readData1 := 0.U
-    }.otherwise{
-      io.readData1 := io.writeData
+  if (F) {
+    val fregisters = if (F) Some(Module(new FPRegisters)) else None
+    val rAddr = if (F) Some(Seq(
+      io.writeReg,  // rd
+      registerRs1,  // rs1
+      registerRs2,  // rs2
+      io.id_instruction(31, 27)  // rs3
+    )) else None
+
+    for (i <- 0 until fregisters.get.io.rAddr.length) {
+      fregisters.get.io.rAddr(i) := rAddr.get(i)
     }
-  }.otherwise{
-    io.readData1 := registers.io.readData(0)
+
+    Seq(
+      (fregisters.get.io.wData.valid, io.fWriteEn.get),
+      (fregisters.get.io.wData.bits, io.writeData)
+    ).map(f => f._1 := f._2)
+
+    // Structural Hazard Forwarding
+    // rs1
+    when ((io.ctl_writeEnable || io.fWriteEn.get) && (io.writeReg === registerRs1)) {
+      when (registerRs1 === 0.U) {
+        io.readData1 := 0.U
+      } otherwise {
+        io.readData1 := io.writeData
+      }
+    } otherwise {
+      io.readData1 := Mux(
+        io.id_instruction(6, 0) === "b1010011".U,
+        fregisters.get.io.rData(0),
+        registers.io.readData(0)
+      )
+    }
+    // rs2
+    when ((io.ctl_writeEnable || io.fWriteEn.get) && (io.writeReg === registerRs2)) {
+      when (registerRs2 === 0.U) {
+        io.readData2 := 0.U
+      } otherwise {
+        io.readData2 := io.writeData
+      }
+    } otherwise {
+      io.readData2 := Mux(
+        io.id_instruction(6, 0) === "b1010011".U,
+        fregisters.get.io.rData(1),
+        registers.io.readData(1)
+      )
+    }
+    // rs3
+    when (io.fWriteEn.get && (io.writeReg === io.id_instruction(31, 27))) {
+      when (io.id_instruction(31, 27) === 0.U) {
+        io.readData3.get := 0.U
+      } otherwise {
+        io.readData3.get := io.writeData
+      }
+    } otherwise {
+      io.readData3.get := fregisters.get.io.rData(2),
+    }
   }
-  when(io.ctl_writeEnable && (io.writeReg === registerRs2)){
-    when(registerRs2 === 0.U){
-      io.readData2 := 0.U
+
+  //Forwarding to fix structural hazard
+  if (!F) {
+    when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
+      when(registerRs1 === 0.U){
+        io.readData1 := 0.U
+      }.otherwise{
+        io.readData1 := io.writeData
+      }
     }.otherwise{
-      io.readData2 := io.writeData
+      io.readData1 := registers.io.readData(0)
     }
-  }.otherwise{
-    io.readData2 := registers.io.readData(1)
+    when(io.ctl_writeEnable && (io.writeReg === registerRs2)){
+      when(registerRs2 === 0.U){
+        io.readData2 := 0.U
+      }.otherwise{
+        io.readData2 := io.writeData
+      }
+    }.otherwise{
+      io.readData2 := registers.io.readData(1)
+    }
   }
   
 
@@ -249,6 +326,15 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   )
 
   csr.io.i_data := MuxLookup(csrController.io.forwardRS1, registers.io.readData(1), csr_iData_cases)
+
+  // F Extension
+  if (F) {
+    Seq(
+      (io.rm, io.id_instruction(14, 12)),
+      (io.fAluCtl, Cat(io.id_instruction(31, 27), io.id_instruction(6, 0))),
+      (io.frs2, io.id_instruction(24, 20))
+    ).map(f => f._1.get := f._2)
+  }
 
   // RVFI
   if (TRACE) {

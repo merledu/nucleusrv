@@ -2,8 +2,10 @@
 package nucleusrv.components
 import chisel3._
 import chisel3.util.MuxCase
+import nucleusrv.components.fpu._
+import chisel3.util.MuxLookup
 
-class Execute(M:Boolean = false) extends Module {
+class Execute(M :Boolean = false, F :Boolean) extends Module {
   val io = IO(new Bundle {
     val immediate = Input(UInt(32.W))
     val readData1 = Input(UInt(32.W))
@@ -24,15 +26,20 @@ class Execute(M:Boolean = false) extends Module {
     val ctl_aluOp = Input(UInt(2.W))
     val ctl_aluSrc1 = Input(UInt(2.W))
 
+    val fAluCtl = if (F) Some(Input(UInt((5 + 7).W))) else None
+    val rm = if (F) Some(Input(UInt(3.W))) else None
+    val frs2 = if (F) Some(Input(UInt(5.W))) else None
+    val readData3 = if (F) Some(Input(UInt(32.W))) else None
+
     val writeData = Output(UInt(32.W))
     val ALUresult = Output(UInt(32.W))
 
     val stall = Output(Bool())
   })
 
-  val alu = Module(new ALU)
+  val alu = Module(new ALU(F))
   val aluCtl = Module(new AluControl)
-  val fu = Module(new ForwardingUnit).io
+  val fu = Module(new ForwardingUnit(F)).io
 
   // Forwarding Unt
 
@@ -76,7 +83,19 @@ class Execute(M:Boolean = false) extends Module {
 
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
-  alu.io.aluCtl := aluCtl.io.out
+  if (F) {
+    Seq(
+      //(alu.io.input3.get, io.input3.get),
+      (alu.io.rm.get, io.rm.get),
+      (alu.io.aluCtl, MuxCase(aluCtl.io.out, Seq(
+        ((io.fAluCtl.get === "b110101010011".U) && !io.frs2.get.orR) -> 10.U,  // fcvt.s.w
+        ((io.fAluCtl.get === "b110101010011".U) && io.frs2.get.orR) -> 11.U,  // fcvt.s.wu
+      ))),
+      (fu.reg_rs3.get, io.id_ex_ins(31, 27))
+    ).map(f => f._1 := f._2)
+  } else {
+    alu.io.aluCtl := aluCtl.io.out
+  }
 
   io.stall := false.B
   if(M){
@@ -137,12 +156,11 @@ class Execute(M:Boolean = false) extends Module {
       io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
     }
     .otherwise{io.ALUresult := alu.io.result}
-  } 
-  else {
-    io.ALUresult := alu.io.result
   }
 
-  // io.ALUresult := alu.io.result
+    //io.ALUresult := alu.io.result
+
+  io.ALUresult := alu.io.result
 
   io.writeData := inputMux2
 }
