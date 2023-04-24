@@ -64,6 +64,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val csr_i_mhartid     = Input(UInt(32.W))
     val csr_o_data        = Output(UInt(32.W))
     val is_csr            = Output(Bool())
+    val fscr_o_data       = Output(UInt(32.W))
 
     // RVFI pins
     val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
@@ -80,6 +81,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
 
   io.is_csr                   := io.id_instruction(6, 0) === "b1110011".U
   io.csr_o_data               := csr.io.o_data
+  io.fscr_o_data              := csr.io.fcsr_o_data
 
   val csrController = Module(new CSRController())
   csrController.io.regWrExecute    := io.id_ex_regWr
