@@ -57,6 +57,8 @@ class CSRRegFile extends Module{
     val MCAUSE_INTERRUPT_WIRE   = WireInit(MCAUSE_REG(31))
     val MTVEC_MODE_WIRE         = WireInit(MTVEC_REG(1,0))
     val MTVEC_BASE_WIRE         = WireInit(MTVEC_REG(31,2))
+    val FFLAGS_WIRE             = WireInit(Cat(FCSR_FRM_REG,FCSR_NV_REG,FCSR_DZ_REG,FCSR_OF_REG,FCSR_UF_REG,FCSR_NX_REG))
+    val FRM_WIRE                = WireInit(FCSR_FRM_REG)
     val FCSR_WIRE               = WireInit(Cat("b0".U(24.W),FCSR_FRM_REG,FCSR_NV_REG,FCSR_DZ_REG,FCSR_OF_REG,FCSR_UF_REG,FCSR_NX_REG))
 
     val csr_opr = CSROperations()
@@ -74,6 +76,8 @@ class CSRRegFile extends Module{
         AddressMap.MTVEC   -> MTVEC_REG,
         AddressMap.MEPC    -> MEPC_REG,
         AddressMap.MIE     -> MIE_REG,
+        AddressMap.FFLAGS  -> FFLAGS_WIRE,
+        AddressMap.FRM     -> FRM_WIRE,
         AddressMap.FCSR    -> FCSR_WIRE
     )
 
@@ -121,6 +125,16 @@ class CSRRegFile extends Module{
                FCSR_OF_REG       := w_data(2)
                FCSR_DZ_REG       := w_data(3)
                FCSR_NV_REG       := w_data(4)
+               FCSR_FRM_REG      := w_data(7,5)
+            }
+            is(AddressMap.FFLAGS){
+               FCSR_NX_REG       := w_data(0)
+               FCSR_UF_REG       := w_data(1)
+               FCSR_OF_REG       := w_data(2)
+               FCSR_DZ_REG       := w_data(3)
+               FCSR_NV_REG       := w_data(4)
+            }
+            is(AddressMap.FRM){
                FCSR_FRM_REG      := w_data(7,5)
             }
         }
