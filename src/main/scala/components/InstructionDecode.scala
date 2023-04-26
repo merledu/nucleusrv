@@ -133,10 +133,14 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameter
   io.ctl_jump := control.io.jump
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
     io.ctl_memWrite := control.io.memWrite
-    io.ctl_regWrite := control.io.regWrite
 
     if (F) {
       io.fctl_regWrite.get := (io.id_instruction(6, 0) === "b1010011".U)
+      io.ctl_regWrite := control.io.regWrite || (
+        (io.id_instruction(6, 0) === "b1010011".U) && (io.id_instruction(31, 27) === "b11000".U)
+      )
+    } else {
+      io.ctl_regWrite := control.io.regWrite
     }
 
   }.otherwise {

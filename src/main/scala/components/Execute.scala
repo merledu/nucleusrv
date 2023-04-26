@@ -83,6 +83,9 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
 
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
+
+  val debug_aluCtl = dontTouch(WireInit(0.B))
+
   if (F) {
     Seq(
       //(alu.io.input3.get, io.input3.get),
@@ -90,9 +93,13 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
       (alu.io.aluCtl, MuxCase(aluCtl.io.out, Seq(
         ((io.fAluCtl.get === "b110101010011".U) && !io.frs2.get.orR) -> 10.U,  // fcvt.s.w
         ((io.fAluCtl.get === "b110101010011".U) && io.frs2.get.orR) -> 11.U,  // fcvt.s.wu
+        ((io.fAluCtl.get === "b110001010011".U) && !io.frs2.get.orR) -> 16.U  // fcvt.w.s
       ))),
-      (fu.reg_rs3.get, io.id_ex_ins(31, 27))
+      (fu.reg_rs3.get, io.id_ex_ins(31, 27)),
+      (fu.fEn.get, (alu.io.aluCtl === 16.U))
     ).map(f => f._1 := f._2)
+    debug_aluCtl := ((io.fAluCtl.get === "b110001010011".U) && !io.frs2.get.orR) 
+
   } else {
     alu.io.aluCtl := aluCtl.io.out
   }

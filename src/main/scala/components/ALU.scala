@@ -7,7 +7,7 @@ class ALU(F :Boolean) extends Module {
   val io = IO(new Bundle {
     val input1: UInt = Input(UInt(32.W))
     val input2: UInt = Input(UInt(32.W))
-    val aluCtl: UInt = Input(UInt(4.W))
+    val aluCtl: UInt = Input(UInt(5.W))
 
     //val input3 = if (F) Some(Input(UInt(32.W))) else None
     val rm = if (F) Some(Input(UInt(3.W))) else None

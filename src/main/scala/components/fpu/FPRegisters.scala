@@ -8,7 +8,7 @@ class FPRegistersIO extends Bundle with Parameters {
   val rAddr: Vec[UInt]   = Input(Vec(4, UInt(regAddrWidth.W)))
   val wData: Valid[UInt] = Flipped(Valid(UInt(flen.W)))
 
-  val rData: Vec[UInt] = Output(Vec(3, UInt(regAddrWidth.W)))
+  val rData: Vec[UInt] = Output(Vec(3, UInt(flen.W)))
 }
 
 
