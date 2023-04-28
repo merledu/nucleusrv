@@ -79,6 +79,18 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameter
     val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
   })
 
+  // F Extension
+  val fopcode = if (F) Some(WireInit(io.id_instruction(6, 0))) else None
+  val func5_rs3 = if (F) WireInit(io.id_instruction(31, 27)) else WireInit(0.U(f5Width.W))
+  val fWriteEn = if (F) io.fWriteEn.get else 0.B
+  if (F) {
+    Seq(
+      (io.rm, io.id_instruction(14, 12)),
+      (io.fAluCtl, Cat(func5_rs3, fopcode.get)),
+      (io.frs2, io.id_instruction(24, 20))
+    ).map(f => f._1.get := f._2)
+  }
+
   // CSR
   val csr = Module(new CSR())
   csr.io.i_misa_value         := io.csr_i_misa
@@ -135,9 +147,9 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameter
     io.ctl_memWrite := control.io.memWrite
 
     if (F) {
-      io.fctl_regWrite.get := (io.id_instruction(6, 0) === "b1010011".U)
+      io.fctl_regWrite.get := (fopcode.get === "b1010011".U)
       io.ctl_regWrite := control.io.regWrite || (
-        (io.id_instruction(6, 0) === "b1010011".U) && (io.id_instruction(31, 27) === "b11000".U)
+       (fopcode.get === "b1010011".U) && (func5_rs3 === "b11000".U)
       )
     } else {
       io.ctl_regWrite := control.io.regWrite
@@ -161,17 +173,17 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameter
   registers.io.writeAddress := registerRd
   registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
 
+  // Floating Point Register File
+  val fregisters = if (F) Some(Module(new FPRegisters)) else None
+  val rAddr = Seq(
+    io.writeReg,  // rd
+    registerRs1,  // rs1
+    registerRs2,  // rs2
+    func5_rs3  // rs3
+  )
   if (F) {
-    val fregisters = if (F) Some(Module(new FPRegisters)) else None
-    val rAddr = if (F) Some(Seq(
-      io.writeReg,  // rd
-      registerRs1,  // rs1
-      registerRs2,  // rs2
-      io.id_instruction(31, 27)  // rs3
-    )) else None
-
     for (i <- 0 until fregisters.get.io.rAddr.length) {
-      fregisters.get.io.rAddr(i) := rAddr.get(i)
+      fregisters.get.io.rAddr(i) := rAddr(i)
     }
 
     Seq(
@@ -179,35 +191,6 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameter
       (fregisters.get.io.wData.bits, io.writeData)
     ).map(f => f._1 := f._2)
 
-    // Structural Hazard Forwarding
-    // rs1
-    when ((io.ctl_writeEnable || io.fWriteEn.get) && (io.writeReg === registerRs1)) {
-      when (registerRs1 === 0.U) {
-        io.readData1 := 0.U
-      } otherwise {
-        io.readData1 := io.writeData
-      }
-    } otherwise {
-      io.readData1 := Mux(
-        io.id_instruction(6, 0) === "b1010011".U,
-        fregisters.get.io.rData(0),
-        registers.io.readData(0)
-      )
-    }
-    // rs2
-    when ((io.ctl_writeEnable || io.fWriteEn.get) && (io.writeReg === registerRs2)) {
-      when (registerRs2 === 0.U) {
-        io.readData2 := 0.U
-      } otherwise {
-        io.readData2 := io.writeData
-      }
-    } otherwise {
-      io.readData2 := Mux(
-        io.id_instruction(6, 0) === "b1010011".U,
-        fregisters.get.io.rData(1),
-        registers.io.readData(1)
-      )
-    }
     // rs3
     when (io.fWriteEn.get && (io.writeReg === io.id_instruction(31, 27))) {
       when (io.id_instruction(31, 27) === 0.U) {
@@ -221,26 +204,37 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameter
   }
 
   //Forwarding to fix structural hazard
-  if (!F) {
-    when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
-      when(registerRs1 === 0.U){
-        io.readData1 := 0.U
-      }.otherwise{
-        io.readData1 := io.writeData
-      }
+  when((io.ctl_writeEnable || fWriteEn) && (io.writeReg === registerRs1)){
+    when(registerRs1 === 0.U){
+      io.readData1 := 0.U
     }.otherwise{
-      io.readData1 := registers.io.readData(0)
+      io.readData1 := io.writeData
     }
-    when(io.ctl_writeEnable && (io.writeReg === registerRs2)){
-      when(registerRs2 === 0.U){
-        io.readData2 := 0.U
-      }.otherwise{
-        io.readData2 := io.writeData
-      }
-    }.otherwise{
-      io.readData2 := registers.io.readData(1)
-    }
+  }.otherwise{
+    io.readData1 := (
+      if (F) Mux(
+        fopcode.get === "b1010011".U,
+        fregisters.get.io.rData(0),
+        registers.io.readData(0)
+      ) else registers.io.readData(0)
+    )
   }
+  when((io.ctl_writeEnable || fWriteEn) && (io.writeReg === registerRs2)){
+    when(registerRs2 === 0.U){
+      io.readData2 := 0.U
+    }.otherwise{
+      io.readData2 := io.writeData
+    }
+  }.otherwise{
+    io.readData2 := (
+      if (F) Mux(
+        fopcode.get === "b1010011".U,
+        fregisters.get.io.rData(1),
+        registers.io.readData(1)
+      ) else registers.io.readData(1)
+    )
+  }
+  
   
 
   val immediate = Module(new ImmediateGen)
@@ -330,15 +324,6 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module with Parameter
   )
 
   csr.io.i_data := MuxLookup(csrController.io.forwardRS1, registers.io.readData(1), csr_iData_cases)
-
-  // F Extension
-  if (F) {
-    Seq(
-      (io.rm, io.id_instruction(14, 12)),
-      (io.fAluCtl, Cat(io.id_instruction(31, 27), io.id_instruction(6, 0))),
-      (io.frs2, io.id_instruction(24, 20))
-    ).map(f => f._1.get := f._2)
-  }
 
   // RVFI
   if (TRACE) {

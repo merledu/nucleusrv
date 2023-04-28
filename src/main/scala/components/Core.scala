@@ -338,10 +338,10 @@ class Core(implicit val config:Configs) extends Module{
 
   if (F) {
     mem_reg_fctl_regWrite.get := ex_reg_fctl_regWrite.get
-    EX.ex_mem_regWrite := (ex_reg_fctl_regWrite.get || ex_reg_ctl_regWrite)
-  } else {
-    EX.ex_mem_regWrite := ex_reg_ctl_regWrite
   }
+  EX.ex_mem_regWrite := ((
+    if (F) ex_reg_fctl_regWrite.get else 0.B
+  ) || ex_reg_ctl_regWrite)
 
   /********************
    * Write Back Stage *
@@ -373,11 +373,11 @@ class Core(implicit val config:Configs) extends Module{
   io.pin := wb_data
 
   if (F) {
-    EX.mem_wb_regWrite := (mem_reg_ctl_regWrite || mem_reg_fctl_regWrite.get)
     ID.fWriteEn.get := mem_reg_fctl_regWrite.get
-  } else {
-    EX.mem_wb_regWrite := mem_reg_ctl_regWrite
   }
+  EX.mem_wb_regWrite := (mem_reg_ctl_regWrite || (
+    if (F) mem_reg_fctl_regWrite.get else 0.B
+  ))
 
   /**************
   ** RVFI PINS **
