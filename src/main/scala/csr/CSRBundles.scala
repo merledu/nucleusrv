@@ -20,18 +20,6 @@ class FCSR extends Bundle{
     val frm = Output(UInt(3.W))
 }
 
-class FRM extends Bundle{
-    val frm = Output(UInt(3.W))
-}
-
-class FFLAGS extends Bundle{
-    val nx  = Output(UInt(1.W))
-    val uf  = Output(UInt(1.W))
-    val of  = Output(UInt(1.W))
-    val dz  = Output(UInt(1.W))
-    val nv  = Output(UInt(1.W))
-}
-
 
 
 class CSR_IO extends Bundle{
@@ -47,6 +35,4 @@ class CSRRegFileIO extends Bundle{
     val MHARTID = new MHARTID()
     val CSR     = new CSR_IO()
     val FCSR    = new FCSR()
-    val FRM     = new FRM()
-    val FFLAGS  = new FFLAGS()
 }
