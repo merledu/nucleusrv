@@ -160,11 +160,10 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
       io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
     }
     .otherwise{io.ALUresult := alu.io.result}
+  } else {
+    io.ALUresult := alu.io.result
   }
 
-    //io.ALUresult := alu.io.result
-
-  io.ALUresult := alu.io.result
 
   io.writeData := inputMux2
 }

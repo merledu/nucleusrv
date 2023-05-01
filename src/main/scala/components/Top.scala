@@ -9,7 +9,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     val pin = Output(UInt(32.W))
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=false, C=false, F=true, TRACE=false)
+  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, F=true, TRACE=false)
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
