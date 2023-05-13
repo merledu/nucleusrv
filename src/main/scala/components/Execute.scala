@@ -26,7 +26,7 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
     val ctl_aluOp = Input(UInt(2.W))
     val ctl_aluSrc1 = Input(UInt(2.W))
 
-    val fAluCtl = if (F) Some(Input(UInt((5 + 7).W))) else None
+    val fAluCtl = if (F) Some(Input(UInt((5 + 2 + 7).W))) else None
     val rm = if (F) Some(Input(UInt(3.W))) else None
     val frs2 = if (F) Some(Input(UInt(5.W))) else None
     val readData3 = if (F) Some(Input(UInt(32.W))) else None
@@ -40,6 +40,8 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
   val alu = Module(new ALU(F))
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit(F)).io
+
+  val fAluCtl = if (F) Some(new FControl) else None
 
   // Forwarding Unit
 
@@ -86,13 +88,12 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
 
   if (F) {
     Seq(
-      //(alu.io.input3.get, io.input3.get),
+      (fAluCtl.get.io.fAluCtl, io.fAluCtl.get),
+      (fAluCtl.get.io.rm, io.rm.get),
+      (fAluCtl.get.io.rs2, io.frs2.get),
+      (alu.io.aluCtl, )
+      (alu.io.input3.get, io.input3.get),
       (alu.io.rm.get, io.rm.get),
-      (alu.io.aluCtl, MuxCase(aluCtl.io.out, Seq(
-        ((io.fAluCtl.get === "b110101010011".U) && !io.frs2.get.orR) -> 10.U,  // fcvt.s.w
-        ((io.fAluCtl.get === "b110101010011".U) && io.frs2.get.orR) -> 11.U,  // fcvt.s.wu
-        ((io.fAluCtl.get === "b110001010011".U) && !io.frs2.get.orR) -> 16.U  // fcvt.w.s
-      ))),
       (fu.reg_rs3.get, io.id_ex_ins(31, 27)),
       (fu.fEn.get, (alu.io.aluCtl === 16.U))
     ).map(f => f._1 := f._2)

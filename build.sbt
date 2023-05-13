@@ -26,19 +26,13 @@ def javacOptionsVersion(scalaVersion: String): Seq[String] = {
   }
 }
 
-name := "nucleusrv"
 
-version := "3.2.0"
-
-scalaVersion := "2.12.10"
-
-crossScalaVersions := Seq("2.12.10", "2.11.12")
-
-
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("snapshots"),
-  Resolver.sonatypeRepo("releases")
-)
+ThisBuild / version := "3.2.0"
+ThisBuild / scalaVersion := "2.12.10"
+ThisBuild / crossScalaVersions := Seq("2.12.10", "2.11.12")
+ThisBuild / logBuffered in Test := false
+ThisBuild / parallelExecution in Test := false
+ThisBuild / trapExit := false
 
 // Provide a managed dependency on X if -DXVersion="" is supplied on the command line.
 val defaultVersions = Map(
@@ -46,19 +40,20 @@ val defaultVersions = Map(
   "chisel-iotesters" -> "1.5.0"
   )
 
-libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
-  dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep)) }
+lazy val hardfloat = project in file("berkeley-hardfloat")
 
-libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.3.2" % "test"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
-
-logBuffered in Test := false
-
-parallelExecution in Test := false
-
-scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
-
-javacOptions ++= javacOptionsVersion(scalaVersion.value)
-
-trapExit := false
+lazy val root = (project in file(".")).settings(
+  name := "nucleusrv",
+  libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
+    dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep))
+  } ++ Seq(
+    "edu.berkeley.cs" %% "chiseltest" % "0.3.2" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+  ),
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("snapshots"),
+    Resolver.sonatypeRepo("releases")
+  ),
+  scalacOptions ++= scalacOptionsVersion(scalaVersion.value),
+  javacOptions ++= javacOptionsVersion(scalaVersion.value)
+).dependsOn(hardfloat)

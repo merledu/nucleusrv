@@ -22,12 +22,14 @@ class Converter extends Module {
   val sIntToFloat: FCVT_S_W = Module(new FCVT_S_W)
   val uIntToFloat: FCVT_S_WU = Module(new FCVT_S_WU)
   val floatToSInt: FCVT_W_S = Module(new FCVT_W_S)
+  val floatToUInt: FCVT_WU_S = Module(new FCVT_WU_S)
 
   // Connections
   Seq(
     (sIntToFloat.io.in, io.sIn),
     (uIntToFloat.io.in, io.uIn),
-    (floatToSInt.io.in, io.uIn)
+    (floatToSInt.io.in, io.uIn),
+    (floatToUInt.io.in, io.uIn)
   ).map(
     f => f._1 := f._2
   )
@@ -39,9 +41,10 @@ class Converter extends Module {
     f => f := io.roundMode
   )
 
-  io.sOut := Mux(io.aluCtl === 16.U, floatToSInt.io.out, 0.S)
+  io.sOut := Mux(io.aluCtl === 13.U, floatToSInt.io.out, 0.S)
   io.uOut := MuxLookup(io.aluCtl, 0.U, Seq(
     10.U -> sIntToFloat.io.out,
-    11.U -> uIntToFloat.io.out
+    11.U -> uIntToFloat.io.out,
+    12.U -> floatToUInt.io.out
   ))
 }
