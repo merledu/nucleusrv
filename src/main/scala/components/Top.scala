@@ -7,6 +7,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
+    val fcsr = Output(UInt(32.W))
   })
 
   implicit val config:Configs = Configs(XLEN=32, M=true, C=true, F=true, TRACE=false)
@@ -27,6 +28,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   dmem.io.req <> core.io.dmemReq
 
   io.pin := core.io.pin
+  io.fcsr := core.io.fcsr_o_data
 
   if (config.TRACE) {
     val tracer = Module(new Tracer())

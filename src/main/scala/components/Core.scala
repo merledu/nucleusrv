@@ -27,6 +27,8 @@ class Core(implicit val config:Configs) extends Module{
     val rvfiBool    = if (TRACE) Some(Output(Vec(1, Bool()))) else None
     val rvfiRegAddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
     val rvfiMode    = if (TRACE) Some(Output(UInt(2.W))) else None
+
+    val fcsr_o_data = Output(UInt(32.W))
   })
 
   // IF-ID Registers
@@ -99,6 +101,8 @@ class Core(implicit val config:Configs) extends Module{
   val EX = Module(new Execute(M = M, F = F)).io
   val MEM = Module(new MemoryFetch)
 
+  io.fcsr_o_data := ID.fscr_o_data
+  
   /*****************
    * Fetch Stage *
    ******************/
