@@ -2,10 +2,10 @@ package nucleusrv.components
 
 import chisel3._
 import chisel3.util._
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
-class CSRTest extends FlatSpec with ChiselScalatestTester {
+class CSRTest extends AnyFlatSpec with ChiselScalatestTester {
   behavior of "CSR"
 
   it should "perform FRCSR operation correctly" in {

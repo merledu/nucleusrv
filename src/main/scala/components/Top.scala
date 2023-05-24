@@ -47,5 +47,6 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
 object Top extends App{
   // generate verilog
-  chisel3.Driver.execute(args, () => new Top(Some("program.hex"), Some("data.hex")))
+  val genVerilog = new chisel3.stage.ChiselStage()
+  genVerilog.emitVerilog(new Top(Some("program.hex"), Some("data.hex")), args)
 }

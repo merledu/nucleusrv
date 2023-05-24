@@ -44,11 +44,13 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_f7 = RegInit(0.U(7.W))
   val id_reg_f3 = RegInit(0.U(3.W))
 
+  // - F Registers
   val id_reg_fAluCtl = if (F) Some(RegInit(0.U((5 + 7).W))) else None
   val id_reg_rm = if (F) Some(RegInit(0.U(3.W))) else None
   val id_reg_frs2 = if (F) Some(RegInit(0.U(5.W))) else None
-  val id_reg_rd3 = if (F) Some(RegInit(0.U(32.W))) else None
+  val id_reg_rs3 = if (F) Some(RegInit(0.U(32.W))) else None
   val id_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
+  val id_reg_fInst = if (F) Some(RegInit(0.B)) else None
 
   val id_reg_ins = RegInit(0.U(32.W))
   val id_reg_ctl_aluSrc = RegInit(false.B)
@@ -79,7 +81,9 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_is_csr = RegInit(false.B)
   val ex_reg_csr_data = RegInit(0.U)
 
+  // - F Registers
   val ex_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
+  val ex_reg_fInst = if (F) Some(RegInit(0.B)) else None
 
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -206,8 +210,9 @@ class Core(implicit val config:Configs) extends Module{
       (id_reg_rm, ID.rm),
       (id_reg_fAluCtl, ID.fAluCtl),
       (id_reg_frs2, ID.frs2),
-      (id_reg_rd3, ID.readData3),
-      (id_reg_fctl_regWrite, ID.fctl_regWrite)
+      (id_reg_rs3, ID.readData3),
+      (id_reg_fctl_regWrite, ID.fctl_regWrite),
+      (id_reg_fInst, ID.fInst)
     ).map(f => f._1.get := f._2.get)
   }
 //  IF.PcWrite := ID.hdu_pcWrite
@@ -246,7 +251,9 @@ class Core(implicit val config:Configs) extends Module{
       (EX.fAluCtl, id_reg_fAluCtl),
       (EX.rm, id_reg_rm),
       (EX.frs2, id_reg_frs2),
-      (EX.readData3, id_reg_rd3)
+      (EX.readData3, id_reg_rs3),
+      (EX.fInst, id_reg_fInst),
+      (ex_reg_fInst, id_reg_fInst)
     ).map(f => f._1.get := f._2.get)
   }
 
@@ -281,6 +288,7 @@ class Core(implicit val config:Configs) extends Module{
 
   if (F) {
     ex_reg_fctl_regWrite.get := id_reg_fctl_regWrite.get
+    ex_reg_fInst.get := id_reg_fInst.get
   }
 
   when(EX.stall){

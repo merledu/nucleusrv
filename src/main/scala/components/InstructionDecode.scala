@@ -63,7 +63,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
 
     // F pins
     val fWriteEn = if (F) Some(Input(Bool())) else None
-    val pipeline_fInst = if (F) Some(Input(Vec(2, Bool())))
+    val pipeline_fInst = if (F) Some(Input(Vec(2, Bool()))) else None
     val fInst = if (F) Some(Output(Bool())) else None
     val rm = if (F) Some(Output(UInt(3.W))) else None
     val fAluCtl = if (F) Some(Output(UInt((5 + 2 + 7).W))) else None
@@ -94,12 +94,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   ).map(
     f => fopcode.get === f.U
   ) else Seq(0.B, 0.B)
-
-  if (F) {
-    io.rm.get := io.id_instruction(14, 12)
-    io.fAluCtl.get := fAluCtl.get
-    io.frs2.get := io.id_instruction(24, 20)
-    io.fInst := Seq(
+  val fInst = if (F) Seq(
       "b0000111",
       "b0100111",
       "b1000011",
@@ -111,7 +106,13 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
       f => fopcode.get === f.U
     ).reduce(
       (e, f) => e || f
-    )
+    ) else 0.B
+
+  if (F) {
+    io.rm.get := io.id_instruction(14, 12)
+    io.fAluCtl.get := fAluCtl.get
+    io.frs2.get := io.id_instruction(24, 20)
+    io.fInst.get := fInst
   }
 
   // CSR
@@ -142,7 +143,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   csrController.io.csrInstIsImmd   := 0.B
 
   //Hazard Detection Unit
-  val hdu = Module(new HazardUnit)
+  val hdu = Module(new HazardUnit(F))
   hdu.io.dmem_resp_valid := io.dmem_resp_valid
   hdu.io.id_ex_memRead := io.id_ex_mem_read
 //  hdu.io.ex_mem_memWrite := io.ex_mem_mem_write
@@ -156,6 +157,9 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   hdu.io.branch := io.ctl_branch
   io.hdu_pcWrite := hdu.io.pc_write
   io.hdu_if_reg_write := hdu.io.if_reg_write
+  if (F) {
+    hdu.io.pipeline_fInst.get <> io.pipeline_fInst.get
+  }
 
   //Control Unit
   val control = Module(new Control)
@@ -165,7 +169,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   io.ctl_aluSrc1 := control.io.aluSrc1
   io.ctl_branch := control.io.branch
   io.ctl_memRead := control.io.memRead || fDMemEn(0)
-  io.ctl_memToReg := control.io.memToReg || fDMemEn(0).asUInt
+  io.ctl_memToReg := Mux(fInst, fDMemEn(0).asUInt, control.io.memToReg)
   io.ctl_jump := control.io.jump
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
     if (F) {
@@ -177,16 +181,16 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
         "b1001011",
         "b1001111"
       ).map(
-        f => io.fopcode.get === f.U
+        f => fopcode.get === f.U
       ).reduce(
         (a, b) => a || b
       )) || (
-        (fopcode.get === "1010011".U) && (Seq(
+        (fopcode.get === "b1010011".U) && (Seq(
           "b1100000",  // fcvt.w[u].s
           "b1110000",  // fmv.x.w, fclass.s
           "b1010000"   // feq.s, flt.s, fle.s
         ).map(  // Not enabled for these instructions
-          f => func5_fmt.get =/= f.U
+          f => func5_fmt =/= f.U
         ).reduce(
           (e, f) => e || f
         ))
@@ -196,7 +200,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
         "b1110000",  // fmv.x.w, fclass.s
         "b1010000"   // feq.s, flt.s, fle.s
       ).map(  // Enabled for these instructions
-        f => fAluCtl.get === (f + "b1010011").U
+        f => fAluCtl.get === (f + "1010011").U
       ).reduce(
         (e, f) => e || f
       ))
@@ -263,15 +267,15 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
         "b1001011",
         "b1001111"
       ).map(
-        f => fopcode === f.U
+        f => fopcode.get === f.U
       ).reduce(
         (a, b) => a || b
       ) || (
-        (fopcode === "b1010011".U) && (Seq(
+        (fopcode.get === "b1010011".U) && (Seq(
           "b1101000",  // fcvt.s.w[u]
           "b1111000"   // fmv.w.x
         ).map(  // Not enabled for these instructions
-          f => func5_fmt.get =/= f.U
+          f => func5_fmt =/= f.U
         ).reduce(
           (e, f) => e || f
         ))
@@ -297,7 +301,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
         "b1001111",
         "b1010011"
       ).map(
-        f => fopcode === f.U
+        f => fopcode.get === f.U
       ).reduce(
         (a, b) => a || b
       ),
@@ -317,21 +321,21 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   val input1 = Wire(UInt(32.W))
   val input2 = Wire(UInt(32.W))
 
-  when(registerRs1 === io.ex_mem_ins(11, 7)) {
+  when((registerRs1 === io.ex_mem_ins(11, 7)) && !fInst) {
     input1 := io.ex_mem_result
-  }.elsewhen(registerRs1 === io.mem_wb_ins(11, 7)) {
+  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fInst) {
       input1 := io.mem_wb_result
     }
     .otherwise {
-      input1 := io.readData1
+      input1 := Mux(fInst, 0.U, io.readData1)
     }
-  when(registerRs2 === io.ex_mem_ins(11, 7)) {
+  when((registerRs2 === io.ex_mem_ins(11, 7)) && !fInst) {
     input2 := io.ex_mem_result
-  }.elsewhen(registerRs2 === io.mem_wb_ins(11, 7)) {
+  }.elsewhen((registerRs2 === io.mem_wb_ins(11, 7)) && !fInst) {
       input2 := io.mem_wb_result
     }
     .otherwise {
-      input2 := io.readData2
+      input2 := Mux(fInst, 0.U, io.readData2)
     }
 
   //Branch Unit
@@ -345,16 +349,16 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
 
   //Forwarding for Jump
   val j_offset = Wire(UInt(32.W))
-    when(registerRs1 === io.ex_ins(11, 7)){
+    when((registerRs1 === io.ex_ins(11, 7)) && !fInst){
       j_offset := io.ex_result
-    }.elsewhen(registerRs1 === io.ex_mem_ins(11, 7)) {
+    }.elsewhen((registerRs1 === io.ex_mem_ins(11, 7)) && !fInst) {
     j_offset := io.ex_mem_result
-  }.elsewhen(registerRs1 === io.mem_wb_ins(11, 7)) {
+  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fInst) {
     j_offset := io.mem_wb_result
-  }.elsewhen(registerRs1 === io.ex_ins(11, 7)){
+  }.elsewhen((registerRs1 === io.ex_ins(11, 7)) && !fInst){
     j_offset := io.ex_result
   }.otherwise {
-      j_offset := io.readData1
+      j_offset := Mux(fInst, 0.U, io.readData1)
     }
 
   //Offset Calculation (Jump/Branch)

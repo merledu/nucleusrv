@@ -22,17 +22,15 @@ class ALU(F :Boolean) extends Module {
   val fConv = if (F) Some(Module(new Converter)) else None
   val fAlu  = if (F) Some(Module(new FALU)) else None
   if (F) {
-    Seq(
-      (fConv.get.io.sIn, io.input1.asSInt),
-      (fConv.get.io.uIn, io.input1),
-      (fConv.get.io.roundMode, io.rm.get),
-      (fConv.get.io.aluCtl, io.aluCtl),
-      (fAlu.get.io.aluCtl, io.aluCtl),
-      (fAlu.get.io.roundMode, 0.U),
-      (fAlu.get.io.input(0), io.input1),
-      (fAlu.get.io.input(1), io.input2),
-      (fAlu.get.io.input(2), io.input3)
-    ).map(f => f._1 := f._2)
+    fConv.get.io.sIn := io.input1.asSInt
+    fConv.get.io.uIn := io.input1
+    fConv.get.io.roundMode := io.rm.get
+    fConv.get.io.aluCtl := io.aluCtl
+    fAlu.get.io.aluCtl := io.aluCtl
+    fAlu.get.io.roundMode := 0.U
+    fAlu.get.io.input(0) := io.input1
+    fAlu.get.io.input(1) := io.input2
+    fAlu.get.io.input(2) := io.input3.get
   }
 
   io.result := MuxCase((io.input1 & io.input2), Seq(
@@ -48,7 +46,7 @@ class ALU(F :Boolean) extends Module {
       if (F) Seq(
         ((io.aluCtl >= 10.U) && (io.aluCtl <= 12.U)) -> fConv.get.io.uOut,
         (io.aluCtl === 13.U) -> fConv.get.io.sOut.asUInt,
-        ((io.aluCtl >= 14.U) && (io.aluCtl <= 27)) -> fAlu.get.io.out
+        ((io.aluCtl >= 14.U) && (io.aluCtl <= 30.U)) -> fAlu.get.io.out
       ) else Seq()
     )
   )

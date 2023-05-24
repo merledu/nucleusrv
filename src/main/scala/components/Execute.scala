@@ -30,6 +30,7 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
     val rm = if (F) Some(Input(UInt(3.W))) else None
     val frs2 = if (F) Some(Input(UInt(5.W))) else None
     val readData3 = if (F) Some(Input(UInt(32.W))) else None
+    val fInst = if (F) Some(Input(Bool())) else None
 
     val writeData = Output(UInt(32.W))
     val ALUresult = Output(UInt(32.W))
@@ -41,7 +42,7 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit(F)).io
 
-  val fAluCtl = if (F) Some(new FControl) else None
+  val fAluCtl = if (F) Some(Module(new FControl)) else None
 
   // Forwarding Unit
 
@@ -87,16 +88,14 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
   alu.io.input2 := aluIn2
 
   if (F) {
-    Seq(
-      (fAluCtl.get.io.fAluCtl, io.fAluCtl.get),
-      (fAluCtl.get.io.rm, io.rm.get),
-      (fAluCtl.get.io.rs2, io.frs2.get),
-      (alu.io.aluCtl, )
-      (alu.io.input3.get, io.input3.get),
-      (alu.io.rm.get, io.rm.get),
-      (fu.reg_rs3.get, io.id_ex_ins(31, 27)),
-      (fu.fEn.get, (alu.io.aluCtl === 16.U))
-    ).map(f => f._1 := f._2)
+    fAluCtl.get.io.fAluCtl := io.fAluCtl.get
+    fAluCtl.get.io.rm := io.rm.get
+    fAluCtl.get.io.rs2 := io.frs2.get
+    alu.io.aluCtl := Mux(io.fInst.get, fAluCtl.get.io.aluCtl, aluCtl.io.out)
+    alu.io.input3.get := io.readData3.get
+    alu.io.rm.get := io.rm.get
+    fu.reg_rs3.get := io.id_ex_ins(31, 27)
+    fu.fEn.get := (alu.io.aluCtl === 16.U)
 
   } else {
     alu.io.aluCtl := aluCtl.io.out
