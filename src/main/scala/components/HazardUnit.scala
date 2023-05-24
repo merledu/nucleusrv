@@ -2,7 +2,7 @@
 package nucleusrv.components
 import chisel3._
 
-class HazardUnit extends Module {
+class HazardUnit(F :Boolean) extends Module {
   val io = IO(new Bundle {
     val id_ex_memRead = Input(Bool())
     val ex_mem_memRead = Input(Bool())
@@ -21,6 +21,9 @@ class HazardUnit extends Module {
     val ctl_mux = Output(Bool())
     val ifid_flush = Output(Bool())
     val take_branch = Output(Bool())
+
+    // F
+    val pipeline_fInst = if (F) Some(Input(Vec(2, Bool()))) else None
   })
 
   io.ctl_mux := true.B
@@ -31,11 +34,18 @@ class HazardUnit extends Module {
 
 //  load-use hazard
   when(
-    (io.id_ex_memRead || io.branch) &&
-      (io.id_ex_rd === io.id_rs1 || io.id_ex_rd === io.id_rs2 ) &&
-      ((io.id_ex_rd =/= 0.U && io.id_rs1 =/= 0.U) ||
-      (io.id_ex_rd =/= 0.U && io.id_rs2 =/= 0.U)) &&
-      !io.id_ex_branch
+    ((io.id_ex_memRead && (if (F) !io.pipeline_fInst(0).get else 1.B)) || io.branch) &&               // For I Ext
+    (((io.id_ex_rd === io.id_rs1) && (if (F) !io.pipeline_fInst(0).get else 1.B)) ||                  // For I Ext
+      ((io.id_ex_rd === io.id_rs2) && (if (F) !io.pipeline_fInst(0).get else 1.B))) &&                // For I Ext
+    (((io.id_ex_rd =/= 0.U && io.id_rs1 =/= 0.U) && (if (F) io.pipeline_fInst(0).get else 1.B)) ||    // For I Ext
+      ((io.id_ex_rd =/= 0.U && io.id_rs2 =/= 0.U) && (if (F) io.pipeline_fInst(0).get else 1.B))) &&  // For I Ext
+    !io.id_ex_branch && (
+      if (F) (
+        (io.id_ex_memRead && io.pipeline_fInst(0).get) &&              // For F Ext
+        (((io.id_ex_rd === io.id_rs1) && io.pipeline_fInst(0).get) ||  // For F Ext
+          ((io.id_ex_rd === io.id_rs2) && io.pipeline_fInst(0).get))   // For F Ext
+      ) else 1.B
+    )
   )
   {
     io.ctl_mux := false.B
@@ -44,7 +54,17 @@ class HazardUnit extends Module {
     io.take_branch := false.B
   }
 
-  when(io.ex_mem_memRead && io.branch && (io.ex_mem_rd === io.id_rs1 || io.ex_mem_rd === io.id_rs2)){
+  when(
+    (io.ex_mem_memRead && (if (F) !io.pipeline_fInst(1).get)) && io.branch &&
+      (((io.ex_mem_rd === io.id_rs1) && (if (F) !io.pipeline_fInst(1).get else 1.B)) ||
+        ((io.ex_mem_rd === io.id_rs2) && (if (F) !io.pipeline_fInst(1).get else 1.B))) && (
+        if (F) (
+          (io.ex_mem_memRead && io.pipeline_fInst(1)) &&
+            (((io.ex_mem_rd === io.id_rs1) && io.pipeline_fInst(1)) ||
+              ((io.ex_mem_rd === io.id_rs2) && io.pipeline_fInst(1)))
+        )
+      )
+  ){
     io.ctl_mux := false.B
     io.pc_write := false.B
     io.if_reg_write := false.B

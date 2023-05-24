@@ -4,15 +4,17 @@ import chisel3._, chisel3.util._
 import hardfloat._
 
 
-class FALU_IO extends Bundle {
+class FALU_IO extends Bundle with Parameters {
   // Inputs
-  val input    : Vec[UInt] = Input(Vec(3, UInt(32.W)))
-  val aluCtl   : UInt      = Input(UInt(5.W))
-  val roundMode: UInt      = Input(UInt(3.W))
+  val input       : Vec[UInt] = Input(Vec(3, UInt(flen.W)))
+  val aluCtl      : UInt      = Input(UInt(5.W))
+  val roundMode   : UInt      = Input(UInt(rmWidth.W))
+  val stallValidIn: Bool      = Input(Bool())
 
   // Outputs
-  val out       : UInt = Output(UInt(32.W))
-  val exceptions: UInt = Output(UInt(5.W))
+  val stallValidOut: Vec[Bool] = Output(Vec(2, Bool()))
+  val out          : UInt      = Output(UInt(flen.W))
+  val exceptions   : UInt      = Output(UInt(5.W))
 }
 
 
@@ -74,8 +76,8 @@ class FALU extends Module {
   (Seq(  // - Module Specific
     fadd.io.subOp -> Mux(io.aluCtl === 21.U, 1.B, 0.B),
 
-    fdiv.io.inValid -> fdiv.io.inReady,
-    fdiv.io.sqrtOp -> 0.U
+    fdiv.io.inValid -> io.stallValidIn,
+    fdiv.io.sqrtOp -> Mux(io.aluCtl === 24.U, 1.B, 0.B)
   ) ++ Seq(
     fmadd.io.op -> Seq(
       16.U  -> 0.U,  // fmadd.s
@@ -112,10 +114,16 @@ class FALU extends Module {
     f => f._1 := f._2
   )
 
+  io.stallValidOut(0) := fdiv.io.inReady
+  io.stallValidOut(1) := (fdiv.io.outValid_div || fdiv.io.outValid_sqrt)
+
   // Operation Selection
   io.out := MuxCase(0.U, (Seq(
     Seq(14, 21) -> fadd.io.out,           // 14 -> fadd.s, 21 -> fsub.s
-    Seq(15) -> fdiv.io.out,               // fdiv.s
+    Seq(15, 24) -> Mux(                   // 15 -> fdiv.s, 24 -> fqrt.s
+      fdiv.io.outValid_div || fdiv.io.outValid_sqrt,
+      fdiv.io.out, 0.U
+    ),
     Seq(16, 17, 25, 26) -> fmadd.io.out,  // 16 -> fmadd.s, 17 -> fnmadd.s, 25 -> fmsub.s, 26 -> fnmsub.s
     Seq(22) -> fmul.io.out                // fmul.s
   ).map(
@@ -143,7 +151,10 @@ class FALU extends Module {
     ).map(
       f => inType(f._1).isNaN -> io.input(f._2)
     )),
-    Seq(27) -> fcmp.io.eq
+    Seq(27) -> fcmp.io.eq,
+    Seq(28) -> Cat(io.input(1)(31), io.input(0)(30, 0)),
+    Seq(29) -> Cat(~io.input(1)(31), io.input(0)(30, 0)),
+    Seq(30) -> Cat(io.input(0)(31) ^ io.input(1)(31), io.input(0)(30, 0))
   )).map(
     x => x._1.map(
       y => io.aluCtl === y.U
@@ -154,7 +165,10 @@ class FALU extends Module {
 
   io.exceptions := MuxCase(0.U, Seq(
     Seq(14, 21) -> fadd.io.exceptionFlags,              // fadd.s, fsub.s
-    Seq(15, 24) -> fdiv.io.exceptionFlags,              // fdiv.s, fsqrt.s
+    Seq(15, 24) -> Mux(                                 // fdiv.s, fsqrt.s
+      fdiv.io.outValid_div || fdiv.io.outValid_sqrt,
+      fdiv.io.exceptionFlags, 0.U
+    ),
     Seq(16, 17, 25, 26) -> fmadd.io.out,                // fmadd.s, fnmadd.s, fmsub.s, fmnsub.s
     Seq(18, 19, 20, 23, 27) -> fcmp.io.exceptionFlags,  // flt.s, fle.s, fmin.s, fmax.s, feq.s
     Seq(22) -> fmul.io.exceptionFlags,                  // fmul.s
@@ -165,8 +179,4 @@ class FALU extends Module {
       (y, z) => y || z
     ) -> x._2
   ))
-
-
-
-  // DEBUG
 }

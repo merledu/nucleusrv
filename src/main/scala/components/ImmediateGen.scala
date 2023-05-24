@@ -11,11 +11,11 @@ class ImmediateGen(F :Boolean) extends Module {
   val opcode = io.instruction(6, 0)
 
   //I-type
-  when(Seq(
+  when((Seq(
     3, 15, 19, 27, 103, 115
   ) ++ (
     if (F) Seq(7) else Seq()
-  ).map(
+  )).map(
     f => opcode === f.U
   ).reduce(
     (a, b) => a || b
@@ -32,7 +32,13 @@ class ImmediateGen(F :Boolean) extends Module {
       io.out := ext_u
     }
     //S-type
-    .elsewhen(opcode === 35.U || opcode === 39.U) {
+    .elsewhen(
+      (Seq(35) ++ (if (F) Seq(39) else Seq())).map(
+        f => opcode === f.U
+      ).reduce(
+        (e, f) => e || f
+      )
+    ) {
       val imm_s = Cat(io.instruction(31, 25), io.instruction(11, 7))
       val ext_s = Cat(Fill(20, imm_s(11)), imm_s)
       io.out := ext_s

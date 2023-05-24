@@ -29,10 +29,13 @@ class FControl extends RawModule with Parameters {
     (Cat(io.rm, io.fAluCtl) === "b00000101001010011".U) -> 20.U,                 // fmin.s
     (io.fAluCtl === "b00001001010011".U) -> 21.U,                                // fsub.s
     (io.fAluCtl === "b00010001010011".U) -> 22.U,                                // fmul.s
-    (Cat(io.rm, io.fAluCtl) === "b00100101001010011.U".U) -> 23.U,               // fmax.s
+    (Cat(io.rm, io.fAluCtl) === "b00100101001010011".U) -> 23.U,                 // fmax.s
     ((io.fAluCtl === "b01011001010011".U) && !io.rs2.orR) -> 24.U,               // fsqrt.s
     (io.fAluCtl((fFmtWidth + fOpcodeWidth) - 1, 0) === "b001000111".U) -> 25.U,  // fmsub.s
     (io.fAluCtl((fFmtWidth + fOpcodeWidth) - 1, 0) === "b001001011".U) -> 26.U,  // fnmsub.s
-    (Cat(io.rm, io.fAluCtl) === "b01010100001010011".U) -> 27.U                  // feq.s
+    (Cat(io.rm, io.fAluCtl) === "b01010100001010011".U) -> 27.U,                 // feq.s
+    (Cat(io.rm, io.fAluCtl) === "b00000100001010011".U) -> 28.U,                 // fsgnj.s
+    (Cat(io.rm, io.fAluCtl) === "b00100100001010011".U) -> 29.U,                 // fsgnjn.s
+    (Cat(io.rm, io.fAluCtl) === "b01000100001010011".U) -> 30.U                  // fsgnjx.s
   ))
 }
