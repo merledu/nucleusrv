@@ -11,6 +11,7 @@ class ALU(F :Boolean) extends Module {
 
     val input3 = if (F) Some(Input(UInt(32.W))) else None
     val rm = if (F) Some(Input(UInt(3.W))) else None
+    val fstall = if (F) Some(Output(Bool())) else None
 
     val zero: Bool = Output(Bool())
     val result: UInt = Output(UInt(32.W))
@@ -31,6 +32,8 @@ class ALU(F :Boolean) extends Module {
     fAlu.get.io.input(0) := io.input1
     fAlu.get.io.input(1) := io.input2
     fAlu.get.io.input(2) := io.input3.get
+    fAlu.get.io.stallValidIn := ((io.aluCtl === 15.U) || (io.aluCtl === 24.U))
+    io.fstall.get := fAlu.get.io.stallValidOut(0)
   }
 
   io.result := MuxCase((io.input1 & io.input2), Seq(
@@ -46,7 +49,7 @@ class ALU(F :Boolean) extends Module {
       if (F) Seq(
         ((io.aluCtl >= 10.U) && (io.aluCtl <= 12.U)) -> fConv.get.io.uOut,
         (io.aluCtl === 13.U) -> fConv.get.io.sOut.asUInt,
-        ((io.aluCtl >= 14.U) && (io.aluCtl <= 30.U)) -> fAlu.get.io.out
+        ((io.aluCtl >= 14.U) && (io.aluCtl <= 31.U)) -> fAlu.get.io.out
       ) else Seq()
     )
   )

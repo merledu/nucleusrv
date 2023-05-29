@@ -63,11 +63,13 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
 
     // F pins
     val fWriteEn = if (F) Some(Input(Bool())) else None
+    val fstall = if (F) Some(Input(Bool())) else None
     val pipeline_fInst = if (F) Some(Input(Vec(2, Bool()))) else None
     val fInst = if (F) Some(Output(Bool())) else None
     val rm = if (F) Some(Output(UInt(3.W))) else None
     val fAluCtl = if (F) Some(Output(UInt((5 + 2 + 7).W))) else None
     val frs2 = if (F) Some(Output(UInt(5.W))) else None
+    val frs3 = if (F) Some(Output(UInt(5.W))) else None
     val readData3 = if (F) Some(Output(UInt(32.W))) else None
     val fctl_regWrite = if (F) Some(Output(Bool())) else None
 
@@ -107,12 +109,14 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
     ).reduce(
       (e, f) => e || f
     ) else 0.B
+  val fstall = if (F) (io.fstall.get && io.pipeline_fInst.get(0)) else 0.B
 
   if (F) {
     io.rm.get := io.id_instruction(14, 12)
     io.fAluCtl.get := fAluCtl.get
     io.frs2.get := io.id_instruction(24, 20)
     io.fInst.get := fInst
+    io.frs3.get := frs3.get
   }
 
   // CSR
@@ -388,7 +392,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
     io.func7 := 0.U
   }
 
-  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
+  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U) && fstall
 
   val csr_iData_cases = Array(
     1.U -> io.ex_result,

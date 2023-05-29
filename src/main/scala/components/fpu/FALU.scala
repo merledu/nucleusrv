@@ -154,7 +154,8 @@ class FALU extends Module {
     Seq(27) -> fcmp.io.eq,
     Seq(28) -> Cat(io.input(1)(31), io.input(0)(30, 0)),
     Seq(29) -> Cat(~io.input(1)(31), io.input(0)(30, 0)),
-    Seq(30) -> Cat(io.input(0)(31) ^ io.input(1)(31), io.input(0)(30, 0))
+    Seq(30) -> Cat(io.input(0)(31) ^ io.input(1)(31), io.input(0)(30, 0)),
+    Seq(31) -> io.input(0)
   )).map(
     x => x._1.map(
       y => io.aluCtl === y.U
