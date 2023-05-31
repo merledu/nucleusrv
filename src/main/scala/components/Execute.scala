@@ -31,7 +31,8 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
     val frs2 = if (F) Some(Input(UInt(5.W))) else None
     val frs3 = if (F) Some(Input(UInt(5.W))) else None
     val readData3 = if (F) Some(Input(UInt(32.W))) else None
-    val fInst = if (F) Some(Input(Vec(3, Bool()))) else None
+    val fInst = if (F) Some(Input(Vec(4, Bool()))) else None
+    val fmv_cnv = if (F) Some(Input(Vec(2, Bool()))) else None
     val fstall = if (F) Some(Output(Bool())) else None
 
     val writeData = Output(UInt(32.W))
@@ -92,6 +93,7 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
   if (F) {
     fu.reg_rs3.get := io.frs3.get
     fu.fInst.get <> io.fInst.get
+    fu.fmv_cnv.get <> io.fmv_cnv.get
 
     val inputMux3 = MuxLookup(fu.forwardC.get, 0.U, Seq(
       0.U -> io.readData3.get,

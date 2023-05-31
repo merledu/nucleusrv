@@ -16,31 +16,32 @@ class ForwardingUnit(F :Boolean) extends Module {
 
     val reg_rs3 = if (F) Some(Input(UInt(5.W))) else None
     val fInst = if (F) Some(Input(Vec(3, Bool()))) else None
+    val fmv_cnv = if (F) Some(Input(Vec(2, Bool()))) else None
     val forwardC = if (F) Some(Output(UInt(2.W))) else None
  })
 
   io.forwardA := DontCare
   io.forwardB := DontCare
-  io.forwardC.get := DontCare
+  if (F) io.forwardC.get := DontCare
 
-  val fInst = if (F) io.fInst.get else WireInit(Vec(3, 1.B))
+  val fInst = if (F) io.fInst.get else VecInit(0.B, 0.B, 0.B)
 
   when(
-    ((io.reg_rs1 === io.ex_reg_rd) && (!fInst(0) === !fInst(1))) && (
-    ((io.ex_reg_rd =/= 0.U) && !fInst(1)) && (io.ex_regWrite && !fInst(1))) && (
+    (((io.reg_rs1 === io.ex_reg_rd) && (!fInst(0) === !fInst(1))) && (
+    ((io.ex_reg_rd =/= 0.U) && !fInst(1)) && (io.ex_regWrite && !fInst(1)))) || (
       if (F) (
-        ((io.reg_rs1 === io.ex_reg_rd) && (fInst(0) === fInst(2))) && (io.ex_regWrite && fInst(1))
-      ) else 1.B
+        ((io.reg_rs1 === io.ex_reg_rd) && (fInst(0) === (fInst(1) || io.fmv_cnv.get(0)))) && (io.ex_regWrite && fInst(1))
+      ) else 0.B
     )) {
     io.forwardA := 1.U
   }.elsewhen(
-      ((io.reg_rs1 === io.mem_reg_rd) && (!fInst(0) === !fInst(2))) && (
-        (io.mem_reg_rd =/= 0.U) && !fInst(2)) && (io.mem_regWrite && !fInst(2)) && (
+      (((io.reg_rs1 === io.mem_reg_rd) && (!fInst(0) === !fInst(2))) && (
+        (io.mem_reg_rd =/= 0.U) && !fInst(2)) && (io.mem_regWrite && !fInst(2))) || (
           if (F) (
             ((io.reg_rs1 === io.mem_reg_rd) && (fInst(0) === fInst(2))) && (
               (io.mem_regWrite && fInst(2))
             )
-          ) else 1.B
+          ) else 0.B
         )
     ) {
       io.forwardA := 2.U
@@ -50,20 +51,20 @@ class ForwardingUnit(F :Boolean) extends Module {
     }
 
   when(
-    ((io.reg_rs2 === io.ex_reg_rd) && (!fInst(0) === !fInst(1))) && (
-    ((io.ex_reg_rd =/= 0.U) && !fInst(1)) && (io.ex_regWrite && !fInst(1))) && (
+    (((io.reg_rs2 === io.ex_reg_rd) && (!fInst(0) === !fInst(1))) && (
+    ((io.ex_reg_rd =/= 0.U) && !fInst(1)) && (io.ex_regWrite && !fInst(1)))) || (
       if (F) (
         ((io.reg_rs1 === io.ex_reg_rd) && (fInst(0) === fInst(2))) && (io.ex_regWrite && fInst(1))
-      ) else 1.B
+      ) else 0.B
     )
   ) {
     io.forwardB := 1.U
   }.elsewhen(
-      ((io.reg_rs2 === io.mem_reg_rd) && (!fInst(0) === !fInst(2))) && (
-      ((io.mem_reg_rd =/= 0.U) && (!fInst(2))) && (io.mem_regWrite && !fInst(2)) && (
+      (((io.reg_rs2 === io.mem_reg_rd) && (!fInst(0) === !fInst(2))) && (
+      ((io.mem_reg_rd =/= 0.U) && (!fInst(2))) && (io.mem_regWrite && !fInst(2))) || (
         if (F) (
           ((io.reg_rs2 === io.mem_reg_rd) && (fInst(0) === fInst(2))) && (io.mem_regWrite && fInst(2))
-        ) else 1.B
+        ) else 0.B
       ))
     ) {
       io.forwardB := 2.U

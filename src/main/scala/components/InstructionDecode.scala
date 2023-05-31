@@ -72,6 +72,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
     val frs3 = if (F) Some(Output(UInt(5.W))) else None
     val readData3 = if (F) Some(Output(UInt(32.W))) else None
     val fctl_regWrite = if (F) Some(Output(Bool())) else None
+    val fmv_cnv = if (F) Some(Output(Bool())) else None
 
     // CSR pins
     val csr_i_misa        = Input(UInt(32.W))
@@ -117,6 +118,12 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
     io.frs2.get := io.id_instruction(24, 20)
     io.fInst.get := fInst
     io.frs3.get := frs3.get
+    io.fmv_cnv.get := Seq(
+      "b11110001010011",
+      "b11010001010011",
+      "b11100001010011",
+      "b11000001010011"
+    ).map(f => fAluCtl.get === f.U).reduce((e, f) => e || f)
   }
 
   // CSR
@@ -217,7 +224,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
     io.ctl_memWrite := false.B
     io.ctl_regWrite := false.B
 
-    io.fctl_regWrite.get := 0.B
+    if (F) io.fctl_regWrite.get := 0.B
   }
 
   //Register File
@@ -233,12 +240,12 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
 
   // Floating Point Register File
   val fregisters = if (F) Some(Module(new FPRegisters)) else None
-  val frAddr = Seq(
+  val frAddr = if (F) Seq(
     io.writeReg,  // rd
     registerRs1,  // rs1
     registerRs2,  // rs2
     frs3.get      // rs3
-  )
+  ) else Seq()
 
   if (F) {
     for (i <- 0 until fregisters.get.io.rAddr.length) {

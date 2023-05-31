@@ -34,17 +34,17 @@ class HazardUnit(F :Boolean) extends Module {
 
 //  load-use hazard
   when(
-    ((io.id_ex_memRead && (if (F) !io.pipeline_fInst.get(0) else 1.B)) || io.branch) &&               // For I Ext
+    (((io.id_ex_memRead && (if (F) !io.pipeline_fInst.get(0) else 1.B)) || io.branch) &&               // For I Ext
     (((io.id_ex_rd === io.id_rs1) && (if (F) !io.pipeline_fInst.get(0) else 1.B)) ||                  // For I Ext
       ((io.id_ex_rd === io.id_rs2) && (if (F) !io.pipeline_fInst.get(0) else 1.B))) &&                // For I Ext
     (((io.id_ex_rd =/= 0.U && io.id_rs1 =/= 0.U) && (if (F) io.pipeline_fInst.get(0) else 1.B)) ||    // For I Ext
       ((io.id_ex_rd =/= 0.U && io.id_rs2 =/= 0.U) && (if (F) io.pipeline_fInst.get(0) else 1.B))) &&  // For I Ext
-    !io.id_ex_branch && (
+    !io.id_ex_branch) || (
       if (F) (
         (io.id_ex_memRead && io.pipeline_fInst.get(0)) &&              // For F Ext
         (((io.id_ex_rd === io.id_rs1) && io.pipeline_fInst.get(0)) ||  // For F Ext
           ((io.id_ex_rd === io.id_rs2) && io.pipeline_fInst.get(0)))   // For F Ext
-      ) else 1.B
+      ) else 0.B
     )
   )
   {
@@ -55,14 +55,14 @@ class HazardUnit(F :Boolean) extends Module {
   }
 
   when(
-    (io.ex_mem_memRead && (if (F) !io.pipeline_fInst.get(1) else 1.B)) && io.branch &&       // For I Ext
+    ((io.ex_mem_memRead && (if (F) !io.pipeline_fInst.get(1) else 1.B)) && io.branch &&       // For I Ext
       (((io.ex_mem_rd === io.id_rs1) && (if (F) !io.pipeline_fInst.get(1) else 1.B)) ||      // For I Ext
-        ((io.ex_mem_rd === io.id_rs2) && (if (F) !io.pipeline_fInst.get(1) else 1.B))) && (  // For I Ext
+        ((io.ex_mem_rd === io.id_rs2) && (if (F) !io.pipeline_fInst.get(1) else 1.B)))) || (  // For I Ext
         if (F) (
           (io.ex_mem_memRead && io.pipeline_fInst.get(1)) &&                // For F Ext
             (((io.ex_mem_rd === io.id_rs1) && io.pipeline_fInst.get(1)) ||  // For F Ext
               ((io.ex_mem_rd === io.id_rs2) && io.pipeline_fInst.get(1)))   // For F Ext
-        ) else 1.B
+        ) else 0.B
       )
   ){
     io.ctl_mux := false.B

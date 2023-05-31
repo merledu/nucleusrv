@@ -45,13 +45,14 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_f3 = RegInit(0.U(3.W))
 
   // - F Registers
-  val id_reg_fAluCtl = if (F) Some(RegInit(0.U((5 + 7).W))) else None
+  val id_reg_fAluCtl = if (F) Some(RegInit(0.U((5 + 3 + 7).W))) else None
   val id_reg_rm = if (F) Some(RegInit(0.U(3.W))) else None
   val id_reg_frs2 = if (F) Some(RegInit(0.U(5.W))) else None
   val id_reg_frs3 = if (F) Some(RegInit(0.U(5.W))) else None
   val id_reg_rs3 = if (F) Some(RegInit(0.U(32.W))) else None
   val id_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
   val id_reg_fInst = if (F) Some(RegInit(0.B)) else None
+  val id_reg_fmv_cnv = if (F) Some(RegInit(0.B)) else None
 
   val id_reg_ins = RegInit(0.U(32.W))
   val id_reg_ctl_aluSrc = RegInit(false.B)
@@ -86,6 +87,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
   val ex_reg_fInst = if (F) Some(RegInit(0.B)) else None
   val ex_reg_fstall = if (F) Some(RegInit(0.B)) else None
+  val ex_reg_fmv_cnv = if (F) Some(RegInit(0.B)) else None
 
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -102,6 +104,7 @@ class Core(implicit val config:Configs) extends Module{
   // - F Register
   val mem_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
   val mem_reg_fInst = if (F) Some(RegInit(0.B)) else None
+  val mem_reg_fmv_cnv = if (F) Some(RegInit(0.B)) else None
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
@@ -218,6 +221,7 @@ class Core(implicit val config:Configs) extends Module{
       (id_reg_fctl_regWrite.get, ID.fctl_regWrite),
       (id_reg_fInst.get, ID.fInst),
       (id_reg_frs3.get, ID.frs3),
+      (id_reg_fmv_cnv.get, ID.fmv_cnv),
       (ID.pipeline_fInst.get(0), id_reg_fInst),
       (ID.pipeline_fInst.get(1), ex_reg_fInst)
     ).map(f => f._1 := f._2.get)
@@ -263,8 +267,11 @@ class Core(implicit val config:Configs) extends Module{
       (EX.fInst.get(1), ex_reg_fInst),
       (EX.fInst.get(2), mem_reg_fInst),
       (ex_reg_fInst.get, id_reg_fInst),
+      (ex_reg_fmv_cnv.get, id_reg_fmv_cnv),
       (EX.frs3.get, id_reg_frs3),
-      (ID.fstall.get, EX.fstall)
+      (EX.fmv_cnv.get(0), ex_reg_fmv_cnv),
+      (EX.fmv_cnv.get(1), mem_reg_fmv_cnv),
+      (ID.fstall.get, EX.fstall),
     ).map(f => f._1 := f._2.get)
   }
 
@@ -305,7 +312,8 @@ class Core(implicit val config:Configs) extends Module{
   when(EX.stall){
     id_reg_wra := id_reg_wra
     id_reg_ctl_regWrite := id_reg_ctl_regWrite
-    id_reg_fctl_regWrite.get := id_reg_fctl_regWrite.get
+
+    if (F) id_reg_fctl_regWrite.get := id_reg_fctl_regWrite.get
   }
 
   /****************
@@ -361,6 +369,8 @@ class Core(implicit val config:Configs) extends Module{
 
   if (F) {
     mem_reg_fctl_regWrite.get := ex_reg_fctl_regWrite.get
+    mem_reg_fmv_cnv.get := ex_reg_fmv_cnv.get
+    mem_reg_fInst.get := ex_reg_fInst.get
   }
   EX.ex_mem_regWrite := ((
     if (F) ex_reg_fctl_regWrite.get else 0.B
@@ -397,7 +407,6 @@ class Core(implicit val config:Configs) extends Module{
 
   if (F) {
     ID.fWriteEn.get := mem_reg_fctl_regWrite.get
-    mem_reg_fInst.get := ex_reg_fInst.get
   }
   EX.mem_wb_regWrite := (mem_reg_ctl_regWrite || (
     if (F) mem_reg_fctl_regWrite.get else 0.B
