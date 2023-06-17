@@ -45,14 +45,13 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_f3 = RegInit(0.U(3.W))
 
   // - F Registers
-  val id_reg_fAluCtl = if (F) Some(RegInit(0.U((5 + 3 + 7).W))) else None
-  val id_reg_rm = if (F) Some(RegInit(0.U(3.W))) else None
-  val id_reg_frs2 = if (F) Some(RegInit(0.U(5.W))) else None
-  val id_reg_frs3 = if (F) Some(RegInit(0.U(5.W))) else None
-  val id_reg_rs3 = if (F) Some(RegInit(0.U(32.W))) else None
-  val id_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
-  val id_reg_fInst = if (F) Some(RegInit(0.B)) else None
-  val id_reg_fmv_cnv = if (F) Some(RegInit(0.B)) else None
+  val id_reg_fWrite    = if (F) Some(RegInit(0.B)) else None
+  val id_reg_iWrite    = if (F) Some(RegInit(0.B)) else None
+  val id_reg_fAluCtl   = if (F) Some(RegInit(0.U(5.W))) else None
+  val id_reg_readData3 = if (F) Some(RegInit(0.U(XLEN.W))) else None
+  val id_reg_rm        = if (F) Some(RegInit(0.U(3.W))) else None
+  val id_reg_rs3       = if (F) Some(RegInit(0.U(5.W))) else None
+  val id_reg_fRead     = if (F) Some(RegInit(0.B)) else None
 
   val id_reg_ins = RegInit(0.U(32.W))
   val id_reg_ctl_aluSrc = RegInit(false.B)
@@ -84,10 +83,8 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_csr_data = RegInit(0.U)
 
   // - F Registers
-  val ex_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
-  val ex_reg_fInst = if (F) Some(RegInit(0.B)) else None
-  val ex_reg_fstall = if (F) Some(RegInit(0.B)) else None
-  val ex_reg_fmv_cnv = if (F) Some(RegInit(0.B)) else None
+  val ex_reg_fWrite = if (F) Some(RegInit(0.B)) else None
+  val ex_reg_iWrite = if (F) Some(RegInit(0.B)) else None
 
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -102,13 +99,12 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_csr_data = RegInit(0.U)
 
   // - F Register
-  val mem_reg_fctl_regWrite = if (F) Some(RegInit(0.B)) else None
-  val mem_reg_fInst = if (F) Some(RegInit(0.B)) else None
-  val mem_reg_fmv_cnv = if (F) Some(RegInit(0.B)) else None
+  val mem_reg_fWrite = if (F) Some(RegInit(0.B)) else None
+  val mem_reg_iWrite = if (F) Some(RegInit(0.B)) else None
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val ID = Module(new InstructionDecode(F, TRACE)).io
+  val ID = Module(new InstructionDecode(XLEN, F, TRACE)).io
   val EX = Module(new Execute(M = M, F = F)).io
   val MEM = Module(new MemoryFetch)
 
@@ -212,20 +208,6 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_is_csr := ID.is_csr
   id_reg_csr_data := ID.csr_o_data
 
-  if (F) {
-    Seq(
-      (id_reg_rm.get, ID.rm),
-      (id_reg_fAluCtl.get, ID.fAluCtl),
-      (id_reg_frs2.get, ID.frs2),
-      (id_reg_rs3.get, ID.readData3),
-      (id_reg_fctl_regWrite.get, ID.fctl_regWrite),
-      (id_reg_fInst.get, ID.fInst),
-      (id_reg_frs3.get, ID.frs3),
-      (id_reg_fmv_cnv.get, ID.fmv_cnv),
-      (ID.pipeline_fInst.get(0), id_reg_fInst),
-      (ID.pipeline_fInst.get(1), ex_reg_fInst)
-    ).map(f => f._1 := f._2.get)
-  }
 //  IF.PcWrite := ID.hdu_pcWrite
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
@@ -242,6 +224,30 @@ class Core(implicit val config:Configs) extends Module{
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
 
+  if (F) {
+    id_reg_fWrite.get    := ID.fpCUfWrite.get
+    id_reg_iWrite.get    := ID.fpCUiWrite.get
+    id_reg_fAluCtl.get   := ID.fAluCtl.get
+    id_reg_readData3.get := ID.readData3.get
+    id_reg_rm.get        := ID.rm.get
+    id_reg_rs3.get       := ID.rs3.get
+    id_reg_fRead.get     := ID.fpCURead.get
+    Seq(
+      id_reg_fWrite,
+      ex_reg_fWrite,
+      mem_reg_fWrite
+    ).zipWithIndex.foreach(
+      f => ID.fWrite.get(f._2) := f._1.get
+    )
+    Seq(
+      id_reg_iWrite,
+      ex_reg_iWrite,
+      mem_reg_iWrite
+    ).zipWithIndex.foreach(
+      f => ID.iWrite.get(f._2) := f._1.get
+    )
+  }
+
   /*****************
    * Execute Stage *
   ******************/
@@ -256,24 +262,6 @@ class Core(implicit val config:Configs) extends Module{
   EX.pcAddress := id_reg_pc
   EX.func3 := id_reg_f3
   EX.func7 := id_reg_f7
-
-  if (F) {
-    Seq(
-      (EX.fAluCtl.get, id_reg_fAluCtl),
-      (EX.rm.get, id_reg_rm),
-      (EX.frs2.get, id_reg_frs2),
-      (EX.readData3.get, id_reg_rs3),
-      (EX.fInst.get(0), id_reg_fInst),
-      (EX.fInst.get(1), ex_reg_fInst),
-      (EX.fInst.get(2), mem_reg_fInst),
-      (ex_reg_fInst.get, id_reg_fInst),
-      (ex_reg_fmv_cnv.get, id_reg_fmv_cnv),
-      (EX.frs3.get, id_reg_frs3),
-      (EX.fmv_cnv.get(0), ex_reg_fmv_cnv),
-      (EX.fmv_cnv.get(1), mem_reg_fmv_cnv),
-      (ID.fstall.get, EX.fstall),
-    ).map(f => f._1 := f._2.get)
-  }
 
   EX.ctl_aluSrc := id_reg_ctl_aluSrc
   EX.ctl_aluOp := id_reg_ctl_aluOp
@@ -304,16 +292,29 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Ex := id_reg_is_csr
   ID.csr_Ex_data := id_reg_csr_data
 
-  if (F) {
-    ex_reg_fctl_regWrite.get := id_reg_fctl_regWrite.get
-    ex_reg_fInst.get := id_reg_fInst.get
-  }
-
   when(EX.stall){
     id_reg_wra := id_reg_wra
     id_reg_ctl_regWrite := id_reg_ctl_regWrite
 
-    if (F) id_reg_fctl_regWrite.get := id_reg_fctl_regWrite.get
+    if (F) {
+      id_reg_fWrite.get := id_reg_fWrite.get
+      id_reg_iWrite.get := id_reg_iWrite.get
+    }
+  }
+
+  if (F) {
+    EX.fRead.get      := id_reg_fRead.get
+    EX.rs3.get        := id_reg_rs3.get
+    EX.readData3.get  := id_reg_readData3.get
+    EX.fAluCtl.get    := id_reg_fAluCtl.get
+    EX.rm.get         := id_reg_rm.get
+    ex_reg_fWrite.get := id_reg_fWrite.get
+    Seq(
+      ex_reg_fWrite,
+      mem_reg_fWrite
+    ).zipWithIndex.map(
+      f => EX.fWrite.get(f._2) := f._1.get
+    )
   }
 
   /****************
@@ -367,14 +368,12 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
 
+  EX.ex_mem_regWrite := ex_reg_ctl_regWrite
+
   if (F) {
-    mem_reg_fctl_regWrite.get := ex_reg_fctl_regWrite.get
-    mem_reg_fmv_cnv.get := ex_reg_fmv_cnv.get
-    mem_reg_fInst.get := ex_reg_fInst.get
+    mem_reg_fWrite.get := ex_reg_fWrite.get
+    mem_reg_iWrite.get := ex_reg_iWrite.get
   }
-  EX.ex_mem_regWrite := ((
-    if (F) ex_reg_fctl_regWrite.get else 0.B
-  ) || ex_reg_ctl_regWrite)
 
   /********************
    * Write Back Stage *
@@ -405,12 +404,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.dmem_data := io.dmemRsp.bits.dataResponse
   io.pin := wb_data
 
-  if (F) {
-    ID.fWriteEn.get := mem_reg_fctl_regWrite.get
-  }
-  EX.mem_wb_regWrite := (mem_reg_ctl_regWrite || (
-    if (F) mem_reg_fctl_regWrite.get else 0.B
-  ))
+  EX.mem_wb_regWrite := mem_reg_ctl_regWrite
 
   /**************
   ** RVFI PINS **

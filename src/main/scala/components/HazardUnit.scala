@@ -2,7 +2,7 @@
 package nucleusrv.components
 import chisel3._
 
-class HazardUnit(F :Boolean) extends Module {
+class HazardUnit(F:Boolean) extends Module {
   val io = IO(new Bundle {
     val id_ex_memRead = Input(Bool())
     val ex_mem_memRead = Input(Bool())
@@ -23,7 +23,7 @@ class HazardUnit(F :Boolean) extends Module {
     val take_branch = Output(Bool())
 
     // F
-    val pipeline_fInst = if (F) Some(Input(Vec(2, Bool()))) else None
+    val fWrite = if (F) Some(Input(Vec(3, Bool()))) else None
   })
 
   io.ctl_mux := true.B
@@ -32,19 +32,21 @@ class HazardUnit(F :Boolean) extends Module {
   io.take_branch := true.B
   io.ifid_flush := false.B
 
+  val fWrite = if (F) io.fWrite.get else VecInit(
+    for (_ <- 0 until 3)
+      yield 0.B
+  )
+
 //  load-use hazard
   when(
-    (((io.id_ex_memRead && (if (F) !io.pipeline_fInst.get(0) else 1.B)) || io.branch) &&               // For I Ext
-    (((io.id_ex_rd === io.id_rs1) && (if (F) !io.pipeline_fInst.get(0) else 1.B)) ||                  // For I Ext
-      ((io.id_ex_rd === io.id_rs2) && (if (F) !io.pipeline_fInst.get(0) else 1.B))) &&                // For I Ext
-    (((io.id_ex_rd =/= 0.U && io.id_rs1 =/= 0.U) && (if (F) io.pipeline_fInst.get(0) else 1.B)) ||    // For I Ext
-      ((io.id_ex_rd =/= 0.U && io.id_rs2 =/= 0.U) && (if (F) io.pipeline_fInst.get(0) else 1.B))) &&  // For I Ext
+    (((io.id_ex_memRead && !fWrite(1)) || io.branch) &&
+    (((io.id_ex_rd === io.id_rs1) || (io.id_ex_rd === io.id_rs2)) && (!fWrite(1) === !fWrite(0))) &&
+    (((io.id_ex_rd =/= 0.U && io.id_rs1 =/= 0.U) ||  
+     (io.id_ex_rd =/= 0.U && io.id_rs2 =/= 0.U)) && !fWrite(1)) &&
     !io.id_ex_branch) || (
-      if (F) (
-        (io.id_ex_memRead && io.pipeline_fInst.get(0)) &&              // For F Ext
-        (((io.id_ex_rd === io.id_rs1) && io.pipeline_fInst.get(0)) ||  // For F Ext
-          ((io.id_ex_rd === io.id_rs2) && io.pipeline_fInst.get(0)))   // For F Ext
-      ) else 0.B
+      if (F) (io.id_ex_memRead && fWrite(1)) &&
+        (((io.id_ex_rd === io.id_rs1) || (io.id_ex_rd === io.id_rs2)) && (fWrite(1) === fWrite(0)))
+      else 0.B
     )
   )
   {
@@ -55,15 +57,12 @@ class HazardUnit(F :Boolean) extends Module {
   }
 
   when(
-    ((io.ex_mem_memRead && (if (F) !io.pipeline_fInst.get(1) else 1.B)) && io.branch &&       // For I Ext
-      (((io.ex_mem_rd === io.id_rs1) && (if (F) !io.pipeline_fInst.get(1) else 1.B)) ||      // For I Ext
-        ((io.ex_mem_rd === io.id_rs2) && (if (F) !io.pipeline_fInst.get(1) else 1.B)))) || (  // For I Ext
-        if (F) (
-          (io.ex_mem_memRead && io.pipeline_fInst.get(1)) &&                // For F Ext
-            (((io.ex_mem_rd === io.id_rs1) && io.pipeline_fInst.get(1)) ||  // For F Ext
-              ((io.ex_mem_rd === io.id_rs2) && io.pipeline_fInst.get(1)))   // For F Ext
-        ) else 0.B
-      )
+    ((io.ex_mem_memRead && !fWrite(2)) && io.branch &&
+    (((io.ex_mem_rd === io.id_rs1) || (io.ex_mem_rd === io.id_rs2)) && (!fWrite(2) === !fWrite(0)))) || (
+      if (F) (io.ex_mem_memRead && fWrite(2)) &&
+        (((io.ex_mem_rd === io.id_rs1) || (io.ex_mem_rd === io.id_rs2)) && (fWrite(2) === fWrite(0)))
+      else 0.B
+    )
   ){
     io.ctl_mux := false.B
     io.pc_write := false.B

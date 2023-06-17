@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class ImmediateGen(F :Boolean) extends Module {
+class ImmediateGen(F:Boolean) extends Module {
   val io = IO(new Bundle {
     val instruction = Input(UInt(32.W))
     val out = Output(UInt(32.W))

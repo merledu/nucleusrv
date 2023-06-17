@@ -9,12 +9,13 @@ class ALU(F :Boolean) extends Module {
     val input2: UInt = Input(UInt(32.W))
     val aluCtl: UInt = Input(UInt(5.W))
 
-    val input3 = if (F) Some(Input(UInt(32.W))) else None
-    val rm = if (F) Some(Input(UInt(3.W))) else None
-    val fstall = if (F) Some(Output(Bool())) else None
-
     val zero: Bool = Output(Bool())
     val result: UInt = Output(UInt(32.W))
+
+    // F
+    val input3 = if (F) Some(Input(UInt(32.W))) else None
+    val rm     = if (F) Some(Input(UInt(3.W))) else None
+    val fstall = if (F) Some(Output(Bool())) else None
   })
 
   /*****************

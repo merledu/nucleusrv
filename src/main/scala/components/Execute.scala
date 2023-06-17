@@ -5,7 +5,7 @@ import chisel3.util.MuxCase
 import nucleusrv.components.fpu._
 import chisel3.util.MuxLookup
 
-class Execute(M :Boolean = false, F :Boolean) extends Module {
+class Execute(M:Boolean = false, F:Boolean) extends Module {
   val io = IO(new Bundle {
     val immediate = Input(UInt(32.W))
     val readData1 = Input(UInt(32.W))
@@ -26,29 +26,25 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
     val ctl_aluOp = Input(UInt(2.W))
     val ctl_aluSrc1 = Input(UInt(2.W))
 
-    val fAluCtl = if (F) Some(Input(UInt((5 + 2 + 7).W))) else None
-    val rm = if (F) Some(Input(UInt(3.W))) else None
-    val frs2 = if (F) Some(Input(UInt(5.W))) else None
-    val frs3 = if (F) Some(Input(UInt(5.W))) else None
-    val readData3 = if (F) Some(Input(UInt(32.W))) else None
-    val fInst = if (F) Some(Input(Vec(4, Bool()))) else None
-    val fmv_cnv = if (F) Some(Input(Vec(2, Bool()))) else None
-    val fstall = if (F) Some(Output(Bool())) else None
-
     val writeData = Output(UInt(32.W))
     val ALUresult = Output(UInt(32.W))
 
     val stall = Output(Bool())
+
+    // F
+    val readData3 = if (F) Some(Input(UInt(32.W))) else None
+    val fAluCtl   = if (F) Some(Input(UInt(5.W))) else None
+    val rm        = if (F) Some(Input(Bool())) else None
+    val rs3       = if (F) Some(Input(UInt(5.W))) else None
+    val fRead     = if (F) Some(Input(Bool())) else None
+    val fWrite    = if (F) Some(Input(Vec(2, Bool()))) else None
   })
 
   val alu = Module(new ALU(F))
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit(F)).io
 
-  val fAluCtl = if (F) Some(Module(new FControl)) else None
-
   // Forwarding Unit
-
   fu.ex_regWrite := io.ex_mem_regWrite
   fu.mem_regWrite := io.mem_wb_regWrite
   fu.ex_reg_rd := io.ex_mem_ins(11, 7)
@@ -90,28 +86,27 @@ class Execute(M :Boolean = false, F :Boolean) extends Module {
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
 
+  val fAluCtl = if (F) io.fAluCtl.get else WireInit(0.U(5.W))
   if (F) {
-    fu.reg_rs3.get := io.frs3.get
-    fu.fInst.get <> io.fInst.get
-    fu.fmv_cnv.get <> io.fmv_cnv.get
+    fu.rs3.get    := io.rs3.get
+    fu.fRead.get  := io.fRead.get
+    fu.fWrite.get <> io.fWrite.get
 
-    val inputMux3 = MuxLookup(fu.forwardC.get, 0.U, Seq(
-      0.U -> io.readData3.get,
-      1.U -> io.mem_result,
-      2.U -> io.wb_result
-    ))
+    val inputMux3 = MuxCase(
+      0.U,
+      Array(
+        (fu.forwardC.get === 0.U) -> io.readData3.get,
+        (fu.forwardC.get === 1.U) -> io.mem_result,
+        (fu.forwardC.get === 2.U) -> io.wb_result
+      )
+    )
 
-    fAluCtl.get.io.fAluCtl := io.fAluCtl.get
-    fAluCtl.get.io.rm := io.rm.get
-    fAluCtl.get.io.rs2 := io.frs2.get
-    alu.io.aluCtl := Mux(io.fInst.get(0), fAluCtl.get.io.aluCtl, aluCtl.io.out)
     alu.io.input3.get := inputMux3
-    alu.io.rm.get := io.rm.get
-    fu.reg_rs3.get := io.id_ex_ins(31, 27)
-    io.fstall.get := alu.io.fstall.get
-  } else {
-    alu.io.aluCtl := aluCtl.io.out
+    alu.io.rm.get     := io.rm.get
   }
+
+  alu.io.aluCtl := Mux(fAluCtl >= 10.U, fAluCtl, aluCtl.io.out)
+ 
 
   io.stall := false.B
   if(M){

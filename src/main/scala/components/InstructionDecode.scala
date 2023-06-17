@@ -5,7 +5,7 @@ import chisel3.util._
 
 import nucleusrv.components.fpu._
 
-class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
+class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
     val writeData = Input(UInt(32.W))
@@ -62,68 +62,66 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
     val stall = Output(Bool())
 
     // F pins
-    val fWriteEn = if (F) Some(Input(Bool())) else None
-    val fstall = if (F) Some(Input(Bool())) else None
-    val pipeline_fInst = if (F) Some(Input(Vec(2, Bool()))) else None
-    val fInst = if (F) Some(Output(Bool())) else None
-    val rm = if (F) Some(Output(UInt(3.W))) else None
-    val fAluCtl = if (F) Some(Output(UInt((5 + 2 + 7).W))) else None
-    val frs2 = if (F) Some(Output(UInt(5.W))) else None
-    val frs3 = if (F) Some(Output(UInt(5.W))) else None
-    val readData3 = if (F) Some(Output(UInt(32.W))) else None
-    val fctl_regWrite = if (F) Some(Output(Bool())) else None
-    val fmv_cnv = if (F) Some(Output(Bool())) else None
+    val fWrite     = if (F) Some(Input(Vec(3, Bool()))) else None
+    val iWrite     = if (F) Some(Input(Vec(3, Bool()))) else None
+    val fpCUfWrite = if (F) Some(Output(Bool())) else None
+    val fpCUiWrite = if (F) Some(Output(Bool())) else None
+    val fpCURead   = if (F) Some(Output(Bool())) else None
+    val fAluCtl    = if (F) Some(Output(UInt(5.W))) else None
+    val readData3  = if (F) Some(Output(UInt(32.W))) else None
+    val rm         = if (F) Some(Output(UInt(3.W))) else None
+    val rs3        = if (F) Some(Output(UInt(5.W))) else None
 
     // CSR pins
-    val csr_i_misa        = Input(UInt(32.W))
-    val csr_i_mhartid     = Input(UInt(32.W))
-    val csr_o_data        = Output(UInt(32.W))
-    val is_csr            = Output(Bool())
-    val fscr_o_data       = Output(UInt(32.W))
+    val csr_i_misa    = Input(UInt(32.W))
+    val csr_i_mhartid = Input(UInt(32.W))
+    val csr_o_data    = Output(UInt(32.W))
+    val is_csr        = Output(Bool())
+    val fscr_o_data   = Output(UInt(32.W))
 
     // RVFI pins
     val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
   })
 
   // F Extension
-  val fopcode = if (F) Some(WireInit(io.id_instruction(6, 0))) else None
-  val func5_fmt = if (F) WireInit(io.id_instruction(31, 25)) else WireInit(0.U((5 + 2).W))
-  val fAluCtl = if(F) Some(WireInit(Cat(func5_fmt, fopcode.get))) else None
-  val frs3 = if (F) Some(WireInit(func5_fmt(6, 2))) else None
-  val fWriteEn = if (F) io.fWriteEn.get else 0.B
-  val fDMemEn = if (F) Seq(
-    "b0000111",  // flw
-    "b0100111"   // fsw
-  ).map(
-    f => fopcode.get === f.U
-  ) else Seq(0.B, 0.B)
-  val fInst = if (F) Seq(
-      "b0000111",
-      "b0100111",
-      "b1000011",
-      "b1000111",
-      "b1001011",
-      "b1001111",
-      "b1010011"
-    ).map(
-      f => fopcode.get === f.U
-    ).reduce(
-      (e, f) => e || f
-    ) else 0.B
-  val fstall = if (F) (io.fstall.get && io.pipeline_fInst.get(0)) else 0.B
+  val fpDecoder  = if (F) Some(Module(new FPDecoder(XLEN)).io) else None
+  val fpRegFile  = if (F) Some(dontTouch(Module(new FPRegisters).io)) else None
+  val fpCU       = if (F) Some(Module(new FPControl).io) else None
+  val fWrite     = if (F) VecInit(
+    Seq(fpCU.get.fWrite) ++ (0 until io.fWrite.get.length).toSeq.map(
+      f => io.fWrite.get(f)
+    )
+  ) else VecInit(
+    for (i <- 0 until 4)
+      yield 0.B
+  )
+  val fRead      = if (F) fpCU.get.fRead else WireInit(0.B)
+  val fLoad      = if (F) fpCU.get.fLoad else WireInit(0.B)
+  val fStore     = if (F) fpCU.get.fStore else WireInit(0.B)
+  val iWrite     = if (F) VecInit(
+    Seq(fpCU.get.iWrite) ++ (0 until io.iWrite.get.length).toSeq.map(
+      f => io.iWrite.get(f)
+    )
+  ) else VecInit(
+    for (i <- 0 until 4)
+      yield 0.B
+  )
 
   if (F) {
-    io.rm.get := io.id_instruction(14, 12)
-    io.fAluCtl.get := fAluCtl.get
-    io.frs2.get := io.id_instruction(24, 20)
-    io.fInst.get := fInst
-    io.frs3.get := frs3.get
-    io.fmv_cnv.get := Seq(
-      "b11110001010011",
-      "b11010001010011",
-      "b11100001010011",
-      "b11000001010011"
-    ).map(f => fAluCtl.get === f.U).reduce((e, f) => e || f)
+    fpDecoder.get.inst := io.id_instruction
+
+    fpCU.get.opcode := io.id_instruction(6, 0)
+    fpCU.get.fmt    := fpDecoder.get.fmt
+    fpCU.get.funct5 := fpDecoder.get.funct5
+    fpCU.get.rm     := fpDecoder.get.rm
+    fpCU.get.rs2    := io.id_instruction(24, 20)
+
+    io.fpCUfWrite.get := fpCU.get.fWrite
+    io.fpCUiWrite.get := fpCU.get.iWrite
+    io.fAluCtl.get    := fpCU.get.aluCtl
+    io.rs3.get        := fpDecoder.get.funct5
+    io.fpCURead.get   := fpCU.get.fRead
+    io.rm.get         := fpDecoder.get.rm
   }
 
   // CSR
@@ -168,63 +166,39 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   hdu.io.branch := io.ctl_branch
   io.hdu_pcWrite := hdu.io.pc_write
   io.hdu_if_reg_write := hdu.io.if_reg_write
+
   if (F) {
-    hdu.io.pipeline_fInst.get <> io.pipeline_fInst.get
+    for (i <- 0 until hdu.io.fWrite.get.length) {
+      hdu.io.fWrite.get(i) := fWrite(i)
+    }
   }
 
   //Control Unit
   val control = Module(new Control)
   control.io.in := io.id_instruction
   io.ctl_aluOp := control.io.aluOp
-  io.ctl_aluSrc := control.io.aluSrc
+  io.ctl_aluSrc := control.io.aluSrc || fRead
   io.ctl_aluSrc1 := control.io.aluSrc1
   io.ctl_branch := control.io.branch
-  io.ctl_memRead := control.io.memRead || fDMemEn(0)
-  io.ctl_memToReg := Mux(fInst, fDMemEn(0).asUInt, control.io.memToReg)
+  io.ctl_memRead := control.io.memRead || fLoad
+  io.ctl_memToReg := Mux(fLoad, 1.U, control.io.memToReg)
   io.ctl_jump := control.io.jump
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
-    if (F) {
-      io.ctl_memWrite := control.io.memWrite || fDMemEn(1)
-      io.fctl_regWrite.get := (Seq(
-        "b0000111",
-        "b1000011",
-        "b1000111",
-        "b1001011",
-        "b1001111"
-      ).map(
-        f => fopcode.get === f.U
-      ).reduce(
-        (a, b) => a || b
-      )) || (
-        (fopcode.get === "b1010011".U) && (Seq(
-          "b1100000",  // fcvt.w[u].s
-          "b1110000",  // fmv.x.w, fclass.s
-          "b1010000"   // feq.s, flt.s, fle.s
-        ).map(  // Not enabled for these instructions
-          f => func5_fmt =/= f.U
-        ).reduce(
-          (e, f) => e || f
-        ))
-      )
-      io.ctl_regWrite := control.io.regWrite || (Seq(
-        "b1100000",  // fcvt.w[u].s
-        "b1110000",  // fmv.x.w, fclass.s
-        "b1010000"   // feq.s, flt.s, fle.s
-      ).map(  // Enabled for these instructions
-        f => fAluCtl.get === (f + "1010011").U
-      ).reduce(
-        (e, f) => e || f
-      ))
-    } else {
-      io.ctl_regWrite := control.io.regWrite
-      io.ctl_memWrite := control.io.memWrite
-    }
+    io.ctl_regWrite := control.io.regWrite || iWrite(0)
+    io.ctl_memWrite := control.io.memWrite || fStore
 
+    if (F) {
+      io.fpCUfWrite.get := fpCU.get.fWrite
+      io.fpCUiWrite.get := fpCU.get.iWrite
+    }
   }.otherwise {
     io.ctl_memWrite := false.B
     io.ctl_regWrite := false.B
 
-    if (F) io.fctl_regWrite.get := 0.B
+    if (F) {
+      io.fpCUfWrite.get := 0.B
+      io.fpCUiWrite.get := 0.B
+    }
   }
 
   //Register File
@@ -234,94 +208,60 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   val registerRs2 = io.id_instruction(24, 20)
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb
+  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb || iWrite(3)
   registers.io.writeAddress := registerRd
   registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
 
-  // Floating Point Register File
-  val fregisters = if (F) Some(Module(new FPRegisters)) else None
-  val frAddr = if (F) Seq(
-    io.writeReg,  // rd
-    registerRs1,  // rs1
-    registerRs2,  // rs2
-    frs3.get      // rs3
-  ) else Seq()
-
+  // Floating point Register File
+  val ffwd = fWrite(3) && fRead
   if (F) {
-    for (i <- 0 until fregisters.get.io.rAddr.length) {
-      fregisters.get.io.rAddr(i) := frAddr(i)
-    }
+    Seq(
+      registerRd,           // rd
+      registerRs1,          // rs1
+      registerRs2,          // rs2
+      fpDecoder.get.funct5  // rs3
+    ).zipWithIndex.foreach(
+      f => dontTouch(fpRegFile.get.rAddr(f._2)) := f._1
+    )
+    
+    fpRegFile.get.wData.valid := fWrite(3)
+    fpRegFile.get.wData.bits  := io.writeData
 
-    fregisters.get.io.wData.valid := io.fWriteEn.get
-    fregisters.get.io.wData.bits := io.writeData
-
-    // rs3 forwarding to fix structural hazard
-    when (io.fWriteEn.get && (io.writeReg === frs3.get)) {
+    when ((io.writeReg === fpDecoder.get.funct5) && ffwd) {
       io.readData3.get := io.writeData
     } otherwise {
-      io.readData3.get := fregisters.get.io.rData(2)
+      io.readData3.get := fpRegFile.get.rData(2)
     }
   }
 
   //Forwarding to fix structural hazard
-  when((io.ctl_writeEnable || fWriteEn) && (io.writeReg === registerRs1)){
+  when((io.ctl_writeEnable || ffwd) && (io.writeReg === registerRs1)){
     when(registerRs1 === 0.U){
-      io.readData1 := Mux(fWriteEn, io.writeData, 0.U)
+      io.readData1 := Mux(ffwd, io.writeData, 0.U)
     }.otherwise{
       io.readData1 := io.writeData
     }
   }.otherwise{
-    io.readData1 := (
-      if (F) Mux(Seq(
-        "b1000011",
-        "b1000111",
-        "b1001011",
-        "b1001111"
-      ).map(
-        f => fopcode.get === f.U
-      ).reduce(
-        (a, b) => a || b
-      ) || (
-        (fopcode.get === "b1010011".U) && (Seq(
-          "b1101000",  // fcvt.s.w[u]
-          "b1111000"   // fmv.w.x
-        ).map(  // Not enabled for these instructions
-          f => func5_fmt =/= f.U
-        ).reduce(
-          (e, f) => e || f
-        ))
-      ),
-        fregisters.get.io.rData(0),
-        registers.io.readData(0)
-      ) else registers.io.readData(0)
+    io.readData1 := Mux(
+      fRead && !fStore,
+      if (F) fpRegFile.get.rData(0) else 0.U,
+      registers.io.readData(0)
     )
   }
-  when((io.ctl_writeEnable || fWriteEn) && (io.writeReg === registerRs2)){
+  when((io.ctl_writeEnable || ffwd) && (io.writeReg === registerRs2)){
     when(registerRs2 === 0.U){
-      io.readData2 := Mux(fWriteEn, io.writeData, 0.U)
+      io.readData2 := Mux(ffwd, io.writeData, 0.U)
     }.otherwise{
       io.readData2 := io.writeData
     }
   }.otherwise{
-    io.readData2 := (
-      if (F) Mux(Seq(
-        "b0100111",
-        "b1000011",
-        "b1000111",
-        "b1001011",
-        "b1001111",
-        "b1010011"
-      ).map(
-        f => fopcode.get === f.U
-      ).reduce(
-        (a, b) => a || b
-      ),
-        fregisters.get.io.rData(1),
-        registers.io.readData(1)
-      ) else registers.io.readData(1)
+    io.readData2 := Mux(
+      fRead,
+      if (F) fpRegFile.get.rData(1) else 0.U,
+      registers.io.readData(1)
     )
   }
-  
+
   
 
   val immediate = Module(new ImmediateGen(F))
@@ -332,21 +272,27 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   val input1 = Wire(UInt(32.W))
   val input2 = Wire(UInt(32.W))
 
-  when((registerRs1 === io.ex_mem_ins(11, 7)) && !fInst) {
+  val fJmpFwd = VecInit(
+    fRead === fWrite(1),  // id_ex
+    fRead === fWrite(2),  // ex_mem
+    fRead === fWrite(3)   // mem_wb
+  )
+
+  when((registerRs1 === io.ex_mem_ins(11, 7)) && !fJmpFwd(1)) {
     input1 := io.ex_mem_result
-  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fInst) {
+  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fJmpFwd(2)) {
       input1 := io.mem_wb_result
     }
     .otherwise {
-      input1 := Mux(fInst, 0.U, io.readData1)
+      input1 := io.readData1
     }
-  when((registerRs2 === io.ex_mem_ins(11, 7)) && !fInst) {
+  when((registerRs2 === io.ex_mem_ins(11, 7)) && !fJmpFwd(1)) {
     input2 := io.ex_mem_result
-  }.elsewhen((registerRs2 === io.mem_wb_ins(11, 7)) && !fInst) {
+  }.elsewhen((registerRs2 === io.mem_wb_ins(11, 7)) && !fJmpFwd(2)) {
       input2 := io.mem_wb_result
     }
     .otherwise {
-      input2 := Mux(fInst, 0.U, io.readData2)
+      input2 := io.readData2
     }
 
   //Branch Unit
@@ -356,20 +302,20 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
   bu.io.rd1 := input1
   bu.io.rd2 := input2
   bu.io.take_branch := hdu.io.take_branch
-  hdu.io.taken := bu.io.taken  
+  hdu.io.taken := bu.io.taken
 
   //Forwarding for Jump
   val j_offset = Wire(UInt(32.W))
-    when((registerRs1 === io.ex_ins(11, 7)) && !fInst){
+    when((registerRs1 === io.ex_ins(11, 7)) && !fJmpFwd(0)) {
       j_offset := io.ex_result
-    }.elsewhen((registerRs1 === io.ex_mem_ins(11, 7)) && !fInst) {
+    }.elsewhen((registerRs1 === io.ex_mem_ins(11, 7)) && !fJmpFwd(1)) {
     j_offset := io.ex_mem_result
-  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fInst) {
+  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fJmpFwd(2)) {
     j_offset := io.mem_wb_result
-  }.elsewhen((registerRs1 === io.ex_ins(11, 7)) && !fInst){
+  }.elsewhen((registerRs1 === io.ex_ins(11, 7)) && !fJmpFwd(0)) {
     j_offset := io.ex_result
   }.otherwise {
-      j_offset := Mux(fInst, 0.U, io.readData1)
+      j_offset := io.readData1
     }
 
   //Offset Calculation (Jump/Branch)
@@ -399,7 +345,7 @@ class InstructionDecode(F :Boolean, TRACE:Boolean) extends Module {
     io.func7 := 0.U
   }
 
-  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U) && fstall
+  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
 
   val csr_iData_cases = Array(
     1.U -> io.ex_result,
