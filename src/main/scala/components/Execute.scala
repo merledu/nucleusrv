@@ -24,6 +24,53 @@ class Execute(M:Boolean = false) extends Module {
     val ctl_aluOp = Input(UInt(2.W))
     val ctl_aluSrc1 = Input(UInt(2.W))
 
+    // val instruction = Input(UInt(32.W))
+    val func6 = Input(UInt(6.W))
+    val v_ctl_aluop = Input(UInt(3.W))
+    val v_ctl_exsel = Input(UInt(4.W))
+    // val v_ctl_mem2reg = Input(Bool())
+    val v_ctl_regwrite = Input(Bool())
+    // val v_ctl_memwrite = Input(Bool())
+    // val v_ctl_branch = Input(Bool())
+    // val v_ctl_memread = Input(Bool())
+    // val v_ctl_opAsel = Input(UInt(2.W))
+    val v_ctl_opBsel = Input(Bool())
+    // val v_ctl_nextpcsel = Input(UInt(2.W))
+    val v_ctl_v_load = Input(Bool())
+    val v_ctl_v_ins = Input(Bool())
+    val v_ctl_vset = Input(Bool())
+    val vs1_data = Input(SInt(128.W))
+    val vs2_data = Input(SInt(128.W))
+    val vl = Input(SInt(32.W))
+    val vstart = Input(SInt(32.W))
+    val vd_data = Input(SInt(128.W))
+    val vma = Input(UInt(1.W))
+    val vta = Input(UInt(1.W))
+    val vm = Input(UInt(1.W))
+    val vs0 = Input(SInt(128.W))
+    val vd_addr = Input(UInt(5.W))
+    // val wb_data = Input(SInt(128.W))
+    val v_sew = Input(UInt(3.W))
+    val zimm = Input(SInt(32.W))
+    val v_addi_imm = Input(SInt(32.W))
+    val vec_mem_res = Input(SInt(128.W))
+    val vec_wb_res = Input(SInt(128.W))
+    // val vtype_in = Input(SInt(11.W))
+    
+    val fu_ex_reg_vd = Input(UInt(5.W))
+    val fu_mem_reg_vd = Input(UInt(5.W))
+    val fu_reg_vs1 = Input(UInt(5.W))
+    val fu_reg_vs2 = Input(UInt(5.W))
+    val fu_ex_reg_write = Input(Bool())
+    val fu_mem_reg_write = Input(Bool())
+
+    val vec_alu_res = Output(SInt(128.W))
+    val vec_lmul = Output(SInt(32.W))
+    val vec_vl = Output(SInt(32.W))
+    val vec_rd_out = Output(UInt(5.W))
+    val vec_avl_o = Output(SInt(32.W))
+    val vec_valmax_o = Output(SInt(32.W))
+
     val writeData = Output(UInt(32.W))
     val ALUresult = Output(UInt(32.W))
 
@@ -42,6 +89,13 @@ class Execute(M:Boolean = false) extends Module {
   fu.mem_reg_rd := io.mem_wb_ins(11, 7)
   fu.reg_rs1 := io.id_ex_ins(19, 15)
   fu.reg_rs2 := io.id_ex_ins(24, 20)
+
+  fu.ex_reg_vd := io.fu_ex_reg_vd
+  fu.mem_reg_vd := io.fu_mem_reg_vd
+  fu.reg_vs1 := io.fu_reg_vs1
+  fu.reg_vs2 := io.fu_reg_vs2
+  fu.ex_reg_write := io.fu_ex_reg_write
+  fu.mem_reg_write := io.fu_mem_reg_write
 
   val inputMux1 = MuxCase(
     0.U,
@@ -74,9 +128,96 @@ class Execute(M:Boolean = false) extends Module {
   aluCtl.io.aluOp := io.ctl_aluOp
   aluCtl.io.aluSrc := io.ctl_aluSrc
 
+  val Vec_aluCtl = Module(new vu.Alu_Control)
+  dontTouch(Vec_aluCtl.io)
+  Vec_aluCtl.io.func3 := io.func3
+  Vec_aluCtl.io.func6 := io.func6
+  Vec_aluCtl.io.aluOp := io.v_ctl_aluop
+
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
+
+  // Vector ALU
+  val vec_alu = Module(new vu.ALU_)
+  dontTouch(vec_alu.io)
+  // vec_alu.io.in_A := MuxCase(0.S, Array(
+  //   (io.v_ctl_opAsel === "b00".U || io.v_ctl_opAsel === "b11".U) -> io.readData1,
+  //   (io.v_ctl_opAsel === "b01".U) -> io.pcAddress.asSInt,
+  //   // (io.v_ctl_opAsel === "b10".U) -> io.pcAddress + 4.U
+  //   ))
+
+  vec_alu.io.in_A := io.readData1.asSInt
+
+  when(fu.forwardA === 1.U){
+    vec_alu.io.vs1 := io.vec_mem_res
+  }.elsewhen(fu.forwardA === 2.U){
+    vec_alu.io.vs1 := io.vec_wb_res
+  }.otherwise{
+    vec_alu.io.vs1 := io.vs1_data
+  }
+  // vec_alu.io.vs1 := io.vs1_data
+
+  when(io.v_ctl_exsel === "b0011".U && io.v_ctl_opBsel === 1.U){
+    vec_alu.io.in_B := io.zimm.asSInt
+  }.elsewhen(io.v_ctl_exsel === "b0100".U && io.v_ctl_opBsel === 1.U){
+    vec_alu.io.in_B := io.v_addi_imm.asSInt
+  }.otherwise{
+    vec_alu.io.in_B := io.readData2.asSInt
+  }
+
+  //  vec_alu.io.in_B := io.readData2
+  when(fu.forwardB === 1.U){
+    vec_alu.io.vs2 := io.vec_mem_res
+  }.elsewhen(fu.forwardB === 2.U){
+    vec_alu.io.vs2 := io.vec_wb_res
+  }.otherwise{
+    vec_alu.io.vs2 := io.vs2_data
+  }
+  vec_alu.io.aluc := Vec_aluCtl.io.aluc
+  vec_alu.io.vd_addr := io.vd_addr
+  vec_alu.io.sew := io.v_sew
+  vec_alu.io.v_ins := io.v_ctl_v_ins
+  vec_alu.io.vl := io.vl.asUInt
+  vec_alu.io.vta := io.vta
+  vec_alu.io.vma := io.vma
+  vec_alu.io.vm := io.vm
+  vec_alu.io.vd := io.vd_data
+  vec_alu.io.vs0 := io.vs0
+  vec_alu.io.vstart := io.vstart.asUInt
+  io.vec_alu_res := vec_alu.io.v_output
+
+  // Vector Config Module
+  val vec_config = Module(new vu.configure)
+  // dontTouch(vec_config.io)
+  when(io.v_ctl_vset === 1.B) {
+    vec_config.io.zimm := io.id_ex_ins(30, 20)
+    vec_config.io.rs1 := io.id_ex_ins(19, 15)
+    vec_config.io.rd := io.id_ex_ins(11, 7)
+    when(fu.forwardA === 1.U){
+      vec_config.io.rs1_readdata := io.mem_result.asSInt
+    }.elsewhen((fu.forwardA === 2.U)){
+      vec_config.io.rs1_readdata := io.wb_result.asSInt
+    }.otherwise{
+      vec_config.io.rs1_readdata := io.readData1.asSInt
+    }
+    // vec_config.io.rs1_readdata := io.readData1.asSInt
+    vec_config.io.current_vl := io.vl.asSInt
+  }.otherwise{
+    vec_config.io.zimm := 0.U
+    vec_config.io.rs1 := 0.U
+    vec_config.io.rd := 0.U
+    vec_config.io.rs1_readdata := 0.S
+    vec_config.io.current_vl := 0.S
+  }
+
+  io.vec_lmul := vec_config.io.lmul.asSInt
+  io.vec_vl := vec_config.io.vl
+  io.vec_rd_out := vec_config.io.rd_out
+  io.vec_avl_o := vec_config.io.avl_o
+  io.vec_valmax_o := vec_config.io.valmax_o
+
+
 
   io.stall := false.B
   if(M){

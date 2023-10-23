@@ -9,9 +9,11 @@ class Core(implicit val config:Configs) extends Module{
   val C      = config.C
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
+  val V      = config.V
 
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
+    val Vpin = Output(UInt(128.W))
     val stall: Bool = Input(Bool())
 
     val dmemReq = Decoupled(new MemRequestIO)
@@ -41,6 +43,7 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_imm = RegInit(0.U(32.W))
   val id_reg_wra = RegInit(0.U(5.W))
   val id_reg_f7 = RegInit(0.U(7.W))
+  val id_reg_f6 = RegInit(0.U(6.W))
   val id_reg_f3 = RegInit(0.U(3.W))
   val id_reg_ins = RegInit(0.U(32.W))
   val id_reg_ctl_aluSrc = RegInit(false.B)
@@ -54,6 +57,40 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_ctl_jump = RegInit(0.U(2.W))
   val id_reg_is_csr = RegInit(false.B)
   val id_reg_csr_data = RegInit(0.U)
+
+  // Vector ID-EX Register
+  val id_reg_instruction = RegInit(0.U(32.W))
+  val id_reg_vl_out = RegInit(0.S(32.W))
+  val id_reg_z_imm = RegInit(0.S(11.W))
+  val id_reg_vtype_out = RegInit(0.S(11.W))
+  val id_reg_vstart_out = RegInit(0.S(32.W))
+  val id_reg_vtype = RegInit(0.S(32.W))
+  val id_reg_v_addi_imm = RegInit(0.S(32.W))
+  val id_reg_v0_data = RegInit(0.S(128.W))
+  val id_reg_v1_data = RegInit(0.S(128.W))
+  val id_reg_v2_data = RegInit(0.S(128.W))
+  val id_reg_vd_data = RegInit(0.S(128.W))
+  val id_reg_vs1_addr = RegInit(0.U(5.W))
+  val id_reg_vs2_addr = RegInit(0.U(5.W))
+  val id_reg_vd_addr = RegInit(0.U(5.W))
+  dontTouch(id_reg_vd_addr)
+  // val id_reg_ctl_memWrite = RegInit(false.B)
+  // val id_reg_ctl_Branch = RegInit(false.B)
+  // val id_reg_ctl_MemRead = RegInit(false.B)
+  val id_reg_ctl_RegWrite = RegInit(false.B)
+  // val id_reg_ctl_Mem2Reg = RegInit(false.B)
+  // val id_reg_ctl_opAsel = RegInit(0.U(2.W))
+  val id_reg_ctl_opBsel = RegInit(false.B)
+  val id_reg_ctl_Ex_sel = RegInit(0.U(4.W))
+  val id_reg_ctl_nextPCsel = RegInit(0.U(2.W))
+  val id_reg_ctl_aluop = RegInit(0.U(5.W))
+  val id_reg_ctl_vset = RegInit(false.B)
+  val id_reg_ctl_v_load = RegInit(false.B)
+  val id_reg_ctl_v_ins = RegInit(false.B)
+  // val id_reg_RegWrite = RegInit(false.B)
+  // val id_reg_vs1_addr = RegInit(0.U(5.W))
+  // val id_reg_vs2_addr = RegInit(0.U(5.W))
+
 
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
@@ -71,6 +108,21 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_is_csr = RegInit(false.B)
   val ex_reg_csr_data = RegInit(0.U)
 
+  val ex_reg_vec_alu_res = RegInit(0.S(128.W))
+  val ex_reg_lmul = RegInit(0.S(32.W))
+  val ex_reg_vl = RegInit(0.S(32.W))
+  dontTouch(ex_reg_vl)
+  val ex_reg_rd_out = RegInit(0.U(5.W))
+  val ex_reg_avl_o = RegInit(0.S(32.W))
+  val ex_reg_valmax_o = RegInit(0.S(32.W))
+  val ex_reg_vs1_addr = RegInit(0.U(5.W))
+  val ex_reg_vs2_addr = RegInit(0.U(5.W))
+  val ex_reg_vd_addr = RegInit(0.U(5.W))
+  dontTouch(ex_reg_vd_addr)
+  val ex_reg_vset = RegInit(false.B)
+  val ex_reg_reg_write = RegInit(false.B)
+  val ex_reg_vtype = RegInit(0.S(11.W))
+
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
   val mem_reg_ins = RegInit(0.U(32.W))
@@ -83,10 +135,28 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_is_csr = RegInit(false.B)
   val mem_reg_csr_data = RegInit(0.U)
 
+  val mem_reg_vec_alu_out = RegInit(0.S(128.W))
+  val mem_reg_vec_lmul = RegInit(0.S(32.W))
+  val mem_reg_vec_vl = RegInit(0.S(32.W))
+  val mem_reg_vtype = RegInit(0.S(11.W))
+  val mem_reg_vec_rd_out = RegInit(0.U(5.W))
+  val mem_reg_vec_avl_o = RegInit(0.S(32.W))
+  val mem_reg_vec_valmax_o = RegInit(0.S(32.W))
+  val mem_reg_vs1_addr = RegInit(0.U(5.W))
+  val mem_reg_vs2_addr = RegInit(0.U(5.W))
+  val mem_reg_vec_vd_addr = RegInit(0.U(5.W))
+  dontTouch(mem_reg_vec_vd_addr)
+  val mem_reg_vset = RegInit(false.B)
+  val mem_reg_vec_reg_write = RegInit(false.B)
+
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val ID = Module(new InstructionDecode(TRACE)).io
+  dontTouch(IF)
+  val IDecode = Module(new InstructionDecode(TRACE))
+  val ID = IDecode.io
+  dontTouch(ID)
   val EX = Module(new Execute(M = M)).io
+  dontTouch(EX)
   val MEM = Module(new MemoryFetch)
 
   io.fcsr_o_data := ID.fscr_o_data
@@ -104,7 +174,133 @@ class Core(implicit val config:Configs) extends Module{
   val ral_halt_o  = WireInit(false.B)
   val is_comp     = WireInit(false.B)
 
+  // if (V){
 
+  /************************
+   * Vector Decode Stage *
+   ************************/
+
+    // dontTouch(ID.v_registers.io.vs1_addr)
+    // id_reg_vl_out := Mux(ex_reg_vset, ex_reg_vl, Mux(mem_reg_vset, mem_reg_vec_vl, ID.vl_out))
+    id_reg_vl_out := ID.vl_out
+    id_reg_z_imm := ID.v_z_imm
+    id_reg_vstart_out := ID.vstart_out
+    id_reg_vtype := ID.vtypei_out
+    id_reg_v_addi_imm := ID.v_addi_imm
+    id_reg_v0_data := ID.vs0_data
+    id_reg_v1_data := ID.vs1_data
+    id_reg_v2_data := ID.vs2_data
+    id_reg_vd_data := ID.vd_data
+    // id_reg_RegWrite := ID.reg_write
+    // id_reg_ctl_memWrite := ID.ctl_v_MemWrite
+    // id_reg_ctl_Branch :=ID.ctl_v_Branch
+    // id_reg_ctl_MemRead :=ID.ctl_v_MemRead
+    id_reg_ctl_RegWrite :=ID.ctl_v_RegWrite
+    // id_reg_ctl_Mem2Reg :=ID.ctl_v_Mem2Reg
+    // id_reg_ctl_opAsel :=ID.ctl_v_opAsel
+    id_reg_ctl_opBsel :=ID.ctl_v_opBsel
+    id_reg_ctl_Ex_sel :=ID.ctl_v_Ex_sel
+    // id_reg_ctl_nextPCsel := ID.ctl_v_nextPCsel
+    id_reg_ctl_aluop := ID.ctl_v_aluop
+    id_reg_ctl_vset := ID.ctl_v_vset
+    id_reg_ctl_v_load := ID.ctl_v_load
+    id_reg_ctl_v_ins := ID.ctl_v_ins
+    id_reg_instruction := ID.id_instruction
+    // id_reg_vs1_addr ;= ID.vs1_addr
+    id_reg_vd_addr := ID.vd_addr
+    id_reg_vs1_addr := ID.vs1_addr
+    id_reg_vs2_addr := ID.vs2_addr
+    
+    
+
+
+  /*************************
+   * Vector Execute Stage *
+  **************************/
+
+  // EX.id_ex_ins
+  EX.func6 := id_reg_ins(31, 26)
+  EX.v_ctl_aluop := id_reg_ctl_aluop
+  EX.v_ctl_exsel := id_reg_ctl_Ex_sel
+  // EX.v_ctl_mem2reg := id_reg_ctl_memToReg
+  EX.v_ctl_regwrite := id_reg_ctl_RegWrite
+  // EX.v_ctl_memwrite := id_reg_ctl_memWrite
+  // EX.v_ctl_branch := id_reg_ctl_Branch
+  // EX.v_ctl_memread := id_reg_ctl_memRead
+  // EX.v_ctl_opAsel := id_reg_ctl_opAsel
+  EX.v_ctl_opBsel := id_reg_ctl_opBsel
+  // EX.v_ctl_nextpcsel := id_reg_ctl_nextPCsel
+  EX.v_ctl_v_load := id_reg_ctl_v_load
+  EX.v_ctl_v_ins := id_reg_ctl_v_ins
+  EX.v_ctl_vset := id_reg_ctl_vset
+  ex_reg_vset := id_reg_ctl_vset
+  EX.vs1_data := id_reg_v1_data
+  EX.vs2_data := id_reg_v2_data
+  EX.vl := Mux(ex_reg_vset, ex_reg_vl, Mux(mem_reg_vset, mem_reg_vec_vl, ID.vl_out))
+  EX.vstart := id_reg_vstart_out
+  EX.vd_data := id_reg_vd_data
+  EX.vma := Mux(ex_reg_vset, ex_reg_vtype(7), Mux(mem_reg_vset, mem_reg_vtype(7), ID.vtypei_out(7)))
+  EX.vta := Mux(ex_reg_vset, ex_reg_vtype(6), Mux(mem_reg_vset, mem_reg_vtype(6), ID.vtypei_out(6)))
+  EX.vm := id_reg_ins(25)
+  EX.vs0 := id_reg_v0_data
+  EX.vd_addr := id_reg_ins(11, 7)
+  // EX.v_aluc :=
+  EX.v_sew := Mux(ex_reg_vset, ex_reg_vtype(5, 3), Mux(mem_reg_vset, mem_reg_vtype(5, 3), ID.vtypei_out(5, 3)))
+  EX.zimm := id_reg_vtype
+  EX.v_addi_imm := id_reg_v_addi_imm
+  // EX.vtype_in := Mux(ex_reg_vset, ex_reg_vtype, Mux(mem_reg_vset, mem_reg_vtype, id_reg_vtype_out))
+
+  EX.fu_reg_vs1 := id_reg_vs1_addr
+  EX.fu_reg_vs2 := id_reg_vs2_addr
+  EX.fu_ex_reg_vd := ex_reg_vd_addr
+  EX.fu_mem_reg_vd := mem_reg_vec_vd_addr
+  EX.fu_ex_reg_write := ex_reg_reg_write
+  EX.fu_mem_reg_write := mem_reg_vec_reg_write
+
+  ex_reg_vtype := id_reg_z_imm
+  ex_reg_vec_alu_res := EX.vec_alu_res
+  ex_reg_lmul := EX.vec_lmul
+  ex_reg_vl := EX.vec_vl
+  ex_reg_rd_out := EX.vec_rd_out
+  ex_reg_avl_o := EX.vec_avl_o
+  ex_reg_valmax_o := EX.vec_valmax_o
+
+  ex_reg_reg_write := id_reg_ctl_RegWrite
+  EX.fu_ex_reg_write := ex_reg_reg_write
+  // id_reg_ctl_RegWrite := ex_reg_reg_write
+  ex_reg_vd_addr := id_reg_vd_addr
+  // id_reg_vd_addr := ex_reg_vd_addr
+
+  /****************
+   * Memory Stage *
+   ****************/
+
+  EX.vec_mem_res := ex_reg_vec_alu_res
+  mem_reg_vec_alu_out := ex_reg_vec_alu_res
+  mem_reg_vec_lmul := ex_reg_lmul
+  mem_reg_vset := ex_reg_vset
+  mem_reg_vec_vl := ex_reg_vl
+  mem_reg_vtype := ex_reg_vtype
+  mem_reg_vec_rd_out := ex_reg_rd_out
+  mem_reg_vec_avl_o := ex_reg_avl_o
+  mem_reg_vec_valmax_o := ex_reg_valmax_o
+  mem_reg_vec_reg_write := ex_reg_reg_write
+  mem_reg_vec_vd_addr := ex_reg_vd_addr
+
+
+  /****************
+   * Write Back *
+   ****************/
+
+  EX.vec_wb_res := mem_reg_vec_alu_out
+  ID.wb_RegWrite := mem_reg_vec_reg_write
+  ID.wb_addr := mem_reg_vec_vd_addr
+  ID.write_data := mem_reg_vec_alu_out
+  ID.ctl_vset := mem_reg_vset
+  ID.vl := mem_reg_vec_vl
+  ID.vtypei := mem_reg_vtype
+
+  // }
   if (C) {
 
     /*****************
@@ -174,12 +370,13 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_imm := ID.immediate
   id_reg_wra := ID.writeRegAddress
   id_reg_f3 := ID.func3
+  id_reg_f6 := ID.func6
   id_reg_f7 := ID.func7
   id_reg_ins := if_reg_ins
   id_reg_pc := if_reg_pc
   id_reg_ctl_aluSrc := ID.ctl_aluSrc
   id_reg_ctl_memToReg := ID.ctl_memToReg
-  id_reg_ctl_regWrite := ID.ctl_regWrite
+  id_reg_ctl_regWrite := ID.ctl_regWrite || ID.ctl_v_RegWrite
   id_reg_ctl_memRead := ID.ctl_memRead
   id_reg_ctl_memWrite := ID.ctl_memWrite
   id_reg_ctl_branch := ID.ctl_branch
@@ -188,6 +385,32 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
   id_reg_is_csr := ID.is_csr
   id_reg_csr_data := ID.csr_o_data
+
+  // id_reg_vl_out := ID.vl_out
+  // id_reg_vtype_out := ID.vtype_out
+  // id_reg_vstart_out := ID.vstart_out
+  // id_reg_vtype := ID.v_z_imm
+  // id_reg_v_addi_imm := ID.v_addi_imm
+  // id_reg_v0_data := ID.vs0_data
+  // id_reg_v1_data := ID.vs1_data
+  // id_reg_v2_data := ID.vs2_data
+  // id_reg_vd_data := ID.vd_data
+  // id_reg_regWrite := ID.reg_write
+  // id_reg_ctl_memWrite :=ID.ctl_MemWrite
+  // id_reg_ctl_Branch :=ID.ctl_Branch
+  // id_reg_ctl_MemRead :=ID.ctl_MemRead
+  // id_reg_ctl_RegWrite :=ID.ctl_RegWrite
+  // id_reg_ctl_Mem2Reg :=ID.ctl_Mem2Reg
+  // id_reg_ctl_opAsel :=ID.ctl_opAsel
+  // id_reg_ctl_opBsel :=ID.ctl_opBsel
+  // id_reg_ctl_Ex_sel :=ID.ctl_Ex_sel
+  // id_reg_ctl_nextPCsel := ID.ctl_nextPCsel
+  // id_reg_ctl_aluop := ID.ctl_aluop
+  // id_reg_ctl_vset := ID.ctl_vset
+  // id_reg_ctl_v_load := ID.ctl_v_load
+  // id_reg_ctl_v_ins := ID.ctl_v_ins
+  // id_reg_instruction := ID.id_instruction
+
 //  IF.PcWrite := ID.hdu_pcWrite
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
@@ -223,6 +446,37 @@ class Core(implicit val config:Configs) extends Module{
   EX.ctl_aluSrc1 := id_reg_ctl_aluSrc1
   //EX.ctl_branch := id_reg_ctl_branch
   //EX.ctl_jump := id_reg_ctl_jump
+  
+  
+  // EX.id_ex_ins
+  // EX.func6 := id_reg_ins(31, 26)
+  // EX.v_ctl_aluop := id_reg_ctl_aluop
+  // EX.v_ctl_exsel := id_reg_ctl_Ex_sel
+  // EX.v_ctl_mem2reg := id_reg_ctl_memToReg
+  // EX.v_ctl_regwrite := id_reg_ctl_RegWrite
+  // EX.v_ctl_memwrite := id_reg_ctl_memWrite
+  // EX.v_ctl_branch := id_reg_ctl_Branch
+  // EX.v_ctl_memread := id_reg_ctl_memRead
+  // EX.v_ctl_opAsel := id_reg_ctl_opAsel
+  // EX.v_ctl_opBsel := id_reg_ctl_opBsel
+  // EX.v_ctl_nextpcsel := id_reg_ctl_nextPCsel
+  // EX.v_ctl_v_load := id_reg_ctl_v_load
+  // EX.v_ctl_v_ins := id_reg_ctl_v_ins
+  // EX.v_ctl_vset := id_reg_ctl_vset
+  // EX.vs1_data := id_reg_v1_data
+  // EX.vs2_data := id_reg_v2_data
+  // EX.vl := id_reg_vl_out
+  // EX.vstart := id_reg_vstart_out
+  // EX.vd_data := id_reg_vd_data
+  // EX.vma := id_reg_vtype_out(7)
+  // EX.vta := id_reg_vtype_out(6)
+  // EX.vm := id_reg_ins(25)
+  // EX.vs0 := id_reg_v0_data
+  // EX.vd_addr := id_reg_ins(11, 7)
+  // // EX.v_aluc :=
+  // EX.v_sew := id_reg_vtype_out(5, 3)
+  // EX.zimm := id_reg_vtype
+  
   ex_reg_pc := id_reg_pc
   ex_reg_wra := id_reg_wra
   ex_reg_ins := id_reg_ins
@@ -246,6 +500,9 @@ class Core(implicit val config:Configs) extends Module{
   ID.ex_result := EX.ALUresult
   ID.csr_Ex := id_reg_is_csr
   ID.csr_Ex_data := id_reg_csr_data
+
+  
+
 
   when(EX.stall){
     id_reg_wra := id_reg_wra
@@ -333,6 +590,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Wb_data := mem_reg_csr_data
   ID.dmem_data := io.dmemRsp.bits.dataResponse
   io.pin := wb_data
+  io.Vpin := ID.vd_data.asUInt
 
   /**************
   ** RVFI PINS **

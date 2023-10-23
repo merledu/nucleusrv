@@ -2,7 +2,7 @@ package nucleusrv.components
 
 import chisel3._
 import chisel3.util._
-
+import nucleusrv.components.vu.vregfile
 class InstructionDecode(TRACE:Boolean) extends Module {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
@@ -42,14 +42,52 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val readData2 = Output(UInt(32.W))
     val func7 = Output(UInt(7.W))
     val func3 = Output(UInt(3.W))
+    val func6 = Output(UInt(6.W))
     val ctl_aluSrc = Output(Bool())
     val ctl_memToReg = Output(UInt(2.W))
     val ctl_regWrite = Output(Bool())
     val ctl_memRead = Output(Bool())
+    
     val ctl_memWrite = Output(Bool())
     val ctl_branch = Output(Bool())
     val ctl_aluOp = Output(UInt(2.W))
     val ctl_jump = Output(UInt(2.W))
+
+    // Vector control Unit
+    val ctl_v_RegWrite = Output(Bool())
+    val ctl_v_opBsel = Output(Bool())
+    val ctl_v_Ex_sel = Output(UInt(4.W))
+    val ctl_v_aluop = Output(UInt(5.W))
+    val ctl_v_vset = Output(Bool())
+    val ctl_v_load = Output(UInt(4.W))
+    val ctl_v_ins = Output(Bool())
+
+    // vector register file
+    val write_data = Input(SInt(128.W))
+    val wb_addr = Input(UInt(5.W))
+    val wb_RegWrite = Input(Bool())
+    val vs0_data = Output(SInt(128.W))
+    val vs1_data = Output(SInt(128.W))
+    val vs2_data = Output(SInt(128.W))
+    val reg_write = Output(Bool())
+    val vs1_addr = Output(UInt(5.W))
+    val vs2_addr = Output(UInt(5.W))
+    val vd_addr = Output(UInt(5.W))
+    val vd_data = Output(SInt(128.W))
+
+    // Vector Immd Gen
+    val v_z_imm = Output(SInt(32.W))
+    val v_addi_imm = Output(SInt(32.W))
+
+    // Vector Csr
+    val vtypei = Input(SInt(11.W))
+    val vtypei_out = Output(SInt(11.W))
+    val vl = Input(SInt(32.W))
+    val ctl_vset = Input(Bool())
+    val vl_out = Output(SInt(32.W))
+    // val vtype_out = Output(SInt(32.W))
+    val vstart_out = Output(SInt(32.W)) 
+
     val ctl_aluSrc1 = Output(UInt(2.W))
     val hdu_pcWrite = Output(Bool())
     val hdu_if_reg_write = Output(Bool())
@@ -126,11 +164,21 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
     io.ctl_memWrite := control.io.memWrite
     io.ctl_regWrite := control.io.regWrite
-
   }.otherwise {
     io.ctl_memWrite := false.B
     io.ctl_regWrite := false.B
   }
+
+  val Vcontrol = Module(new vu.controldec)
+  dontTouch(Vcontrol.io)
+  Vcontrol.io.Instruction := io.id_instruction
+  io.ctl_v_RegWrite := Vcontrol.io.RegWrite
+  io.ctl_v_opBsel := Vcontrol.io.opBsel
+  io.ctl_v_Ex_sel := Vcontrol.io.Ex_sel
+  io.ctl_v_aluop := Vcontrol.io.aluop
+  io.ctl_v_vset := Vcontrol.io.vset
+  io.ctl_v_load := Vcontrol.io.v_load
+  io.ctl_v_ins := Vcontrol.io.v_ins
 
   //Register File
   val registers = Module(new Registers)
@@ -139,9 +187,39 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   val registerRs2 = io.id_instruction(24, 20)
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb
-  registers.io.writeAddress := registerRd
-  registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
+  // registers.io.writeAddress := registerRd
+  when(io.ctl_vset === 1.B){
+    registers.io.writeEnable := io.ctl_vset
+    registers.io.writeData := io.vl.asUInt
+    registers.io.writeAddress := io.wb_addr
+  }.otherwise{
+    registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
+    registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb
+    registers.io.writeAddress := registerRd
+  }
+
+  val v_registers = Module(new vregfile)
+  dontTouch(v_registers.io)
+  v_registers.io.vd_data := io.write_data
+  v_registers.io.vs1_addr := io.id_instruction(19, 15)
+  v_registers.io.vs2_addr := io.id_instruction(24, 20)
+  v_registers.io.vd_addr := io.wb_addr
+  v_registers.io.reg_write := io.wb_RegWrite
+
+  io.vs0_data := v_registers.io.vs0_data
+  io.vs1_data := v_registers.io.vs1_data
+  io.vs2_data := v_registers.io.vs2_data
+  io.vd_data := v_registers.io.vddata_o
+  io.reg_write := Vcontrol.io.RegWrite
+  io.vs1_addr := io.id_instruction(19, 15)
+  io.vs2_addr := io.id_instruction(24, 20)
+  io.vd_addr := io.id_instruction(11, 7)
+
+
+
+  
+
+
 
   //Forwarding to fix structural hazard
   when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
@@ -167,6 +245,27 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   val immediate = Module(new ImmediateGen)
   immediate.io.instruction := io.id_instruction
   io.immediate := immediate.io.out
+
+  val v_immediate = Module(new vu.ImmdValGen1)
+  dontTouch(v_immediate.io)
+  v_immediate.io.instruction := io.id_instruction
+  // v_immediate.io.instruction := io.pcAddress
+  // io.v_z_imm := v_immediate.io.z_imm
+  io.v_addi_imm := v_immediate.io.addi_imm
+
+  // vector Csr
+  val vec_csr = Module(new vu.v_csr)
+  dontTouch(vec_csr.io)
+  vec_csr.io.vl := io.vl
+  vec_csr.io.vtypei := io.vtypei
+  // io.vtypei_out := io.id_instruction(30, 20).asSInt
+  vec_csr.io.vset := io.ctl_vset
+  // vec_csr.io.vset := io.ctl_vset
+
+  io.v_z_imm := io.id_instruction(30, 20).asSInt
+  io.vl_out := vec_csr.io.vl_out
+  io.vtypei_out := vec_csr.io.vtype_out
+  io.vstart_out := vec_csr.io.vstart_out
 
   // Branch Forwarding
   val input1 = Wire(UInt(32.W))
@@ -233,6 +332,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
 
   io.writeRegAddress := io.id_instruction(11, 7)
   io.func3 := io.id_instruction(14, 12)
+  io.func6 := io.id_instruction(31,26)
   when((io.id_instruction(6,0) === "b0110011".U) | ((io.id_instruction(6,0) === "b0010011".U) & (io.func3 === 5.U))){
     io.func7 := io.id_instruction(31,25)
   }.otherwise{
