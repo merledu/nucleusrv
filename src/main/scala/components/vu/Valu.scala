@@ -171,7 +171,7 @@ def VectorOp_vx( in_A: Vec[SInt], imm: SInt, vlmax:UInt, vd:Vec[SInt]) :SInt = {
             0.S, // Default case (no operation)
             Seq(
                 Vaddvx  -> (in_A(i) + imm).asSInt,
-                Vsubvx -> ( in_A(i)-imm).asSInt,
+                Vsubvx -> ( in_A(i) - imm).asSInt,
                 Vrsubvx -> ( imm-in_A(i)).asSInt,
                 Vandvx -> (in_A(i) & imm).asSInt,
                 Vorvx -> (in_A(i) | imm).asSInt,
@@ -256,16 +256,16 @@ io.v_output := 0.S
             io.v_output := VectorOp_vi(sew_16_b,imm,8.U,sew_16_vd)
     	}  //vector vi end
         //vector  vx
-        .elsewhen(io.sew === "b011".U && io.aluc === Vaddvx){
+        .elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b100".U){
 		    val imm = Cat(0.S(32.W), io.in_A).asSInt
             io.v_output := VectorOp_vx(sew_64_b,imm,2.U,sew_64_vd)
-        }.elsewhen(io.sew === "b010".U && io.aluc === Vaddvx){
+        }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b100".U){
            val imm = io.in_A(31,0).asSInt
             io.v_output := VectorOp_vx(sew_32_b,imm,4.U,sew_32_vd)
-        }.elsewhen(io.sew === "b000".U && io.aluc === Vaddvx){
+        }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b100".U){
 	    	val imm = io.in_A(7,0).asSInt
             io.v_output := VectorOp_vx(sew_8_b,imm,16.U,sew_8_vd)
-        }.elsewhen (io.sew === "b001".U && io.aluc === Vaddvx){
+        }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b100".U){
 		    val imm = io.in_A(15,0).asSInt
             io.v_output := VectorOp_vx(sew_16_b,imm,8.U,sew_16_vd)
 	    }  //vector  vx end

@@ -147,7 +147,13 @@ class Execute(M:Boolean = false) extends Module {
   //   // (io.v_ctl_opAsel === "b10".U) -> io.pcAddress + 4.U
   //   ))
 
-  vec_alu.io.in_A := io.readData1.asSInt
+  when(fu.forwardA === 1.U){
+    vec_alu.io.in_A := io.mem_result.asSInt
+  }.elsewhen(fu.forwardA === 2.U){
+    vec_alu.io.in_A := io.wb_result.asSInt
+  }.otherwise{
+    vec_alu.io.in_A := io.readData1.asSInt
+  }
 
   when(fu.forwardA === 1.U){
     vec_alu.io.vs1 := io.vec_mem_res
@@ -163,7 +169,13 @@ class Execute(M:Boolean = false) extends Module {
   }.elsewhen(io.v_ctl_exsel === "b0100".U && io.v_ctl_opBsel === 1.U){
     vec_alu.io.in_B := io.v_addi_imm.asSInt
   }.otherwise{
-    vec_alu.io.in_B := io.readData2.asSInt
+    when(fu.forwardB === 1.U){
+      vec_alu.io.in_B := io.mem_result.asSInt
+    }.elsewhen(fu.forwardB === 2.U){
+      vec_alu.io.in_B := io.wb_result.asSInt
+    }.otherwise{
+      vec_alu.io.in_B := io.readData2.asSInt
+    }
   }
 
   //  vec_alu.io.in_B := io.readData2

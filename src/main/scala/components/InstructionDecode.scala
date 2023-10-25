@@ -205,6 +205,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   v_registers.io.vs2_addr := io.id_instruction(24, 20)
   v_registers.io.vd_addr := io.wb_addr
   v_registers.io.reg_write := io.wb_RegWrite
+  v_registers.io.reg_read := Vcontrol.io.RegRead
 
   io.vs0_data := v_registers.io.vs0_data
   io.vs1_data := v_registers.io.vs1_data

@@ -17,6 +17,7 @@ class vregfile extends Module {
     val vddata_o = Output(SInt(128.W))
     val vd_data = Input(SInt(128.W))
     val reg_write = Input(Bool())
+    val reg_read = Input(Bool())
   })
 
   val register = RegInit(VecInit(Seq.fill(32)(0.S(128.W))))
@@ -26,7 +27,27 @@ io.vs2_data := register(io.vs2_addr)
 io.vs0_data := register(0.U)
 io.vddata_o := register(io.vd_addr)
 
-  when (io.reg_write) {
+  when (io.reg_write === 1.B && io.reg_read === 0.B) {
       register(io.vd_addr) := io.vd_data
+      io.vs1_data := 0.S
+      io.vs2_data := 0.S
+      io.vs0_data := 0.S
+      io.vddata_o := 0.S
+  }.elsewhen(io.reg_write === 0.B && io.reg_read === 1.B){
+    io.vs1_data := register(io.vs1_addr)
+    io.vs2_data := register(io.vs2_addr)
+    io.vs0_data := register(0.U)
+    io.vddata_o := register(io.vd_addr)
+  }.elsewhen(io.reg_write === 1.B && io.reg_read === 1.B){
+    register(io.vd_addr) := io.vd_data
+    io.vs1_data := register(io.vs1_addr)
+    io.vs2_data := register(io.vs2_addr)
+    io.vs0_data := register(0.U)
+    io.vddata_o := register(io.vd_addr)
+  }.otherwise{
+    io.vs1_data := 0.S
+    io.vs2_data := 0.S
+    io.vs0_data := 0.S
+    io.vddata_o := 0.S
   }
 }
