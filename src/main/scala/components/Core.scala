@@ -109,7 +109,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_csr_data = RegInit(0.U)
 
   val ex_reg_vec_alu_res = RegInit(0.S(128.W))
-  val ex_reg_lmul = RegInit(0.S(32.W))
+  // val ex_reg_lmul = RegInit(0.S(32.W))
   val ex_reg_vl = RegInit(0.S(32.W))
   dontTouch(ex_reg_vl)
   val ex_reg_rd_out = RegInit(0.U(5.W))
@@ -136,14 +136,11 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_csr_data = RegInit(0.U)
 
   val mem_reg_vec_alu_out = RegInit(0.S(128.W))
-  val mem_reg_vec_lmul = RegInit(0.S(32.W))
   val mem_reg_vec_vl = RegInit(0.S(32.W))
   val mem_reg_vtype = RegInit(0.S(11.W))
   val mem_reg_vec_rd_out = RegInit(0.U(5.W))
   val mem_reg_vec_avl_o = RegInit(0.S(32.W))
   val mem_reg_vec_valmax_o = RegInit(0.S(32.W))
-  val mem_reg_vs1_addr = RegInit(0.U(5.W))
-  val mem_reg_vs2_addr = RegInit(0.U(5.W))
   val mem_reg_vec_vd_addr = RegInit(0.U(5.W))
   dontTouch(mem_reg_vec_vd_addr)
   val mem_reg_vset = RegInit(false.B)
@@ -180,8 +177,6 @@ class Core(implicit val config:Configs) extends Module{
    * Vector Decode Stage *
    ************************/
 
-    // dontTouch(ID.v_registers.io.vs1_addr)
-    // id_reg_vl_out := Mux(ex_reg_vset, ex_reg_vl, Mux(mem_reg_vset, mem_reg_vec_vl, ID.vl_out))
     id_reg_vl_out := ID.vl_out
     id_reg_z_imm := ID.v_z_imm
     id_reg_vstart_out := ID.vstart_out
@@ -191,22 +186,14 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_v1_data := ID.vs1_data
     id_reg_v2_data := ID.vs2_data
     id_reg_vd_data := ID.vd_data
-    // id_reg_RegWrite := ID.reg_write
-    // id_reg_ctl_memWrite := ID.ctl_v_MemWrite
-    // id_reg_ctl_Branch :=ID.ctl_v_Branch
-    // id_reg_ctl_MemRead :=ID.ctl_v_MemRead
     id_reg_ctl_RegWrite :=ID.ctl_v_RegWrite
-    // id_reg_ctl_Mem2Reg :=ID.ctl_v_Mem2Reg
-    // id_reg_ctl_opAsel :=ID.ctl_v_opAsel
     id_reg_ctl_opBsel :=ID.ctl_v_opBsel
     id_reg_ctl_Ex_sel :=ID.ctl_v_Ex_sel
-    // id_reg_ctl_nextPCsel := ID.ctl_v_nextPCsel
     id_reg_ctl_aluop := ID.ctl_v_aluop
     id_reg_ctl_vset := ID.ctl_v_vset
     id_reg_ctl_v_load := ID.ctl_v_load
     id_reg_ctl_v_ins := ID.ctl_v_ins
     id_reg_instruction := ID.id_instruction
-    // id_reg_vs1_addr ;= ID.vs1_addr
     id_reg_vd_addr := ID.vd_addr
     id_reg_vs1_addr := ID.vs1_addr
     id_reg_vs2_addr := ID.vs2_addr
@@ -218,18 +205,11 @@ class Core(implicit val config:Configs) extends Module{
    * Vector Execute Stage *
   **************************/
 
-  // EX.id_ex_ins
   EX.func6 := id_reg_ins(31, 26)
   EX.v_ctl_aluop := id_reg_ctl_aluop
   EX.v_ctl_exsel := id_reg_ctl_Ex_sel
-  // EX.v_ctl_mem2reg := id_reg_ctl_memToReg
   EX.v_ctl_regwrite := id_reg_ctl_RegWrite
-  // EX.v_ctl_memwrite := id_reg_ctl_memWrite
-  // EX.v_ctl_branch := id_reg_ctl_Branch
-  // EX.v_ctl_memread := id_reg_ctl_memRead
-  // EX.v_ctl_opAsel := id_reg_ctl_opAsel
   EX.v_ctl_opBsel := id_reg_ctl_opBsel
-  // EX.v_ctl_nextpcsel := id_reg_ctl_nextPCsel
   EX.v_ctl_v_load := id_reg_ctl_v_load
   EX.v_ctl_v_ins := id_reg_ctl_v_ins
   EX.v_ctl_vset := id_reg_ctl_vset
@@ -244,11 +224,9 @@ class Core(implicit val config:Configs) extends Module{
   EX.vm := id_reg_ins(25)
   EX.vs0 := id_reg_v0_data
   EX.vd_addr := id_reg_ins(11, 7)
-  // EX.v_aluc :=
   EX.v_sew := Mux(ex_reg_vset, ex_reg_vtype(5, 3), Mux(mem_reg_vset, mem_reg_vtype(5, 3), ID.vtypei_out(5, 3)))
   EX.zimm := id_reg_vtype
   EX.v_addi_imm := id_reg_v_addi_imm
-  // EX.vtype_in := Mux(ex_reg_vset, ex_reg_vtype, Mux(mem_reg_vset, mem_reg_vtype, id_reg_vtype_out))
 
   EX.fu_reg_vs1 := id_reg_vs1_addr
   EX.fu_reg_vs2 := id_reg_vs2_addr
@@ -259,7 +237,6 @@ class Core(implicit val config:Configs) extends Module{
 
   ex_reg_vtype := id_reg_z_imm
   ex_reg_vec_alu_res := EX.vec_alu_res
-  ex_reg_lmul := EX.vec_lmul
   ex_reg_vl := EX.vec_vl
   ex_reg_rd_out := EX.vec_rd_out
   ex_reg_avl_o := EX.vec_avl_o
@@ -267,9 +244,7 @@ class Core(implicit val config:Configs) extends Module{
 
   ex_reg_reg_write := id_reg_ctl_RegWrite
   EX.fu_ex_reg_write := ex_reg_reg_write
-  // id_reg_ctl_RegWrite := ex_reg_reg_write
   ex_reg_vd_addr := id_reg_vd_addr
-  // id_reg_vd_addr := ex_reg_vd_addr
 
   /****************
    * Memory Stage *
@@ -277,7 +252,6 @@ class Core(implicit val config:Configs) extends Module{
 
   EX.vec_mem_res := ex_reg_vec_alu_res
   mem_reg_vec_alu_out := ex_reg_vec_alu_res
-  mem_reg_vec_lmul := ex_reg_lmul
   mem_reg_vset := ex_reg_vset
   mem_reg_vec_vl := ex_reg_vl
   mem_reg_vtype := ex_reg_vtype

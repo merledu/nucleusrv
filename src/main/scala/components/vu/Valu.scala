@@ -83,7 +83,6 @@ class ALUIO extends Bundle with Config {
     val aluc = Input(UInt(ALUOP_SIG_LEN.W))
     val sew = Input(UInt(3.W))
 	val v_ins = Input(Bool())
-    // val output = Output(SInt(WLEN.W))
 	val v_output = Output(SInt(128.W))
 }
 
@@ -217,20 +216,7 @@ def Vectormove_vv( in_A: Vec[SInt], vlmax:UInt, vd:Vec[SInt]) :SInt = {
 
 
 io.v_output := 0.S
-//    io.output := 0.S
-//     io.output := MuxLookup(io.aluc, io.in_A, Seq(
-//       ALU_ADD -> (io.in_A + io.in_B),
-//       ALU_SLL -> (io.in_A << io.in_B(4, 0)).asSInt,
-//       ALU_SLT -> Mux(io.in_A < io.in_B, 1.S, 0.S),
-//       ALU_SLTU -> Mux(io.in_A.asUInt < io.in_B.asUInt, 1.S, 0.S),
-//       ALU_XOR -> (io.in_A ^ io.in_B),
-//       ALU_SRL -> (io.in_A.asUInt >> io.in_B(4, 0).asUInt).asSInt,
-//       ALU_OR -> (io.in_A | io.in_B),
-//       ALU_AND -> (io.in_A & io.in_B),
-//       ALU_SUB -> (io.in_A - io.in_B),
-//       ALU_SRA -> (io.in_A >> io.in_B(4, 0)).asSInt,
-//       ALU_COPY_A -> io.in_A
-//     ))
+
 //VectorAddvv
     	when (io.sew === "b011".U && io.aluc === V_ADD){  //sew = 64
             io.v_output := VectorOp_vv(sew_64_a,sew_64_b,2.U,sew_64_vd)	        

@@ -11,7 +11,6 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val pcAddress = Input(UInt(32.W))
     val ctl_writeEnable = Input(Bool())
     val id_ex_mem_read = Input(Bool())
-//    val ex_mem_mem_write = Input(Bool())
     val ex_mem_mem_read = Input(Bool())
     val dmem_resp_valid = Input(Bool())
     val id_ex_rd = Input(UInt(5.W))
@@ -85,7 +84,6 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val vl = Input(SInt(32.W))
     val ctl_vset = Input(Bool())
     val vl_out = Output(SInt(32.W))
-    // val vtype_out = Output(SInt(32.W))
     val vstart_out = Output(SInt(32.W)) 
 
     val ctl_aluSrc1 = Output(UInt(2.W))
@@ -139,7 +137,6 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   val hdu = Module(new HazardUnit)
   hdu.io.dmem_resp_valid := io.dmem_resp_valid
   hdu.io.id_ex_memRead := io.id_ex_mem_read
-//  hdu.io.ex_mem_memWrite := io.ex_mem_mem_write
   hdu.io.ex_mem_memRead := io.ex_mem_mem_read
   hdu.io.id_ex_rd := io.id_ex_rd
   hdu.io.id_ex_branch := io.id_ex_branch
@@ -187,7 +184,6 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   val registerRs2 = io.id_instruction(24, 20)
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  // registers.io.writeAddress := registerRd
   when(io.ctl_vset === 1.B){
     registers.io.writeEnable := io.ctl_vset
     registers.io.writeData := io.vl.asUInt
@@ -250,8 +246,6 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   val v_immediate = Module(new vu.ImmdValGen1)
   dontTouch(v_immediate.io)
   v_immediate.io.instruction := io.id_instruction
-  // v_immediate.io.instruction := io.pcAddress
-  // io.v_z_imm := v_immediate.io.z_imm
   io.v_addi_imm := v_immediate.io.addi_imm
 
   // vector Csr
@@ -259,9 +253,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   dontTouch(vec_csr.io)
   vec_csr.io.vl := io.vl
   vec_csr.io.vtypei := io.vtypei
-  // io.vtypei_out := io.id_instruction(30, 20).asSInt
   vec_csr.io.vset := io.ctl_vset
-  // vec_csr.io.vset := io.ctl_vset
 
   io.v_z_imm := io.id_instruction(30, 20).asSInt
   io.vl_out := vec_csr.io.vl_out

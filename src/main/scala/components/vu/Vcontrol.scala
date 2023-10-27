@@ -29,52 +29,33 @@ class controldec extends Module {
     val func3 = io.Instruction(14,12)
 
     switch (opcode){
-    //     }
         is ("b1010111".U){ //vector operations
             
             io.v_ins := 1.B
             when (func3 ==="b111".U && (configtype ==="b00".U || configtype ==="b01".U )){ // vsetvli
                 io.RegWrite:=1.B
-                // io.aluop:=0.U
                 io.opBsel:=1.B
                 io.Ex_sel:=3.U
                 io.vset := 1.B
-            // }.elsewhen(func3 ==="b111".U && configtype ==="b10".U){ // vsetivli
-            //     io.RegWrite:=1.B
-            //     io.aluop:="b00001".U
-            //     io.opBsel:=1.B
-            //     io.MemWrite:=0.B
-            //     io.Branch:=0.B
-            //     io.MemRead :=0.B
-            //     io.Mem2Reg:=0.B
-            //     io.opAsel:="b00".U
-            //     io.Ex_sel:=3.U
-            //     io.nextPCsel:="b00".U
-            //     io.vset := 1.B
-            // }.elsewhen(func3 ==="b111".U && configtype ==="b11".U){ //vsetvl
-            //     io.RegWrite:=1.B
-            //     io.MemWrite:=0.B
-            //     io.Branch:=0.B
-            //     io.MemRead :=0.B
-            //     io.Mem2Reg:=0.B
-            //     io.aluop:="b00000".U
-            //     io.opAsel:="b00".U
-            //     io.opBsel:=0.B
-            //     io.Ex_sel:=3.U
-            //     io.nextPCsel:="b00".U
-            //     io.vset := 1.B
+            }.elsewhen(func3 ==="b111".U && configtype ==="b10".U){ // vsetivli
+                io.RegWrite:=1.B
+                io.aluop:="b00001".U
+                io.opBsel:=1.B
+                io.Ex_sel:=3.U
+                io.vset := 1.B
+            }.elsewhen(func3 ==="b111".U && configtype ==="b11".U){ //vsetvl
+                io.RegWrite:=1.B
+                io.Ex_sel:=3.U
+                io.vset := 1.B
             }.elsewhen (func3 === "b000".U) {//vector-vector
                 io.RegWrite:=1.B
                 io.aluop:=2.U
-                // io.opBsel:=0.B
                 io.Ex_sel:=4.U
                 io.v_ins := 1.U
-                // io.vset := 0.B
                 io.RegRead := 1.B
             }.elsewhen (func3 === "b100".U) {//vector-scalar
                 io.RegWrite:=1.B
                 io.aluop:=3.U
-                // io.opBsel:=0.B
                 io.Ex_sel:=4.U
                 io.RegRead := 1.B
             }.elsewhen (func3 === "b011".U) {//vector-immediate
@@ -83,7 +64,6 @@ class controldec extends Module {
                 io.opBsel:=1.B
                 io.Ex_sel:=4.U
                 io.v_ins := 1.B
-                // io.vset := 0.B
                 io.RegRead := 1.B
             }
         }
