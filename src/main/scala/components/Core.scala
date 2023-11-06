@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class Core(implicit val config:Configs) extends Module{
+class Core(implicit val config:BaseConfig) extends Module{
 
   val M      = config.M
   val C      = config.C
