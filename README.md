@@ -19,9 +19,13 @@ Run this command is SBT shell
 testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile=/path/to/instructions/hex
 ```
 #### Running Compliance Tests
-* Clone `riscv-arch-test` repo in nucleusrv root `git clone git@github.com:riscv-non-isa/riscv-arch-test.git -b 1.0`
-* Build the simulation executable as defined in "Building with SBT" section
-* Run `./run-compliance.sh` in root directory
+* Clone `riscv-arch-test`, `sail-riscv`,`spike`, `riscv-gnu-toolchain` repo and setup riscof as mentioned in  [`RISCOF`](https://riscof.readthedocs.io/en/stable/)
+* Verify paths in `config.ini`
+* Add the following lines at the end of the .bashrc file:
+   `export SBT_LOG=/PATH/TO/nucleusrv/tools/trace/logs`
+   `export NRV_SCRIPT=/PATH/TO/nucleusrv/tools/trace/scripts`
+* Run `riscof run --config=/PATH/TO/nucleusrv/config.ini --suite=/PATH/TO/riscv-arch-test/riscv-tes
+t-suite/ --env=/PATH/TO/riscv-arch-test/riscv-test-suite/env` in nrv root directory
 
 #### Building C Programs
 * In `tools/tests` directory, create a folder and write c program in the `main.c` file

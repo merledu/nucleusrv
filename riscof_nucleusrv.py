@@ -36,7 +36,7 @@ class nucleusrv(pluginTemplate):
         # test-bench produced by a simulator (like verilator, vcs, incisive, etc). In case of an iss or
         # emulator, this variable could point to where the iss binary is located. If 'PATH variable
         # is missing in the config.ini we can hardcode the alternate here.
-        self.dut_exe = os.path.join(config['PATH'] if 'PATH' in config else "","cd /home/hassan/nucleusrv/tools/trace/ && /home/hassan/nucleusrv/tools/trace/logGen.sh")
+        self.dut_exe = os.path.join(config['PATH'] if 'PATH' in config else "","spike")
 
         # Number of parallel jobs that can be spawned off by RISCOF
         # for various actions performed in later functions, specifically to run the tests in
@@ -139,8 +139,8 @@ class nucleusrv(pluginTemplate):
             # name of the signature file as per requirement of RISCOF. RISCOF expects the signature to
             # be named as DUT-<dut-name>.signature. The below variable creates an absolute path of
             # signature file.
-        #   sig_file = os.path.join(test_dir, self.name[:-1] + ".signature")
-            sig_file = "/home/hassan/nucleusrv/tools/trace/logs/nucleusrv.log"
+            sig_file = os.path.join(test_dir, self.name[:-1] + ".signature")
+            # sig_file = "/home/hassan/nucleusrv/tools/trace/logs/nucleusrv.log"
 
           # for each test there are specific compile macros that need to be enabled. The macros in
           # the testList node only contain the macros/values. For the gcc toolchain we need to
@@ -156,10 +156,10 @@ class nucleusrv(pluginTemplate):
 	  # echo statement.
         # set the objdump template here. Note we continue with the variable toolchain below. Also the
         # name of the elf is kept a variable to be fixed in the runTests function.
-            self.objdump = 'riscv{0}-unknown-elf-objdump -D {1} > test.disass' .format(32, elf)
+            self.objdump = 'riscv{0}-unknown-elf-objdump -D {1} > nucleusrv.disass' .format(32, elf)
             # copy this in tools/trace/asm as test.S
             
-            move_disass = 'mv test.disass /home/hassan/nucleusrv/tools/trace/asm/test.S'
+            # move_disass = 'mv test.disass /home/hassan/nucleusrv/tools/trace/asm/test.S'
             # destination_directory = '/home/hassan/tools/trace/asm'
             # new_file_name = 'test.S'
             # new_destination_file = os.path.join(destination_directory, new_file_name)
@@ -169,18 +169,25 @@ class nucleusrv(pluginTemplate):
         # set the elf2hex command here. This is mostly used by rtl test-benches which use the readmemb or
         # readmemh like utilities to load the test. Note again here, we have kept the name of the elf as
         # variable which will be set in runTests function
-            self.elf2hex = 'elf2hex 8 33554432 {0} 2147483648 > code.mem'
+            # self.elf2hex = 'elf2hex 8 33554432 {0} 2147483648 > /home/hassan/nucleusrv/code.mem'
 
         
             if self.target_run:
             # set up the simulation command. Template is for spike. Please change.
-            # simcmd = self.dut_exe + ' --isa={0} +signature={1} +signature-granularity=4 {2}'.format(self.isa, sig_file, elf)
-                simcmd = f"{self.dut_exe} test.S"
+                simcmd = self.dut_exe + ' --isa={0} +signature={1} +signature-granularity=4 {2}'.format(self.isa, sig_file, elf)
+                A = f"python3 $NRV_SCRIPT/assemblyParser.py --asm nucleusrv.disass --hex nucleusrv.hex"
+                B = f"cd "
+                C = "cd nucleusrv"
+                E = 'sbt "testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile={}/nucleusrv.hex" > $SBT_LOG/sbtDump.log'.format(testentry['work_dir'])
+                F = f"cd ./tools/trace"
+                G = f"echo Generating log..."
+                H = "python3 $NRV_SCRIPT/sbtToLog.py --asm {}/nucleusrv.disass --sbt_dump $SBT_LOG/sbtDump.log --log {}/nucleusrv.log".format(testentry['work_dir'], testentry['work_dir'])
+                # simcmd = f"{self.dut_exe} {test}test.S"
             else:
                 simcmd = 'echo "NO RUN"'
 
           # concatenate all commands that need to be executed within a make-target.
-            execute = '@cd {0}; {1}; {2}; {3}; {4};'.format(testentry['work_dir'], cmd, self.objdump, move_disass, simcmd)
+            execute = f"@cd {testentry['work_dir']}; {cmd}; {self.objdump}; {A}; {B}; {C}; {E}; {F}; {G}; cd {testentry['work_dir']}; {H}; {simcmd}"
 
           # create a target. The makeutil will create a target with the name "TARGET<num>" where num
           # starts from 0 and increments automatically for each new target that is added
