@@ -65,6 +65,8 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val write_data = Input(SInt(128.W))
     val wb_addr = Input(UInt(5.W))
     val wb_RegWrite = Input(Bool())
+    val id_lmul_count = Input(UInt(4.W))
+    val id_lmul_vs1in_vs2in = Input(UInt(4.W))
     val vs0_data = Output(SInt(128.W))
     val vs1_data = Output(SInt(128.W))
     val vs2_data = Output(SInt(128.W))
@@ -211,6 +213,8 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   io.vs1_addr := io.id_instruction(19, 15)
   io.vs2_addr := io.id_instruction(24, 20)
   io.vd_addr := io.id_instruction(11, 7)
+  v_registers.io.lmul_count := io.id_lmul_count //grouping counter after write back stage
+  v_registers.io.lmul_vs1in_vs2in := io.id_lmul_vs1in_vs2in //grouping counter after decode stage
 
 
 

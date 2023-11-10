@@ -132,6 +132,7 @@ class Execute(M:Boolean = false) extends Module {
   val vec_alu = Module(new vu.ALU_)
   dontTouch(vec_alu.io)
 
+     // Vector forwarding unit
   when(fu.forwardA === 1.U){
     vec_alu.io.in_A := io.mem_result.asSInt
   }.elsewhen(fu.forwardA === 2.U){

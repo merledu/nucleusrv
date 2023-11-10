@@ -36,6 +36,9 @@ class Core(implicit val config:Configs) extends Module{
   val if_reg_pc = RegInit(0.U(32.W))
   val if_reg_ins = RegInit(0.U(32.W))
 
+  //vector IF-ID Registers
+  val if_reg_lmul_v = RegInit(0.U(4.W))
+
   // ID-EX Registers
   val id_reg_pc = RegInit(0.U(32.W))
   val id_reg_rd1 = RegInit(0.U(32.W))
@@ -73,6 +76,7 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_vs1_addr = RegInit(0.U(5.W))
   val id_reg_vs2_addr = RegInit(0.U(5.W))
   val id_reg_vd_addr = RegInit(0.U(5.W))
+  val id_reg_lmul_v = RegInit(0.U(4.W))
   dontTouch(id_reg_vd_addr)
   // val id_reg_ctl_memWrite = RegInit(false.B)
   // val id_reg_ctl_Branch = RegInit(false.B)
@@ -108,6 +112,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_is_csr = RegInit(false.B)
   val ex_reg_csr_data = RegInit(0.U)
 
+  //vector EX-MEM Registers
   val ex_reg_vec_alu_res = RegInit(0.S(128.W))
   // val ex_reg_lmul = RegInit(0.S(32.W))
   val ex_reg_vl = RegInit(0.S(32.W))
@@ -118,6 +123,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_vs1_addr = RegInit(0.U(5.W))
   val ex_reg_vs2_addr = RegInit(0.U(5.W))
   val ex_reg_vd_addr = RegInit(0.U(5.W))
+  val ex_reg_lmul_v = RegInit(0.U(4.W))
   dontTouch(ex_reg_vd_addr)
   val ex_reg_vset = RegInit(false.B)
   val ex_reg_reg_write = RegInit(false.B)
@@ -135,6 +141,7 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_is_csr = RegInit(false.B)
   val mem_reg_csr_data = RegInit(0.U)
 
+  //vector MEM-WB Registers
   val mem_reg_vec_alu_out = RegInit(0.S(128.W))
   val mem_reg_vec_vl = RegInit(0.S(32.W))
   val mem_reg_vtype = RegInit(0.S(11.W))
@@ -143,6 +150,7 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_vec_valmax_o = RegInit(0.S(32.W))
   val mem_reg_vec_vd_addr = RegInit(0.U(5.W))
   dontTouch(mem_reg_vec_vd_addr)
+  val mem_reg_lmul_v = RegInit(0.U(4.W))
   val mem_reg_vset = RegInit(false.B)
   val mem_reg_vec_reg_write = RegInit(false.B)
 
@@ -171,7 +179,61 @@ class Core(implicit val config:Configs) extends Module{
   val ral_halt_o  = WireInit(false.B)
   val is_comp     = WireInit(false.B)
 
-  // if (V){
+     /************************
+   * Vector Fetch Stage *
+   ************************/
+
+      // **************************grouping**********************//
+      //vsetvl not implement (rs2 value)
+var lmul = RegInit(0.U(3.W)) // by default lmul==1
+when(instruction(6,0)==="b1010111".U && instruction(14,12)==="b111".U && (instruction(31)==="b0".U || instruction(31,30)==="b11".U)){
+  lmul := instruction(22,20)
+}
+.otherwise{
+  lmul := lmul
+}
+
+var vlmul_count = WireInit(0.U(32.W))
+// val vtype = WireInit("b010".U(32.W))
+dontTouch(vlmul_count)
+// dontTouch(vtype)
+// working on  only one vector 
+    when (lmul==="b000".U){
+        vlmul_count := 0.U
+    }
+    // working on  only two vector continously
+    .elsewhen (lmul==="b001".U){
+        vlmul_count := 1.U
+    }
+    // working on  only four vector continously
+    .elsewhen (lmul==="b010".U){
+        vlmul_count := 3.U
+    }
+    // working on  only eight vector continously
+    .elsewhen (lmul==="b011".U){
+        vlmul_count := 7.U
+    }
+    // val aaai = WireInit(0.U(32.W))
+    // aaai := instruction(6,0)
+    // dontTouch(aaai)
+    // val aaaf = WireInit(0.U(32.W))
+    // aaaf := instruction(14,12)
+    // dontTouch(lmul)
+    // dontTouch(aaaf)
+  var next_pc_selector = WireInit(0.U(32.W))
+  val lmul_reg = RegInit(0.U(32.W))
+    when(lmul_reg =/= vlmul_count && instruction(6,0)==="b1010111".U && instruction(14,12)=/="b111".U){
+        next_pc_selector := 1.U
+        lmul_reg := lmul_reg +1.U
+        if_reg_lmul_v := lmul_reg  //paasing fetch stage
+    }
+    .otherwise{
+        lmul_reg := 0.U
+        next_pc_selector := 0.U
+        if_reg_lmul_v := lmul_reg //paasing fetch stage
+    }
+dontTouch(lmul_reg)
+dontTouch(next_pc_selector)
 
   /************************
    * Vector Decode Stage *
@@ -197,6 +259,8 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_vd_addr := ID.vd_addr
     id_reg_vs1_addr := ID.vs1_addr
     id_reg_vs2_addr := ID.vs2_addr
+    id_reg_lmul_v  := if_reg_lmul_v
+    ID.id_lmul_vs1in_vs2in := if_reg_lmul_v
     
     
 
@@ -245,6 +309,7 @@ class Core(implicit val config:Configs) extends Module{
   ex_reg_reg_write := id_reg_ctl_RegWrite
   EX.fu_ex_reg_write := ex_reg_reg_write
   ex_reg_vd_addr := id_reg_vd_addr
+  ex_reg_lmul_v := id_reg_lmul_v
 
   /****************
    * Memory Stage *
@@ -260,6 +325,7 @@ class Core(implicit val config:Configs) extends Module{
   mem_reg_vec_valmax_o := ex_reg_valmax_o
   mem_reg_vec_reg_write := ex_reg_reg_write
   mem_reg_vec_vd_addr := ex_reg_vd_addr
+  mem_reg_lmul_v := ex_reg_lmul_v
 
 
   /****************
@@ -269,6 +335,8 @@ class Core(implicit val config:Configs) extends Module{
   EX.vec_wb_res := mem_reg_vec_alu_out
   ID.wb_RegWrite := mem_reg_vec_reg_write
   ID.wb_addr := mem_reg_vec_vd_addr
+  ID.id_lmul_count := mem_reg_lmul_v
+
   ID.write_data := mem_reg_vec_alu_out
   ID.ctl_vset := mem_reg_vset
   ID.vl := mem_reg_vec_vl
@@ -323,7 +391,8 @@ class Core(implicit val config:Configs) extends Module{
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
   pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
-  val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  // vector changes
+  val npc = Mux(next_pc_selector===1.U,pc.io.out,Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out))
   pc.io.in := npc
 
   when(ID.hdu_if_reg_write) {
