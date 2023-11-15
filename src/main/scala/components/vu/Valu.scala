@@ -1,37 +1,36 @@
 package nucleusrv.components.vu
-
 import chisel3._ 
 import chisel3.util._ 
 
 
 object ALUOP1 {
-	// val ALU_ADD = "b000000000".U
-    // val LUI = "b000000000".U
-    // val ALU_ADDI = "b000000000".U
-    // val ALU_SUB = "b000001000".U
-    // val ALU_AND = "b000000111".U
-    // val ALU_ANDI = "b000000111".U
-    // val ALU_OR  = "b000000110".U
-    // val ALU_ORI  = "b000000110".U
-    // val ALU_XOR = "b000000100".U
-    // val ALU_XORI = "b000000100".U
-    // val ALU_SLT = "b000000010".U
-    // val ALU_SLTI = "b000000010".U
-    // val ALU_SLL = "b000000001".U
-    // val ALU_SLLI = "b000000001".U
-    // val ALU_SLTU= "b000000011".U
-    // val ALU_SLTIU = "b000000011".U
-    // val ALU_SRL = "b000000101".U
-    // val ALU_SRLI = "b000000101".U
-    // val ALU_SRA = "b000001101".U
-    // val ALU_SRAI = "b000000101".U
-    // val ALU_COPY_A = "b000011111".U  //JAL
+	val ALU_ADD = "b000000000".U
+  val LUI = "b000000000".U
+    val ALU_ADDI = "b000000000".U
+    val ALU_SUB = "b000001000".U
+    val ALU_AND = "b000000111".U
+    val ALU_ANDI = "b000000111".U
+    val ALU_OR  = "b000000110".U
+    val ALU_ORI  = "b000000110".U
+    val ALU_XOR = "b000000100".U
+    val ALU_XORI = "b000000100".U
+    val ALU_SLT = "b000000010".U
+    val ALU_SLTI = "b000000010".U
+    val ALU_SLL = "b000000001".U
+    val ALU_SLLI = "b000000001".U
+    val ALU_SLTU= "b000000011".U
+    val ALU_SLTIU = "b000000011".U
+    val ALU_SRL = "b000000101".U
+    val ALU_SRLI = "b000000101".U
+    val ALU_SRA = "b000001101".U
+    val ALU_SRAI = "b000000101".U
+    val ALU_COPY_A = "b000011111".U  //JAL
     
     val V_ADDI = "b000000011".U
     val V_ADD = "b000000000".U
     val Vaddvx = "b000000100".U
     val VMVx = "b010111100".U
-    val VMVvv = "b010111100".U
+    val VMVvv = "b010111000".U
     val VMVvi = 187.U
     val Vsubvv  = 184.U 
     val Vsubvx = "b000010100".U 
@@ -66,23 +65,24 @@ trait Config{
 import ALUOP1._
 
 class ALUIO extends Bundle with Config {
-    val in_A = Input(SInt(WLEN.W))
-    val in_B = Input(SInt(WLEN.W))
-    val vs1 = Input(SInt(128.W))
-    val vs2 = Input(SInt(128.W))
+  val in_A = Input(SInt(WLEN.W))
+  val in_B = Input(SInt(WLEN.W))
+  val vs1 = Input(SInt(128.W))
+  val vs2 = Input(SInt(128.W))
+  
+  val vl = Input(UInt(32.W))   
+  val vstart = Input(UInt(32.W))   
+  val vd = Input (SInt(128.W))
+  val vma =Input(UInt(1.W)) //vtype
+  val vta = Input(UInt(1.W))
+  val vm =Input(UInt(1.W)) //umasked=0  , masked = 1
+  val vs0 = Input(SInt(128.W))
 
-    val vl = Input(UInt(32.W))
-    val vstart = Input(UInt(32.W))
-    val vd = Input (SInt(128.W))
-    val vma =Input(UInt(1.W)) //vtype
-    val vta = Input(UInt(1.W))
-    val vm =Input(UInt(1.W)) //umasked=1  , masked = 0
-    val vs0 = Input(SInt(128.W))
-
-    val vd_addr = Input(UInt(5.W))
-    val aluc = Input(UInt(ALUOP_SIG_LEN.W))
-    val sew = Input(UInt(3.W))
+  val vd_addr = Input(UInt(5.W))
+  val aluc = Input(UInt(ALUOP_SIG_LEN.W))
+	val sew = Input(UInt(3.W))
 	val v_ins = Input(Bool())
+  val output = Output(SInt(WLEN.W))
 	val v_output = Output(SInt(128.W))
 }
 
@@ -170,7 +170,7 @@ def VectorOp_vx( in_A: Vec[SInt], imm: SInt, vlmax:UInt, vd:Vec[SInt]) :SInt = {
             0.S, // Default case (no operation)
             Seq(
                 Vaddvx  -> (in_A(i) + imm).asSInt,
-                Vsubvx -> ( in_A(i) - imm).asSInt,
+                Vsubvx -> ( in_A(i)-imm).asSInt,
                 Vrsubvx -> ( imm-in_A(i)).asSInt,
                 Vandvx -> (in_A(i) & imm).asSInt,
                 Vorvx -> (in_A(i) | imm).asSInt,
@@ -217,94 +217,125 @@ def Vectormove_vv( in_A: Vec[SInt], vlmax:UInt, vd:Vec[SInt]) :SInt = {
 
 io.v_output := 0.S
 
-//VectorAddvv
-    	when (io.sew === "b011".U && io.aluc === V_ADD){  //sew = 64
-            io.v_output := VectorOp_vv(sew_64_a,sew_64_b,2.U,sew_64_vd)	        
-        }.elsewhen (io.sew === "b010".U && io.aluc === V_ADD){ // sew = 32
-            io.v_output := VectorOp_vv(sew_32_a,sew_32_b,4.U,sew_32_vd)
-        }.elsewhen(io.sew === "b001".U && io.aluc === V_ADD){ //sew = 16
-            io.v_output := VectorOp_vv(sew_16_a,sew_16_b,8.U,sew_16_vd)
-	    }.elsewhen(io.sew === "b000".U && io.aluc === V_ADD){ //sew = 8
-            io.v_output := VectorOp_vv(sew_8_a,sew_8_b,16.U,sew_8_vd)
+   io.output := 0.S
+
+    when (io.v_ins =/= 1.B) {
+    io.output := MuxLookup(io.aluc, io.in_A, Seq(
+      ALU_ADD -> (io.in_A + io.in_B),
+      ALU_SLL -> (io.in_A << io.in_B(4, 0)).asSInt,
+      ALU_SLT -> Mux(io.in_A < io.in_B, 1.S, 0.S),
+      ALU_SLTU -> Mux(io.in_A.asUInt < io.in_B.asUInt, 1.S, 0.S),
+      ALU_XOR -> (io.in_A ^ io.in_B),
+      ALU_SRL -> (io.in_A.asUInt >> io.in_B(4, 0).asUInt).asSInt,
+      ALU_OR -> (io.in_A | io.in_B),
+      ALU_AND -> (io.in_A & io.in_B),
+      ALU_SUB -> (io.in_A - io.in_B),
+      ALU_SRA -> (io.in_A >> io.in_B(4, 0)).asSInt,
+      ALU_COPY_A -> io.in_A
+    ))
+
+   }.otherwise{ //VectorAddvv
+	when (io.sew === "b011".U && io.aluc === V_ADD){  //sew = 64
+     io.v_output := VectorOp_vv(sew_64_a,sew_64_b,2.U,sew_64_vd)
+	}
+	 .elsewhen (io.sew === "b010".U && io.aluc === V_ADD){ // sew = 32
+        io.v_output := VectorOp_vv(sew_32_a,sew_32_b,4.U,sew_32_vd)
+      }
+	  .elsewhen(io.sew === "b001".U && io.aluc === V_ADD){ //sew = 16
+        io.v_output := VectorOp_vv(sew_16_a,sew_16_b,8.U,sew_16_vd)
+	  }
+	  .elsewhen(io.sew === "b000".U && io.aluc === V_ADD){ //sew = 8
+        io.v_output := VectorOp_vv(sew_8_a,sew_8_b,16.U,sew_8_vd)
 	 //vectoraddvv end
    //vector add vi start
-        }.elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b011".U){
-            val imm = Cat(0.S(32.W), io.in_B).asSInt
-        io.v_output := VectorOp_vi(sew_64_b,imm,2.U,sew_64_vd)
-        }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b011".U){
-            val imm = io.in_B(31,0).asSInt        
-            io.v_output := VectorOp_vi(sew_32_b,imm,4.U,sew_32_vd)  
-        }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b011".U){
-            val imm = io.in_B(7,0).asSInt
-            io.v_output := VectorOp_vi(sew_8_b,imm,16.U,sew_8_vd)
-        }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b011".U){
-            val imm = io.in_B(15,0).asSInt
-            io.v_output := VectorOp_vi(sew_16_b,imm,8.U,sew_16_vd)
-    	}  //vector vi end
+    }.elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b011".U){
+      val imm = Cat(0.S(32.W), io.in_B).asSInt
+      io.v_output := VectorOp_vi(sew_64_b,imm,2.U,sew_64_vd)
+    
+    }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b011".U){
+       val imm = io.in_B(31,0).asSInt        
+        io.v_output := VectorOp_vi(sew_32_b,imm,4.U,sew_32_vd)
+	  
+    }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b011".U){
+      val imm = io.in_B(7,0).asSInt
+      io.v_output := VectorOp_vi(sew_8_b,imm,16.U,sew_8_vd)
+    }
+	  .elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b011".U){
+      val imm = io.in_B(15,0).asSInt
+      io.v_output := VectorOp_vi(sew_16_b,imm,8.U,sew_16_vd)
+
+	  }  //vector vi end
         //vector  vx
-        .elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b100".U){
-		    val imm = Cat(0.S(32.W), io.in_A).asSInt
-            io.v_output := VectorOp_vx(sew_64_b,imm,2.U,sew_64_vd)
-        }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b100".U){
-           val imm = io.in_A(31,0).asSInt
-            io.v_output := VectorOp_vx(sew_32_b,imm,4.U,sew_32_vd)
-        }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b100".U){
-	    	val imm = io.in_A(7,0).asSInt
-            io.v_output := VectorOp_vx(sew_8_b,imm,16.U,sew_8_vd)
-        }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b100".U){
-		    val imm = io.in_A(15,0).asSInt
-            io.v_output := VectorOp_vx(sew_16_b,imm,8.U,sew_16_vd)
-	    }  //vector  vx end
+    .elsewhen(io.sew === "b011".U && io.aluc === Vaddvx){
+		  val imm = Cat(0.S(32.W), io.in_A).asSInt
+      io.v_output := VectorOp_vx(sew_64_b,imm,2.U,sew_64_vd)
+    
+    }.elsewhen(io.sew === "b010".U && io.aluc === Vaddvx){
+       val imm = io.in_A(31,0).asSInt
+        io.v_output := VectorOp_vx(sew_32_b,imm,4.U,sew_32_vd)
+	  
+    }.elsewhen(io.sew === "b000".U && io.aluc === Vaddvx){
+		val imm = io.in_A(7,0).asSInt
+      io.v_output := VectorOp_vx(sew_8_b,imm,16.U,sew_8_vd)
+    }.elsewhen (io.sew === "b001".U && io.aluc === Vaddvx){
+		val imm = io.in_A(15,0).asSInt
+       io.v_output := VectorOp_vx(sew_16_b,imm,8.U,sew_16_vd)
+	  }  //vector  vx end
+
+
+
+
     //vector move vx instruction
-        .elsewhen (io.aluc === VMVx){
-            when(io.vd_addr === 0.U){
-                io.v_output := Cat((0.S(96.W)),io.in_A).asSInt
-  	        }.otherwise{
-                when (io.sew === "b011".U){
-                    val imm = Cat(0.S(32.W), io.in_A).asSInt
-                    io.v_output := Vectormove_vxvi(imm,2.U,sew_64_vd)
-                }.elsewhen(io.sew === "b010".U ){
-                    val imm = io.in_A(31,0).asSInt
-                    io.v_output := Vectormove_vxvi(imm,4.U,sew_32_vd)
-                }.elsewhen (io.sew === "b001".U){
-		            val imm = io.in_A(15,0).asSInt
-    	            io.v_output := Vectormove_vxvi(imm,8.U,sew_16_vd)
-                }.elsewhen(io.sew === "b000".U ){
-                    val imm = io.in_A(7,0).asSInt
-                    io.v_output := Vectormove_vxvi(imm,16.U,sew_8_vd)
-                } 
-            }
-        }//vmv vx end
+    .elsewhen (io.aluc === VMVx){
+      when(io.vd_addr === 0.U){
+        io.v_output := Cat((0.S(96.W)),io.in_A).asSInt
+  	  }.otherwise{
+      when (io.sew === "b011".U){
+        val imm = Cat(0.S(32.W), io.in_A).asSInt
+          io.v_output := Vectormove_vxvi(imm,2.U,sew_64_vd)
+      
+      }.elsewhen(io.sew === "b010".U ){
+       val imm = io.in_A(31,0).asSInt
+          io.v_output := Vectormove_vxvi(imm,4.U,sew_32_vd)
+	  
+      }.elsewhen (io.sew === "b001".U){
+		   val imm = io.in_A(15,0).asSInt
+    	    io.v_output := Vectormove_vxvi(imm,8.U,sew_16_vd)
+
+      }.elsewhen(io.sew === "b000".U ){
+        val imm = io.in_A(7,0).asSInt
+          io.v_output := Vectormove_vxvi(imm,16.U,sew_8_vd)
+
+
+     } }}//vmv vx end
     
     //vector move vi instruction
-        .elsewhen (io.aluc === VMVvi){
-            when(io.vd_addr === 0.U){
-                io.v_output := Cat((0.S(96.W)),io.in_B).asSInt
-  	        }.otherwise{
-                when (io.sew === "b011".U){
-                    val imm = Cat(0.S(32.W), io.in_B).asSInt
-                    io.v_output := Vectormove_vxvi(imm,2.U,sew_64_vd)
+    .elsewhen (io.aluc === VMVvi){
+      when(io.vd_addr === 0.U){
+        io.v_output := Cat((0.S(96.W)),io.in_B).asSInt
+  	  }.otherwise{
+        when (io.sew === "b011".U){
+        val imm = Cat(0.S(32.W), io.in_B).asSInt
+        io.v_output := Vectormove_vxvi(imm,2.U,sew_64_vd)
     
-                }.elsewhen(io.sew === "b010".U ){
-                    val imm = io.in_B(31,0).asSInt
-                    io.v_output := Vectormove_vxvi(imm,4.U,sew_32_vd)
-                }.elsewhen(io.sew === "b000".U ){
-		            val imm = io.in_B(7,0).asSInt
-    	            io.v_output := Vectormove_vxvi(imm,16.U,sew_8_vd)
-	            }.elsewhen (io.sew === "b001".U){
-		            val imm = io.in_B(15,0).asSInt
-                    io.v_output := Vectormove_vxvi(imm,8.U,sew_16_vd)      
-                }
-            }
-        }
-    //vmv vi end
+        }.elsewhen(io.sew === "b010".U ){
+          val imm = io.in_B(31,0).asSInt
+          io.v_output := Vectormove_vxvi(imm,4.U,sew_32_vd)
+        }.elsewhen(io.sew === "b000".U ){
+		      val imm = io.in_B(7,0).asSInt
+    	    io.v_output := Vectormove_vxvi(imm,16.U,sew_8_vd)
+	      }.elsewhen (io.sew === "b001".U){
+		      val imm = io.in_B(15,0).asSInt
+          io.v_output := Vectormove_vxvi(imm,8.U,sew_16_vd)      
+        }}
+    }//vmv vi end
     
     //vector move vv instruction
-        .elsewhen (io.aluc === VMVvv){
-            when(io.vd_addr === 0.U){
-                io.v_output := io.vs1
-  	        }.otherwise{
-            when (io.sew === "b011".U){
+    .elsewhen (io.aluc === VMVvv){
+      when(io.vd_addr === 0.U){
+    io.v_output := io.vs1
+  	  }.otherwise{
+        when (io.sew === "b011".U){
         io.v_output := Vectormove_vv(sew_64_a,2.U,sew_64_vd)
     
         }.elsewhen(io.sew === "b010".U ){
@@ -317,4 +348,5 @@ io.v_output := 0.S
         }
         }
     }//vmv vv end
-}
+
+	}}

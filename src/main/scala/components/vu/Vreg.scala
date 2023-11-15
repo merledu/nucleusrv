@@ -27,6 +27,7 @@ class vregfile extends Module {
   var vs1_in = io.vs1_addr+io.lmul_vs1in_vs2in
   var vs2_in = io.vs2_addr+io.lmul_vs1in_vs2in
   var vsd_in = io.vd_addr+io.lmul_count
+  var vs3 = io.vd_addr+io.lmul_vs1in_vs2in
   dontTouch(vs1_in)
   dontTouch(vs2_in)
   dontTouch(vsd_in)
@@ -34,7 +35,7 @@ class vregfile extends Module {
 io.vs1_data := register(vs1_in)
 io.vs2_data := register(vs2_in)
 io.vs0_data := register(0.U)
-io.vddata_o := register(io.vd_addr+io.lmul_count)
+io.vddata_o := register(vs3)
 
   when (io.reg_write === 1.B && io.reg_read === 0.B) {
       register(io.vd_addr+io.lmul_count) := io.vd_data
