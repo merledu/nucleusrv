@@ -179,10 +179,10 @@ class nucleusrv(pluginTemplate):
                 AA = f"python3 /home/hassan/nucleusrv/tools/trace/scripts/hex_cleaner.py --hex {testentry['work_dir']}/nucleusrv.hex"
                 B = f"cd "
                 C = "cd nucleusrv"
-                E = 'sbt "testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile={}/nucleusrv.hex" > {}/sbtDump.log'.format(testentry['work_dir'], testentry['work_dir'])
+                E = 'sbt "testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile={}/nucleusrv.hex" &> /home/hassan/nucleusrv/tools/trace/logs/sbtDump.log'.format(testentry['work_dir'], testentry['work_dir'])
                 F = f"cd ./tools/trace"
                 G = f"echo Generating log..."
-                H = "python3 /home/hassan/nucleusrv/tools/trace/scripts/sbtToLog.py --asm {}/nucleusrv.disass --sbt_dump {}/sbtDump.log --log {}/nucleusrv.log".format(testentry['work_dir'], testentry['work_dir'], testentry['work_dir'])
+                H = "python3 /home/hassan/nucleusrv/tools/trace/scripts/sbtToLog.py --asm {}/nucleusrv.disass --sbt_dump /home/hassan/nucleusrv/tools/trace/logs/sbtDump.log --log {}/nucleusrv.log".format(testentry['work_dir'], testentry['work_dir'], testentry['work_dir'])
                 # simcmd = f"{self.dut_exe} {test}test.S"
             else:
                 simcmd = 'echo "NO RUN"'

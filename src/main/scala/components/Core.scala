@@ -652,7 +652,6 @@ dontTouch(next_pc_selector)
     val npcDelay = Reg(Vec(4, UInt(32.W)))
     val rsAddrDelay = for (i <- 0 until 2) yield Reg(Vec(3, UInt(5.W)))
     val rsDataDelay = for (i <- 0 until 2) yield Reg(Vec(2, SInt(32.W)))
-    val insDelay = if (C) Some(Reg(Vec(4, UInt(32.W)))) else Some(Reg(Vec(3, UInt(32.W))))
     val memAddrDelay = RegInit(0.U(32.W))
     val memWdataDelay = RegInit(0.S(32.W))
     val stallDelay = Reg(Vec(4, Bool()))
@@ -672,6 +671,13 @@ dontTouch(next_pc_selector)
       npcDelay(i + 1) := npcDelay(i)
       stallDelay(i + 1) := stallDelay(i)
     }
+    if (C) {
+      for (i <- 0 until 3) {
+        insDelay.get(i + 1) := insDelay.get(i)
+      }
+      insDelay.get(0) := c_ins_trace.get
+    }
+
 
 
     Seq(
@@ -684,7 +690,7 @@ dontTouch(next_pc_selector)
 
       (io.rvfiUInt.get(0), mem_reg_pc),
       (io.rvfiUInt.get(1), npcDelay(3)),
-      (io.rvfiUInt.get(2), mem_reg_ins),
+      (io.rvfiUInt.get(2), if (C) insDelay.get(3) else mem_reg_ins),
       (io.rvfiUInt.get(3), memAddrDelay),
 
       (io.rvfiMode.get, 3.U),

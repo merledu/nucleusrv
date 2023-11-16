@@ -86,7 +86,7 @@ class ALUIO extends Bundle with Config {
 	val v_output = Output(SInt(128.W))
 }
 
-class ALU_ extends Module with Config {
+class VALU extends Module with Config {
     val io = IO(new ALUIO)
 
 val sew_8_a = VecInit((0 until 16).map(i => io.vs1(8*i+7, 8*i).asSInt))

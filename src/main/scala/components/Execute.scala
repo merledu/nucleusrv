@@ -1,4 +1,6 @@
 package nucleusrv.components
+
+import vu._
 import chisel3._
 import chisel3.util.MuxCase
 
@@ -128,7 +130,7 @@ class Execute(M:Boolean = true) extends Module {
   alu.io.aluCtl := aluCtl.io.out
 
   // Vector ALU
-  val vec_alu = Module(new vu.ALU_)
+  val vec_alu = Module(new VALU)
   dontTouch(vec_alu.io)
 
      // Vector forwarding unit
