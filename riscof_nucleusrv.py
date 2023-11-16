@@ -156,7 +156,7 @@ class nucleusrv(pluginTemplate):
 	  # echo statement.
         # set the objdump template here. Note we continue with the variable toolchain below. Also the
         # name of the elf is kept a variable to be fixed in the runTests function.
-            self.objdump = 'riscv{0}-unknown-elf-objdump -D {1} > nucleusrv.disass' .format(32, elf)
+            self.objdump = 'riscv{0}-unknown-elf-objdump -D {3}/{1} > {2}/nucleusrv.disass' .format(32, elf, testentry['work_dir'], testentry['work_dir'])
             # copy this in tools/trace/asm as test.S
             
             # move_disass = 'mv test.disass /home/hassan/nucleusrv/tools/trace/asm/test.S'
@@ -174,20 +174,21 @@ class nucleusrv(pluginTemplate):
         
             if self.target_run:
             # set up the simulation command. Template is for spike. Please change.
-                simcmd = self.dut_exe + ' --isa={0} +signature={1} +signature-granularity=4 {2}'.format(self.isa, sig_file, elf)
-                A = f"python3 $NRV_SCRIPT/assemblyParser.py --asm nucleusrv.disass --hex nucleusrv.hex"
+                simcmd = f"python3 /home/hassan/nucleusrv/tools/trace/scripts/logToSignature.py --log {testentry['work_dir']}/nucleusrv.log --signature {testentry['work_dir']}/nucleusrv.signature"
+                A = f"python3 /home/hassan/nucleusrv/tools/trace/scripts/assemblyParser.py --asm {testentry['work_dir']}/nucleusrv.disass --hex {testentry['work_dir']}/nucleusrv.hex"
+                AA = f"python3 /home/hassan/nucleusrv/tools/trace/scripts/hex_cleaner.py --hex {testentry['work_dir']}/nucleusrv.hex"
                 B = f"cd "
                 C = "cd nucleusrv"
-                E = 'sbt "testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile={}/nucleusrv.hex" > $SBT_LOG/sbtDump.log'.format(testentry['work_dir'])
+                E = 'sbt "testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile={}/nucleusrv.hex" > {}/sbtDump.log'.format(testentry['work_dir'], testentry['work_dir'])
                 F = f"cd ./tools/trace"
                 G = f"echo Generating log..."
-                H = "python3 $NRV_SCRIPT/sbtToLog.py --asm {}/nucleusrv.disass --sbt_dump $SBT_LOG/sbtDump.log --log {}/nucleusrv.log".format(testentry['work_dir'], testentry['work_dir'])
+                H = "python3 /home/hassan/nucleusrv/tools/trace/scripts/sbtToLog.py --asm {}/nucleusrv.disass --sbt_dump {}/sbtDump.log --log {}/nucleusrv.log".format(testentry['work_dir'], testentry['work_dir'], testentry['work_dir'])
                 # simcmd = f"{self.dut_exe} {test}test.S"
             else:
                 simcmd = 'echo "NO RUN"'
 
           # concatenate all commands that need to be executed within a make-target.
-            execute = f"@cd {testentry['work_dir']}; {cmd}; {self.objdump}; {A}; {B}; {C}; {E}; {F}; {G}; cd {testentry['work_dir']}; {H}; {simcmd}"
+            execute = f"@cd {testentry['work_dir']}; {cmd}; {self.objdump}; {A}; {AA};{B}; {C}; {E}; {F}; {G}; cd {testentry['work_dir']}; {H}; {simcmd}"
 
           # create a target. The makeutil will create a target with the name "TARGET<num>" where num
           # starts from 0 and increments automatically for each new target that is added

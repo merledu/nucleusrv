@@ -1,4 +1,4 @@
-# testlist generated on 2023-11-07 22:10 GMT
+# testlist generated on 2023-11-15 16:53 GMT
 /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/C/src/cadd-01.S:
   commit_id: b91f98f3a0e908bad4680c2e3901fbc24b63a563
   work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/C/src/cadd-01.S
@@ -79,17 +79,6 @@
   coverage_labels:
   - cbnez
   test_path: /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/C/src/cbnez-01.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/C/src/cebreak-01.S:
-  commit_id: 136ab593b08af9ea3081f822767e44d4133d301d
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/C/src/cebreak-01.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32IC_Zicsr
-  coverage_labels:
-  - cebreak
-  test_path: /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/C/src/cebreak-01.S
 /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/C/src/cj-01.S:
   commit_id: b91f98f3a0e908bad4680c2e3901fbc24b63a563
   work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/C/src/cj-01.S
@@ -744,38 +733,6 @@
   coverage_labels:
   - remu
   test_path: /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/M/src/remu-01.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/Zifencei/src/Fencei.S:
-  commit_id: 274b6cd787d4d5b0b6c41424b9b7dcca495a9d4b
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/Zifencei/src/Fencei.S
-  macros:
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zifencei
-  coverage_labels:
-  - fencei
-  test_path: /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/Zifencei/src/Fencei.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/ebreak.S:
-  commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/ebreak.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zicsr
-  coverage_labels:
-  - ebreak
-  test_path: /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/ebreak.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/ecall.S:
-  commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/ecall.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zicsr
-  coverage_labels:
-  - ecall
-  test_path: /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/ecall.S
 /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-beq-01.S:
   commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
   work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/misalign-beq-01.S
@@ -867,71 +824,6 @@
   - misalign-jal
   test_path: 
     /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-jal-01.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-lh-01.S:
-  commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/misalign-lh-01.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zicsr
-  coverage_labels:
-  - misalign-lh
-  - misalign-lh
-  test_path: 
-    /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-lh-01.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-lhu-01.S:
-  commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/misalign-lhu-01.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zicsr
-  coverage_labels:
-  - misalign-lhu
-  - misalign-lhu
-  test_path: 
-    /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-lhu-01.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-lw-01.S:
-  commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/misalign-lw-01.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zicsr
-  coverage_labels:
-  - misalign-lw
-  - misalign-lw
-  test_path: 
-    /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-lw-01.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-sh-01.S:
-  commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/misalign-sh-01.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zicsr
-  coverage_labels:
-  - misalign-sh
-  - misalign-sh
-  test_path: 
-    /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-sh-01.S
-/home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-sw-01.S:
-  commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
-  work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/misalign-sw-01.S
-  macros:
-  - rvtest_mtrap_routine=True
-  - TEST_CASE_1=True
-  - XLEN=32
-  isa: RV32I_Zicsr
-  coverage_labels:
-  - misalign-sw
-  - misalign-sw
-  test_path: 
-    /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign-sw-01.S
 /home/hassan/riscv-arch-test/riscv-test-suite/rv32i_m/privilege/src/misalign2-jalr-01.S:
   commit_id: bb74a4aefaa8c89fb28b876484cfdf9ca020cec1
   work_dir: /home/hassan/nucleusrv/riscof_work/rv32i_m/privilege/src/misalign2-jalr-01.S
