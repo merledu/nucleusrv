@@ -2,10 +2,10 @@ package nucleusrv.components
 
 import chisel3._
 import chisel3.util._
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
-class CSRTest extends FlatSpec with ChiselScalatestTester {
+class CSRTest extends AnyFlatSpec with ChiselScalatestTester {
   behavior of "CSR"
 
   it should "perform FRCSR operation correctly" in {
@@ -64,7 +64,7 @@ class CSRTest extends FlatSpec with ChiselScalatestTester {
       c.clock.step(1)
       c.io.i_w_en.poke(false.B) // Write enable low signal for fcsr
       c.clock.step(1)
-      c.io.i_data.expect("b00000000000000000000000000000100".U) 
+      c.io.i_data.expect("b00000000000000000000000000000100".U)
     }
   }
 
@@ -75,11 +75,11 @@ class CSRTest extends FlatSpec with ChiselScalatestTester {
       c.io.i_data.poke("b00000000000000000000000000000001".U) // Data input to fcsr (NV flag)
       c.io.i_w_en.poke(true.B) // Write enable signal for fcsr
       c.clock.step(1)
-      c.io.i_data.expect("b00000000000000000000000000000001".U) 
+      c.io.i_data.expect("b00000000000000000000000000000001".U)
     }
   }
 
 
-  
+
 
 }
