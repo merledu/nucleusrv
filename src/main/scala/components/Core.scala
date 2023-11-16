@@ -104,6 +104,8 @@ class Core(implicit val config:Configs) extends Module{
   val ral_halt_o  = WireInit(false.B)
   val is_comp     = WireInit(false.B)
 
+  val c_ins_trace = if (C) Some(dontTouch(WireInit(0.U(32.W)))) else None
+
 
   if (C) {
 
@@ -130,6 +132,8 @@ class Core(implicit val config:Configs) extends Module{
     instruction  := CD.instruction_o
 
     is_comp := CD.is_comp
+
+    c_ins_trace.get := IF.instruction
 
   }
   else {
@@ -344,6 +348,7 @@ class Core(implicit val config:Configs) extends Module{
     val memAddrDelay = RegInit(0.U(32.W))
     val memWdataDelay = RegInit(0.S(32.W))
     val stallDelay = Reg(Vec(4, Bool()))
+    val insDelay = if (C) Some(dontTouch(Reg(Vec(4, UInt(32.W))))) else None
 
     for (i <- 0 until 2) {
       for (j <- 0 until 2) {
@@ -359,6 +364,12 @@ class Core(implicit val config:Configs) extends Module{
       npcDelay(i + 1) := npcDelay(i)
       stallDelay(i + 1) := stallDelay(i)
     }
+    if (C) {
+      for (i <- 0 until 3) {
+        insDelay.get(i + 1) := insDelay.get(i)
+      }
+      insDelay.get(0) := c_ins_trace.get
+    }
 
 
     Seq(
@@ -371,7 +382,7 @@ class Core(implicit val config:Configs) extends Module{
 
       (io.rvfiUInt.get(0), mem_reg_pc),
       (io.rvfiUInt.get(1), npcDelay(3)),
-      (io.rvfiUInt.get(2), mem_reg_ins),
+      (io.rvfiUInt.get(2), if (C) insDelay.get(3) else mem_reg_ins),
       (io.rvfiUInt.get(3), memAddrDelay),
 
       (io.rvfiMode.get, 3.U),
