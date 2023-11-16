@@ -412,13 +412,15 @@ dontTouch(next_pc_selector)
   when(ID.ifid_flush) {
     if_reg_ins := 0.U
   }
-  // val ins_trace = if (C && TRACE){
-  //   Some(WireInit(instruction_cd))
-  // }else if(!C && TRACE){
-  //   Some(WireInit(if_reg_ins))
-  // }else{
-  //   None
-  // }
+
+  val ins_trace = if (C && TRACE){
+    Some(WireInit(instruction_cd))
+  }else if(!C && TRACE){
+    Some(WireInit(if_reg_ins))
+  }else{
+    None
+  }
+>>>>>>> Stashed changes
 
   /****************
    * Decode Stage *
@@ -658,6 +660,7 @@ dontTouch(next_pc_selector)
     val npcDelay = Reg(Vec(4, UInt(32.W)))
     val rsAddrDelay = for (i <- 0 until 2) yield Reg(Vec(3, UInt(5.W)))
     val rsDataDelay = for (i <- 0 until 2) yield Reg(Vec(2, SInt(32.W)))
+    val insDelay = if (C) Some(Reg(Vec(4, UInt(32.W)))) else Some(Reg(Vec(3, UInt(32.W))))
     val memAddrDelay = RegInit(0.U(32.W))
     val memWdataDelay = RegInit(0.S(32.W))
     val stallDelay = Reg(Vec(4, Bool()))
@@ -676,6 +679,9 @@ dontTouch(next_pc_selector)
     for (i <- 0 until 3) {
       npcDelay(i + 1) := npcDelay(i)
       stallDelay(i + 1) := stallDelay(i)
+    }
+    for (i <- 0 until insDelay.length){
+      insDelay(i + 1) := insDelay(i)
     }
 
     if (C) {
@@ -698,6 +704,7 @@ dontTouch(next_pc_selector)
       (io.rvfiUInt.get(1), npcDelay(3)),
 
       (io.rvfiUInt.get(2), if (C) insDelay.get(3) else mem_reg_ins),
+
 
       (io.rvfiUInt.get(3), memAddrDelay),
 
