@@ -46,8 +46,10 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   }
 }
 
-object Top extends App{
+object NRVDriver {
   // generate verilog
-  new ChiselStage().emitVerilog(new Top(Some("program.hex"), Some("data.hex")))
-  //chisel3.Driver.execute(args, () => new Top(Some("program.hex"), Some("data.hex")))
+  def main(args: Array[String]): Unit = {
+      val IMem =  if (args.length > 0) args(0) else "program.hex"
+      new ChiselStage().emitVerilog(new Top(Some(IMem), Some("data.hex")))
+  }
 }
