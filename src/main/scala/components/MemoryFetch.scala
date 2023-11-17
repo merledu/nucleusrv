@@ -1,14 +1,15 @@
-
 package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
 
-
-
 class MemoryFetch extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
+    val v_addr: UInt = Input(UInt(32.W))
+    val v_ins:Bool = Input(Bool())
     val writeData: UInt = Input(UInt(32.W))
+    val v_writeData: UInt = Input(UInt(32.W))
+   // val vs0: UInt = Input(UInt(4.W))
     val writeEnable: Bool = Input(Bool())
     val readEnable: Bool = Input(Bool())
     val readData: UInt = Output(UInt(32.W))
@@ -18,8 +19,19 @@ class MemoryFetch extends Module {
     val dccmReq = Decoupled(new MemRequestIO)
     val dccmRsp = Flipped(Decoupled(new MemResponseIO))
   })
-
+ dontTouch(io.v_addr)
   io.dccmRsp.ready := true.B
+  var addr = WireInit(0.U(32.W))
+  var data = WireInit(0.U(32.W))
+  dontTouch(addr)
+  dontTouch(data)
+  when(io.v_ins === 1.B){
+    addr := io.v_addr
+    data := io.v_writeData
+  }.otherwise{
+    addr := io.aluResultIn
+    data := io.writeData
+  }
 
   val wdata = Wire(Vec(4, UInt(8.W)))
   val rdata = Wire(UInt(32.W))
@@ -71,7 +83,7 @@ class MemoryFetch extends Module {
       // data to be stored at lower 16 bits (15,0)
       io.dccmReq.bits.activeByteLane := "b0011".U
     }.elsewhen(offsetSW === 1.U){
-      // data to be stored at lower 16 bits (15,0)
+      // data to be stored at lower 16 bits (15,0)  
       io.dccmReq.bits.activeByteLane := "b0110".U
       wdata(0) := io.writeData(23,16)
       wdata(1) := io.writeData(7,0)
