@@ -9,8 +9,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     val pin = Output(UInt(32.W))
   })
 
-  // implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
-  implicit val config:BaseConfig = DefaultConfig()
+  implicit val core_config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -29,7 +28,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
   io.pin := core.io.pin
 
-  if (config.TRACE) {
+  if (core_config.TRACE) {
     val tracer = Module(new Tracer())
 
     Seq(
