@@ -46,6 +46,18 @@ class Control extends Module {
         2.U, // aluOp
         0.U
       ),
+      // CSR
+      BitPat("b?????????????????????????1110011") -> List(
+        false.B, // aluSrc
+        0.U, // memToReg
+        true.B, // regWrite
+        false.B, // memRead
+        false.B, // memWrite
+        false.B, // branch
+        0.U, // jump
+        2.U, // aluOp
+        0.U
+      ),
       // Load
       BitPat("b?????????????????????????0000011") -> List(
         false.B, // aluSrc
