@@ -341,9 +341,10 @@ dontTouch(vlmul_count)
     }
     val delays = RegInit(0.U(32.W))
     when( delays =/= vlcount1 && instruction(6,0)==="b0100111".U){
-      next_pc_selector := 1.U
+      
       delays := delays+1.U
       if_reg_delay := delays
+      next_pc_selector := 1.U
     }
     //.otherwise{
     // delays := 0.U
@@ -477,8 +478,6 @@ MEM.io.v_writeData := 0.U
 MEM.io.vs0 := 0.U
 val vlcount = RegInit(0.U(32.W)) 
 var valcount = 0
-val test = RegInit(0.U(32.W)) 
-dontTouch(test)
 dontTouch(vlcount)
 //val eew_32_vs3_data = VecInit((0 until 4).map(i => EX.vs3_data_o(32*i+31, 32*i).asSInt))
 val eew_32_vs3_data = VecInit((0 until 4).map(i => ex_reg_vs3(32*i+31, 32*i).asSInt))
@@ -492,23 +491,20 @@ when (vlcount =/= ex_reg_vl.asUInt && ex_reg_ins(6,0) === "b0100111".U){
     }
     next_pc_sel = 1.U
   }
-  when(ex_reg_ins(25) === 0.U){
+  when(ex_reg_ins(25) === "b0".U){
   when (ex_reg_eew === 8.U ){
-    test := valcount.asUInt
       MEM.io.vs0 := EX.vs0_o((valcount+3), valcount)
       valcount = valcount + 4
       
   }.elsewhen(ex_reg_eew === 16.U){
-    test := valcount.asUInt
     val mem_vs0 = EX.vs0_o((valcount+1), valcount)
     MEM.io.vs0 := Cat(Fill(1,mem_vs0(1)),Fill(1,mem_vs0(0)))
     valcount = valcount + 2
   }.elsewhen(ex_reg_eew === 32.U){
-    test := valcount.asUInt
     val mem_vs0 = EX.vs0_o(valcount)
     MEM.io.vs0 := Cat(Fill(3,mem_vs0))
     valcount = valcount + 1
-  }}.elsewhen(ex_reg_ins(25) === 1.U){
+  }}.elsewhen(ex_reg_ins(25) === "b1".U){
     MEM.io.vs0 := "b1111".U
   }
   vlcount := MuxCase(0.U, Array( // 
