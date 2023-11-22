@@ -66,9 +66,9 @@ io.vs3_data := register(vs3_in)
     io.vs3_data := 0.S
 
   }
-val vs3_in_1 = RegInit(0.U(5.W))
+
 when (io.ins(6,0)==="b0100111".U){
-   vs3_in_1 := io.vs3_addr + io.id_vc3
+   val vs3_in_1 = io.vs3_addr + io.id_vc3
   io.vs3_data := register(vs3_in_1)
 }
 

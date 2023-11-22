@@ -11,7 +11,7 @@ object ALUOP1 {
     val Vaddvx = "b000000100".U
     val VMVx = "b010111100".U
     val VMVvv = "b010111000".U
-    val VMVvi = 187.U
+    val VMVvi = "b010111011".U
     val Vsubvv  = 184.U 
     val Vsubvx = "b000010100".U 
     val Vrsubvx = "b000011100".U
@@ -207,37 +207,38 @@ io.v_output := 0.S
             io.v_output := VectorOp_vv(sew_8_a,sew_8_b,16.U,sew_8_vd)
 
    //Opivi
-        }.elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b011".U){
+        }.elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b011".U &&  io.aluc =/= VMVvi){
             val imm = Cat(0.S(32.W), io.in_B).asSInt
         io.v_output := VectorOp_vi(sew_64_b,imm,2.U,sew_64_vd)
-        }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b011".U){
+        }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b011".U &&  io.aluc =/= VMVvi){
             val imm = io.in_B(31,0).asSInt        
             io.v_output := VectorOp_vi(sew_32_b,imm,4.U,sew_32_vd)  
-        }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b011".U){
+        }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b011".U &&  io.aluc =/= VMVvi){
             val imm = io.in_B(7,0).asSInt
             io.v_output := VectorOp_vi(sew_8_b,imm,16.U,sew_8_vd)
-        }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b011".U){
+        }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b011".U &&  io.aluc =/= VMVvi){
             val imm = io.in_B(15,0).asSInt
             io.v_output := VectorOp_vi(sew_16_b,imm,8.U,sew_16_vd)
     	}  
         //opivx
-        .elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b100".U){
+        .elsewhen(io.sew === "b011".U && io.aluc(2,0) === "b100".U && io.aluc =/= VMVx){
 		    val imm = Cat(0.S(32.W), io.in_A).asSInt
             io.v_output := VectorOp_vx(sew_64_b,imm,2.U,sew_64_vd)
-        }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b100".U){
+        }.elsewhen(io.sew === "b010".U && io.aluc(2,0) === "b100".U && io.aluc =/= VMVx){
            val imm = io.in_A(31,0).asSInt
             io.v_output := VectorOp_vx(sew_32_b,imm,4.U,sew_32_vd)
-        }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b100".U){
+        }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b100".U && io.aluc =/= VMVx){
 	    	val imm = io.in_A(7,0).asSInt
             io.v_output := VectorOp_vx(sew_8_b,imm,16.U,sew_8_vd)
-        }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b100".U){
+        }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b100".U && io.aluc =/= VMVx){
 		    val imm = io.in_A(15,0).asSInt
             io.v_output := VectorOp_vx(sew_16_b,imm,8.U,sew_16_vd)
 	    }  
     //vector move vx instruction
         .elsewhen (io.aluc === VMVx){
             when(io.vd_addr === 0.U){
-                io.v_output := Cat((0.S(96.W)),io.in_A).asSInt
+                val imm = Cat((0.S(96.W)),io.in_A).asSInt
+                io.v_output := 3.S(128.W)
   	        }.otherwise{
                 when (io.sew === "b011".U){
                     val imm = Cat(0.S(32.W), io.in_A).asSInt

@@ -321,15 +321,17 @@ dontTouch(vlmul_count)
       }.elsewhen(emul_reg === emul_count &&  instruction(6,0)==="b0100111".U ){
         //paasing fetch stage
          
-        when(vc3 =/= 3.U && instruction(6,0)==="b0100111".U ){
+        when(vc3 =/= 4.U && instruction(6,0)==="b0100111".U ){
            vc3 := vc3 + 1.U
            if_vc3 := emul_reg + 0.U
            emul_reg := emul_reg
           next_pc_selector := 1.U
         //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
           }.otherwise{
-          if_vc3 := lmul_reg + 1.U
-          lmul_reg := 0.U
+            if_vc3 := emul_reg + 0.U
+          emul_reg := 0.U
+          
+
           next_pc_selector := 0.U
           vc3 := 0.U
 
@@ -472,12 +474,16 @@ var next_pc_sel = WireInit(0.U(32.W))
 dontTouch(next_pc_sel)
 MEM.io.v_addr := 0.U
 MEM.io.v_writeData := 0.U
+MEM.io.vs0 := 0.U
 val vlcount = RegInit(0.U(32.W)) 
+var valcount = 0
+val test = RegInit(0.U(32.W)) 
+dontTouch(test)
 dontTouch(vlcount)
-
+//val eew_32_vs3_data = VecInit((0 until 4).map(i => EX.vs3_data_o(32*i+31, 32*i).asSInt))
+val eew_32_vs3_data = VecInit((0 until 4).map(i => ex_reg_vs3(32*i+31, 32*i).asSInt))
+dontTouch(eew_32_vs3_data)
 when (vlcount =/= ex_reg_vl.asUInt && ex_reg_ins(6,0) === "b0100111".U){
- val eew_32_vs3_data = VecInit((0 until 4).map(i => EX.vs3_data_o(32*i+31, 32*i).asSInt))
-  dontTouch(eew_32_vs3_data)
   when(ex_reg_lsuType === 1.U)  {
     for (count <- 0 until 3){
       MEM.io.v_writeData := eew_32_vs3_data(count).asUInt
@@ -486,18 +492,45 @@ when (vlcount =/= ex_reg_vl.asUInt && ex_reg_ins(6,0) === "b0100111".U){
     }
     next_pc_sel = 1.U
   }
+  when(ex_reg_ins(25) === 0.U){
+  when (ex_reg_eew === 8.U ){
+    test := valcount.asUInt
+      MEM.io.vs0 := EX.vs0_o((valcount+3), valcount)
+      valcount = valcount + 4
+      
+  }.elsewhen(ex_reg_eew === 16.U){
+    test := valcount.asUInt
+    val mem_vs0 = EX.vs0_o((valcount+1), valcount)
+    MEM.io.vs0 := Cat(Fill(1,mem_vs0(1)),Fill(1,mem_vs0(0)))
+    valcount = valcount + 2
+  }.elsewhen(ex_reg_eew === 32.U){
+    test := valcount.asUInt
+    val mem_vs0 = EX.vs0_o(valcount)
+    MEM.io.vs0 := Cat(Fill(3,mem_vs0))
+    valcount = valcount + 1
+  }}.elsewhen(ex_reg_ins(25) === 1.U){
+    MEM.io.vs0 := "b1111".U
+  }
   vlcount := MuxCase(0.U, Array( // 
       (ex_reg_eew === 8.U) -> (vlcount+ 4.U),
       (ex_reg_eew === 16.U) -> (vlcount+ 2.U),
       (ex_reg_eew === 32.U) -> (vlcount+ 1.U),
       (ex_reg_eew === 64.U) -> (vlcount+ 0.U)
   ))
+   
+  
+  
   
 }.otherwise{
   next_pc_sel = 0.U
-  MEM.io.v_addr := 0.U
-  //vlcount :=0.U
+  // MEM.io.v_addr := 0.U
+  vlcount :=0.U
+  addrcount := 0.U
 }
+
+
+
+
 
   EX.vec_mem_res := ex_reg_vec_alu_res
   mem_reg_vec_alu_out := ex_reg_vec_alu_res
