@@ -1,16 +1,16 @@
 {
     "version": "1.4.0",
     "project": {
-        "name": "vaquita-build-build",
-        "directory": "/home/maira/vaquita/project/project",
-        "workspaceDir": "/home/maira/vaquita/project/project",
+        "name": "nucleusrv-build-build",
+        "directory": "/home/maira/Desktop/merl/nucleusrv/project/project",
+        "workspaceDir": "/home/maira/Desktop/merl/nucleusrv/project/project",
         "sources": [
-            "/home/maira/vaquita/project/project/src/main/scala",
-            "/home/maira/vaquita/project/project/src/main/scala-2.12",
-            "/home/maira/vaquita/project/project/src/main/scala-2",
-            "/home/maira/vaquita/project/project/src/main/java",
-            "/home/maira/vaquita/project/project/src/main/scala-sbt-1.0",
-            "/home/maira/vaquita/project/project/target/scala-2.12/sbt-1.0/src_managed/main"
+            "/home/maira/Desktop/merl/nucleusrv/project/project/src/main/scala",
+            "/home/maira/Desktop/merl/nucleusrv/project/project/src/main/scala-2.12",
+            "/home/maira/Desktop/merl/nucleusrv/project/project/src/main/scala-2",
+            "/home/maira/Desktop/merl/nucleusrv/project/project/src/main/java",
+            "/home/maira/Desktop/merl/nucleusrv/project/project/src/main/scala-sbt-1.0",
+            "/home/maira/Desktop/merl/nucleusrv/project/project/target/scala-2.12/sbt-1.0/src_managed/main"
         ],
         "dependencies": [
             
@@ -105,11 +105,11 @@
             "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/com/squareup/okio/okio/1.17.2/okio-1.17.2.jar",
             "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/config/1.3.3/config-1.3.3.jar"
         ],
-        "out": "/home/maira/vaquita/project/project/.bloop/vaquita-build-build",
-        "classesDir": "/home/maira/vaquita/project/project/.bloop/vaquita-build-build/scala-2.12/sbt-1.0/classes",
+        "out": "/home/maira/Desktop/merl/nucleusrv/project/project/.bloop/nucleusrv-build-build",
+        "classesDir": "/home/maira/Desktop/merl/nucleusrv/project/project/.bloop/nucleusrv-build-build/scala-2.12/sbt-1.0/classes",
         "resources": [
-            "/home/maira/vaquita/project/project/src/main/resources",
-            "/home/maira/vaquita/project/project/target/scala-2.12/sbt-1.0/resource_managed/main"
+            "/home/maira/Desktop/merl/nucleusrv/project/project/src/main/resources",
+            "/home/maira/Desktop/merl/nucleusrv/project/project/target/scala-2.12/sbt-1.0/resource_managed/main"
         ],
         "scala": {
             "organization": "org.scala-lang",
@@ -201,7 +201,7 @@
             "config": {
                 "home": "/usr/lib/jvm/java-17-openjdk-amd64",
                 "options": [
-                    "-Duser.dir=/home/maira/vaquita/project/project"
+                    "-Duser.dir=/home/maira/Desktop/merl/nucleusrv/project/project"
                 ]
             },
             "mainClass": [
@@ -224,6 +224,11 @@
                             "name": "sbt-bloop",
                             "classifier": "sources",
                             "path": "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/sbt-bloop_2.12_1.0/1.5.11/sbt-bloop-1.5.11-sources.jar"
+                        },
+                        {
+                            "name": "sbt-bloop",
+                            "classifier": "javadoc",
+                            "path": "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/sbt-bloop_2.12_1.0/1.5.11/sbt-bloop-1.5.11-javadoc.jar"
                         }
                     ]
                 },
@@ -241,6 +246,11 @@
                             "name": "bloop-config_2.12",
                             "classifier": "sources",
                             "path": "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/bloop-config_2.12/1.5.5/bloop-config_2.12-1.5.5-sources.jar"
+                        },
+                        {
+                            "name": "bloop-config_2.12",
+                            "classifier": "javadoc",
+                            "path": "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/bloop-config_2.12/1.5.5/bloop-config_2.12-1.5.5-javadoc.jar"
                         }
                     ]
                 },
@@ -258,6 +268,11 @@
                             "name": "jsoniter-scala-core_2.12",
                             "classifier": "sources",
                             "path": "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.4.0/jsoniter-scala-core_2.12-2.4.0-sources.jar"
+                        },
+                        {
+                            "name": "jsoniter-scala-core_2.12",
+                            "classifier": "javadoc",
+                            "path": "/home/maira/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/plokhotnyuk/jsoniter-scala/jsoniter-scala-core_2.12/2.4.0/jsoniter-scala-core_2.12-2.4.0-javadoc.jar"
                         }
                     ]
                 },

@@ -325,7 +325,7 @@ dontTouch(vlmul_count)
            vc3 := vc3 + 1.U
            if_vc3 := emul_reg + 0.U
            emul_reg := emul_reg
-          next_pc_selector := 1.U
+          next_pc_selector := 0.U
         //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
           }.otherwise{
             if_vc3 := emul_reg + 0.U
