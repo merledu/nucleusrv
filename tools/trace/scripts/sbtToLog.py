@@ -45,7 +45,7 @@ def readAsm(asmFile):
 
     inst = {
         split('\s+', line)[1]: split('\s+', line, maxsplit=2)[2].replace('\n', '') for line in asm
-            if match('[0-9a-f]+:\s+[0-9a-f]+\s+[a-z]+', line)
+            if match('[0-9a-f]+:\s+[0-9a-f]+\s+[a-z]+', line) or match('([0-9a-f]+):\s+([0-9a-f]+)\s+([a-z]+)\s+(.*)', line)
     }
 
     for k in inst.keys():
