@@ -89,14 +89,16 @@ class controldec extends Module {
         }
         
         is ("b0000111".U){//vector load
-            io.RegWrite := 0.B
+            io.RegWrite := 1.B
             io.opBsel := 0.B
             io.Ex_sel := 0.U
             io.aluop := 0.U
             io.vset := 0.B
             io.v_load := 1.B
-            io.v_ins := 0.B
-            io.RegRead := 0.B
+            io.v_ins := 1.B
+            io.RegRead := 1.B
+            io.V_MemToReg := 1.B
+            io.V_MemRead := 1.B
 
         }
     }
