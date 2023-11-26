@@ -68,7 +68,7 @@ class VLSU extends Module {
 var emul=RegInit(0.U(4.W))
 
 when(
-  (eew === sew  && lmul === 1.U) ||
+  ((eew === sew)  && lmul === 1.U) ||
   (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 2.U) ||
   (((eew === 8.U && sew === 32.U) || (eew === 16.U && sew === 64.U)) && lmul === 4.U) ||
   ((eew === 8.U && sew === 64.U) && lmul === 8.U)
@@ -76,7 +76,7 @@ when(
    emul := 1.U
 }.elsewhen(
   (((eew === 16.U && sew === 8.U) || (eew === 32.U && sew === 16.U) || (eew === 64.U && sew === 32.U)) && lmul === 1.U) ||
-  (eew === sew && lmul === 2.U) ||
+  ((eew === sew) && lmul === 2.U) ||
   (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 4.U) ||
   (((eew === 8.U && sew === 32.U) || (eew === 16.U && sew === 64.U)) && lmul === 8.U)
 ) {
@@ -84,7 +84,7 @@ when(
 }.elsewhen(
   (((eew === 32.U && sew === 8.U) || (eew === 64.U && sew === 16.U)) && lmul === 1.U) ||
   (((eew === 16.U && sew === 8.U) || (eew === 32.U && sew === 16.U) || (eew === 64.U && sew === 32.U)) && lmul === 2.U) ||
-  (eew === sew && lmul === 4.U) ||
+  ((eew === sew) && lmul === 4.U) ||
   (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 8.U)
 ) {
   emul := 4.U
@@ -92,7 +92,7 @@ when(
   (((eew === 64.U && sew === 8.U)) && lmul === 1.U) ||
   (((eew === 32.U && sew === 8.U) || (eew === 64.U && sew === 16.U)) && lmul === 2.U) ||
   (((eew === 16.U && sew === 8.U) || (eew === 64.U && sew === 32.U) || (eew === 32.U && sew === 16.U)) && lmul === 4.U) ||
-  (eew === sew && lmul === 8.U) 
+  ((eew === sew) && lmul === 8.U) 
 ) {
    emul := 8.U
 }
@@ -134,7 +134,8 @@ when(nf === "b000".U) {
     io.UnitStride := MuxLookup(lsumop, 0.U, Array(
         ("b00000".U) -> 1.U , //unit stride st||e
         ("b01000".U) -> 2.U , // whole register
-        ("b01011".U) -> 3.U // mask st||e unit stride
+        ("b01011".U) -> 3.U, // mask st||e unit stride
+        ("b10000".U) -> 4.U //fault only first unit stride
         ))
 
     
