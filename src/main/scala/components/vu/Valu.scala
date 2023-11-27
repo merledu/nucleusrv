@@ -142,7 +142,7 @@ def VectorOp_vx( in_A: Vec[SInt], imm: SInt, vlmax:UInt, vd:Vec[SInt]) :SInt = {
   
     val out = vd.zipWithIndex.map{ case(elem,i) => 
        Mux(i.U < io.vstart,elem,
-       Mux(i.U >= (io.vstart && i.U) < io.vl,
+       Mux(i.U >= io.vstart && i.U < io.vl,
                             Mux(io.vm === 0.U && io.vs0(i) === 0.U && io.vma === 0.U, elem,
                                 Mux(io.vm === 0.U && io.vs0(i) === 0.U && io.vma === 1.U, (-1).S,MuxLookup(
             io.aluc,
