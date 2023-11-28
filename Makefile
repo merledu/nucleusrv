@@ -44,7 +44,7 @@ IMEM=asm.txt
 
 rtl:
 	sbt "runMain nucleusrv.components.NRVDriver $(IMEM)"
-	(echo '/* verilator lint_off ASSIGNDLY */' && echo '/* verilator lint_off UNUSED */' && echo '/* verilator lint_off BLKSEQ */' && echo '/* verilator lint_off DECLFILENAME */' && cat Top.v) > temp && mv temp Top.v
+	(echo '/* verilator lint_off ASSIGNDLY */' && echo '/* verilator lint_off UNUSED */' && echo '/* verilator lint_off BLKSEQ */' && echo '/* verilator lint_off DECLFILENAME */' && echo '/* verilator lint_off WIDTH */' && cat Top.v) > temp && mv temp Top.v
 
 VERILATOR = verilator
 VERILATOR_FLAGS = -Wall --cc Top.v --exe tb_Top.cpp
