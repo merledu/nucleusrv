@@ -553,9 +553,9 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
   next_pc_sel = 0.U
   
 }}.otherwise{
-  val test = ex_reg_vl - (ex_reg_vl % 4.S)
+  val test = ex_reg_vl + (ex_reg_vl % 4.S)
   dontTouch(test)
-  when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - (ex_reg_vl % 4.S)).asUInt)|| (ex_reg_eew === 16.U && vlcount === (ex_reg_vl - 2.S).asUInt)|| (ex_reg_eew === 32.U && vlcount === (ex_reg_vl - 1.S).asUInt)|| (ex_reg_eew === 64.U && vlcount === (ex_reg_vl - 0.S).asUInt))){
+  when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl + (ex_reg_vl % 4.S)).asUInt)|| (ex_reg_eew === 16.U && vlcount === (ex_reg_vl - 2.S).asUInt)|| (ex_reg_eew === 32.U && vlcount === (ex_reg_vl - 1.S).asUInt)|| (ex_reg_eew === 64.U && vlcount === (ex_reg_vl - 0.S).asUInt))){
   
   addrcount := 0.U
   vlcount:= 0.U

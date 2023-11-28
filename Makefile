@@ -31,7 +31,37 @@ verilator: $(gen_dir)/VTop
 
 clean:
 	rm -rf $(gen_dir) $(out_dir) test_run_dir
-	
+	rm -rf obj_dir
+	rm *.v
+	rm *.fir
+	rm *.anno.json
+	rm *.f
 	
 compliance:
 	./run_compliance.sh $(ISA) $(TEST)
+
+IMEM=asm.txt
+
+rtl:
+	sbt "runMain nucleusrv.components.NRVDriver $(IMEM)"
+	(echo '/* verilator lint_off ASSIGNDLY */' && echo '/* verilator lint_off UNUSED */' && echo '/* verilator lint_off BLKSEQ */' && echo '/* verilator lint_off DECLFILENAME */' && cat Top.v) > temp && mv temp Top.v
+
+VERILATOR = verilator
+VERILATOR_FLAGS = -Wall --cc Top.v --exe tb_Top.cpp
+
+ver: 
+	@( $(VERILATOR) $(VERILATOR_FLAGS); \
+	   make -C obj_dir -f VTop.mk VTop) > ver_output.log 2>&1
+	   obj_dir/VTop > trace.log 2>&1
+
+sim: rtl ver
+
+PYTHON := $(shell command -v python3 || command -v python)
+ASM=test.s
+asmtohex:
+	$(PYTHON) ./tools/trace/scripts/assemblyParser.py --asm $(ASM) --hex assembly.hex
+
+
+dv:
+	$(MAKE) asmtohex
+	$(MAKE) IMEM=assembly.hex sim	
