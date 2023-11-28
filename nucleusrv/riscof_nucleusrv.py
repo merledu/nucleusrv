@@ -183,12 +183,13 @@ class nucleusrv(pluginTemplate):
                 F = f"cd ./tools/trace"
                 G = f"echo Generating log..."
                 H = "python3 /home/shassan/nucleusrv/tools/trace/scripts/sbtToLog.py --asm {}/nucleusrv.disass --sbt_dump /home/shassan/nucleusrv/trace.log --log {}/nucleusrv.log".format(testentry['work_dir'], testentry['work_dir'], testentry['work_dir'])
+                I = f"rm {testentry['work_dir']}/nucleusrv.hex && rm {testentry['work_dir']}/my.elf"
                 # simcmd = f"{self.dut_exe} {test}test.S"
             else:
                 simcmd = 'echo "NO RUN"'
 
           # concatenate all commands that need to be executed within a make-target.
-            execute = f"@cd {testentry['work_dir']}; {cmd}; {self.objdump}; {A}; {AA};{B}; {C}; {E}; {F}; {G}; cd {testentry['work_dir']}; {H}; {simcmd}"
+            execute = f"@cd {testentry['work_dir']}; {cmd}; {self.objdump}; {A}; {AA};{B}; {C}; {E}; {F}; {G}; cd {testentry['work_dir']}; {H}; {simcmd}; {I}"
 
           # create a target. The makeutil will create a target with the name "TARGET<num>" where num
           # starts from 0 and increments automatically for each new target that is added

@@ -1,6 +1,5 @@
 import argparse
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--log', type=str, help='core log file')
@@ -14,8 +13,6 @@ def main():
             columns = line.split()
             mem_wdata = columns[13]
             mem_inst_str = columns[14]
-            print(mem_wdata)
-            print(mem_inst_str)
             if mem_inst_str == "sw":
                 signatures.append(mem_wdata + '\n')
 
