@@ -1,5 +1,6 @@
 package nucleusrv.components
 import chisel3._
+import chisel3.stage.ChiselStage
 import nucleusrv.tracer._
 
 
@@ -10,7 +11,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     val fcsr = Output(UInt(32.W))
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=false, C=false, F=true, TRACE=false)
+  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -45,8 +46,10 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   }
 }
 
-object Top extends App{
+object NRVDriver {
   // generate verilog
-  val genVerilog = new chisel3.stage.ChiselStage()
-  genVerilog.emitVerilog(new Top(Some("program.hex"), Some("data.hex")), args)
+  def main(args: Array[String]): Unit = {
+      val IMem =  if (args.length > 0) args(0) else "program.hex"
+      new ChiselStage().emitVerilog(new Top(Some(IMem), Some("data.hex")))
+  }
 }
