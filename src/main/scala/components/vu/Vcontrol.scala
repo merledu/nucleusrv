@@ -35,7 +35,19 @@ class controldec extends Module {
     val opcode = io.Instruction(6, 0)
     val func3 = io.Instruction(14,12)
 
-
+// load write back
+    var c = RegInit(0.U(5.W))
+    when (io.Instruction(14,12) === BitPat("b???") && opcode ==="b0000111".U) {
+    c := 3.U}
+    // }.elsewhen (io.Instruction(14,12) === "b101".U && opcode ==="b0000111".U) {
+    // c := 7.U
+    // }.elsewhen (io.Instruction(14,12) === "b000".U && opcode ==="b0000111".U) {
+    // c := 15.U
+    // }
+    .otherwise{
+    c := 9.U
+    }
+    dontTouch(c)
 
     switch (opcode){
         is ("b1010111".U){ //vector operations
@@ -96,8 +108,19 @@ class controldec extends Module {
             io.vset := 0.B
             io.v_load := 1.B
             io.v_ins := 1.B
-            io.RegRead := 1.B
+
+        val reg123 = RegInit(0.U(32.W))
+        when((reg123 =/= c) && opcode==="b0000111".U){
+            reg123 := reg123 + 1.U
+            io.RegWrite := 0.B
+            io.V_MemToReg := 0.B
+        }
+        .otherwise{
+            reg123 := 0.U
+            io.RegWrite := 1.B
             io.V_MemToReg := 1.B
+        }
+            io.RegRead := 0.B
             io.V_MemRead := 1.B
 
         }
