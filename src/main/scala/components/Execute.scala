@@ -200,8 +200,10 @@ class Execute(M:Boolean = false) extends Module {
   io.vs0_o := vec_alu.io.vs0_o
 
   // Vector Config Module
-  val vec_config = Module(new vu.configure)
 
+  val vec_config = Module(new vu.configure)
+  // io.vec_vl := 0.S
+  val vlReg = RegInit(0.S(32.W))
   when(io.v_ctl_vset === 1.B) {
     vec_config.io.zimm := io.id_ex_ins(30, 20)
     vec_config.io.rs1 := io.id_ex_ins(19, 15)
@@ -214,15 +216,18 @@ class Execute(M:Boolean = false) extends Module {
       vec_config.io.rs1_readdata := io.readData1.asSInt
     }
     vec_config.io.current_vl := io.vl.asSInt
+    vlReg := vec_config.io.vl
+    io.vec_vl := vec_config.io.vl
   }.otherwise{
     vec_config.io.zimm := 0.U
     vec_config.io.rs1 := 0.U
     vec_config.io.rd := 0.U
     vec_config.io.rs1_readdata := 0.S
     vec_config.io.current_vl := io.vl.asSInt
+    io.vec_vl := vlReg
   }
 
-  io.vec_vl := vec_config.io.vl
+  // io.vec_vl := vlReg
   // io.vec_vl := io.vl.asSInt
   io.vec_rd_out := vec_config.io.rd_out
   io.vec_avl_o := vec_config.io.avl_o
