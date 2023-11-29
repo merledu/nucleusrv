@@ -99,15 +99,14 @@ class spike(pluginTemplate):
             #      toolchain is not riscv-gcc you may want to change the below code
             compile_cmd = cmd + ' -D' + " -D".join(testentry['macros'])
             execute+=compile_cmd+";"
-
             execute += self.objdump_cmd.format(elf, self.xlen, 'ref.disass')
             sig_file = os.path.join(test_dir, self.name[:-1] + ".signature")
-
+            a=f"--isa=rv{self.isa} +signature={sig_file} +signature-granularity=4 {test_dir}/ref.elf"
             #TODO: You will need to add any other arguments to your DUT
             #      executable if any in the quotes below
-            execute += self.ref_exe + ''
+            execute += self.ref_exe + a
 
-            #TODO: The following is useful only if your reference model can
+            #TODO: The following is useful only if yourself.ref_exe reference model can
             #      support coverage extraction from riscv-isac. Else leave it
             #      commented out
 
