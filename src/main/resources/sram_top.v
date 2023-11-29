@@ -1,8 +1,3 @@
-/* verilator lint_off ASSIGNDLY */
-/* verilator lint_off PINCONNECTEMPTY */
-/* verilator lint_off WIDTH */
-/* verilator lint_off UNUSED */
-/* verilator lint_off EOFNEWLINE */
 module sram_top #(
     parameter IFILE_IN = ""
 )

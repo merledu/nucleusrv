@@ -53,7 +53,6 @@ class ALUIO extends Bundle with Config {
     val vd = Input (SInt(128.W))
     val vl = Input(UInt(32.W))
     val vstart = Input(UInt(32.W))
-    // val vlmax = Input(SInt(32.W))
     val vma =Input(UInt(1.W)) //vtype
     val vta = Input(UInt(1.W))
     val vm =Input(UInt(1.W)) //umasked=1  , masked = 0
