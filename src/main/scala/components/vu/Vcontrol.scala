@@ -101,15 +101,14 @@ class controldec extends Module {
         }
         
         is ("b0000111".U){//vector load
-            io.RegWrite := 1.B
             io.opBsel := 0.B
             io.Ex_sel := 0.U
             io.aluop := 0.U
             io.vset := 0.B
             io.v_load := 1.B
             io.v_ins := 1.B
-
-        val reg123 = RegInit(0.U(32.W))
+          
+            val reg123 = RegInit(0.U(32.W))
         when((reg123 =/= c) && opcode==="b0000111".U){
             reg123 := reg123 + 1.U
             io.RegWrite := 0.B
