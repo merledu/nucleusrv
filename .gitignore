@@ -3,7 +3,7 @@ obj_dir
 *.fir
 *.anno.json
 *.f
-*.log
+# *.log
 ### Project Specific stuff
 test_run_dir/*
 .metals/*
@@ -23,7 +23,7 @@ riscv-arch-test/
 *.bgn
 *.bit
 *.bld
-*.cmd_log
+# *.cmd_log
 *.drc
 *.ll
 *.lso
@@ -326,7 +326,7 @@ xcuserdata
 *.xcuserstate
 ### Scala template
 *.class
-*.log
+# *.log
 
 # sbt specific
 .cache
