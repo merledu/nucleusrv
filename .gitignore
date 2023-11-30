@@ -121,7 +121,7 @@ local.properties
 *.o
 *.ko
 *.obj
-*.elf
+
 
 # Precompiled Headers
 *.gch
