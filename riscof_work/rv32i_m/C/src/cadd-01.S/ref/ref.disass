@@ -72,7 +72,7 @@ Disassembly of section .text.init:
 800000f8:	00000013          	nop
 800000fc:	00000013          	nop
 80000100:	00005417          	auipc	s0,0x5
-80000104:	01440413          	addi	s0,s0,20 # 80005114 <signature_x8_0>
+80000104:	f0440413          	addi	s0,s0,-252 # 80005004 <signature_x8_0>
 80000108:	00000013          	nop
 8000010c:	00000013          	nop
 80000110:	00000013          	nop
@@ -235,7 +235,7 @@ Disassembly of section .text.init:
 80000258:	00000013          	nop
 8000025c:	00000013          	nop
 80000260:	00005097          	auipc	ra,0x5
-80000264:	f1008093          	addi	ra,ra,-240 # 80005170 <signature_x1_0>
+80000264:	e0008093          	addi	ra,ra,-512 # 80005060 <signature_x1_0>
 80000268:	00000013          	nop
 8000026c:	00000013          	nop
 80000270:	00000013          	nop
@@ -3994,7 +3994,7 @@ Disassembly of section .text.init:
 800024ba:	00000013          	nop
 800024be:	0001                	nop
 800024c0:	00003097          	auipc	ra,0x3
-800024c4:	4b008093          	addi	ra,ra,1200 # 80005970 <signature_x1_1>
+800024c4:	3a008093          	addi	ra,ra,928 # 80005860 <signature_x1_1>
 800024c8:	00000013          	nop
 800024cc:	00000013          	nop
 800024d0:	00000013          	nop
@@ -4435,19 +4435,81 @@ Disassembly of section .data:
 80004014:	deadbeef          	jal	t4,7ffdf5fe <absimm+0x3aced0cf>
 	...
 
-80005000 <begin_regstate>:
-80005000:	0080                	addi	s0,sp,64
-	...
+80005000 <begin_signature>:
+80005000:	a309                	j	80005502 <signature_x1_0+0x4a2>
+80005002:	6f5c                	.2byte	0x6f5c
 
-80005100 <end_regstate>:
-80005100:	0004                	.2byte	0x4
-	...
+80005004 <signature_x8_0>:
+80005004:	deadbeef          	jal	t4,7ffe05ee <absimm+0x3acee0bf>
+80005008:	deadbeef          	jal	t4,7ffe05f2 <absimm+0x3acee0c3>
+8000500c:	deadbeef          	jal	t4,7ffe05f6 <absimm+0x3acee0c7>
+80005010:	deadbeef          	jal	t4,7ffe05fa <absimm+0x3acee0cb>
+80005014:	deadbeef          	jal	t4,7ffe05fe <absimm+0x3acee0cf>
+80005018:	deadbeef          	jal	t4,7ffe0602 <absimm+0x3acee0d3>
+8000501c:	deadbeef          	jal	t4,7ffe0606 <absimm+0x3acee0d7>
+80005020:	deadbeef          	jal	t4,7ffe060a <absimm+0x3acee0db>
+80005024:	deadbeef          	jal	t4,7ffe060e <absimm+0x3acee0df>
+80005028:	deadbeef          	jal	t4,7ffe0612 <absimm+0x3acee0e3>
+8000502c:	deadbeef          	jal	t4,7ffe0616 <absimm+0x3acee0e7>
+80005030:	deadbeef          	jal	t4,7ffe061a <absimm+0x3acee0eb>
+80005034:	deadbeef          	jal	t4,7ffe061e <absimm+0x3acee0ef>
+80005038:	deadbeef          	jal	t4,7ffe0622 <absimm+0x3acee0f3>
+8000503c:	deadbeef          	jal	t4,7ffe0626 <absimm+0x3acee0f7>
+80005040:	deadbeef          	jal	t4,7ffe062a <absimm+0x3acee0fb>
+80005044:	deadbeef          	jal	t4,7ffe062e <absimm+0x3acee0ff>
+80005048:	deadbeef          	jal	t4,7ffe0632 <absimm+0x3acee103>
+8000504c:	deadbeef          	jal	t4,7ffe0636 <absimm+0x3acee107>
+80005050:	deadbeef          	jal	t4,7ffe063a <absimm+0x3acee10b>
+80005054:	deadbeef          	jal	t4,7ffe063e <absimm+0x3acee10f>
+80005058:	deadbeef          	jal	t4,7ffe0642 <absimm+0x3acee113>
+8000505c:	deadbeef          	jal	t4,7ffe0646 <absimm+0x3acee117>
 
-80005110 <begin_signature>:
-80005110:	a309                	j	80005612 <signature_x1_0+0x4a2>
-80005112:	6f5c                	.2byte	0x6f5c
-
-80005114 <signature_x8_0>:
+80005060 <signature_x1_0>:
+80005060:	deadbeef          	jal	t4,7ffe064a <absimm+0x3acee11b>
+80005064:	deadbeef          	jal	t4,7ffe064e <absimm+0x3acee11f>
+80005068:	deadbeef          	jal	t4,7ffe0652 <absimm+0x3acee123>
+8000506c:	deadbeef          	jal	t4,7ffe0656 <absimm+0x3acee127>
+80005070:	deadbeef          	jal	t4,7ffe065a <absimm+0x3acee12b>
+80005074:	deadbeef          	jal	t4,7ffe065e <absimm+0x3acee12f>
+80005078:	deadbeef          	jal	t4,7ffe0662 <absimm+0x3acee133>
+8000507c:	deadbeef          	jal	t4,7ffe0666 <absimm+0x3acee137>
+80005080:	deadbeef          	jal	t4,7ffe066a <absimm+0x3acee13b>
+80005084:	deadbeef          	jal	t4,7ffe066e <absimm+0x3acee13f>
+80005088:	deadbeef          	jal	t4,7ffe0672 <absimm+0x3acee143>
+8000508c:	deadbeef          	jal	t4,7ffe0676 <absimm+0x3acee147>
+80005090:	deadbeef          	jal	t4,7ffe067a <absimm+0x3acee14b>
+80005094:	deadbeef          	jal	t4,7ffe067e <absimm+0x3acee14f>
+80005098:	deadbeef          	jal	t4,7ffe0682 <absimm+0x3acee153>
+8000509c:	deadbeef          	jal	t4,7ffe0686 <absimm+0x3acee157>
+800050a0:	deadbeef          	jal	t4,7ffe068a <absimm+0x3acee15b>
+800050a4:	deadbeef          	jal	t4,7ffe068e <absimm+0x3acee15f>
+800050a8:	deadbeef          	jal	t4,7ffe0692 <absimm+0x3acee163>
+800050ac:	deadbeef          	jal	t4,7ffe0696 <absimm+0x3acee167>
+800050b0:	deadbeef          	jal	t4,7ffe069a <absimm+0x3acee16b>
+800050b4:	deadbeef          	jal	t4,7ffe069e <absimm+0x3acee16f>
+800050b8:	deadbeef          	jal	t4,7ffe06a2 <absimm+0x3acee173>
+800050bc:	deadbeef          	jal	t4,7ffe06a6 <absimm+0x3acee177>
+800050c0:	deadbeef          	jal	t4,7ffe06aa <absimm+0x3acee17b>
+800050c4:	deadbeef          	jal	t4,7ffe06ae <absimm+0x3acee17f>
+800050c8:	deadbeef          	jal	t4,7ffe06b2 <absimm+0x3acee183>
+800050cc:	deadbeef          	jal	t4,7ffe06b6 <absimm+0x3acee187>
+800050d0:	deadbeef          	jal	t4,7ffe06ba <absimm+0x3acee18b>
+800050d4:	deadbeef          	jal	t4,7ffe06be <absimm+0x3acee18f>
+800050d8:	deadbeef          	jal	t4,7ffe06c2 <absimm+0x3acee193>
+800050dc:	deadbeef          	jal	t4,7ffe06c6 <absimm+0x3acee197>
+800050e0:	deadbeef          	jal	t4,7ffe06ca <absimm+0x3acee19b>
+800050e4:	deadbeef          	jal	t4,7ffe06ce <absimm+0x3acee19f>
+800050e8:	deadbeef          	jal	t4,7ffe06d2 <absimm+0x3acee1a3>
+800050ec:	deadbeef          	jal	t4,7ffe06d6 <absimm+0x3acee1a7>
+800050f0:	deadbeef          	jal	t4,7ffe06da <absimm+0x3acee1ab>
+800050f4:	deadbeef          	jal	t4,7ffe06de <absimm+0x3acee1af>
+800050f8:	deadbeef          	jal	t4,7ffe06e2 <absimm+0x3acee1b3>
+800050fc:	deadbeef          	jal	t4,7ffe06e6 <absimm+0x3acee1b7>
+80005100:	deadbeef          	jal	t4,7ffe06ea <absimm+0x3acee1bb>
+80005104:	deadbeef          	jal	t4,7ffe06ee <absimm+0x3acee1bf>
+80005108:	deadbeef          	jal	t4,7ffe06f2 <absimm+0x3acee1c3>
+8000510c:	deadbeef          	jal	t4,7ffe06f6 <absimm+0x3acee1c7>
+80005110:	deadbeef          	jal	t4,7ffe06fa <absimm+0x3acee1cb>
 80005114:	deadbeef          	jal	t4,7ffe06fe <absimm+0x3acee1cf>
 80005118:	deadbeef          	jal	t4,7ffe0702 <absimm+0x3acee1d3>
 8000511c:	deadbeef          	jal	t4,7ffe0706 <absimm+0x3acee1d7>
@@ -4471,8 +4533,6 @@ Disassembly of section .data:
 80005164:	deadbeef          	jal	t4,7ffe074e <absimm+0x3acee21f>
 80005168:	deadbeef          	jal	t4,7ffe0752 <absimm+0x3acee223>
 8000516c:	deadbeef          	jal	t4,7ffe0756 <absimm+0x3acee227>
-
-80005170 <signature_x1_0>:
 80005170:	deadbeef          	jal	t4,7ffe075a <absimm+0x3acee22b>
 80005174:	deadbeef          	jal	t4,7ffe075e <absimm+0x3acee22f>
 80005178:	deadbeef          	jal	t4,7ffe0762 <absimm+0x3acee233>
@@ -4917,6 +4977,8 @@ Disassembly of section .data:
 80005854:	deadbeef          	jal	t4,7ffe0e3e <absimm+0x3acee90f>
 80005858:	deadbeef          	jal	t4,7ffe0e42 <absimm+0x3acee913>
 8000585c:	deadbeef          	jal	t4,7ffe0e46 <absimm+0x3acee917>
+
+80005860 <signature_x1_1>:
 80005860:	deadbeef          	jal	t4,7ffe0e4a <absimm+0x3acee91b>
 80005864:	deadbeef          	jal	t4,7ffe0e4e <absimm+0x3acee91f>
 80005868:	deadbeef          	jal	t4,7ffe0e52 <absimm+0x3acee923>
@@ -4967,83 +5029,24 @@ Disassembly of section .data:
 8000591c:	deadbeef          	jal	t4,7ffe0f06 <absimm+0x3acee9d7>
 80005920:	deadbeef          	jal	t4,7ffe0f0a <absimm+0x3acee9db>
 80005924:	deadbeef          	jal	t4,7ffe0f0e <absimm+0x3acee9df>
-80005928:	deadbeef          	jal	t4,7ffe0f12 <absimm+0x3acee9e3>
-8000592c:	deadbeef          	jal	t4,7ffe0f16 <absimm+0x3acee9e7>
-80005930:	deadbeef          	jal	t4,7ffe0f1a <absimm+0x3acee9eb>
-80005934:	deadbeef          	jal	t4,7ffe0f1e <absimm+0x3acee9ef>
-80005938:	deadbeef          	jal	t4,7ffe0f22 <absimm+0x3acee9f3>
-8000593c:	deadbeef          	jal	t4,7ffe0f26 <absimm+0x3acee9f7>
-80005940:	deadbeef          	jal	t4,7ffe0f2a <absimm+0x3acee9fb>
-80005944:	deadbeef          	jal	t4,7ffe0f2e <absimm+0x3acee9ff>
-80005948:	deadbeef          	jal	t4,7ffe0f32 <absimm+0x3aceea03>
-8000594c:	deadbeef          	jal	t4,7ffe0f36 <absimm+0x3aceea07>
-80005950:	deadbeef          	jal	t4,7ffe0f3a <absimm+0x3aceea0b>
-80005954:	deadbeef          	jal	t4,7ffe0f3e <absimm+0x3aceea0f>
-80005958:	deadbeef          	jal	t4,7ffe0f42 <absimm+0x3aceea13>
-8000595c:	deadbeef          	jal	t4,7ffe0f46 <absimm+0x3aceea17>
-80005960:	deadbeef          	jal	t4,7ffe0f4a <absimm+0x3aceea1b>
-80005964:	deadbeef          	jal	t4,7ffe0f4e <absimm+0x3aceea1f>
-80005968:	deadbeef          	jal	t4,7ffe0f52 <absimm+0x3aceea23>
-8000596c:	deadbeef          	jal	t4,7ffe0f56 <absimm+0x3aceea27>
 
-80005970 <signature_x1_1>:
-80005970:	deadbeef          	jal	t4,7ffe0f5a <absimm+0x3aceea2b>
-80005974:	deadbeef          	jal	t4,7ffe0f5e <absimm+0x3aceea2f>
-80005978:	deadbeef          	jal	t4,7ffe0f62 <absimm+0x3aceea33>
-8000597c:	deadbeef          	jal	t4,7ffe0f66 <absimm+0x3aceea37>
-80005980:	deadbeef          	jal	t4,7ffe0f6a <absimm+0x3aceea3b>
-80005984:	deadbeef          	jal	t4,7ffe0f6e <absimm+0x3aceea3f>
-80005988:	deadbeef          	jal	t4,7ffe0f72 <absimm+0x3aceea43>
-8000598c:	deadbeef          	jal	t4,7ffe0f76 <absimm+0x3aceea47>
-80005990:	deadbeef          	jal	t4,7ffe0f7a <absimm+0x3aceea4b>
-80005994:	deadbeef          	jal	t4,7ffe0f7e <absimm+0x3aceea4f>
-80005998:	deadbeef          	jal	t4,7ffe0f82 <absimm+0x3aceea53>
-8000599c:	deadbeef          	jal	t4,7ffe0f86 <absimm+0x3aceea57>
-800059a0:	deadbeef          	jal	t4,7ffe0f8a <absimm+0x3aceea5b>
-800059a4:	deadbeef          	jal	t4,7ffe0f8e <absimm+0x3aceea5f>
-800059a8:	deadbeef          	jal	t4,7ffe0f92 <absimm+0x3aceea63>
-800059ac:	deadbeef          	jal	t4,7ffe0f96 <absimm+0x3aceea67>
-800059b0:	deadbeef          	jal	t4,7ffe0f9a <absimm+0x3aceea6b>
-800059b4:	deadbeef          	jal	t4,7ffe0f9e <absimm+0x3aceea6f>
-800059b8:	deadbeef          	jal	t4,7ffe0fa2 <absimm+0x3aceea73>
-800059bc:	deadbeef          	jal	t4,7ffe0fa6 <absimm+0x3aceea77>
-800059c0:	deadbeef          	jal	t4,7ffe0faa <absimm+0x3aceea7b>
-800059c4:	deadbeef          	jal	t4,7ffe0fae <absimm+0x3aceea7f>
-800059c8:	deadbeef          	jal	t4,7ffe0fb2 <absimm+0x3aceea83>
-800059cc:	deadbeef          	jal	t4,7ffe0fb6 <absimm+0x3aceea87>
-800059d0:	deadbeef          	jal	t4,7ffe0fba <absimm+0x3aceea8b>
-800059d4:	deadbeef          	jal	t4,7ffe0fbe <absimm+0x3aceea8f>
-800059d8:	deadbeef          	jal	t4,7ffe0fc2 <absimm+0x3aceea93>
-800059dc:	deadbeef          	jal	t4,7ffe0fc6 <absimm+0x3aceea97>
-800059e0:	deadbeef          	jal	t4,7ffe0fca <absimm+0x3aceea9b>
-800059e4:	deadbeef          	jal	t4,7ffe0fce <absimm+0x3aceea9f>
-800059e8:	deadbeef          	jal	t4,7ffe0fd2 <absimm+0x3aceeaa3>
-800059ec:	deadbeef          	jal	t4,7ffe0fd6 <absimm+0x3aceeaa7>
-800059f0:	deadbeef          	jal	t4,7ffe0fda <absimm+0x3aceeaab>
-800059f4:	deadbeef          	jal	t4,7ffe0fde <absimm+0x3aceeaaf>
-800059f8:	deadbeef          	jal	t4,7ffe0fe2 <absimm+0x3aceeab3>
-800059fc:	deadbeef          	jal	t4,7ffe0fe6 <absimm+0x3aceeab7>
-80005a00:	deadbeef          	jal	t4,7ffe0fea <absimm+0x3aceeabb>
-80005a04:	deadbeef          	jal	t4,7ffe0fee <absimm+0x3aceeabf>
-80005a08:	deadbeef          	jal	t4,7ffe0ff2 <absimm+0x3aceeac3>
-80005a0c:	deadbeef          	jal	t4,7ffe0ff6 <absimm+0x3aceeac7>
-80005a10:	deadbeef          	jal	t4,7ffe0ffa <absimm+0x3aceeacb>
-80005a14:	deadbeef          	jal	t4,7ffe0ffe <absimm+0x3aceeacf>
-80005a18:	deadbeef          	jal	t4,7ffe1002 <absimm+0x3aceead3>
-80005a1c:	deadbeef          	jal	t4,7ffe1006 <absimm+0x3aceead7>
-80005a20:	deadbeef          	jal	t4,7ffe100a <absimm+0x3aceeadb>
-80005a24:	deadbeef          	jal	t4,7ffe100e <absimm+0x3aceeadf>
-80005a28:	deadbeef          	jal	t4,7ffe1012 <absimm+0x3aceeae3>
-80005a2c:	deadbeef          	jal	t4,7ffe1016 <absimm+0x3aceeae7>
-80005a30:	deadbeef          	jal	t4,7ffe101a <absimm+0x3aceeaeb>
-80005a34:	deadbeef          	jal	t4,7ffe101e <absimm+0x3aceeaef>
+80005928 <sig_end_canary>:
+80005928:	a309                	j	80005e2a <_end+0x326>
+8000592a:	6f5c                	.2byte	0x6f5c
 
-80005a38 <sig_end_canary>:
-80005a38:	a309                	j	80005f3a <_end+0x4fa>
-80005a3a:	6f5c                	.2byte	0x6f5c
+8000592c <rvtest_sig_end>:
+8000592c:	0000                	unimp
+	...
 
-80005a3c <rvtest_sig_end>:
-80005a3c:	0000                	unimp
+80005930 <end_signature>:
+	...
+
+80005a00 <begin_regstate>:
+80005a00:	0080                	addi	s0,sp,64
+	...
+
+80005b00 <end_regstate>:
+80005b00:	0004                	.2byte	0x4
 	...
 
 Disassembly of section .riscv.attributes:

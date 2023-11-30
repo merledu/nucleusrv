@@ -174,7 +174,7 @@ class nucleusrv(pluginTemplate):
         
             if self.target_run:
             # set up the simulation command. Template is for spike. Please change.
-                simcmd = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/logToSignature.py --log {testentry['work_dir']}/nucleusrv.log --signature {testentry['work_dir']}/nucleusrv.signature"
+                simcmd = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/logToSignature.py --log {testentry['work_dir']}/nucleusrv.log --disass {testentry['work_dir']}/nucleusrv.disass --signature {testentry['work_dir']}/nucleusrv.signature"
                 A = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/assemblyParser.py --asm {testentry['work_dir']}/nucleusrv.disass --hex {testentry['work_dir']}/nucleusrv.hex"
                 AA = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/hex_cleaner.py --hex {testentry['work_dir']}/nucleusrv.hex"
                 B = f"cd "
@@ -189,7 +189,7 @@ class nucleusrv(pluginTemplate):
                 simcmd = 'echo "NO RUN"'
 
           # concatenate all commands that need to be executed within a make-target.
-            execute = f"@cd {testentry['work_dir']}; {cmd}; {self.objdump}; {A}; {AA};{B}; {C}; {E}; {F}; {G}; cd {testentry['work_dir']}; {H}; {simcmd}; {I}"
+            execute = f"@cd {testentry['work_dir']}; {cmd}; {self.objdump}; {A}; {AA};{B}; {C}; {E}; {F}; {G}; cd {testentry['work_dir']}; {H}; {simcmd}"
 
           # create a target. The makeutil will create a target with the name "TARGET<num>" where num
           # starts from 0 and increments automatically for each new target that is added
