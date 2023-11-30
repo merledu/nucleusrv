@@ -80,6 +80,8 @@ class Execute(M:Boolean = false) extends Module {
   fu.mem_regWrite := io.mem_wb_regWrite
   fu.ex_reg_rd := io.ex_mem_ins(11, 7)
   fu.mem_reg_rd := io.mem_wb_ins(11, 7)
+  fu.ex_opcode := io.ex_mem_ins(6, 0)
+  fu.mem_opcode := io.mem_wb_ins(6, 0)
   fu.reg_rs1 := io.id_ex_ins(19, 15)
   fu.reg_rs2 := io.id_ex_ins(24, 20)
 
