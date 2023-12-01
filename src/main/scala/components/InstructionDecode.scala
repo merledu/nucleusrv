@@ -209,6 +209,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
 
   val v_registers = Module(new vregfile)
   dontTouch(v_registers.io)
+  v_registers.io.wb_ins := io.mem_wb_ins
   v_registers.io.wb__emul := io.wb_emul
   v_registers.io.emul := io.id_reg_emul1
   v_registers.io.ins := io.id_instruction

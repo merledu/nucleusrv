@@ -9,6 +9,7 @@ import chisel3.stage.ChiselStage
 class vregfile extends Module {
   val io = IO (new Bundle {
     val ins = Input(UInt(32.W))
+    val wb_ins = Input(UInt(32.W))
     val vs1_addr = Input(UInt(5.W))
     val vs2_addr = Input(UInt(5.W))
     val vs3_addr = Input(UInt(5.W))
@@ -39,7 +40,7 @@ class vregfile extends Module {
   val vs1_in = Mux((io.ins(6,0)==="b1010111".U) && (io.ins(14,12)=/="b111".U),io.vs1_addr+io.lmul_vs1in_vs2in,Mux((io.ins(6,0)==="b0000111".U || io.ins(6,0)==="b0100111".U),io.vs1_addr+io.emul,0.U))
   val vs2_in = Mux((io.ins(6,0)==="b1010111".U) && (io.ins(14,12)=/="b111".U),io.vs2_addr+io.lmul_vs1in_vs2in,Mux((io.ins(6,0)==="b0000111".U || io.ins(6,0)==="b0100111".U),io.vs1_addr+io.emul,0.U))
   val vs3_in = Mux((io.ins(6,0)==="b1010111".U) && (io.ins(14,12)=/="b111".U),io.vs3_addr+io.lmul_vs1in_vs2in,Mux((io.ins(6,0)==="b0000111".U || io.ins(6,0)==="b0100111".U),io.vs1_addr+io.emul,0.U))
-  val vsd_in = Mux((io.ins(6,0)==="b1010111".U) && (io.ins(14,12)=/="b111".U),io.vd_addr+io.lmul_count,Mux((io.ins(6,0)==="b0000111".U || io.ins(6,0)==="b0100111".U),io.vs1_addr+io.wb__emul,0.U))
+  val vsd_in = Mux((io.wb_ins(6,0)==="b1010111".U) && (io.wb_ins(14,12)=/="b111".U),io.vd_addr+io.lmul_count,Mux((io.wb_ins(6,0)==="b0000111".U || io.wb_ins(6,0)==="b0100111".U),io.vd_addr+io.wb__emul,0.U))
 
   // var vs1_in = io.vs1_addr+io.lmul_vs1in_vs2in
   // var vs2_in = io.vs2_addr+io.lmul_vs1in_vs2in

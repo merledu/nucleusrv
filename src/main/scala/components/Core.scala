@@ -312,42 +312,42 @@ dontTouch(vlmul_count)
     //     if_reg_lmul_v := lmul_reg //paasing fetch stage
     // }
     val emul_reg = RegInit(0.U(32.W))
-    when(emul_reg =/= emul_count &&  instruction(6,0)==="b0100111".U ){
-  //paasing fetch stage
+  //   when(emul_reg =/= emul_count &&  instruction(6,0)==="b0100111".U ){
+  // //paasing fetch stage
         
-        when(vc3 =/= 4.U ){
-           vc3 := vc3 + 1.U
-           if_vc3 := emul_reg + 0.U
-           next_pc_selector := 1.U
+  //       when(vc3 =/= 4.U ){
+  //          vc3 := vc3 + 1.U
+  //          if_vc3 := emul_reg + 0.U
+  //          next_pc_selector := 1.U
 
-        //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
-        }.otherwise{
-          if_vc3 := emul_reg + 1.U
-          emul_reg := emul_reg +1.U
-          vc3 := 0.U
-          next_pc_selector := 0.U
-        }
-      }.elsewhen(emul_reg === emul_count &&  instruction(6,0)==="b0100111".U ){
-        //paasing fetch stage
+  //       //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
+  //       }.otherwise{
+  //         if_vc3 := emul_reg + 1.U
+  //         emul_reg := emul_reg +1.U
+  //         vc3 := 0.U
+  //         next_pc_selector := 0.U
+  //       }
+  //     }.elsewhen(emul_reg === emul_count &&  instruction(6,0)==="b0100111".U ){
+  //       //paasing fetch stage
          
-        when(vc3 =/= 4.U && instruction(6,0)==="b0100111".U ){
-           vc3 := vc3 + 1.U
-           if_vc3 := emul_reg + 0.U
-           emul_reg := emul_reg
-          next_pc_selector := 0.U
-        //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
-          }.otherwise{
-            if_vc3 := emul_reg + 0.U
-          emul_reg := 0.U
+  //       when(vc3 =/= 4.U && instruction(6,0)==="b0100111".U ){
+  //          vc3 := vc3 + 1.U
+  //          if_vc3 := emul_reg + 0.U
+  //          emul_reg := emul_reg
+  //         next_pc_selector := 0.U
+  //       //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
+  //         }.otherwise{
+  //           if_vc3 := emul_reg + 0.U
+  //         emul_reg := 0.U
           
 
-          next_pc_selector := 0.U
-          vc3 := 0.U
+  //         next_pc_selector := 0.U
+  //         vc3 := 0.U
 
-        }
+  //       }
              
 
-    }
+  //   }
     val delays = RegInit(1.U(32.W))
      when(lmul_reg =/= vlmul_count && instruction(6,0)==="b1010111".U && instruction(14,12)=/="b111".U){
         next_pc_selector := 1.U
