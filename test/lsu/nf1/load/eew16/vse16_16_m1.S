@@ -15,3 +15,4 @@ main:
     vse16.v v11 ,(x3)
     addi x5 , x0 , 10
     vle16.v v1, (x12)
+    vle16.v v3, (x22)

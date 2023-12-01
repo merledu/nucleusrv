@@ -15,3 +15,4 @@ main:
     vse8.v v11 ,(x3)
     addi x5 , x0 , 10
     vle8.v v1, (x12)
+    vle8.v v3, (x12)

@@ -5,7 +5,7 @@ main:
     addi x2 , x0 , 80
     addi x3 , x0 , 120
     addi x4 , x0, 135
-    vsetvli x1,x2, e8, m8,tu,mu
+    vsetvli x1,x3, e8, m8,tu,mu
     vadd.vx v2, v1, x3
     vadd.vx v10, v1 , x4
     addi x21 , x0,120
