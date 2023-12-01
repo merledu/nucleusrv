@@ -281,7 +281,12 @@ dontTouch(vlmul_count)
     
     val emul_count = WireInit(0.U(32.W))
     val vlcount1 = WireInit(0.U(32.W))
-    vlcount1 := (((vlsu.io.eew * ex_reg_vl) + 31.S) / 32.S).asUInt
+    when(instruction(6,0)==="b0100111".U){
+      vlcount1 := 4.U
+    }
+    .otherwise{
+      vlcount1 := 0.U
+    }
   when (vlsu.io.emul === 1.U && instruction(6,0)==="b0100111".U){
     // vlcount1 := 3.U
     emul_count := 0.U
