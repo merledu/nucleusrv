@@ -3335,7 +3335,7 @@ module SRamTop_1(
   wire [31:0] sram_wdata_i; // @[SRamTop.scala 21:22]
   wire [31:0] sram_rdata_o; // @[SRamTop.scala 21:22]
   reg  validReg; // @[SRamTop.scala 14:27]
-  sram_top #(.IFILE_IN("/home/hassan/imperas_test/VAADDU-VV-SEW8_LMUL1.hex")) sram ( // @[SRamTop.scala 21:22]
+  sram_top #(.IFILE_IN("/home/hassan/Downloads/nucleusrv/riscof_work/rv32i_m/I/src/add-01.S/dut/nucleusrv.hex")) sram ( // @[SRamTop.scala 21:22]
     .clk_i(sram_clk_i),
     .rst_i(sram_rst_i),
     .csb_i(sram_csb_i),

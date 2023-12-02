@@ -2627,7 +2627,7 @@ circuit Top :
     input wdata_i : UInt<32>
     output rdata_o : UInt<32>
     defname = sram_top
-    parameter IFILE_IN = "/home/hassan/imperas_test/VAADDU-VV-SEW8_LMUL1.hex"
+    parameter IFILE_IN = "/home/hassan/Downloads/nucleusrv/riscof_work/rv32i_m/I/src/add-01.S/dut/nucleusrv.hex"
 
   module SRamTop_1 :
     input clock : Clock

@@ -6,7 +6,7 @@
 
 #include "VTop___024root.h"
 
-extern const VlWide<13>/*415:0*/ VTop__ConstPool__CONST_h44a5001f_0;
+extern const VlWide<22>/*703:0*/ VTop__ConstPool__CONST_h065e7a33_0;
 
 VL_ATTR_COLD void VTop___024root___initial__TOP__0(VTop___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
@@ -16,7 +16,7 @@ VL_ATTR_COLD void VTop___024root___initial__TOP__0(VTop___024root* vlSelf) {
     VL_READMEM_N(true, 32, 8192, 0, std::string{"data.hex"}
                  ,  &(vlSelf->Top__DOT__dmem__DOT__sram__DOT__memory__DOT__mem)
                  , 0, ~0ULL);
-    VL_READMEM_N(true, 32, 8192, 0, VL_CVT_PACK_STR_NW(13, VTop__ConstPool__CONST_h44a5001f_0)
+    VL_READMEM_N(true, 32, 8192, 0, VL_CVT_PACK_STR_NW(22, VTop__ConstPool__CONST_h065e7a33_0)
                  ,  &(vlSelf->Top__DOT__imem__DOT__sram__DOT__memory__DOT__mem)
                  , 0, ~0ULL);
 }
