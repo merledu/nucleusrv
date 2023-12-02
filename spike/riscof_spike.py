@@ -101,7 +101,7 @@ class spike(pluginTemplate):
             execute+=compile_cmd+";"
             execute += self.objdump_cmd.format(elf, self.xlen, 'ref.disass')
             sig_file = os.path.join(test_dir, self.name[:-1] + ".signature")
-            a=f"--isa=rv{self.isa} +signature={sig_file} +signature-granularity=4 {test_dir}/ref.elf"
+            a=f" --isa={self.isa} +signature={sig_file} +signature-granularity=4 {test_dir}/ref.elf"
             #TODO: You will need to add any other arguments to your DUT
             #      executable if any in the quotes below
             execute += self.ref_exe + a

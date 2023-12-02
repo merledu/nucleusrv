@@ -1,4 +1,4 @@
-# testlist generated on 2023-12-01 17:27 GMT
+# testlist generated on 2023-12-01 20:31 GMT
 /home/shassan/riscv-arch-test/riscv-test-suite/rv32i_m/C/src/cadd-01.S:
   commit_id: b91f98f3a0e908bad4680c2e3901fbc24b63a563
   work_dir: /home/shassan/nucleusrv/riscof_work/rv32i_m/C/src/cadd-01.S

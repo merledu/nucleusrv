@@ -174,7 +174,7 @@ class nucleusrv(pluginTemplate):
         
             if self.target_run:
             # set up the simulation command. Template is for spike. Please change.
-                simcmd = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/logToSignature.py --log {testentry['work_dir']}/nucleusrv.log --disass {testentry['work_dir']}/nucleusrv.disass --signature {testentry['work_dir']}/nucleusrv.signature"
+                simcmd = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/logToSignature.py --log {testentry['work_dir']}/nucleusrv.log --disass {testentry['work_dir']}/nucleusrv.disass --signature {testentry['work_dir']}/DUT-nucleusrv.signature"
                 A = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/assemblyParser.py --asm {testentry['work_dir']}/nucleusrv.disass --hex {testentry['work_dir']}/nucleusrv.hex"
                 AA = f"python3 /home/shassan/nucleusrv/tools/trace/scripts/hex_cleaner.py --hex {testentry['work_dir']}/nucleusrv.hex"
                 B = f"cd "
