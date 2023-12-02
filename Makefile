@@ -56,3 +56,12 @@ ver:
 	   obj_dir/VTop > trace.log 2>&1
 
 sim: rtl ver
+PYTHON := $(shell command -v python3 || command -v python)
+ASM=test.s
+asmtohex:
+	$(PYTHON) ./tools/trace/scripts/assemblyParser.py --asm $(ASM) --hex assembly.hex
+
+
+dv:
+	$(MAKE) asmtohex
+	$(MAKE) IMEM=assembly.hex sim	
