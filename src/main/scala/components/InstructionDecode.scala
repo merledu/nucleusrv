@@ -68,7 +68,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     // vector register file
     val wb_emul = Input(UInt(5.W))
     val write_data = Input(SInt(128.W))
-    val id_reg_emul1 = Input(UInt(5.W))
+    // val id_reg_emul1 = Input(UInt(5.W))
     val wb_addr = Input(UInt(5.W))
     val wb_RegWrite = Input(Bool())
     val id_lmul_count = Input(UInt(4.W))
@@ -211,7 +211,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   dontTouch(v_registers.io)
   v_registers.io.wb_ins := io.mem_wb_ins
   v_registers.io.wb__emul := io.wb_emul
-  v_registers.io.emul := io.id_reg_emul1
+  // v_registers.io.emul := io.id_reg_emul1
   v_registers.io.ins := io.id_instruction
   v_registers.io.vd_data := io.write_data
   v_registers.io.vs1_addr := io.id_instruction(19, 15)
