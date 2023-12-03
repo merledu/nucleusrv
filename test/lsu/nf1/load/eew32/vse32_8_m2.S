@@ -12,4 +12,6 @@ main:
     addi x22 , x0 , 80
     addi x23 , x0,120
     vse32.v v8 ,(x2)
+    addi x2 , x0 , 80
+    addi x3 , x0 , 13
     vle32.v v12, (x22)
