@@ -3,7 +3,7 @@ import chisel3._
 import chisel3.util.MuxCase
 import vu._
 
-class Execute(M:Boolean = false) extends Module {
+class Execute(M:Boolean = true) extends Module {
   val io = IO(new Bundle {
     val immediate = Input(UInt(32.W))
     val readData1 = Input(UInt(32.W))
@@ -80,8 +80,7 @@ class Execute(M:Boolean = false) extends Module {
   fu.mem_regWrite := io.mem_wb_regWrite
   fu.ex_reg_rd := io.ex_mem_ins(11, 7)
   fu.mem_reg_rd := io.mem_wb_ins(11, 7)
-  
-  // vector Data Hazard 
+
   fu.ex_opcode := io.ex_mem_ins(6, 0)
   fu.mem_opcode := io.mem_wb_ins(6, 0)
   

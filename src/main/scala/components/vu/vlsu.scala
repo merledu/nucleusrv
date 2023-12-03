@@ -66,36 +66,43 @@ class VLSU extends Module {
 
 
 var emul=RegInit(0.U(4.W))
-
-when(
-  ((eew === sew)  && lmul === 1.U) ||
-  (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 2.U) ||
-  (((eew === 8.U && sew === 32.U) || (eew === 16.U && sew === 64.U)) && lmul === 4.U) ||
-  ((eew === 8.U && sew === 64.U) && lmul === 8.U)
-) {
-   emul := 1.U
-}.elsewhen(
-  (((eew === 16.U && sew === 8.U) || (eew === 32.U && sew === 16.U) || (eew === 64.U && sew === 32.U)) && lmul === 1.U) ||
-  ((eew === sew) && lmul === 2.U) ||
-  (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 4.U) ||
-  (((eew === 8.U && sew === 32.U) || (eew === 16.U && sew === 64.U)) && lmul === 8.U)
-) {
-   emul := 2.U
-}.elsewhen(
-  (((eew === 32.U && sew === 8.U) || (eew === 64.U && sew === 16.U)) && lmul === 1.U) ||
-  (((eew === 16.U && sew === 8.U) || (eew === 32.U && sew === 16.U) || (eew === 64.U && sew === 32.U)) && lmul === 2.U) ||
-  ((eew === sew) && lmul === 4.U) ||
-  (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 8.U)
-) {
-  emul := 4.U
-}.elsewhen(
-  (((eew === 64.U && sew === 8.U)) && lmul === 1.U) ||
-  (((eew === 32.U && sew === 8.U) || (eew === 64.U && sew === 16.U)) && lmul === 2.U) ||
-  (((eew === 16.U && sew === 8.U) || (eew === 64.U && sew === 32.U) || (eew === 32.U && sew === 16.U)) && lmul === 4.U) ||
-  ((eew === sew) && lmul === 8.U) 
-) {
-   emul := 8.U
+when((io.instr(6,0)==="b0100111".U || io.instr(6,0)==="b0000111".U)){
+  when(
+    ((eew === sew)  && lmul === 1.U) ||
+    (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 2.U) ||
+    (((eew === 8.U && sew === 32.U) || (eew === 16.U && sew === 64.U)) && lmul === 4.U) ||
+    ((eew === 8.U && sew === 64.U) && lmul === 8.U)
+  ) {
+    emul := 1.U
+  }.elsewhen(
+    (((eew === 16.U && sew === 8.U) || (eew === 32.U && sew === 16.U) || (eew === 64.U && sew === 32.U)) && lmul === 1.U) ||
+    ((eew === sew) && lmul === 2.U) ||
+    (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 4.U) ||
+    (((eew === 8.U && sew === 32.U) || (eew === 16.U && sew === 64.U)) && lmul === 8.U)
+  ) {
+    emul := 2.U
+  }.elsewhen(
+    (((eew === 32.U && sew === 8.U) || (eew === 64.U && sew === 16.U)) && lmul === 1.U) ||
+    (((eew === 16.U && sew === 8.U) || (eew === 32.U && sew === 16.U) || (eew === 64.U && sew === 32.U)) && lmul === 2.U) ||
+    ((eew === sew) && lmul === 4.U) ||
+    (((eew === 8.U && sew === 16.U) || (eew === 16.U && sew === 32.U) || (eew === 32.U && sew === 64.U)) && lmul === 8.U)
+  ) {
+    emul := 4.U
+  }.elsewhen(
+    (((eew === 64.U && sew === 8.U)) && lmul === 1.U) ||
+    (((eew === 32.U && sew === 8.U) || (eew === 64.U && sew === 16.U)) && lmul === 2.U) ||
+    (((eew === 16.U && sew === 8.U) || (eew === 64.U && sew === 32.U) || (eew === 32.U && sew === 16.U)) && lmul === 4.U) ||
+    ((eew === sew) && lmul === 8.U) 
+  ) {
+    emul := 8.U
+  }
+  .otherwise{
+    emul := 1.U
+  }
+}otherwise{
+  emul := 0.U
 }
+
 
 
 
