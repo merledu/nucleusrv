@@ -1,3 +1,4 @@
+%Warning: /home/hassan/Documents/nucleusrv/riscv-arch-test/work/rv32i/I-ADD-01.elf.data.hex:0: $readmem file not found
 ClkCycle:          6, pc_rdata: 00000000, pc_wdata: 00000004, insn: 0440006f, mode: 3, rs1_addr:  0, rs1_rdata: 00000000, rs2_addr:  4, rs2_rdata: 00000000, rd_addr:  0, rd_wdata: 00000004, mem_addr: 00000044, mem_rdata: 00000000, mem_wdata: 00000000
 ClkCycle:          7, pc_rdata: 00000004, pc_wdata: 00000044, insn: 342022f3, mode: 3, rs1_addr:  0, rs1_rdata: 00000000, rs2_addr:  0, rs2_rdata: 00000000, rd_addr:  0, rd_wdata: 00000000, mem_addr: 00000000, mem_rdata: 00000000, mem_wdata: 00000000
 ClkCycle:          8, pc_rdata: 00000044, pc_wdata: 00000048, insn: 00002537, mode: 3, rs1_addr:  0, rs1_rdata: 00000000, rs2_addr:  0, rs2_rdata: 00000000, rd_addr: 10, rd_wdata: 00002000, mem_addr: 00002000, mem_rdata: 00000000, mem_wdata: 00000000

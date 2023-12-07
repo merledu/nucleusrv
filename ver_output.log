@@ -29,7 +29,7 @@
    33 |   if(rst_i) begin
       |      ^~~~~
 %Error: Exiting due to 5 warning(s)
-make[1]: Entering directory '/home/hassan/Documents/nucleusrv/obj_dir'
+make[1]: Entering directory '/home/hassan/nucleusrv/obj_dir'
 ccache g++  -I.  -MMD -I/home/hassan/verilator/include -I/home/hassan/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow      -std=gnu++17 -Os -c -o tb_Top.o ../tb_Top.cpp
 ccache g++  -I.  -MMD -I/home/hassan/verilator/include -I/home/hassan/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow      -std=gnu++17 -Os -c -o verilated.o /home/hassan/verilator/include/verilated.cpp
 /usr/bin/perl /home/hassan/verilator/bin/verilator_includer -DVL_INCLUDE_OPT=include VTop.cpp VTop___024root__DepSet_h0d2e5939__0.cpp VTop__ConstPool_0.cpp VTop___024root__Slow.cpp VTop___024root__DepSet_h0d2e5939__0__Slow.cpp VTop__Syms.cpp > VTop__ALL.cpp
@@ -38,4 +38,4 @@ echo "" > VTop__ALL.verilator_deplist.tmp
 Archive ar -rcs VTop__ALL.a VTop__ALL.o
 g++    tb_Top.o verilated.o VTop__ALL.a      -o VTop
 rm VTop__ALL.verilator_deplist.tmp
-make[1]: Leaving directory '/home/hassan/Documents/nucleusrv/obj_dir'
+make[1]: Leaving directory '/home/hassan/nucleusrv/obj_dir'

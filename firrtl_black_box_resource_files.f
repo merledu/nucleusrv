@@ -1,2 +1,2 @@
-/home/hassan/Documents/nucleusrv/sram.v
-/home/hassan/Documents/nucleusrv/sram_top.v
+/home/hassan/nucleusrv/sram.v
+/home/hassan/nucleusrv/sram_top.v
