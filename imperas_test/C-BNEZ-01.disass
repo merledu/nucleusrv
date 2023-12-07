@@ -1,0 +1,1799 @@
+
+/home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-BNEZ-01.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text.init:
+
+80000000 <rvtest_entry_point>:
+80000000:	a82d                	j	8000003a <reset_vector>
+80000002:	0001                	nop
+
+80000004 <trap_vector>:
+80000004:	342022f3          	csrr	t0,mcause
+80000008:	4321                	li	t1,8
+8000000a:	02628363          	beq	t0,t1,80000030 <write_tohost>
+8000000e:	4325                	li	t1,9
+80000010:	02628063          	beq	t0,t1,80000030 <write_tohost>
+80000014:	432d                	li	t1,11
+80000016:	00628d63          	beq	t0,t1,80000030 <write_tohost>
+8000001a:	00000293          	li	t0,0
+8000001e:	00028363          	beqz	t0,80000024 <trap_vector+0x20>
+80000022:	8282                	jr	t0
+80000024:	342022f3          	csrr	t0,mcause
+80000028:	0002d263          	bgez	t0,8000002c <handle_exception>
+
+8000002c <handle_exception>:
+8000002c:	5391e193          	or	gp,gp,1337
+
+80000030 <write_tohost>:
+80000030:	00002297          	auipc	t0,0x2
+80000034:	fc32a823          	sw	gp,-48(t0) # 80002000 <tohost>
+80000038:	bfe5                	j	80000030 <write_tohost>
+
+8000003a <reset_vector>:
+8000003a:	6509                	lui	a0,0x2
+8000003c:	80050513          	add	a0,a0,-2048 # 1800 <offset+0x1800>
+80000040:	30052073          	csrs	mstatus,a0
+80000044:	00000297          	auipc	t0,0x0
+80000048:	fc028293          	add	t0,t0,-64 # 80000004 <trap_vector>
+8000004c:	30529073          	csrw	mtvec,t0
+80000050:	00000297          	auipc	t0,0x0
+80000054:	03028293          	add	t0,t0,48 # 80000080 <rvtest_init>
+80000058:	34129073          	csrw	mepc,t0
+8000005c:	f1402573          	csrr	a0,mhartid
+80000060:	30200073          	mret
+80000064:	00000013          	nop
+80000068:	00000013          	nop
+8000006c:	00000013          	nop
+80000070:	00000013          	nop
+80000074:	00000013          	nop
+80000078:	00000013          	nop
+8000007c:	00000013          	nop
+
+80000080 <rvtest_init>:
+80000080:	feedc0b7          	lui	ra,0xfeedc
+80000084:	ead08093          	add	ra,ra,-339 # feedbead <_end+0x7eed8aa9>
+80000088:	ff76e137          	lui	sp,0xff76e
+8000008c:	f5610113          	add	sp,sp,-170 # ff76df56 <_end+0x7f76ab52>
+80000090:	7fbb71b7          	lui	gp,0x7fbb7
+80000094:	fab18193          	add	gp,gp,-85 # 7fbb6fab <offset+0x7fbb6fab>
+80000098:	bfddb237          	lui	tp,0xbfddb
+8000009c:	7d520213          	add	tp,tp,2005 # bfddb7d5 <_end+0x3fdd83d1>
+800000a0:	00000297          	auipc	t0,0x0
+800000a4:	0d828293          	add	t0,t0,216 # 80000178 <rvtest_code_begin>
+800000a8:	00003317          	auipc	t1,0x3
+800000ac:	f5830313          	add	t1,t1,-168 # 80003000 <rvtest_data_begin>
+800000b0:	b7fbb3b7          	lui	t2,0xb7fbb
+800000b4:	6fa38393          	add	t2,t2,1786 # b7fbb6fa <_end+0x37fb82f6>
+800000b8:	5bfde437          	lui	s0,0x5bfde
+800000bc:	b7d40413          	add	s0,s0,-1155 # 5bfddb7d <offset+0x5bfddb7d>
+800000c0:	adfef4b7          	lui	s1,0xadfef
+800000c4:	dbe48493          	add	s1,s1,-578 # adfeedbe <_end+0x2dfeb9ba>
+800000c8:	56ff7537          	lui	a0,0x56ff7
+800000cc:	6df50513          	add	a0,a0,1759 # 56ff76df <offset+0x56ff76df>
+800000d0:	ab7fc5b7          	lui	a1,0xab7fc
+800000d4:	b6f58593          	add	a1,a1,-1169 # ab7fbb6f <_end+0x2b7f876b>
+800000d8:	d5bfe637          	lui	a2,0xd5bfe
+800000dc:	db760613          	add	a2,a2,-585 # d5bfddb7 <_end+0x55bfa9b3>
+800000e0:	eadff6b7          	lui	a3,0xeadff
+800000e4:	edb68693          	add	a3,a3,-293 # eadfeedb <_end+0x6adfbad7>
+800000e8:	f56ff737          	lui	a4,0xf56ff
+800000ec:	76d70713          	add	a4,a4,1901 # f56ff76d <_end+0x756fc369>
+800000f0:	fab807b7          	lui	a5,0xfab80
+800000f4:	bb678793          	add	a5,a5,-1098 # fab7fbb6 <_end+0x7ab7c7b2>
+800000f8:	7d5c0837          	lui	a6,0x7d5c0
+800000fc:	ddb80813          	add	a6,a6,-549 # 7d5bfddb <offset+0x7d5bfddb>
+80000100:	beae08b7          	lui	a7,0xbeae0
+80000104:	eed88893          	add	a7,a7,-275 # beadfeed <_end+0x3eadcae9>
+80000108:	df570937          	lui	s2,0xdf570
+8000010c:	f7690913          	add	s2,s2,-138 # df56ff76 <_end+0x5f56cb72>
+80000110:	6fab89b7          	lui	s3,0x6fab8
+80000114:	fbb98993          	add	s3,s3,-69 # 6fab7fbb <offset+0x6fab7fbb>
+80000118:	b7d5ca37          	lui	s4,0xb7d5c
+8000011c:	fdda0a13          	add	s4,s4,-35 # b7d5bfdd <_end+0x37d58bd9>
+80000120:	dbeaeab7          	lui	s5,0xdbeae
+80000124:	feea8a93          	add	s5,s5,-18 # dbeadfee <_end+0x5beaabea>
+80000128:	6df57b37          	lui	s6,0x6df57
+8000012c:	ff7b0b13          	add	s6,s6,-9 # 6df56ff7 <offset+0x6df56ff7>
+80000130:	b6fabbb7          	lui	s7,0xb6fab
+80000134:	7fbb8b93          	add	s7,s7,2043 # b6fab7fb <_end+0x36fa83f7>
+80000138:	db7d6c37          	lui	s8,0xdb7d6
+8000013c:	bfdc0c13          	add	s8,s8,-1027 # db7d5bfd <_end+0x5b7d27f9>
+80000140:	edbebcb7          	lui	s9,0xedbeb
+80000144:	dfec8c93          	add	s9,s9,-514 # edbeadfe <_end+0x6dbe79fa>
+80000148:	76df5d37          	lui	s10,0x76df5
+8000014c:	6ffd0d13          	add	s10,s10,1791 # 76df56ff <offset+0x76df56ff>
+80000150:	bb6fbdb7          	lui	s11,0xbb6fb
+80000154:	b7fd8d93          	add	s11,s11,-1153 # bb6fab7f <_end+0x3b6f777b>
+80000158:	ddb7de37          	lui	t3,0xddb7d
+8000015c:	5bfe0e13          	add	t3,t3,1471 # ddb7d5bf <_end+0x5db7a1bb>
+80000160:	eedbfeb7          	lui	t4,0xeedbf
+80000164:	adfe8e93          	add	t4,t4,-1313 # eedbeadf <_end+0x6edbb6db>
+80000168:	f76dff37          	lui	t5,0xf76df
+8000016c:	56ff0f13          	add	t5,t5,1391 # f76df56f <_end+0x776dc16b>
+80000170:	fbb70fb7          	lui	t6,0xfbb70
+80000174:	ab7f8f93          	add	t6,t6,-1353 # fbb6fab7 <_end+0x7bb6c6b3>
+
+80000178 <rvtest_code_begin>:
+80000178:	00003097          	auipc	ra,0x3
+8000017c:	e9808093          	add	ra,ra,-360 # 80003010 <begin_signature>
+80000180:	61b5                	lui	gp,0xd
+80000182:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000186:	54f4b5b7          	lui	a1,0x54f4b
+8000018a:	eeb58593          	add	a1,a1,-277 # 54f4aeeb <offset+0x54f4aeeb>
+8000018e:	e581                	bnez	a1,80000196 <rvtest_code_begin+0x1e>
+80000190:	61c9                	lui	gp,0x12
+80000192:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000196:	0030a023          	sw	gp,0(ra)
+8000019a:	61b5                	lui	gp,0xd
+8000019c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800001a0:	e1b12637          	lui	a2,0xe1b12
+800001a4:	99b60613          	add	a2,a2,-1637 # e1b1199b <_end+0x61b0e597>
+800001a8:	e601                	bnez	a2,800001b0 <rvtest_code_begin+0x38>
+800001aa:	61c9                	lui	gp,0x12
+800001ac:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800001b0:	0030a223          	sw	gp,4(ra)
+800001b4:	0080006f          	j	800001bc <rvtest_code_begin+0x44>
+800001b8:	01a0006f          	j	800001d2 <rvtest_code_begin+0x5a>
+800001bc:	61b5                	lui	gp,0xd
+800001be:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800001c2:	b2656737          	lui	a4,0xb2656
+800001c6:	6a070713          	add	a4,a4,1696 # b26566a0 <_end+0x3265329c>
+800001ca:	f77d                	bnez	a4,800001b8 <rvtest_code_begin+0x40>
+800001cc:	61c9                	lui	gp,0x12
+800001ce:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800001d2:	0030a423          	sw	gp,8(ra)
+800001d6:	61b5                	lui	gp,0xd
+800001d8:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800001dc:	f2701637          	lui	a2,0xf2701
+800001e0:	8e660613          	add	a2,a2,-1818 # f27008e6 <_end+0x726fd4e2>
+800001e4:	e601                	bnez	a2,800001ec <rvtest_code_begin+0x74>
+800001e6:	61c9                	lui	gp,0x12
+800001e8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800001ec:	0030a623          	sw	gp,12(ra)
+800001f0:	61b5                	lui	gp,0xd
+800001f2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800001f6:	0c848537          	lui	a0,0xc848
+800001fa:	4a350513          	add	a0,a0,1187 # c8484a3 <offset+0xc8484a3>
+800001fe:	e501                	bnez	a0,80000206 <rvtest_code_begin+0x8e>
+80000200:	61c9                	lui	gp,0x12
+80000202:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000206:	0030a823          	sw	gp,16(ra)
+8000020a:	00003097          	auipc	ra,0x3
+8000020e:	e1a08093          	add	ra,ra,-486 # 80003024 <signature_2_0>
+80000212:	61b5                	lui	gp,0xd
+80000214:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000218:	a783d437          	lui	s0,0xa783d
+8000021c:	03f40413          	add	s0,s0,63 # a783d03f <_end+0x27839c3b>
+80000220:	e401                	bnez	s0,80000228 <rvtest_code_begin+0xb0>
+80000222:	61c9                	lui	gp,0x12
+80000224:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000228:	0030a023          	sw	gp,0(ra)
+8000022c:	61b5                	lui	gp,0xd
+8000022e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000232:	fd7ba5b7          	lui	a1,0xfd7ba
+80000236:	df858593          	add	a1,a1,-520 # fd7b9df8 <_end+0x7d7b69f4>
+8000023a:	e581                	bnez	a1,80000242 <rvtest_code_begin+0xca>
+8000023c:	61c9                	lui	gp,0x12
+8000023e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000242:	0030a223          	sw	gp,4(ra)
+80000246:	0080006f          	j	8000024e <rvtest_code_begin+0xd6>
+8000024a:	01a0006f          	j	80000264 <rvtest_code_begin+0xec>
+8000024e:	61b5                	lui	gp,0xd
+80000250:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000254:	0afaa7b7          	lui	a5,0xafaa
+80000258:	29d78793          	add	a5,a5,669 # afaa29d <offset+0xafaa29d>
+8000025c:	f7fd                	bnez	a5,8000024a <rvtest_code_begin+0xd2>
+8000025e:	61c9                	lui	gp,0x12
+80000260:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000264:	0030a423          	sw	gp,8(ra)
+80000268:	61b5                	lui	gp,0xd
+8000026a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000026e:	413f36b7          	lui	a3,0x413f3
+80000272:	c6268693          	add	a3,a3,-926 # 413f2c62 <offset+0x413f2c62>
+80000276:	e681                	bnez	a3,8000027e <rvtest_code_begin+0x106>
+80000278:	61c9                	lui	gp,0x12
+8000027a:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000027e:	0030a623          	sw	gp,12(ra)
+80000282:	61b5                	lui	gp,0xd
+80000284:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000288:	2c3716b7          	lui	a3,0x2c371
+8000028c:	a9a68693          	add	a3,a3,-1382 # 2c370a9a <offset+0x2c370a9a>
+80000290:	e681                	bnez	a3,80000298 <rvtest_code_begin+0x120>
+80000292:	61c9                	lui	gp,0x12
+80000294:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000298:	0030a823          	sw	gp,16(ra)
+8000029c:	00003097          	auipc	ra,0x3
+800002a0:	d9c08093          	add	ra,ra,-612 # 80003038 <signature_3_0>
+800002a4:	61b5                	lui	gp,0xd
+800002a6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800002aa:	2882a437          	lui	s0,0x2882a
+800002ae:	0b340413          	add	s0,s0,179 # 2882a0b3 <offset+0x2882a0b3>
+800002b2:	e401                	bnez	s0,800002ba <rvtest_code_begin+0x142>
+800002b4:	61c9                	lui	gp,0x12
+800002b6:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800002ba:	0030a023          	sw	gp,0(ra)
+800002be:	61b5                	lui	gp,0xd
+800002c0:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800002c4:	91dd66b7          	lui	a3,0x91dd6
+800002c8:	ad668693          	add	a3,a3,-1322 # 91dd5ad6 <_end+0x11dd26d2>
+800002cc:	e681                	bnez	a3,800002d4 <rvtest_code_begin+0x15c>
+800002ce:	61c9                	lui	gp,0x12
+800002d0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800002d4:	0030a223          	sw	gp,4(ra)
+800002d8:	0080006f          	j	800002e0 <rvtest_code_begin+0x168>
+800002dc:	01a0006f          	j	800002f6 <rvtest_code_begin+0x17e>
+800002e0:	61b5                	lui	gp,0xd
+800002e2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800002e6:	42f1d637          	lui	a2,0x42f1d
+800002ea:	62960613          	add	a2,a2,1577 # 42f1d629 <offset+0x42f1d629>
+800002ee:	f67d                	bnez	a2,800002dc <rvtest_code_begin+0x164>
+800002f0:	61c9                	lui	gp,0x12
+800002f2:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800002f6:	0030a423          	sw	gp,8(ra)
+800002fa:	61b5                	lui	gp,0xd
+800002fc:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000300:	cddbe5b7          	lui	a1,0xcddbe
+80000304:	f6f58593          	add	a1,a1,-145 # cddbdf6f <_end+0x4ddbab6b>
+80000308:	e581                	bnez	a1,80000310 <rvtest_code_begin+0x198>
+8000030a:	61c9                	lui	gp,0x12
+8000030c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000310:	0030a623          	sw	gp,12(ra)
+80000314:	61b5                	lui	gp,0xd
+80000316:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000031a:	4d2374b7          	lui	s1,0x4d237
+8000031e:	af848493          	add	s1,s1,-1288 # 4d236af8 <offset+0x4d236af8>
+80000322:	e481                	bnez	s1,8000032a <rvtest_code_begin+0x1b2>
+80000324:	61c9                	lui	gp,0x12
+80000326:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000032a:	0030a823          	sw	gp,16(ra)
+8000032e:	00003097          	auipc	ra,0x3
+80000332:	d1e08093          	add	ra,ra,-738 # 8000304c <signature_4_0>
+80000336:	61b5                	lui	gp,0xd
+80000338:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000033c:	983ba537          	lui	a0,0x983ba
+80000340:	f6350513          	add	a0,a0,-157 # 983b9f63 <_end+0x183b6b5f>
+80000344:	e501                	bnez	a0,8000034c <rvtest_code_begin+0x1d4>
+80000346:	61c9                	lui	gp,0x12
+80000348:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000034c:	0030a023          	sw	gp,0(ra)
+80000350:	61b5                	lui	gp,0xd
+80000352:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000356:	1fbe4537          	lui	a0,0x1fbe4
+8000035a:	ca650513          	add	a0,a0,-858 # 1fbe3ca6 <offset+0x1fbe3ca6>
+8000035e:	e501                	bnez	a0,80000366 <rvtest_code_begin+0x1ee>
+80000360:	61c9                	lui	gp,0x12
+80000362:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000366:	0030a223          	sw	gp,4(ra)
+8000036a:	0080006f          	j	80000372 <rvtest_code_begin+0x1fa>
+8000036e:	01a0006f          	j	80000388 <rvtest_code_begin+0x210>
+80000372:	61b5                	lui	gp,0xd
+80000374:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000378:	353a8537          	lui	a0,0x353a8
+8000037c:	59350513          	add	a0,a0,1427 # 353a8593 <offset+0x353a8593>
+80000380:	f57d                	bnez	a0,8000036e <rvtest_code_begin+0x1f6>
+80000382:	61c9                	lui	gp,0x12
+80000384:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000388:	0030a423          	sw	gp,8(ra)
+8000038c:	61b5                	lui	gp,0xd
+8000038e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000392:	662697b7          	lui	a5,0x66269
+80000396:	a1a78793          	add	a5,a5,-1510 # 66268a1a <offset+0x66268a1a>
+8000039a:	e781                	bnez	a5,800003a2 <rvtest_code_begin+0x22a>
+8000039c:	61c9                	lui	gp,0x12
+8000039e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800003a2:	0030a623          	sw	gp,12(ra)
+800003a6:	61b5                	lui	gp,0xd
+800003a8:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800003ac:	28ac54b7          	lui	s1,0x28ac5
+800003b0:	4a348493          	add	s1,s1,1187 # 28ac54a3 <offset+0x28ac54a3>
+800003b4:	e481                	bnez	s1,800003bc <rvtest_code_begin+0x244>
+800003b6:	61c9                	lui	gp,0x12
+800003b8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800003bc:	0030a823          	sw	gp,16(ra)
+800003c0:	00003097          	auipc	ra,0x3
+800003c4:	ca008093          	add	ra,ra,-864 # 80003060 <signature_5_0>
+800003c8:	61b5                	lui	gp,0xd
+800003ca:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800003ce:	dc3717b7          	lui	a5,0xdc371
+800003d2:	3a278793          	add	a5,a5,930 # dc3713a2 <_end+0x5c36df9e>
+800003d6:	e781                	bnez	a5,800003de <rvtest_code_begin+0x266>
+800003d8:	61c9                	lui	gp,0x12
+800003da:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800003de:	0030a023          	sw	gp,0(ra)
+800003e2:	61b5                	lui	gp,0xd
+800003e4:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800003e8:	746744b7          	lui	s1,0x74674
+800003ec:	39948493          	add	s1,s1,921 # 74674399 <offset+0x74674399>
+800003f0:	e481                	bnez	s1,800003f8 <rvtest_code_begin+0x280>
+800003f2:	61c9                	lui	gp,0x12
+800003f4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800003f8:	0030a223          	sw	gp,4(ra)
+800003fc:	0080006f          	j	80000404 <rvtest_code_begin+0x28c>
+80000400:	01a0006f          	j	8000041a <rvtest_code_begin+0x2a2>
+80000404:	61b5                	lui	gp,0xd
+80000406:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000040a:	6bdda7b7          	lui	a5,0x6bdda
+8000040e:	82178793          	add	a5,a5,-2015 # 6bdd9821 <offset+0x6bdd9821>
+80000412:	f7fd                	bnez	a5,80000400 <rvtest_code_begin+0x288>
+80000414:	61c9                	lui	gp,0x12
+80000416:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000041a:	0030a423          	sw	gp,8(ra)
+8000041e:	61b5                	lui	gp,0xd
+80000420:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000424:	825657b7          	lui	a5,0x82565
+80000428:	8e478793          	add	a5,a5,-1820 # 825648e4 <_end+0x25614e0>
+8000042c:	e781                	bnez	a5,80000434 <rvtest_code_begin+0x2bc>
+8000042e:	61c9                	lui	gp,0x12
+80000430:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000434:	0030a623          	sw	gp,12(ra)
+80000438:	61b5                	lui	gp,0xd
+8000043a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000043e:	7bf4f6b7          	lui	a3,0x7bf4f
+80000442:	f1c68693          	add	a3,a3,-228 # 7bf4ef1c <offset+0x7bf4ef1c>
+80000446:	e681                	bnez	a3,8000044e <rvtest_code_begin+0x2d6>
+80000448:	61c9                	lui	gp,0x12
+8000044a:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000044e:	0030a823          	sw	gp,16(ra)
+80000452:	00003097          	auipc	ra,0x3
+80000456:	c2208093          	add	ra,ra,-990 # 80003074 <signature_6_0>
+8000045a:	61b5                	lui	gp,0xd
+8000045c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000460:	0f49a437          	lui	s0,0xf49a
+80000464:	4b240413          	add	s0,s0,1202 # f49a4b2 <offset+0xf49a4b2>
+80000468:	e401                	bnez	s0,80000470 <rvtest_code_begin+0x2f8>
+8000046a:	61c9                	lui	gp,0x12
+8000046c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000470:	0030a023          	sw	gp,0(ra)
+80000474:	61b5                	lui	gp,0xd
+80000476:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000047a:	fe9b9737          	lui	a4,0xfe9b9
+8000047e:	abf70713          	add	a4,a4,-1345 # fe9b8abf <_end+0x7e9b56bb>
+80000482:	e701                	bnez	a4,8000048a <rvtest_code_begin+0x312>
+80000484:	61c9                	lui	gp,0x12
+80000486:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000048a:	0030a223          	sw	gp,4(ra)
+8000048e:	0080006f          	j	80000496 <rvtest_code_begin+0x31e>
+80000492:	01a0006f          	j	800004ac <rvtest_code_begin+0x334>
+80000496:	61b5                	lui	gp,0xd
+80000498:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000049c:	347ec437          	lui	s0,0x347ec
+800004a0:	c8940413          	add	s0,s0,-887 # 347ebc89 <offset+0x347ebc89>
+800004a4:	f47d                	bnez	s0,80000492 <rvtest_code_begin+0x31a>
+800004a6:	61c9                	lui	gp,0x12
+800004a8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800004ac:	0030a423          	sw	gp,8(ra)
+800004b0:	61b5                	lui	gp,0xd
+800004b2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800004b6:	f52a54b7          	lui	s1,0xf52a5
+800004ba:	2bf48493          	add	s1,s1,703 # f52a52bf <_end+0x752a1ebb>
+800004be:	e481                	bnez	s1,800004c6 <rvtest_code_begin+0x34e>
+800004c0:	61c9                	lui	gp,0x12
+800004c2:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800004c6:	0030a623          	sw	gp,12(ra)
+800004ca:	61b5                	lui	gp,0xd
+800004cc:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800004d0:	caa4c7b7          	lui	a5,0xcaa4c
+800004d4:	80e78793          	add	a5,a5,-2034 # caa4b80e <_end+0x4aa4840a>
+800004d8:	e781                	bnez	a5,800004e0 <rvtest_code_begin+0x368>
+800004da:	61c9                	lui	gp,0x12
+800004dc:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800004e0:	0030a823          	sw	gp,16(ra)
+800004e4:	00003097          	auipc	ra,0x3
+800004e8:	ba408093          	add	ra,ra,-1116 # 80003088 <signature_7_0>
+800004ec:	61b5                	lui	gp,0xd
+800004ee:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800004f2:	fff00713          	li	a4,-1
+800004f6:	e701                	bnez	a4,800004fe <rvtest_code_begin+0x386>
+800004f8:	61c9                	lui	gp,0x12
+800004fa:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800004fe:	0030a023          	sw	gp,0(ra)
+80000502:	61b5                	lui	gp,0xd
+80000504:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000508:	800005b7          	lui	a1,0x80000
+8000050c:	e581                	bnez	a1,80000514 <rvtest_code_begin+0x39c>
+8000050e:	61c9                	lui	gp,0x12
+80000510:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000514:	0030a223          	sw	gp,4(ra)
+80000518:	0080006f          	j	80000520 <rvtest_code_begin+0x3a8>
+8000051c:	0160006f          	j	80000532 <rvtest_code_begin+0x3ba>
+80000520:	61b5                	lui	gp,0xd
+80000522:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000526:	fff00713          	li	a4,-1
+8000052a:	fb6d                	bnez	a4,8000051c <rvtest_code_begin+0x3a4>
+8000052c:	61c9                	lui	gp,0x12
+8000052e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000532:	0030a423          	sw	gp,8(ra)
+80000536:	61b5                	lui	gp,0xd
+80000538:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000053c:	4481                	li	s1,0
+8000053e:	e481                	bnez	s1,80000546 <rvtest_code_begin+0x3ce>
+80000540:	61c9                	lui	gp,0x12
+80000542:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000546:	0030a623          	sw	gp,12(ra)
+8000054a:	61b5                	lui	gp,0xd
+8000054c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000550:	fff00513          	li	a0,-1
+80000554:	e501                	bnez	a0,8000055c <rvtest_code_begin+0x3e4>
+80000556:	61c9                	lui	gp,0x12
+80000558:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000055c:	0030a823          	sw	gp,16(ra)
+80000560:	00003097          	auipc	ra,0x3
+80000564:	b3c08093          	add	ra,ra,-1220 # 8000309c <signature_8_0>
+80000568:	61b5                	lui	gp,0xd
+8000056a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000056e:	800007b7          	lui	a5,0x80000
+80000572:	e781                	bnez	a5,8000057a <rvtest_code_begin+0x402>
+80000574:	61c9                	lui	gp,0x12
+80000576:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000057a:	0030a023          	sw	gp,0(ra)
+8000057e:	61b5                	lui	gp,0xd
+80000580:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000584:	fff00693          	li	a3,-1
+80000588:	e681                	bnez	a3,80000590 <rvtest_code_begin+0x418>
+8000058a:	61c9                	lui	gp,0x12
+8000058c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000590:	0030a223          	sw	gp,4(ra)
+80000594:	0080006f          	j	8000059c <rvtest_code_begin+0x424>
+80000598:	0140006f          	j	800005ac <rvtest_code_begin+0x434>
+8000059c:	61b5                	lui	gp,0xd
+8000059e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800005a2:	4781                	li	a5,0
+800005a4:	fbf5                	bnez	a5,80000598 <rvtest_code_begin+0x420>
+800005a6:	61c9                	lui	gp,0x12
+800005a8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800005ac:	0030a423          	sw	gp,8(ra)
+800005b0:	61b5                	lui	gp,0xd
+800005b2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800005b6:	fff00593          	li	a1,-1
+800005ba:	e581                	bnez	a1,800005c2 <rvtest_code_begin+0x44a>
+800005bc:	61c9                	lui	gp,0x12
+800005be:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800005c2:	0030a623          	sw	gp,12(ra)
+800005c6:	61b5                	lui	gp,0xd
+800005c8:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800005cc:	800006b7          	lui	a3,0x80000
+800005d0:	e681                	bnez	a3,800005d8 <rvtest_code_begin+0x460>
+800005d2:	61c9                	lui	gp,0x12
+800005d4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800005d8:	0030a823          	sw	gp,16(ra)
+800005dc:	00003097          	auipc	ra,0x3
+800005e0:	ad408093          	add	ra,ra,-1324 # 800030b0 <signature_9_0>
+800005e4:	61b5                	lui	gp,0xd
+800005e6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800005ea:	4405                	li	s0,1
+800005ec:	e401                	bnez	s0,800005f4 <rvtest_code_begin+0x47c>
+800005ee:	61c9                	lui	gp,0x12
+800005f0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800005f4:	0030a023          	sw	gp,0(ra)
+800005f8:	61b5                	lui	gp,0xd
+800005fa:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800005fe:	4489                	li	s1,2
+80000600:	e481                	bnez	s1,80000608 <rvtest_code_begin+0x490>
+80000602:	61c9                	lui	gp,0x12
+80000604:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000608:	0030a223          	sw	gp,4(ra)
+8000060c:	0080006f          	j	80000614 <rvtest_code_begin+0x49c>
+80000610:	0140006f          	j	80000624 <rvtest_code_begin+0x4ac>
+80000614:	61b5                	lui	gp,0xd
+80000616:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000061a:	4511                	li	a0,4
+8000061c:	f975                	bnez	a0,80000610 <rvtest_code_begin+0x498>
+8000061e:	61c9                	lui	gp,0x12
+80000620:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000624:	0030a423          	sw	gp,8(ra)
+80000628:	61b5                	lui	gp,0xd
+8000062a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000062e:	45a1                	li	a1,8
+80000630:	e581                	bnez	a1,80000638 <rvtest_code_begin+0x4c0>
+80000632:	61c9                	lui	gp,0x12
+80000634:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000638:	0030a623          	sw	gp,12(ra)
+8000063c:	61b5                	lui	gp,0xd
+8000063e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000642:	4641                	li	a2,16
+80000644:	e601                	bnez	a2,8000064c <rvtest_code_begin+0x4d4>
+80000646:	61c9                	lui	gp,0x12
+80000648:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000064c:	0030a823          	sw	gp,16(ra)
+80000650:	00003097          	auipc	ra,0x3
+80000654:	a7408093          	add	ra,ra,-1420 # 800030c4 <signature_10_0>
+80000658:	61b5                	lui	gp,0xd
+8000065a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000065e:	02000693          	li	a3,32
+80000662:	e681                	bnez	a3,8000066a <rvtest_code_begin+0x4f2>
+80000664:	61c9                	lui	gp,0x12
+80000666:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000066a:	0030a023          	sw	gp,0(ra)
+8000066e:	61b5                	lui	gp,0xd
+80000670:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000674:	04000713          	li	a4,64
+80000678:	e701                	bnez	a4,80000680 <rvtest_code_begin+0x508>
+8000067a:	61c9                	lui	gp,0x12
+8000067c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000680:	0030a223          	sw	gp,4(ra)
+80000684:	0080006f          	j	8000068c <rvtest_code_begin+0x514>
+80000688:	0160006f          	j	8000069e <rvtest_code_begin+0x526>
+8000068c:	61b5                	lui	gp,0xd
+8000068e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000692:	08000793          	li	a5,128
+80000696:	fbed                	bnez	a5,80000688 <rvtest_code_begin+0x510>
+80000698:	61c9                	lui	gp,0x12
+8000069a:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000069e:	0030a423          	sw	gp,8(ra)
+800006a2:	61b5                	lui	gp,0xd
+800006a4:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800006a8:	10000413          	li	s0,256
+800006ac:	e401                	bnez	s0,800006b4 <rvtest_code_begin+0x53c>
+800006ae:	61c9                	lui	gp,0x12
+800006b0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800006b4:	0030a623          	sw	gp,12(ra)
+800006b8:	61b5                	lui	gp,0xd
+800006ba:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800006be:	20000493          	li	s1,512
+800006c2:	e481                	bnez	s1,800006ca <rvtest_code_begin+0x552>
+800006c4:	61c9                	lui	gp,0x12
+800006c6:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800006ca:	0030a823          	sw	gp,16(ra)
+800006ce:	00003097          	auipc	ra,0x3
+800006d2:	a0a08093          	add	ra,ra,-1526 # 800030d8 <signature_11_0>
+800006d6:	61b5                	lui	gp,0xd
+800006d8:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800006dc:	40000513          	li	a0,1024
+800006e0:	e501                	bnez	a0,800006e8 <rvtest_code_begin+0x570>
+800006e2:	61c9                	lui	gp,0x12
+800006e4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800006e8:	0030a023          	sw	gp,0(ra)
+800006ec:	61b5                	lui	gp,0xd
+800006ee:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800006f2:	6585                	lui	a1,0x1
+800006f4:	80058593          	add	a1,a1,-2048 # 800 <offset+0x800>
+800006f8:	e581                	bnez	a1,80000700 <rvtest_code_begin+0x588>
+800006fa:	61c9                	lui	gp,0x12
+800006fc:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000700:	0030a223          	sw	gp,4(ra)
+80000704:	0080006f          	j	8000070c <rvtest_code_begin+0x594>
+80000708:	0140006f          	j	8000071c <rvtest_code_begin+0x5a4>
+8000070c:	61b5                	lui	gp,0xd
+8000070e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000712:	6605                	lui	a2,0x1
+80000714:	fa75                	bnez	a2,80000708 <rvtest_code_begin+0x590>
+80000716:	61c9                	lui	gp,0x12
+80000718:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000071c:	0030a423          	sw	gp,8(ra)
+80000720:	61b5                	lui	gp,0xd
+80000722:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000726:	6689                	lui	a3,0x2
+80000728:	e681                	bnez	a3,80000730 <rvtest_code_begin+0x5b8>
+8000072a:	61c9                	lui	gp,0x12
+8000072c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000730:	0030a623          	sw	gp,12(ra)
+80000734:	61b5                	lui	gp,0xd
+80000736:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000073a:	6711                	lui	a4,0x4
+8000073c:	e701                	bnez	a4,80000744 <rvtest_code_begin+0x5cc>
+8000073e:	61c9                	lui	gp,0x12
+80000740:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000744:	0030a823          	sw	gp,16(ra)
+80000748:	00003097          	auipc	ra,0x3
+8000074c:	9a408093          	add	ra,ra,-1628 # 800030ec <signature_12_0>
+80000750:	61b5                	lui	gp,0xd
+80000752:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000756:	67a1                	lui	a5,0x8
+80000758:	e781                	bnez	a5,80000760 <rvtest_code_begin+0x5e8>
+8000075a:	61c9                	lui	gp,0x12
+8000075c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000760:	0030a023          	sw	gp,0(ra)
+80000764:	61b5                	lui	gp,0xd
+80000766:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000076a:	6441                	lui	s0,0x10
+8000076c:	e401                	bnez	s0,80000774 <rvtest_code_begin+0x5fc>
+8000076e:	61c9                	lui	gp,0x12
+80000770:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000774:	0030a223          	sw	gp,4(ra)
+80000778:	0080006f          	j	80000780 <rvtest_code_begin+0x608>
+8000077c:	0160006f          	j	80000792 <rvtest_code_begin+0x61a>
+80000780:	61b5                	lui	gp,0xd
+80000782:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000786:	000204b7          	lui	s1,0x20
+8000078a:	f8ed                	bnez	s1,8000077c <rvtest_code_begin+0x604>
+8000078c:	61c9                	lui	gp,0x12
+8000078e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000792:	0030a423          	sw	gp,8(ra)
+80000796:	61b5                	lui	gp,0xd
+80000798:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000079c:	00040537          	lui	a0,0x40
+800007a0:	e501                	bnez	a0,800007a8 <rvtest_code_begin+0x630>
+800007a2:	61c9                	lui	gp,0x12
+800007a4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800007a8:	0030a623          	sw	gp,12(ra)
+800007ac:	61b5                	lui	gp,0xd
+800007ae:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800007b2:	000805b7          	lui	a1,0x80
+800007b6:	e581                	bnez	a1,800007be <rvtest_code_begin+0x646>
+800007b8:	61c9                	lui	gp,0x12
+800007ba:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800007be:	0030a823          	sw	gp,16(ra)
+800007c2:	00003097          	auipc	ra,0x3
+800007c6:	93e08093          	add	ra,ra,-1730 # 80003100 <signature_13_0>
+800007ca:	61b5                	lui	gp,0xd
+800007cc:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800007d0:	00100637          	lui	a2,0x100
+800007d4:	e601                	bnez	a2,800007dc <rvtest_code_begin+0x664>
+800007d6:	61c9                	lui	gp,0x12
+800007d8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800007dc:	0030a023          	sw	gp,0(ra)
+800007e0:	61b5                	lui	gp,0xd
+800007e2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800007e6:	002006b7          	lui	a3,0x200
+800007ea:	e681                	bnez	a3,800007f2 <rvtest_code_begin+0x67a>
+800007ec:	61c9                	lui	gp,0x12
+800007ee:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800007f2:	0030a223          	sw	gp,4(ra)
+800007f6:	0080006f          	j	800007fe <rvtest_code_begin+0x686>
+800007fa:	0160006f          	j	80000810 <rvtest_code_begin+0x698>
+800007fe:	61b5                	lui	gp,0xd
+80000800:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000804:	00400737          	lui	a4,0x400
+80000808:	fb6d                	bnez	a4,800007fa <rvtest_code_begin+0x682>
+8000080a:	61c9                	lui	gp,0x12
+8000080c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000810:	0030a423          	sw	gp,8(ra)
+80000814:	61b5                	lui	gp,0xd
+80000816:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000081a:	008007b7          	lui	a5,0x800
+8000081e:	e781                	bnez	a5,80000826 <rvtest_code_begin+0x6ae>
+80000820:	61c9                	lui	gp,0x12
+80000822:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000826:	0030a623          	sw	gp,12(ra)
+8000082a:	61b5                	lui	gp,0xd
+8000082c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000830:	01000437          	lui	s0,0x1000
+80000834:	e401                	bnez	s0,8000083c <rvtest_code_begin+0x6c4>
+80000836:	61c9                	lui	gp,0x12
+80000838:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000083c:	0030a823          	sw	gp,16(ra)
+80000840:	00003097          	auipc	ra,0x3
+80000844:	8d408093          	add	ra,ra,-1836 # 80003114 <signature_14_0>
+80000848:	61b5                	lui	gp,0xd
+8000084a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000084e:	020004b7          	lui	s1,0x2000
+80000852:	e481                	bnez	s1,8000085a <rvtest_code_begin+0x6e2>
+80000854:	61c9                	lui	gp,0x12
+80000856:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000085a:	0030a023          	sw	gp,0(ra)
+8000085e:	61b5                	lui	gp,0xd
+80000860:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000864:	04000537          	lui	a0,0x4000
+80000868:	e501                	bnez	a0,80000870 <rvtest_code_begin+0x6f8>
+8000086a:	61c9                	lui	gp,0x12
+8000086c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000870:	0030a223          	sw	gp,4(ra)
+80000874:	0080006f          	j	8000087c <rvtest_code_begin+0x704>
+80000878:	0160006f          	j	8000088e <rvtest_code_begin+0x716>
+8000087c:	61b5                	lui	gp,0xd
+8000087e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000882:	080005b7          	lui	a1,0x8000
+80000886:	f9ed                	bnez	a1,80000878 <rvtest_code_begin+0x700>
+80000888:	61c9                	lui	gp,0x12
+8000088a:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000088e:	0030a423          	sw	gp,8(ra)
+80000892:	61b5                	lui	gp,0xd
+80000894:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000898:	10000637          	lui	a2,0x10000
+8000089c:	e601                	bnez	a2,800008a4 <rvtest_code_begin+0x72c>
+8000089e:	61c9                	lui	gp,0x12
+800008a0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800008a4:	0030a623          	sw	gp,12(ra)
+800008a8:	61b5                	lui	gp,0xd
+800008aa:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800008ae:	200006b7          	lui	a3,0x20000
+800008b2:	e681                	bnez	a3,800008ba <rvtest_code_begin+0x742>
+800008b4:	61c9                	lui	gp,0x12
+800008b6:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800008ba:	0030a823          	sw	gp,16(ra)
+800008be:	00003097          	auipc	ra,0x3
+800008c2:	86a08093          	add	ra,ra,-1942 # 80003128 <signature_15_0>
+800008c6:	61b5                	lui	gp,0xd
+800008c8:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800008cc:	40000737          	lui	a4,0x40000
+800008d0:	e701                	bnez	a4,800008d8 <rvtest_code_begin+0x760>
+800008d2:	61c9                	lui	gp,0x12
+800008d4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800008d8:	0030a023          	sw	gp,0(ra)
+800008dc:	61b5                	lui	gp,0xd
+800008de:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800008e2:	800007b7          	lui	a5,0x80000
+800008e6:	e781                	bnez	a5,800008ee <rvtest_code_begin+0x776>
+800008e8:	61c9                	lui	gp,0x12
+800008ea:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800008ee:	0030a223          	sw	gp,4(ra)
+800008f2:	0080006f          	j	800008fa <rvtest_code_begin+0x782>
+800008f6:	0160006f          	j	8000090c <rvtest_code_begin+0x794>
+800008fa:	61b5                	lui	gp,0xd
+800008fc:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000900:	ffe00413          	li	s0,-2
+80000904:	f86d                	bnez	s0,800008f6 <rvtest_code_begin+0x77e>
+80000906:	61c9                	lui	gp,0x12
+80000908:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000090c:	0030a423          	sw	gp,8(ra)
+80000910:	61b5                	lui	gp,0xd
+80000912:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000916:	ffd00493          	li	s1,-3
+8000091a:	e481                	bnez	s1,80000922 <rvtest_code_begin+0x7aa>
+8000091c:	61c9                	lui	gp,0x12
+8000091e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000922:	0030a623          	sw	gp,12(ra)
+80000926:	61b5                	lui	gp,0xd
+80000928:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000092c:	ffb00513          	li	a0,-5
+80000930:	e501                	bnez	a0,80000938 <rvtest_code_begin+0x7c0>
+80000932:	61c9                	lui	gp,0x12
+80000934:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000938:	0030a823          	sw	gp,16(ra)
+8000093c:	00003097          	auipc	ra,0x3
+80000940:	80008093          	add	ra,ra,-2048 # 8000313c <signature_16_0>
+80000944:	61b5                	lui	gp,0xd
+80000946:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000094a:	ff700593          	li	a1,-9
+8000094e:	e581                	bnez	a1,80000956 <rvtest_code_begin+0x7de>
+80000950:	61c9                	lui	gp,0x12
+80000952:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000956:	0030a023          	sw	gp,0(ra)
+8000095a:	61b5                	lui	gp,0xd
+8000095c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000960:	fef00613          	li	a2,-17
+80000964:	e601                	bnez	a2,8000096c <rvtest_code_begin+0x7f4>
+80000966:	61c9                	lui	gp,0x12
+80000968:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000096c:	0030a223          	sw	gp,4(ra)
+80000970:	0080006f          	j	80000978 <rvtest_code_begin+0x800>
+80000974:	0160006f          	j	8000098a <rvtest_code_begin+0x812>
+80000978:	61b5                	lui	gp,0xd
+8000097a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000097e:	fdf00693          	li	a3,-33
+80000982:	faed                	bnez	a3,80000974 <rvtest_code_begin+0x7fc>
+80000984:	61c9                	lui	gp,0x12
+80000986:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000098a:	0030a423          	sw	gp,8(ra)
+8000098e:	61b5                	lui	gp,0xd
+80000990:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000994:	fbf00713          	li	a4,-65
+80000998:	e701                	bnez	a4,800009a0 <rvtest_code_begin+0x828>
+8000099a:	61c9                	lui	gp,0x12
+8000099c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800009a0:	0030a623          	sw	gp,12(ra)
+800009a4:	61b5                	lui	gp,0xd
+800009a6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800009aa:	f7f00793          	li	a5,-129
+800009ae:	e781                	bnez	a5,800009b6 <rvtest_code_begin+0x83e>
+800009b0:	61c9                	lui	gp,0x12
+800009b2:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800009b6:	0030a823          	sw	gp,16(ra)
+800009ba:	00002097          	auipc	ra,0x2
+800009be:	79608093          	add	ra,ra,1942 # 80003150 <signature_17_0>
+800009c2:	61b5                	lui	gp,0xd
+800009c4:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800009c8:	eff00413          	li	s0,-257
+800009cc:	e401                	bnez	s0,800009d4 <rvtest_code_begin+0x85c>
+800009ce:	61c9                	lui	gp,0x12
+800009d0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800009d4:	0030a023          	sw	gp,0(ra)
+800009d8:	61b5                	lui	gp,0xd
+800009da:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800009de:	dff00493          	li	s1,-513
+800009e2:	e481                	bnez	s1,800009ea <rvtest_code_begin+0x872>
+800009e4:	61c9                	lui	gp,0x12
+800009e6:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800009ea:	0030a223          	sw	gp,4(ra)
+800009ee:	0080006f          	j	800009f6 <rvtest_code_begin+0x87e>
+800009f2:	0160006f          	j	80000a08 <rvtest_code_begin+0x890>
+800009f6:	61b5                	lui	gp,0xd
+800009f8:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800009fc:	bff00513          	li	a0,-1025
+80000a00:	f96d                	bnez	a0,800009f2 <rvtest_code_begin+0x87a>
+80000a02:	61c9                	lui	gp,0x12
+80000a04:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000a08:	0030a423          	sw	gp,8(ra)
+80000a0c:	61b5                	lui	gp,0xd
+80000a0e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000a12:	75fd                	lui	a1,0xfffff
+80000a14:	7ff58593          	add	a1,a1,2047 # fffff7ff <_end+0x7fffc3fb>
+80000a18:	e581                	bnez	a1,80000a20 <rvtest_code_begin+0x8a8>
+80000a1a:	61c9                	lui	gp,0x12
+80000a1c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000a20:	0030a623          	sw	gp,12(ra)
+80000a24:	61b5                	lui	gp,0xd
+80000a26:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000a2a:	767d                	lui	a2,0xfffff
+80000a2c:	167d                	add	a2,a2,-1 # ffffefff <_end+0x7fffbbfb>
+80000a2e:	e601                	bnez	a2,80000a36 <rvtest_code_begin+0x8be>
+80000a30:	61c9                	lui	gp,0x12
+80000a32:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000a36:	0030a823          	sw	gp,16(ra)
+80000a3a:	00002097          	auipc	ra,0x2
+80000a3e:	72a08093          	add	ra,ra,1834 # 80003164 <signature_18_0>
+80000a42:	61b5                	lui	gp,0xd
+80000a44:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000a48:	76f9                	lui	a3,0xffffe
+80000a4a:	16fd                	add	a3,a3,-1 # ffffdfff <_end+0x7fffabfb>
+80000a4c:	e681                	bnez	a3,80000a54 <rvtest_code_begin+0x8dc>
+80000a4e:	61c9                	lui	gp,0x12
+80000a50:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000a54:	0030a023          	sw	gp,0(ra)
+80000a58:	61b5                	lui	gp,0xd
+80000a5a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000a5e:	7771                	lui	a4,0xffffc
+80000a60:	177d                	add	a4,a4,-1 # ffffbfff <_end+0x7fff8bfb>
+80000a62:	e701                	bnez	a4,80000a6a <rvtest_code_begin+0x8f2>
+80000a64:	61c9                	lui	gp,0x12
+80000a66:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000a6a:	0030a223          	sw	gp,4(ra)
+80000a6e:	0080006f          	j	80000a76 <rvtest_code_begin+0x8fe>
+80000a72:	0160006f          	j	80000a88 <rvtest_code_begin+0x910>
+80000a76:	61b5                	lui	gp,0xd
+80000a78:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000a7c:	77e1                	lui	a5,0xffff8
+80000a7e:	17fd                	add	a5,a5,-1 # ffff7fff <_end+0x7fff4bfb>
+80000a80:	fbed                	bnez	a5,80000a72 <rvtest_code_begin+0x8fa>
+80000a82:	61c9                	lui	gp,0x12
+80000a84:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000a88:	0030a423          	sw	gp,8(ra)
+80000a8c:	61b5                	lui	gp,0xd
+80000a8e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000a92:	7441                	lui	s0,0xffff0
+80000a94:	147d                	add	s0,s0,-1 # fffeffff <_end+0x7ffecbfb>
+80000a96:	e401                	bnez	s0,80000a9e <rvtest_code_begin+0x926>
+80000a98:	61c9                	lui	gp,0x12
+80000a9a:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000a9e:	0030a623          	sw	gp,12(ra)
+80000aa2:	61b5                	lui	gp,0xd
+80000aa4:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000aa8:	7481                	lui	s1,0xfffe0
+80000aaa:	14fd                	add	s1,s1,-1 # fffdffff <_end+0x7ffdcbfb>
+80000aac:	e481                	bnez	s1,80000ab4 <rvtest_code_begin+0x93c>
+80000aae:	61c9                	lui	gp,0x12
+80000ab0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000ab4:	0030a823          	sw	gp,16(ra)
+80000ab8:	00002097          	auipc	ra,0x2
+80000abc:	6c008093          	add	ra,ra,1728 # 80003178 <signature_19_0>
+80000ac0:	61b5                	lui	gp,0xd
+80000ac2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ac6:	fffc0537          	lui	a0,0xfffc0
+80000aca:	157d                	add	a0,a0,-1 # fffbffff <_end+0x7ffbcbfb>
+80000acc:	e501                	bnez	a0,80000ad4 <rvtest_code_begin+0x95c>
+80000ace:	61c9                	lui	gp,0x12
+80000ad0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000ad4:	0030a023          	sw	gp,0(ra)
+80000ad8:	61b5                	lui	gp,0xd
+80000ada:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ade:	fff805b7          	lui	a1,0xfff80
+80000ae2:	15fd                	add	a1,a1,-1 # fff7ffff <_end+0x7ff7cbfb>
+80000ae4:	e581                	bnez	a1,80000aec <rvtest_code_begin+0x974>
+80000ae6:	61c9                	lui	gp,0x12
+80000ae8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000aec:	0030a223          	sw	gp,4(ra)
+80000af0:	0080006f          	j	80000af8 <rvtest_code_begin+0x980>
+80000af4:	0180006f          	j	80000b0c <rvtest_code_begin+0x994>
+80000af8:	61b5                	lui	gp,0xd
+80000afa:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000afe:	fff00637          	lui	a2,0xfff00
+80000b02:	167d                	add	a2,a2,-1 # ffefffff <_end+0x7fefcbfb>
+80000b04:	fa65                	bnez	a2,80000af4 <rvtest_code_begin+0x97c>
+80000b06:	61c9                	lui	gp,0x12
+80000b08:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000b0c:	0030a423          	sw	gp,8(ra)
+80000b10:	61b5                	lui	gp,0xd
+80000b12:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000b16:	ffe006b7          	lui	a3,0xffe00
+80000b1a:	16fd                	add	a3,a3,-1 # ffdfffff <_end+0x7fdfcbfb>
+80000b1c:	e681                	bnez	a3,80000b24 <rvtest_code_begin+0x9ac>
+80000b1e:	61c9                	lui	gp,0x12
+80000b20:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000b24:	0030a623          	sw	gp,12(ra)
+80000b28:	61b5                	lui	gp,0xd
+80000b2a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000b2e:	ffc00737          	lui	a4,0xffc00
+80000b32:	177d                	add	a4,a4,-1 # ffbfffff <_end+0x7fbfcbfb>
+80000b34:	e701                	bnez	a4,80000b3c <rvtest_code_begin+0x9c4>
+80000b36:	61c9                	lui	gp,0x12
+80000b38:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000b3c:	0030a823          	sw	gp,16(ra)
+80000b40:	00002097          	auipc	ra,0x2
+80000b44:	64c08093          	add	ra,ra,1612 # 8000318c <signature_20_0>
+80000b48:	61b5                	lui	gp,0xd
+80000b4a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000b4e:	ff8007b7          	lui	a5,0xff800
+80000b52:	17fd                	add	a5,a5,-1 # ff7fffff <_end+0x7f7fcbfb>
+80000b54:	e781                	bnez	a5,80000b5c <rvtest_code_begin+0x9e4>
+80000b56:	61c9                	lui	gp,0x12
+80000b58:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000b5c:	0030a023          	sw	gp,0(ra)
+80000b60:	61b5                	lui	gp,0xd
+80000b62:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000b66:	ff000437          	lui	s0,0xff000
+80000b6a:	147d                	add	s0,s0,-1 # feffffff <_end+0x7effcbfb>
+80000b6c:	e401                	bnez	s0,80000b74 <rvtest_code_begin+0x9fc>
+80000b6e:	61c9                	lui	gp,0x12
+80000b70:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000b74:	0030a223          	sw	gp,4(ra)
+80000b78:	0080006f          	j	80000b80 <rvtest_code_begin+0xa08>
+80000b7c:	0180006f          	j	80000b94 <rvtest_code_begin+0xa1c>
+80000b80:	61b5                	lui	gp,0xd
+80000b82:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000b86:	fe0004b7          	lui	s1,0xfe000
+80000b8a:	14fd                	add	s1,s1,-1 # fdffffff <_end+0x7dffcbfb>
+80000b8c:	f8e5                	bnez	s1,80000b7c <rvtest_code_begin+0xa04>
+80000b8e:	61c9                	lui	gp,0x12
+80000b90:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000b94:	0030a423          	sw	gp,8(ra)
+80000b98:	61b5                	lui	gp,0xd
+80000b9a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000b9e:	fc000537          	lui	a0,0xfc000
+80000ba2:	157d                	add	a0,a0,-1 # fbffffff <_end+0x7bffcbfb>
+80000ba4:	e501                	bnez	a0,80000bac <rvtest_code_begin+0xa34>
+80000ba6:	61c9                	lui	gp,0x12
+80000ba8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000bac:	0030a623          	sw	gp,12(ra)
+80000bb0:	61b5                	lui	gp,0xd
+80000bb2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000bb6:	f80005b7          	lui	a1,0xf8000
+80000bba:	15fd                	add	a1,a1,-1 # f7ffffff <_end+0x77ffcbfb>
+80000bbc:	e581                	bnez	a1,80000bc4 <rvtest_code_begin+0xa4c>
+80000bbe:	61c9                	lui	gp,0x12
+80000bc0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000bc4:	0030a823          	sw	gp,16(ra)
+80000bc8:	00002097          	auipc	ra,0x2
+80000bcc:	5d808093          	add	ra,ra,1496 # 800031a0 <signature_21_0>
+80000bd0:	61b5                	lui	gp,0xd
+80000bd2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000bd6:	f0000637          	lui	a2,0xf0000
+80000bda:	167d                	add	a2,a2,-1 # efffffff <_end+0x6fffcbfb>
+80000bdc:	e601                	bnez	a2,80000be4 <rvtest_code_begin+0xa6c>
+80000bde:	61c9                	lui	gp,0x12
+80000be0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000be4:	0030a023          	sw	gp,0(ra)
+80000be8:	61b5                	lui	gp,0xd
+80000bea:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000bee:	e00006b7          	lui	a3,0xe0000
+80000bf2:	16fd                	add	a3,a3,-1 # dfffffff <_end+0x5fffcbfb>
+80000bf4:	e681                	bnez	a3,80000bfc <rvtest_code_begin+0xa84>
+80000bf6:	61c9                	lui	gp,0x12
+80000bf8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000bfc:	0030a223          	sw	gp,4(ra)
+80000c00:	0080006f          	j	80000c08 <rvtest_code_begin+0xa90>
+80000c04:	0180006f          	j	80000c1c <rvtest_code_begin+0xaa4>
+80000c08:	61b5                	lui	gp,0xd
+80000c0a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000c0e:	c0000737          	lui	a4,0xc0000
+80000c12:	177d                	add	a4,a4,-1 # bfffffff <_end+0x3fffcbfb>
+80000c14:	fb65                	bnez	a4,80000c04 <rvtest_code_begin+0xa8c>
+80000c16:	61c9                	lui	gp,0x12
+80000c18:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000c1c:	0030a423          	sw	gp,8(ra)
+80000c20:	61b5                	lui	gp,0xd
+80000c22:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000c26:	800007b7          	lui	a5,0x80000
+80000c2a:	17fd                	add	a5,a5,-1 # 7fffffff <offset+0x7fffffff>
+80000c2c:	e781                	bnez	a5,80000c34 <rvtest_code_begin+0xabc>
+80000c2e:	61c9                	lui	gp,0x12
+80000c30:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000c34:	0030a623          	sw	gp,12(ra)
+80000c38:	61b5                	lui	gp,0xd
+80000c3a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000c3e:	4405                	li	s0,1
+80000c40:	e401                	bnez	s0,80000c48 <rvtest_code_begin+0xad0>
+80000c42:	61c9                	lui	gp,0x12
+80000c44:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000c48:	0030a823          	sw	gp,16(ra)
+80000c4c:	00002097          	auipc	ra,0x2
+80000c50:	56808093          	add	ra,ra,1384 # 800031b4 <signature_22_0>
+80000c54:	61b5                	lui	gp,0xd
+80000c56:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000c5a:	4489                	li	s1,2
+80000c5c:	e481                	bnez	s1,80000c64 <rvtest_code_begin+0xaec>
+80000c5e:	61c9                	lui	gp,0x12
+80000c60:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000c64:	0030a023          	sw	gp,0(ra)
+80000c68:	61b5                	lui	gp,0xd
+80000c6a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000c6e:	4511                	li	a0,4
+80000c70:	e501                	bnez	a0,80000c78 <rvtest_code_begin+0xb00>
+80000c72:	61c9                	lui	gp,0x12
+80000c74:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000c78:	0030a223          	sw	gp,4(ra)
+80000c7c:	0080006f          	j	80000c84 <rvtest_code_begin+0xb0c>
+80000c80:	0140006f          	j	80000c94 <rvtest_code_begin+0xb1c>
+80000c84:	61b5                	lui	gp,0xd
+80000c86:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000c8a:	45a1                	li	a1,8
+80000c8c:	f9f5                	bnez	a1,80000c80 <rvtest_code_begin+0xb08>
+80000c8e:	61c9                	lui	gp,0x12
+80000c90:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000c94:	0030a423          	sw	gp,8(ra)
+80000c98:	61b5                	lui	gp,0xd
+80000c9a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000c9e:	4641                	li	a2,16
+80000ca0:	e601                	bnez	a2,80000ca8 <rvtest_code_begin+0xb30>
+80000ca2:	61c9                	lui	gp,0x12
+80000ca4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000ca8:	0030a623          	sw	gp,12(ra)
+80000cac:	61b5                	lui	gp,0xd
+80000cae:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000cb2:	02000693          	li	a3,32
+80000cb6:	e681                	bnez	a3,80000cbe <rvtest_code_begin+0xb46>
+80000cb8:	61c9                	lui	gp,0x12
+80000cba:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000cbe:	0030a823          	sw	gp,16(ra)
+80000cc2:	00002097          	auipc	ra,0x2
+80000cc6:	50608093          	add	ra,ra,1286 # 800031c8 <signature_23_0>
+80000cca:	61b5                	lui	gp,0xd
+80000ccc:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000cd0:	04000713          	li	a4,64
+80000cd4:	e701                	bnez	a4,80000cdc <rvtest_code_begin+0xb64>
+80000cd6:	61c9                	lui	gp,0x12
+80000cd8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000cdc:	0030a023          	sw	gp,0(ra)
+80000ce0:	61b5                	lui	gp,0xd
+80000ce2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ce6:	08000793          	li	a5,128
+80000cea:	e781                	bnez	a5,80000cf2 <rvtest_code_begin+0xb7a>
+80000cec:	61c9                	lui	gp,0x12
+80000cee:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000cf2:	0030a223          	sw	gp,4(ra)
+80000cf6:	0080006f          	j	80000cfe <rvtest_code_begin+0xb86>
+80000cfa:	0160006f          	j	80000d10 <rvtest_code_begin+0xb98>
+80000cfe:	61b5                	lui	gp,0xd
+80000d00:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000d04:	10000413          	li	s0,256
+80000d08:	f86d                	bnez	s0,80000cfa <rvtest_code_begin+0xb82>
+80000d0a:	61c9                	lui	gp,0x12
+80000d0c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000d10:	0030a423          	sw	gp,8(ra)
+80000d14:	61b5                	lui	gp,0xd
+80000d16:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000d1a:	20000493          	li	s1,512
+80000d1e:	e481                	bnez	s1,80000d26 <rvtest_code_begin+0xbae>
+80000d20:	61c9                	lui	gp,0x12
+80000d22:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000d26:	0030a623          	sw	gp,12(ra)
+80000d2a:	61b5                	lui	gp,0xd
+80000d2c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000d30:	40000513          	li	a0,1024
+80000d34:	e501                	bnez	a0,80000d3c <rvtest_code_begin+0xbc4>
+80000d36:	61c9                	lui	gp,0x12
+80000d38:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000d3c:	0030a823          	sw	gp,16(ra)
+80000d40:	00002097          	auipc	ra,0x2
+80000d44:	49c08093          	add	ra,ra,1180 # 800031dc <signature_24_0>
+80000d48:	61b5                	lui	gp,0xd
+80000d4a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000d4e:	6585                	lui	a1,0x1
+80000d50:	80058593          	add	a1,a1,-2048 # 800 <offset+0x800>
+80000d54:	e581                	bnez	a1,80000d5c <rvtest_code_begin+0xbe4>
+80000d56:	61c9                	lui	gp,0x12
+80000d58:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000d5c:	0030a023          	sw	gp,0(ra)
+80000d60:	61b5                	lui	gp,0xd
+80000d62:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000d66:	6605                	lui	a2,0x1
+80000d68:	e601                	bnez	a2,80000d70 <rvtest_code_begin+0xbf8>
+80000d6a:	61c9                	lui	gp,0x12
+80000d6c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000d70:	0030a223          	sw	gp,4(ra)
+80000d74:	0080006f          	j	80000d7c <rvtest_code_begin+0xc04>
+80000d78:	0140006f          	j	80000d8c <rvtest_code_begin+0xc14>
+80000d7c:	61b5                	lui	gp,0xd
+80000d7e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000d82:	6689                	lui	a3,0x2
+80000d84:	faf5                	bnez	a3,80000d78 <rvtest_code_begin+0xc00>
+80000d86:	61c9                	lui	gp,0x12
+80000d88:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000d8c:	0030a423          	sw	gp,8(ra)
+80000d90:	61b5                	lui	gp,0xd
+80000d92:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000d96:	6711                	lui	a4,0x4
+80000d98:	e701                	bnez	a4,80000da0 <rvtest_code_begin+0xc28>
+80000d9a:	61c9                	lui	gp,0x12
+80000d9c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000da0:	0030a623          	sw	gp,12(ra)
+80000da4:	61b5                	lui	gp,0xd
+80000da6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000daa:	67a1                	lui	a5,0x8
+80000dac:	e781                	bnez	a5,80000db4 <rvtest_code_begin+0xc3c>
+80000dae:	61c9                	lui	gp,0x12
+80000db0:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000db4:	0030a823          	sw	gp,16(ra)
+80000db8:	00002097          	auipc	ra,0x2
+80000dbc:	43808093          	add	ra,ra,1080 # 800031f0 <signature_25_0>
+80000dc0:	61b5                	lui	gp,0xd
+80000dc2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000dc6:	6441                	lui	s0,0x10
+80000dc8:	e401                	bnez	s0,80000dd0 <rvtest_code_begin+0xc58>
+80000dca:	61c9                	lui	gp,0x12
+80000dcc:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000dd0:	0030a023          	sw	gp,0(ra)
+80000dd4:	61b5                	lui	gp,0xd
+80000dd6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000dda:	000204b7          	lui	s1,0x20
+80000dde:	e481                	bnez	s1,80000de6 <rvtest_code_begin+0xc6e>
+80000de0:	61c9                	lui	gp,0x12
+80000de2:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000de6:	0030a223          	sw	gp,4(ra)
+80000dea:	0080006f          	j	80000df2 <rvtest_code_begin+0xc7a>
+80000dee:	0160006f          	j	80000e04 <rvtest_code_begin+0xc8c>
+80000df2:	61b5                	lui	gp,0xd
+80000df4:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000df8:	00040537          	lui	a0,0x40
+80000dfc:	f96d                	bnez	a0,80000dee <rvtest_code_begin+0xc76>
+80000dfe:	61c9                	lui	gp,0x12
+80000e00:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000e04:	0030a423          	sw	gp,8(ra)
+80000e08:	61b5                	lui	gp,0xd
+80000e0a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000e0e:	000805b7          	lui	a1,0x80
+80000e12:	e581                	bnez	a1,80000e1a <rvtest_code_begin+0xca2>
+80000e14:	61c9                	lui	gp,0x12
+80000e16:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000e1a:	0030a623          	sw	gp,12(ra)
+80000e1e:	61b5                	lui	gp,0xd
+80000e20:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000e24:	00100637          	lui	a2,0x100
+80000e28:	e601                	bnez	a2,80000e30 <rvtest_code_begin+0xcb8>
+80000e2a:	61c9                	lui	gp,0x12
+80000e2c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000e30:	0030a823          	sw	gp,16(ra)
+80000e34:	00002097          	auipc	ra,0x2
+80000e38:	3d008093          	add	ra,ra,976 # 80003204 <signature_26_0>
+80000e3c:	61b5                	lui	gp,0xd
+80000e3e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000e42:	002006b7          	lui	a3,0x200
+80000e46:	e681                	bnez	a3,80000e4e <rvtest_code_begin+0xcd6>
+80000e48:	61c9                	lui	gp,0x12
+80000e4a:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000e4e:	0030a023          	sw	gp,0(ra)
+80000e52:	61b5                	lui	gp,0xd
+80000e54:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000e58:	00400737          	lui	a4,0x400
+80000e5c:	e701                	bnez	a4,80000e64 <rvtest_code_begin+0xcec>
+80000e5e:	61c9                	lui	gp,0x12
+80000e60:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000e64:	0030a223          	sw	gp,4(ra)
+80000e68:	0080006f          	j	80000e70 <rvtest_code_begin+0xcf8>
+80000e6c:	0160006f          	j	80000e82 <rvtest_code_begin+0xd0a>
+80000e70:	61b5                	lui	gp,0xd
+80000e72:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000e76:	008007b7          	lui	a5,0x800
+80000e7a:	fbed                	bnez	a5,80000e6c <rvtest_code_begin+0xcf4>
+80000e7c:	61c9                	lui	gp,0x12
+80000e7e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000e82:	0030a423          	sw	gp,8(ra)
+80000e86:	61b5                	lui	gp,0xd
+80000e88:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000e8c:	01000437          	lui	s0,0x1000
+80000e90:	e401                	bnez	s0,80000e98 <rvtest_code_begin+0xd20>
+80000e92:	61c9                	lui	gp,0x12
+80000e94:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000e98:	0030a623          	sw	gp,12(ra)
+80000e9c:	61b5                	lui	gp,0xd
+80000e9e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ea2:	020004b7          	lui	s1,0x2000
+80000ea6:	e481                	bnez	s1,80000eae <rvtest_code_begin+0xd36>
+80000ea8:	61c9                	lui	gp,0x12
+80000eaa:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000eae:	0030a823          	sw	gp,16(ra)
+80000eb2:	00002097          	auipc	ra,0x2
+80000eb6:	36608093          	add	ra,ra,870 # 80003218 <signature_27_0>
+80000eba:	61b5                	lui	gp,0xd
+80000ebc:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ec0:	04000537          	lui	a0,0x4000
+80000ec4:	e501                	bnez	a0,80000ecc <rvtest_code_begin+0xd54>
+80000ec6:	61c9                	lui	gp,0x12
+80000ec8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000ecc:	0030a023          	sw	gp,0(ra)
+80000ed0:	61b5                	lui	gp,0xd
+80000ed2:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ed6:	080005b7          	lui	a1,0x8000
+80000eda:	e581                	bnez	a1,80000ee2 <rvtest_code_begin+0xd6a>
+80000edc:	61c9                	lui	gp,0x12
+80000ede:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000ee2:	0030a223          	sw	gp,4(ra)
+80000ee6:	0080006f          	j	80000eee <rvtest_code_begin+0xd76>
+80000eea:	0160006f          	j	80000f00 <rvtest_code_begin+0xd88>
+80000eee:	61b5                	lui	gp,0xd
+80000ef0:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ef4:	10000637          	lui	a2,0x10000
+80000ef8:	fa6d                	bnez	a2,80000eea <rvtest_code_begin+0xd72>
+80000efa:	61c9                	lui	gp,0x12
+80000efc:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000f00:	0030a423          	sw	gp,8(ra)
+80000f04:	61b5                	lui	gp,0xd
+80000f06:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000f0a:	200006b7          	lui	a3,0x20000
+80000f0e:	e681                	bnez	a3,80000f16 <rvtest_code_begin+0xd9e>
+80000f10:	61c9                	lui	gp,0x12
+80000f12:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000f16:	0030a623          	sw	gp,12(ra)
+80000f1a:	61b5                	lui	gp,0xd
+80000f1c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000f20:	40000737          	lui	a4,0x40000
+80000f24:	e701                	bnez	a4,80000f2c <rvtest_code_begin+0xdb4>
+80000f26:	61c9                	lui	gp,0x12
+80000f28:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000f2c:	0030a823          	sw	gp,16(ra)
+80000f30:	00002097          	auipc	ra,0x2
+80000f34:	2fc08093          	add	ra,ra,764 # 8000322c <signature_28_0>
+80000f38:	61b5                	lui	gp,0xd
+80000f3a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000f3e:	800007b7          	lui	a5,0x80000
+80000f42:	e781                	bnez	a5,80000f4a <rvtest_code_begin+0xdd2>
+80000f44:	61c9                	lui	gp,0x12
+80000f46:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000f4a:	0030a023          	sw	gp,0(ra)
+80000f4e:	61b5                	lui	gp,0xd
+80000f50:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000f54:	ffe00413          	li	s0,-2
+80000f58:	e401                	bnez	s0,80000f60 <rvtest_code_begin+0xde8>
+80000f5a:	61c9                	lui	gp,0x12
+80000f5c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000f60:	0030a223          	sw	gp,4(ra)
+80000f64:	0080006f          	j	80000f6c <rvtest_code_begin+0xdf4>
+80000f68:	0160006f          	j	80000f7e <rvtest_code_begin+0xe06>
+80000f6c:	61b5                	lui	gp,0xd
+80000f6e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000f72:	ffd00493          	li	s1,-3
+80000f76:	f8ed                	bnez	s1,80000f68 <rvtest_code_begin+0xdf0>
+80000f78:	61c9                	lui	gp,0x12
+80000f7a:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000f7e:	0030a423          	sw	gp,8(ra)
+80000f82:	61b5                	lui	gp,0xd
+80000f84:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000f88:	ffb00513          	li	a0,-5
+80000f8c:	e501                	bnez	a0,80000f94 <rvtest_code_begin+0xe1c>
+80000f8e:	61c9                	lui	gp,0x12
+80000f90:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000f94:	0030a623          	sw	gp,12(ra)
+80000f98:	61b5                	lui	gp,0xd
+80000f9a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000f9e:	ff700593          	li	a1,-9
+80000fa2:	e581                	bnez	a1,80000faa <rvtest_code_begin+0xe32>
+80000fa4:	61c9                	lui	gp,0x12
+80000fa6:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000faa:	0030a823          	sw	gp,16(ra)
+80000fae:	00002097          	auipc	ra,0x2
+80000fb2:	29208093          	add	ra,ra,658 # 80003240 <signature_29_0>
+80000fb6:	61b5                	lui	gp,0xd
+80000fb8:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000fbc:	fef00613          	li	a2,-17
+80000fc0:	e601                	bnez	a2,80000fc8 <rvtest_code_begin+0xe50>
+80000fc2:	61c9                	lui	gp,0x12
+80000fc4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000fc8:	0030a023          	sw	gp,0(ra)
+80000fcc:	61b5                	lui	gp,0xd
+80000fce:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000fd2:	fdf00693          	li	a3,-33
+80000fd6:	e681                	bnez	a3,80000fde <rvtest_code_begin+0xe66>
+80000fd8:	61c9                	lui	gp,0x12
+80000fda:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000fde:	0030a223          	sw	gp,4(ra)
+80000fe2:	0080006f          	j	80000fea <rvtest_code_begin+0xe72>
+80000fe6:	0160006f          	j	80000ffc <rvtest_code_begin+0xe84>
+80000fea:	61b5                	lui	gp,0xd
+80000fec:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80000ff0:	fbf00713          	li	a4,-65
+80000ff4:	fb6d                	bnez	a4,80000fe6 <rvtest_code_begin+0xe6e>
+80000ff6:	61c9                	lui	gp,0x12
+80000ff8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80000ffc:	0030a423          	sw	gp,8(ra)
+80001000:	61b5                	lui	gp,0xd
+80001002:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001006:	f7f00793          	li	a5,-129
+8000100a:	e781                	bnez	a5,80001012 <rvtest_code_begin+0xe9a>
+8000100c:	61c9                	lui	gp,0x12
+8000100e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001012:	0030a623          	sw	gp,12(ra)
+80001016:	61b5                	lui	gp,0xd
+80001018:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000101c:	eff00413          	li	s0,-257
+80001020:	e401                	bnez	s0,80001028 <rvtest_code_begin+0xeb0>
+80001022:	61c9                	lui	gp,0x12
+80001024:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001028:	0030a823          	sw	gp,16(ra)
+8000102c:	00002097          	auipc	ra,0x2
+80001030:	22808093          	add	ra,ra,552 # 80003254 <signature_30_0>
+80001034:	61b5                	lui	gp,0xd
+80001036:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000103a:	dff00493          	li	s1,-513
+8000103e:	e481                	bnez	s1,80001046 <rvtest_code_begin+0xece>
+80001040:	61c9                	lui	gp,0x12
+80001042:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001046:	0030a023          	sw	gp,0(ra)
+8000104a:	61b5                	lui	gp,0xd
+8000104c:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001050:	bff00513          	li	a0,-1025
+80001054:	e501                	bnez	a0,8000105c <rvtest_code_begin+0xee4>
+80001056:	61c9                	lui	gp,0x12
+80001058:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000105c:	0030a223          	sw	gp,4(ra)
+80001060:	0080006f          	j	80001068 <rvtest_code_begin+0xef0>
+80001064:	0180006f          	j	8000107c <rvtest_code_begin+0xf04>
+80001068:	61b5                	lui	gp,0xd
+8000106a:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000106e:	75fd                	lui	a1,0xfffff
+80001070:	7ff58593          	add	a1,a1,2047 # fffff7ff <_end+0x7fffc3fb>
+80001074:	f9e5                	bnez	a1,80001064 <rvtest_code_begin+0xeec>
+80001076:	61c9                	lui	gp,0x12
+80001078:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+8000107c:	0030a423          	sw	gp,8(ra)
+80001080:	61b5                	lui	gp,0xd
+80001082:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001086:	767d                	lui	a2,0xfffff
+80001088:	167d                	add	a2,a2,-1 # ffffefff <_end+0x7fffbbfb>
+8000108a:	e601                	bnez	a2,80001092 <rvtest_code_begin+0xf1a>
+8000108c:	61c9                	lui	gp,0x12
+8000108e:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001092:	0030a623          	sw	gp,12(ra)
+80001096:	61b5                	lui	gp,0xd
+80001098:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000109c:	76f9                	lui	a3,0xffffe
+8000109e:	16fd                	add	a3,a3,-1 # ffffdfff <_end+0x7fffabfb>
+800010a0:	e681                	bnez	a3,800010a8 <rvtest_code_begin+0xf30>
+800010a2:	61c9                	lui	gp,0x12
+800010a4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800010a8:	0030a823          	sw	gp,16(ra)
+800010ac:	00002097          	auipc	ra,0x2
+800010b0:	1bc08093          	add	ra,ra,444 # 80003268 <signature_31_0>
+800010b4:	61b5                	lui	gp,0xd
+800010b6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800010ba:	7771                	lui	a4,0xffffc
+800010bc:	177d                	add	a4,a4,-1 # ffffbfff <_end+0x7fff8bfb>
+800010be:	e701                	bnez	a4,800010c6 <rvtest_code_begin+0xf4e>
+800010c0:	61c9                	lui	gp,0x12
+800010c2:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800010c6:	0030a023          	sw	gp,0(ra)
+800010ca:	61b5                	lui	gp,0xd
+800010cc:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800010d0:	77e1                	lui	a5,0xffff8
+800010d2:	17fd                	add	a5,a5,-1 # ffff7fff <_end+0x7fff4bfb>
+800010d4:	e781                	bnez	a5,800010dc <rvtest_code_begin+0xf64>
+800010d6:	61c9                	lui	gp,0x12
+800010d8:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800010dc:	0030a223          	sw	gp,4(ra)
+800010e0:	0080006f          	j	800010e8 <rvtest_code_begin+0xf70>
+800010e4:	0160006f          	j	800010fa <rvtest_code_begin+0xf82>
+800010e8:	61b5                	lui	gp,0xd
+800010ea:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800010ee:	7441                	lui	s0,0xffff0
+800010f0:	147d                	add	s0,s0,-1 # fffeffff <_end+0x7ffecbfb>
+800010f2:	f86d                	bnez	s0,800010e4 <rvtest_code_begin+0xf6c>
+800010f4:	61c9                	lui	gp,0x12
+800010f6:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800010fa:	0030a423          	sw	gp,8(ra)
+800010fe:	61b5                	lui	gp,0xd
+80001100:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001104:	7481                	lui	s1,0xfffe0
+80001106:	14fd                	add	s1,s1,-1 # fffdffff <_end+0x7ffdcbfb>
+80001108:	e481                	bnez	s1,80001110 <rvtest_code_begin+0xf98>
+8000110a:	61c9                	lui	gp,0x12
+8000110c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001110:	0030a623          	sw	gp,12(ra)
+80001114:	61b5                	lui	gp,0xd
+80001116:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000111a:	fffc0537          	lui	a0,0xfffc0
+8000111e:	157d                	add	a0,a0,-1 # fffbffff <_end+0x7ffbcbfb>
+80001120:	e501                	bnez	a0,80001128 <rvtest_code_begin+0xfb0>
+80001122:	61c9                	lui	gp,0x12
+80001124:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001128:	0030a823          	sw	gp,16(ra)
+8000112c:	00002097          	auipc	ra,0x2
+80001130:	15008093          	add	ra,ra,336 # 8000327c <signature_32_0>
+80001134:	61b5                	lui	gp,0xd
+80001136:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000113a:	fff805b7          	lui	a1,0xfff80
+8000113e:	15fd                	add	a1,a1,-1 # fff7ffff <_end+0x7ff7cbfb>
+80001140:	e581                	bnez	a1,80001148 <rvtest_code_begin+0xfd0>
+80001142:	61c9                	lui	gp,0x12
+80001144:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001148:	0030a023          	sw	gp,0(ra)
+8000114c:	61b5                	lui	gp,0xd
+8000114e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001152:	fff00637          	lui	a2,0xfff00
+80001156:	167d                	add	a2,a2,-1 # ffefffff <_end+0x7fefcbfb>
+80001158:	e601                	bnez	a2,80001160 <rvtest_code_begin+0xfe8>
+8000115a:	61c9                	lui	gp,0x12
+8000115c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001160:	0030a223          	sw	gp,4(ra)
+80001164:	0080006f          	j	8000116c <rvtest_code_begin+0xff4>
+80001168:	0180006f          	j	80001180 <rvtest_code_begin+0x1008>
+8000116c:	61b5                	lui	gp,0xd
+8000116e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001172:	ffe006b7          	lui	a3,0xffe00
+80001176:	16fd                	add	a3,a3,-1 # ffdfffff <_end+0x7fdfcbfb>
+80001178:	fae5                	bnez	a3,80001168 <rvtest_code_begin+0xff0>
+8000117a:	61c9                	lui	gp,0x12
+8000117c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001180:	0030a423          	sw	gp,8(ra)
+80001184:	61b5                	lui	gp,0xd
+80001186:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000118a:	ffc00737          	lui	a4,0xffc00
+8000118e:	177d                	add	a4,a4,-1 # ffbfffff <_end+0x7fbfcbfb>
+80001190:	e701                	bnez	a4,80001198 <rvtest_code_begin+0x1020>
+80001192:	61c9                	lui	gp,0x12
+80001194:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001198:	0030a623          	sw	gp,12(ra)
+8000119c:	61b5                	lui	gp,0xd
+8000119e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800011a2:	ff8007b7          	lui	a5,0xff800
+800011a6:	17fd                	add	a5,a5,-1 # ff7fffff <_end+0x7f7fcbfb>
+800011a8:	e781                	bnez	a5,800011b0 <rvtest_code_begin+0x1038>
+800011aa:	61c9                	lui	gp,0x12
+800011ac:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800011b0:	0030a823          	sw	gp,16(ra)
+800011b4:	00002097          	auipc	ra,0x2
+800011b8:	0dc08093          	add	ra,ra,220 # 80003290 <signature_33_0>
+800011bc:	61b5                	lui	gp,0xd
+800011be:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800011c2:	ff000437          	lui	s0,0xff000
+800011c6:	147d                	add	s0,s0,-1 # feffffff <_end+0x7effcbfb>
+800011c8:	e401                	bnez	s0,800011d0 <rvtest_code_begin+0x1058>
+800011ca:	61c9                	lui	gp,0x12
+800011cc:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800011d0:	0030a023          	sw	gp,0(ra)
+800011d4:	61b5                	lui	gp,0xd
+800011d6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800011da:	fe0004b7          	lui	s1,0xfe000
+800011de:	14fd                	add	s1,s1,-1 # fdffffff <_end+0x7dffcbfb>
+800011e0:	e481                	bnez	s1,800011e8 <rvtest_code_begin+0x1070>
+800011e2:	61c9                	lui	gp,0x12
+800011e4:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+800011e8:	0030a223          	sw	gp,4(ra)
+800011ec:	0080006f          	j	800011f4 <rvtest_code_begin+0x107c>
+800011f0:	0180006f          	j	80001208 <rvtest_code_begin+0x1090>
+800011f4:	61b5                	lui	gp,0xd
+800011f6:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+800011fa:	fc000537          	lui	a0,0xfc000
+800011fe:	157d                	add	a0,a0,-1 # fbffffff <_end+0x7bffcbfb>
+80001200:	f965                	bnez	a0,800011f0 <rvtest_code_begin+0x1078>
+80001202:	61c9                	lui	gp,0x12
+80001204:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001208:	0030a423          	sw	gp,8(ra)
+8000120c:	61b5                	lui	gp,0xd
+8000120e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001212:	f80005b7          	lui	a1,0xf8000
+80001216:	15fd                	add	a1,a1,-1 # f7ffffff <_end+0x77ffcbfb>
+80001218:	e581                	bnez	a1,80001220 <rvtest_code_begin+0x10a8>
+8000121a:	61c9                	lui	gp,0x12
+8000121c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001220:	0030a623          	sw	gp,12(ra)
+80001224:	61b5                	lui	gp,0xd
+80001226:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000122a:	f0000637          	lui	a2,0xf0000
+8000122e:	167d                	add	a2,a2,-1 # efffffff <_end+0x6fffcbfb>
+80001230:	e601                	bnez	a2,80001238 <rvtest_code_begin+0x10c0>
+80001232:	61c9                	lui	gp,0x12
+80001234:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001238:	0030a823          	sw	gp,16(ra)
+8000123c:	00002097          	auipc	ra,0x2
+80001240:	06808093          	add	ra,ra,104 # 800032a4 <signature_34_0>
+80001244:	61b5                	lui	gp,0xd
+80001246:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+8000124a:	e00006b7          	lui	a3,0xe0000
+8000124e:	16fd                	add	a3,a3,-1 # dfffffff <_end+0x5fffcbfb>
+80001250:	e681                	bnez	a3,80001258 <rvtest_code_begin+0x10e0>
+80001252:	61c9                	lui	gp,0x12
+80001254:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001258:	0030a023          	sw	gp,0(ra)
+8000125c:	61b5                	lui	gp,0xd
+8000125e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001262:	c0000737          	lui	a4,0xc0000
+80001266:	177d                	add	a4,a4,-1 # bfffffff <_end+0x3fffcbfb>
+80001268:	e701                	bnez	a4,80001270 <rvtest_code_begin+0x10f8>
+8000126a:	61c9                	lui	gp,0x12
+8000126c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001270:	0030a223          	sw	gp,4(ra)
+80001274:	0080006f          	j	8000127c <rvtest_code_begin+0x1104>
+80001278:	0180006f          	j	80001290 <rvtest_code_begin+0x1118>
+8000127c:	61b5                	lui	gp,0xd
+8000127e:	ccc18193          	add	gp,gp,-820 # cccc <offset+0xcccc>
+80001282:	800007b7          	lui	a5,0x80000
+80001286:	17fd                	add	a5,a5,-1 # 7fffffff <offset+0x7fffffff>
+80001288:	fbe5                	bnez	a5,80001278 <rvtest_code_begin+0x1100>
+8000128a:	61c9                	lui	gp,0x12
+8000128c:	3ab18193          	add	gp,gp,939 # 123ab <offset+0x123ab>
+80001290:	0030a423          	sw	gp,8(ra)
+80001294:	00000013          	nop
+80001298:	00000013          	nop
+8000129c:	00000013          	nop
+
+800012a0 <rvtest_code_end>:
+800012a0:	0ff0000f          	fence
+800012a4:	00000073          	ecall
+	...
+
+Disassembly of section .tohost:
+
+80002000 <tohost>:
+	...
+
+80002100 <fromhost>:
+	...
+
+Disassembly of section .data:
+
+80003000 <rvtest_data_begin>:
+80003000:	cafe                	sw	t6,84(sp)
+80003002:	babe                	.insn	2, 0xbabe
+
+80003004 <rvtest_data_end>:
+	...
+
+80003010 <begin_signature>:
+80003010:	deadbeef          	jal	t4,7ffde5fa <offset+0x7ffde5fa>
+80003014:	deadbeef          	jal	t4,7ffde5fe <offset+0x7ffde5fe>
+80003018:	deadbeef          	jal	t4,7ffde602 <offset+0x7ffde602>
+8000301c:	deadbeef          	jal	t4,7ffde606 <offset+0x7ffde606>
+80003020:	deadbeef          	jal	t4,7ffde60a <offset+0x7ffde60a>
+
+80003024 <signature_2_0>:
+80003024:	deadbeef          	jal	t4,7ffde60e <offset+0x7ffde60e>
+80003028:	deadbeef          	jal	t4,7ffde612 <offset+0x7ffde612>
+8000302c:	deadbeef          	jal	t4,7ffde616 <offset+0x7ffde616>
+80003030:	deadbeef          	jal	t4,7ffde61a <offset+0x7ffde61a>
+80003034:	deadbeef          	jal	t4,7ffde61e <offset+0x7ffde61e>
+
+80003038 <signature_3_0>:
+80003038:	deadbeef          	jal	t4,7ffde622 <offset+0x7ffde622>
+8000303c:	deadbeef          	jal	t4,7ffde626 <offset+0x7ffde626>
+80003040:	deadbeef          	jal	t4,7ffde62a <offset+0x7ffde62a>
+80003044:	deadbeef          	jal	t4,7ffde62e <offset+0x7ffde62e>
+80003048:	deadbeef          	jal	t4,7ffde632 <offset+0x7ffde632>
+
+8000304c <signature_4_0>:
+8000304c:	deadbeef          	jal	t4,7ffde636 <offset+0x7ffde636>
+80003050:	deadbeef          	jal	t4,7ffde63a <offset+0x7ffde63a>
+80003054:	deadbeef          	jal	t4,7ffde63e <offset+0x7ffde63e>
+80003058:	deadbeef          	jal	t4,7ffde642 <offset+0x7ffde642>
+8000305c:	deadbeef          	jal	t4,7ffde646 <offset+0x7ffde646>
+
+80003060 <signature_5_0>:
+80003060:	deadbeef          	jal	t4,7ffde64a <offset+0x7ffde64a>
+80003064:	deadbeef          	jal	t4,7ffde64e <offset+0x7ffde64e>
+80003068:	deadbeef          	jal	t4,7ffde652 <offset+0x7ffde652>
+8000306c:	deadbeef          	jal	t4,7ffde656 <offset+0x7ffde656>
+80003070:	deadbeef          	jal	t4,7ffde65a <offset+0x7ffde65a>
+
+80003074 <signature_6_0>:
+80003074:	deadbeef          	jal	t4,7ffde65e <offset+0x7ffde65e>
+80003078:	deadbeef          	jal	t4,7ffde662 <offset+0x7ffde662>
+8000307c:	deadbeef          	jal	t4,7ffde666 <offset+0x7ffde666>
+80003080:	deadbeef          	jal	t4,7ffde66a <offset+0x7ffde66a>
+80003084:	deadbeef          	jal	t4,7ffde66e <offset+0x7ffde66e>
+
+80003088 <signature_7_0>:
+80003088:	deadbeef          	jal	t4,7ffde672 <offset+0x7ffde672>
+8000308c:	deadbeef          	jal	t4,7ffde676 <offset+0x7ffde676>
+80003090:	deadbeef          	jal	t4,7ffde67a <offset+0x7ffde67a>
+80003094:	deadbeef          	jal	t4,7ffde67e <offset+0x7ffde67e>
+80003098:	deadbeef          	jal	t4,7ffde682 <offset+0x7ffde682>
+
+8000309c <signature_8_0>:
+8000309c:	deadbeef          	jal	t4,7ffde686 <offset+0x7ffde686>
+800030a0:	deadbeef          	jal	t4,7ffde68a <offset+0x7ffde68a>
+800030a4:	deadbeef          	jal	t4,7ffde68e <offset+0x7ffde68e>
+800030a8:	deadbeef          	jal	t4,7ffde692 <offset+0x7ffde692>
+800030ac:	deadbeef          	jal	t4,7ffde696 <offset+0x7ffde696>
+
+800030b0 <signature_9_0>:
+800030b0:	deadbeef          	jal	t4,7ffde69a <offset+0x7ffde69a>
+800030b4:	deadbeef          	jal	t4,7ffde69e <offset+0x7ffde69e>
+800030b8:	deadbeef          	jal	t4,7ffde6a2 <offset+0x7ffde6a2>
+800030bc:	deadbeef          	jal	t4,7ffde6a6 <offset+0x7ffde6a6>
+800030c0:	deadbeef          	jal	t4,7ffde6aa <offset+0x7ffde6aa>
+
+800030c4 <signature_10_0>:
+800030c4:	deadbeef          	jal	t4,7ffde6ae <offset+0x7ffde6ae>
+800030c8:	deadbeef          	jal	t4,7ffde6b2 <offset+0x7ffde6b2>
+800030cc:	deadbeef          	jal	t4,7ffde6b6 <offset+0x7ffde6b6>
+800030d0:	deadbeef          	jal	t4,7ffde6ba <offset+0x7ffde6ba>
+800030d4:	deadbeef          	jal	t4,7ffde6be <offset+0x7ffde6be>
+
+800030d8 <signature_11_0>:
+800030d8:	deadbeef          	jal	t4,7ffde6c2 <offset+0x7ffde6c2>
+800030dc:	deadbeef          	jal	t4,7ffde6c6 <offset+0x7ffde6c6>
+800030e0:	deadbeef          	jal	t4,7ffde6ca <offset+0x7ffde6ca>
+800030e4:	deadbeef          	jal	t4,7ffde6ce <offset+0x7ffde6ce>
+800030e8:	deadbeef          	jal	t4,7ffde6d2 <offset+0x7ffde6d2>
+
+800030ec <signature_12_0>:
+800030ec:	deadbeef          	jal	t4,7ffde6d6 <offset+0x7ffde6d6>
+800030f0:	deadbeef          	jal	t4,7ffde6da <offset+0x7ffde6da>
+800030f4:	deadbeef          	jal	t4,7ffde6de <offset+0x7ffde6de>
+800030f8:	deadbeef          	jal	t4,7ffde6e2 <offset+0x7ffde6e2>
+800030fc:	deadbeef          	jal	t4,7ffde6e6 <offset+0x7ffde6e6>
+
+80003100 <signature_13_0>:
+80003100:	deadbeef          	jal	t4,7ffde6ea <offset+0x7ffde6ea>
+80003104:	deadbeef          	jal	t4,7ffde6ee <offset+0x7ffde6ee>
+80003108:	deadbeef          	jal	t4,7ffde6f2 <offset+0x7ffde6f2>
+8000310c:	deadbeef          	jal	t4,7ffde6f6 <offset+0x7ffde6f6>
+80003110:	deadbeef          	jal	t4,7ffde6fa <offset+0x7ffde6fa>
+
+80003114 <signature_14_0>:
+80003114:	deadbeef          	jal	t4,7ffde6fe <offset+0x7ffde6fe>
+80003118:	deadbeef          	jal	t4,7ffde702 <offset+0x7ffde702>
+8000311c:	deadbeef          	jal	t4,7ffde706 <offset+0x7ffde706>
+80003120:	deadbeef          	jal	t4,7ffde70a <offset+0x7ffde70a>
+80003124:	deadbeef          	jal	t4,7ffde70e <offset+0x7ffde70e>
+
+80003128 <signature_15_0>:
+80003128:	deadbeef          	jal	t4,7ffde712 <offset+0x7ffde712>
+8000312c:	deadbeef          	jal	t4,7ffde716 <offset+0x7ffde716>
+80003130:	deadbeef          	jal	t4,7ffde71a <offset+0x7ffde71a>
+80003134:	deadbeef          	jal	t4,7ffde71e <offset+0x7ffde71e>
+80003138:	deadbeef          	jal	t4,7ffde722 <offset+0x7ffde722>
+
+8000313c <signature_16_0>:
+8000313c:	deadbeef          	jal	t4,7ffde726 <offset+0x7ffde726>
+80003140:	deadbeef          	jal	t4,7ffde72a <offset+0x7ffde72a>
+80003144:	deadbeef          	jal	t4,7ffde72e <offset+0x7ffde72e>
+80003148:	deadbeef          	jal	t4,7ffde732 <offset+0x7ffde732>
+8000314c:	deadbeef          	jal	t4,7ffde736 <offset+0x7ffde736>
+
+80003150 <signature_17_0>:
+80003150:	deadbeef          	jal	t4,7ffde73a <offset+0x7ffde73a>
+80003154:	deadbeef          	jal	t4,7ffde73e <offset+0x7ffde73e>
+80003158:	deadbeef          	jal	t4,7ffde742 <offset+0x7ffde742>
+8000315c:	deadbeef          	jal	t4,7ffde746 <offset+0x7ffde746>
+80003160:	deadbeef          	jal	t4,7ffde74a <offset+0x7ffde74a>
+
+80003164 <signature_18_0>:
+80003164:	deadbeef          	jal	t4,7ffde74e <offset+0x7ffde74e>
+80003168:	deadbeef          	jal	t4,7ffde752 <offset+0x7ffde752>
+8000316c:	deadbeef          	jal	t4,7ffde756 <offset+0x7ffde756>
+80003170:	deadbeef          	jal	t4,7ffde75a <offset+0x7ffde75a>
+80003174:	deadbeef          	jal	t4,7ffde75e <offset+0x7ffde75e>
+
+80003178 <signature_19_0>:
+80003178:	deadbeef          	jal	t4,7ffde762 <offset+0x7ffde762>
+8000317c:	deadbeef          	jal	t4,7ffde766 <offset+0x7ffde766>
+80003180:	deadbeef          	jal	t4,7ffde76a <offset+0x7ffde76a>
+80003184:	deadbeef          	jal	t4,7ffde76e <offset+0x7ffde76e>
+80003188:	deadbeef          	jal	t4,7ffde772 <offset+0x7ffde772>
+
+8000318c <signature_20_0>:
+8000318c:	deadbeef          	jal	t4,7ffde776 <offset+0x7ffde776>
+80003190:	deadbeef          	jal	t4,7ffde77a <offset+0x7ffde77a>
+80003194:	deadbeef          	jal	t4,7ffde77e <offset+0x7ffde77e>
+80003198:	deadbeef          	jal	t4,7ffde782 <offset+0x7ffde782>
+8000319c:	deadbeef          	jal	t4,7ffde786 <offset+0x7ffde786>
+
+800031a0 <signature_21_0>:
+800031a0:	deadbeef          	jal	t4,7ffde78a <offset+0x7ffde78a>
+800031a4:	deadbeef          	jal	t4,7ffde78e <offset+0x7ffde78e>
+800031a8:	deadbeef          	jal	t4,7ffde792 <offset+0x7ffde792>
+800031ac:	deadbeef          	jal	t4,7ffde796 <offset+0x7ffde796>
+800031b0:	deadbeef          	jal	t4,7ffde79a <offset+0x7ffde79a>
+
+800031b4 <signature_22_0>:
+800031b4:	deadbeef          	jal	t4,7ffde79e <offset+0x7ffde79e>
+800031b8:	deadbeef          	jal	t4,7ffde7a2 <offset+0x7ffde7a2>
+800031bc:	deadbeef          	jal	t4,7ffde7a6 <offset+0x7ffde7a6>
+800031c0:	deadbeef          	jal	t4,7ffde7aa <offset+0x7ffde7aa>
+800031c4:	deadbeef          	jal	t4,7ffde7ae <offset+0x7ffde7ae>
+
+800031c8 <signature_23_0>:
+800031c8:	deadbeef          	jal	t4,7ffde7b2 <offset+0x7ffde7b2>
+800031cc:	deadbeef          	jal	t4,7ffde7b6 <offset+0x7ffde7b6>
+800031d0:	deadbeef          	jal	t4,7ffde7ba <offset+0x7ffde7ba>
+800031d4:	deadbeef          	jal	t4,7ffde7be <offset+0x7ffde7be>
+800031d8:	deadbeef          	jal	t4,7ffde7c2 <offset+0x7ffde7c2>
+
+800031dc <signature_24_0>:
+800031dc:	deadbeef          	jal	t4,7ffde7c6 <offset+0x7ffde7c6>
+800031e0:	deadbeef          	jal	t4,7ffde7ca <offset+0x7ffde7ca>
+800031e4:	deadbeef          	jal	t4,7ffde7ce <offset+0x7ffde7ce>
+800031e8:	deadbeef          	jal	t4,7ffde7d2 <offset+0x7ffde7d2>
+800031ec:	deadbeef          	jal	t4,7ffde7d6 <offset+0x7ffde7d6>
+
+800031f0 <signature_25_0>:
+800031f0:	deadbeef          	jal	t4,7ffde7da <offset+0x7ffde7da>
+800031f4:	deadbeef          	jal	t4,7ffde7de <offset+0x7ffde7de>
+800031f8:	deadbeef          	jal	t4,7ffde7e2 <offset+0x7ffde7e2>
+800031fc:	deadbeef          	jal	t4,7ffde7e6 <offset+0x7ffde7e6>
+80003200:	deadbeef          	jal	t4,7ffde7ea <offset+0x7ffde7ea>
+
+80003204 <signature_26_0>:
+80003204:	deadbeef          	jal	t4,7ffde7ee <offset+0x7ffde7ee>
+80003208:	deadbeef          	jal	t4,7ffde7f2 <offset+0x7ffde7f2>
+8000320c:	deadbeef          	jal	t4,7ffde7f6 <offset+0x7ffde7f6>
+80003210:	deadbeef          	jal	t4,7ffde7fa <offset+0x7ffde7fa>
+80003214:	deadbeef          	jal	t4,7ffde7fe <offset+0x7ffde7fe>
+
+80003218 <signature_27_0>:
+80003218:	deadbeef          	jal	t4,7ffde802 <offset+0x7ffde802>
+8000321c:	deadbeef          	jal	t4,7ffde806 <offset+0x7ffde806>
+80003220:	deadbeef          	jal	t4,7ffde80a <offset+0x7ffde80a>
+80003224:	deadbeef          	jal	t4,7ffde80e <offset+0x7ffde80e>
+80003228:	deadbeef          	jal	t4,7ffde812 <offset+0x7ffde812>
+
+8000322c <signature_28_0>:
+8000322c:	deadbeef          	jal	t4,7ffde816 <offset+0x7ffde816>
+80003230:	deadbeef          	jal	t4,7ffde81a <offset+0x7ffde81a>
+80003234:	deadbeef          	jal	t4,7ffde81e <offset+0x7ffde81e>
+80003238:	deadbeef          	jal	t4,7ffde822 <offset+0x7ffde822>
+8000323c:	deadbeef          	jal	t4,7ffde826 <offset+0x7ffde826>
+
+80003240 <signature_29_0>:
+80003240:	deadbeef          	jal	t4,7ffde82a <offset+0x7ffde82a>
+80003244:	deadbeef          	jal	t4,7ffde82e <offset+0x7ffde82e>
+80003248:	deadbeef          	jal	t4,7ffde832 <offset+0x7ffde832>
+8000324c:	deadbeef          	jal	t4,7ffde836 <offset+0x7ffde836>
+80003250:	deadbeef          	jal	t4,7ffde83a <offset+0x7ffde83a>
+
+80003254 <signature_30_0>:
+80003254:	deadbeef          	jal	t4,7ffde83e <offset+0x7ffde83e>
+80003258:	deadbeef          	jal	t4,7ffde842 <offset+0x7ffde842>
+8000325c:	deadbeef          	jal	t4,7ffde846 <offset+0x7ffde846>
+80003260:	deadbeef          	jal	t4,7ffde84a <offset+0x7ffde84a>
+80003264:	deadbeef          	jal	t4,7ffde84e <offset+0x7ffde84e>
+
+80003268 <signature_31_0>:
+80003268:	deadbeef          	jal	t4,7ffde852 <offset+0x7ffde852>
+8000326c:	deadbeef          	jal	t4,7ffde856 <offset+0x7ffde856>
+80003270:	deadbeef          	jal	t4,7ffde85a <offset+0x7ffde85a>
+80003274:	deadbeef          	jal	t4,7ffde85e <offset+0x7ffde85e>
+80003278:	deadbeef          	jal	t4,7ffde862 <offset+0x7ffde862>
+
+8000327c <signature_32_0>:
+8000327c:	deadbeef          	jal	t4,7ffde866 <offset+0x7ffde866>
+80003280:	deadbeef          	jal	t4,7ffde86a <offset+0x7ffde86a>
+80003284:	deadbeef          	jal	t4,7ffde86e <offset+0x7ffde86e>
+80003288:	deadbeef          	jal	t4,7ffde872 <offset+0x7ffde872>
+8000328c:	deadbeef          	jal	t4,7ffde876 <offset+0x7ffde876>
+
+80003290 <signature_33_0>:
+80003290:	deadbeef          	jal	t4,7ffde87a <offset+0x7ffde87a>
+80003294:	deadbeef          	jal	t4,7ffde87e <offset+0x7ffde87e>
+80003298:	deadbeef          	jal	t4,7ffde882 <offset+0x7ffde882>
+8000329c:	deadbeef          	jal	t4,7ffde886 <offset+0x7ffde886>
+800032a0:	deadbeef          	jal	t4,7ffde88a <offset+0x7ffde88a>
+
+800032a4 <signature_34_0>:
+800032a4:	deadbeef          	jal	t4,7ffde88e <offset+0x7ffde88e>
+800032a8:	deadbeef          	jal	t4,7ffde892 <offset+0x7ffde892>
+800032ac:	deadbeef          	jal	t4,7ffde896 <offset+0x7ffde896>
+800032b0:	deadbeef          	jal	t4,7ffde89a <offset+0x7ffde89a>
+800032b4:	deadbeef          	jal	t4,7ffde89e <offset+0x7ffde89e>
+	...
+
+800032c0 <end_signature>:
+	...
+
+80003300 <begin_regstate>:
+80003300:	0080                	add	s0,sp,64
+	...
+
+80003400 <end_regstate>:
+80003400:	0004                	.insn	2, 0x0004
+	...
+
+Disassembly of section .riscv.attributes:
+
+00000000 <.riscv.attributes>:
+   0:	2741                	jal	780 <offset+0x780>
+   2:	0000                	unimp
+   4:	7200                	.insn	2, 0x7200
+   6:	7369                	lui	t1,0xffffa
+   8:	01007663          	bgeu	zero,a6,14 <offset+0x14>
+   c:	001d                	c.nop	7
+   e:	0000                	unimp
+  10:	7205                	lui	tp,0xfffe1
+  12:	3376                	.insn	2, 0x3376
+  14:	6932                	.insn	2, 0x6932
+  16:	7032                	.insn	2, 0x7032
+  18:	5f30                	lw	a2,120(a4)
+  1a:	326d                	jal	fffff9c4 <_end+0x7fffc5c0>
+  1c:	3070                	.insn	2, 0x3070
+  1e:	635f 7032 0030      	.insn	6, 0x00307032635f
+  24:	0108                	add	a0,sp,128
+  26:	0b0a                	sll	s6,s6,0x2

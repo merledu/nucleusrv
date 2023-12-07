@@ -6,17 +6,18 @@
 
 #include "VTop___024root.h"
 
-extern const VlWide<22>/*703:0*/ VTop__ConstPool__CONST_h065e7a33_0;
+extern const VlWide<21>/*671:0*/ VTop__ConstPool__CONST_h894e0f5d_0;
+extern const VlWide<12>/*383:0*/ VTop__ConstPool__CONST_h17a25744_0;
 
 VL_ATTR_COLD void VTop___024root___initial__TOP__0(VTop___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     VTop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    VTop___024root___initial__TOP__0\n"); );
     // Body
-    VL_READMEM_N(true, 32, 8192, 0, std::string{"data.hex"}
+    VL_READMEM_N(true, 32, 8192, 0, VL_CVT_PACK_STR_NW(21, VTop__ConstPool__CONST_h894e0f5d_0)
                  ,  &(vlSelf->Top__DOT__dmem__DOT__sram__DOT__memory__DOT__mem)
                  , 0, ~0ULL);
-    VL_READMEM_N(true, 32, 8192, 0, VL_CVT_PACK_STR_NW(22, VTop__ConstPool__CONST_h065e7a33_0)
+    VL_READMEM_N(true, 32, 8192, 0, VL_CVT_PACK_STR_NW(12, VTop__ConstPool__CONST_h17a25744_0)
                  ,  &(vlSelf->Top__DOT__imem__DOT__sram__DOT__memory__DOT__mem)
                  , 0, ~0ULL);
 }

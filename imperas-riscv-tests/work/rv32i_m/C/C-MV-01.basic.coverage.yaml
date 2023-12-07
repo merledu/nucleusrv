@@ -1,0 +1,671 @@
+---
+c_add:
+  asm_count: 0
+  rd:
+    gpr:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 0
+      gp: 0
+      ra: 0
+      s0: 0
+      s1: 0
+      s2: 0
+      s3: 0
+      s4: 0
+      s5: 0
+      s6: 0
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 0
+      t5: 0
+      t6: 0
+      tp: 0
+      zero: 0
+  rs2:
+    gpr:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 0
+      gp: 0
+      ra: 0
+      s0: 0
+      s1: 0
+      s2: 0
+      s3: 0
+      s4: 0
+      s5: 0
+      s6: 0
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 0
+      t5: 0
+      t6: 0
+      tp: 0
+      zero: 0
+    sign:
+      neg: 0
+      pos: 0
+c_addi:
+  asm_count: 23
+  imm:
+    sign:
+      neg: 22
+      pos: 1
+  rd:
+    gpr:
+      a0: 1
+      a1: 1
+      a2: 1
+      a3: 1
+      a4: 2
+      a5: 1
+      a6: 1
+      a7: 1
+      gp: 1
+      ra: 0
+      s0: 1
+      s1: 1
+      s2: 1
+      s3: 1
+      s4: 1
+      s5: 1
+      s6: 1
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 1
+      t1: 1
+      t2: 1
+      t3: 0
+      t4: 1
+      t5: 0
+      t6: 0
+      tp: 1
+      zero: 1
+c_and:
+  asm_count: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+  rs2p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_andi:
+  asm_count: 0
+  imm:
+    sign:
+      neg: 0
+      pos: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_beqz:
+  asm_count: 0
+  offset:
+    sign:
+      neg: 0
+      pos: 0
+      zero: 0
+  rs1p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_bnez:
+  asm_count: 0
+  offset:
+    sign:
+      neg: 0
+      pos: 0
+      zero: 0
+  rs1p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_ebreak:
+  asm_count: 0
+c_j:
+  asm_count: 0
+  offset:
+    sign:
+      neg: 0
+      pos: 0
+      zero: 0
+c_jal:
+  asm_count: 0
+  offset:
+    sign:
+      neg: 0
+      pos: 0
+      zero: 0
+c_jalr:
+  asm_count: 0
+  rs1:
+    gpr:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 0
+      gp: 0
+      ra: 0
+      s0: 0
+      s1: 0
+      s2: 0
+      s3: 0
+      s4: 0
+      s5: 0
+      s6: 0
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 0
+      t5: 0
+      t6: 0
+      tp: 0
+      zero: 0
+    sign:
+      neg: 0
+      pos: 0
+c_jr:
+  asm_count: 0
+  rs1:
+    gpr:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 0
+      gp: 0
+      ra: 0
+      s0: 0
+      s1: 0
+      s2: 0
+      s3: 0
+      s4: 0
+      s5: 0
+      s6: 0
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 0
+      t5: 0
+      t6: 0
+      tp: 0
+      zero: 0
+c_li:
+  asm_count: 238
+  imm:
+    sign:
+      neg: 0
+      pos: 238
+  rd:
+    gpr:
+      a0: 9
+      a1: 8
+      a2: 7
+      a3: 7
+      a4: 7
+      a5: 7
+      a6: 7
+      a7: 7
+      gp: 8
+      ra: 13
+      s0: 8
+      s1: 6
+      s2: 9
+      s3: 8
+      s4: 9
+      s5: 6
+      s6: 7
+      s7: 7
+      s8: 6
+      s9: 6
+      s10: 7
+      s11: 6
+      sp: 11
+      t0: 8
+      t1: 6
+      t2: 7
+      t3: 7
+      t4: 7
+      t5: 8
+      t6: 9
+      tp: 10
+      zero: 0
+c_lui:
+  asm_count: 13
+  rd:
+    gpr:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 1
+      gp: 0
+      ra: 0
+      s0: 0
+      s1: 0
+      s2: 1
+      s3: 2
+      s4: 2
+      s5: 2
+      s6: 2
+      s7: 2
+      s8: 1
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 0
+      t5: 0
+      t6: 0
+      tp: 0
+      zero: 0
+c_lw:
+  asm_count: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+  rs1p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_lwsp:
+  asm_count: 0
+  rd:
+    gpr:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 0
+      gp: 0
+      ra: 0
+      s0: 0
+      s1: 0
+      s2: 0
+      s3: 0
+      s4: 0
+      s5: 0
+      s6: 0
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 0
+      t5: 0
+      t6: 0
+      tp: 0
+      zero: 0
+c_mv:
+  asm_count: 168
+  rd:
+    gpr:
+      a0: 7
+      a1: 6
+      a2: 5
+      a3: 5
+      a4: 5
+      a5: 5
+      a6: 5
+      a7: 5
+      gp: 5
+      ra: 10
+      s0: 6
+      s1: 4
+      s2: 7
+      s3: 6
+      s4: 7
+      s5: 4
+      s6: 5
+      s7: 5
+      s8: 4
+      s9: 4
+      s10: 5
+      s11: 4
+      sp: 7
+      t0: 5
+      t1: 4
+      t2: 5
+      t3: 4
+      t4: 5
+      t5: 6
+      t6: 6
+      tp: 7
+      zero: 0
+  rs2:
+    gpr:
+      a0: 4
+      a1: 4
+      a2: 5
+      a3: 4
+      a4: 7
+      a5: 6
+      a6: 4
+      a7: 4
+      gp: 7
+      ra: 7
+      s0: 5
+      s1: 4
+      s2: 6
+      s3: 4
+      s4: 5
+      s5: 6
+      s6: 5
+      s7: 6
+      s8: 6
+      s9: 6
+      s10: 4
+      s11: 4
+      sp: 8
+      t0: 6
+      t1: 5
+      t2: 7
+      t3: 5
+      t4: 6
+      t5: 4
+      t6: 6
+      tp: 8
+      zero: 0
+    sign:
+      neg: 57
+      pos: 111
+c_nop:
+  asm_count: 0
+c_or:
+  asm_count: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+  rs2p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_slli:
+  asm_count: 0
+  rd:
+    gpr:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 0
+      gp: 0
+      ra: 0
+      s0: 0
+      s1: 0
+      s2: 0
+      s3: 0
+      s4: 0
+      s5: 0
+      s6: 0
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 0
+      t5: 0
+      t6: 0
+      tp: 0
+      zero: 0
+c_srai:
+  asm_count: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_srli:
+  asm_count: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_sub:
+  asm_count: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+  rs2p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_sw:
+  asm_count: 0
+  rs1p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+  rs2p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+c_swsp:
+  asm_count: 12
+  rs2:
+    gpr:
+      a0: 1
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      a6: 0
+      a7: 0
+      gp: 0
+      ra: 2
+      s0: 0
+      s1: 0
+      s2: 2
+      s3: 1
+      s4: 1
+      s5: 0
+      s6: 1
+      s7: 0
+      s8: 0
+      s9: 0
+      s10: 0
+      s11: 0
+      sp: 0
+      t0: 0
+      t1: 0
+      t2: 0
+      t3: 0
+      t4: 1
+      t5: 1
+      t6: 2
+      tp: 0
+      zero: 0
+c_xor:
+  asm_count: 0
+  rdp:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+  rs2p:
+    gprp:
+      a0: 0
+      a1: 0
+      a2: 0
+      a3: 0
+      a4: 0
+      a5: 0
+      s0: 0
+      s1: 0
+...

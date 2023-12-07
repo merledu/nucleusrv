@@ -40,7 +40,6 @@ clean:
 compliance:
 	./run_compliance.sh $(ISA) $(TEST)
 
-
 IMEM=asm.txt
 
 rtl:
@@ -56,6 +55,7 @@ ver:
 	   obj_dir/VTop > trace.log 2>&1
 
 sim: rtl ver
+
 PYTHON := $(shell command -v python3 || command -v python)
 ASM=test.s
 asmtohex:
