@@ -1,0 +1,10 @@
+ClkCycle  pc_rdata  pc_wdata  insn      mode      rs1_addr  rs1_rdata rs2_addr  rs2_rdata rd_addr   rd_wdata  mem_addr  mem_rdata mem_wdata inst_str
+6         00000000  00000004  feedc0b7  3         27        00000000  14        00000000  1         feedc000  feedc000  00000000  00000000  lui     ra, 0xfeedc
+7         00000004  00000008  ead08093  3         1         00000000  13        00000000  1         feedbead  feedbead  00000000  00000000  add     ra, ra, -339
+8         00000008  0000000c  ff76e137  3         13        00000000  23        00000000  2         ff76e000  ff76e000  00000000  00000000  lui     sp, 0xff76e
+9         0000000c  00000010  f5610113  3         2         00000000  22        00000000  2         ff76df56  ff76df56  00000000  00000000  add     sp, sp, -170
+10        00000010  00000014  7fbb71b7  3         22        00000000  27        00000000  3         7fbb7000  7fbb7000  00000000  00000000  lui     gp, 0x7fbb7
+11        00000014  00000018  fab18193  3         3         00000000  11        00000000  3         7fbb6fab  7fbb6fab  00000000  00000000  add     gp, gp, -85
+12        00000018  0000001c  bfddb237  3         27        00000000  29        00000000  4         bfddb000  bfddb000  00000000  00000000  lui     tp, 0xbfddb
+13        0000001c  00000020  7d520213  3         4         00000000  21        00000000  4         bfddb7d5  bfddb7d5  00000000  00000000  add     tp, tp, 2005
+14        00000020  00000024  dfeee2b7  3         29        00000000  30        00000000  5         dfeee000  dfeee000  00000000  00000000  

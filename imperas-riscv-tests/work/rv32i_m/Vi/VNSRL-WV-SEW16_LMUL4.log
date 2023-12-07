@@ -1,0 +1,740 @@
+Info Session started: Sat Nov 11 20:09:30 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32GCV
+Info --override           riscvOVPsim/cpu/add_Extensions=AMFV
+Info --override           riscvOVPsim/cpu/vector_version=1.0
+Info --override           riscvOVPsim/cpu/VLEN=256
+Info --override           riscvOVPsim/cpu/SLEN=256
+Info --override           riscvOVPsim/cpu/ELEN=32
+Info --override           riscvOVPsim/cpu/Zvfh=T
+Info --override           riscvOVPsim/cpu/tval_ii_code=F
+Info --program            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VNSRL-WV-SEW16_LMUL4.elf
+Info --signaturedump     
+Info --customcontrol     
+Info --startcover         rvtest_code_begin
+Info --finishcover        rvtest_code_end
+Info --cover              basic
+Info --extensions         Vi
+Info --outputfile         /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VNSRL-WV-SEW16_LMUL4.basic.coverage.yaml
+Info --override           riscvOVPsim/cpu/sigdump/SignatureFile=/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VNSRL-WV-SEW16_LMUL4.signature.output
+Info --override           riscvOVPsim/cpu/sigdump/SignatureGranularity=4
+Info --override           riscvOVPsim/cpu/simulateexceptions=T
+Info --override           riscvOVPsim/cpu/defaultsemihost=F
+Info --logfile            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VNSRL-WV-SEW16_LMUL4.log
+Info --override           riscvOVPsim/cpu/user_version=2.3
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:09:30 2023
+
+
+Info (OR_OF) Target 'riscvOVPsim/cpu' has object file read from '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VNSRL-WV-SEW16_LMUL4.elf'
+Info (OR_PH) Program Headers:
+Info (OR_PH) Type           Offset     VirtAddr   PhysAddr   FileSiz    MemSiz     Flags Align
+Info (OR_PD) PROC           0x00003f04 0x00000000 0x00000000 0x00000088 0x00000000 R--   1
+Info (OR_PD) LOAD           0x00001000 0x80000000 0x80000000 0x0000082c 0x0000082c R-E   1000
+Info (OR_PD) LOAD           0x00002000 0x80001000 0x80001000 0x00001f04 0x00001f04 RW-   1000
+Info (SIGNATURE_DUMP_FSB) Found Symbol 'begin_signature' in application at 0x800025e0
+Info (SIGNATURE_DUMP_FSE) Found Symbol 'end_signature' in application at 0x80002de0
+Info (SIGNATURE_DUMP_EN) Signature File enabled, file '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VNSRL-WV-SEW16_LMUL4.signature.output'.
+Info (SIGNATURE_DUMP_ES) Extracting signature from 0x800025e0 size 2048 bytes
+Info (SIGNATURE_DUMP_SB) Symbol 'begin_signature' at 0x800025e0
+Info (SIGNATURE_DUMP_SE) Symbol 'end_signature' at 0x80002de0
+Info (ICV_PVSN) parameter 'vector_version' is '1.0'
+Info (ICV_ALI) Pseudo instructions will be translated
+Adding CSR fcsr
+Adding CSR fflags
+Adding CSR frm
+Adding CSR mstatus
+Adding CSR sstatus
+Adding CSR vcsr
+Adding CSR vl
+Adding CSR vlenb
+Adding CSR vstart
+Adding CSR vtype
+Adding CSR vxrm
+Adding CSR vxsat
+Adding CSR field fcsr/vxrm
+Adding CSR field fcsr/vxrm
+Adding CSR field fcsr/frm
+Adding CSR field fcsr/fflags
+Adding CSR field fcsr/vxsat
+Adding CSR field fcsr/vxsat
+Adding CSR field sstatus/spie
+Adding CSR field sstatus/sie
+Adding CSR field sstatus/ube
+Adding CSR field sstatus/fs
+Adding CSR field sstatus/vs
+Adding CSR field sstatus/vs
+Adding CSR field sstatus/mxr
+Adding CSR field sstatus/sd
+Adding CSR field sstatus/sum
+Adding CSR field sstatus/xs
+Adding CSR field sstatus/spp
+Adding CSR field vxrm/vxrm
+Adding CSR field frm/frm
+Adding CSR field vtype/vlmul
+Adding CSR field vtype/vill
+Adding CSR field vtype/vsew
+Adding CSR field vtype/vma
+Adding CSR field vtype/vta
+Adding CSR field fflags/fflags
+Adding CSR field mstatus/vs
+Adding CSR field mstatus/vs
+Adding CSR field enum fcsr/fflags/DZ
+Adding CSR field enum fcsr/fflags/NV
+Adding CSR field enum fcsr/fflags/NX
+Adding CSR field enum fcsr/fflags/OF
+Adding CSR field enum fcsr/fflags/UF
+Adding CSR field enum fcsr/frm/illegal
+Adding CSR field enum fcsr/frm/rdn
+Adding CSR field enum fcsr/frm/rmm
+Adding CSR field enum fcsr/frm/rne
+Adding CSR field enum fcsr/frm/rtz
+Adding CSR field enum fcsr/frm/rup
+Adding CSR field enum fcsr/vxrm/rdn
+Adding CSR field enum fcsr/vxrm/rdn
+Adding CSR field enum fcsr/vxrm/rne
+Adding CSR field enum fcsr/vxrm/rne
+Adding CSR field enum fcsr/vxrm/rnu
+Adding CSR field enum fcsr/vxrm/rnu
+Adding CSR field enum fcsr/vxrm/rod
+Adding CSR field enum fcsr/vxrm/rod
+Adding CSR field enum fcsr/vxsat/one
+Adding CSR field enum fcsr/vxsat/one
+Adding CSR field enum fcsr/vxsat/zero
+Adding CSR field enum fcsr/vxsat/zero
+Adding CSR field enum fflags/fflags/DZ
+Adding CSR field enum fflags/fflags/NV
+Adding CSR field enum fflags/fflags/NX
+Adding CSR field enum fflags/fflags/OF
+Adding CSR field enum fflags/fflags/UF
+Adding CSR field enum frm/frm/illegal
+Adding CSR field enum frm/frm/rdn
+Adding CSR field enum frm/frm/rmm
+Adding CSR field enum frm/frm/rne
+Adding CSR field enum frm/frm/rtz
+Adding CSR field enum frm/frm/rup
+Adding CSR field enum mstatus/vs/_initial
+Adding CSR field enum mstatus/vs/_initial
+Adding CSR field enum mstatus/vs/clean
+Adding CSR field enum mstatus/vs/clean
+Adding CSR field enum mstatus/vs/dirty
+Adding CSR field enum mstatus/vs/dirty
+Adding CSR field enum mstatus/vs/off
+Adding CSR field enum mstatus/vs/off
+Adding CSR field enum sstatus/fs/_initial
+Adding CSR field enum sstatus/fs/clean
+Adding CSR field enum sstatus/fs/dirty
+Adding CSR field enum sstatus/fs/off
+Adding CSR field enum sstatus/mxr/one
+Adding CSR field enum sstatus/mxr/zero
+Adding CSR field enum sstatus/sd/one
+Adding CSR field enum sstatus/sd/zero
+Adding CSR field enum sstatus/sie/one
+Adding CSR field enum sstatus/sie/zero
+Adding CSR field enum sstatus/spie/one
+Adding CSR field enum sstatus/spie/zero
+Adding CSR field enum sstatus/spp/one
+Adding CSR field enum sstatus/spp/zero
+Adding CSR field enum sstatus/sum/one
+Adding CSR field enum sstatus/sum/zero
+Adding CSR field enum sstatus/ube/one
+Adding CSR field enum sstatus/ube/zero
+Adding CSR field enum sstatus/vs/_initial
+Adding CSR field enum sstatus/vs/_initial
+Adding CSR field enum sstatus/vs/clean
+Adding CSR field enum sstatus/vs/clean
+Adding CSR field enum sstatus/vs/dirty
+Adding CSR field enum sstatus/vs/dirty
+Adding CSR field enum sstatus/vs/off
+Adding CSR field enum sstatus/vs/off
+Adding CSR field enum sstatus/xs/nonedcso
+Adding CSR field enum sstatus/xs/nonedsc
+Adding CSR field enum sstatus/xs/off
+Adding CSR field enum sstatus/xs/somed
+Adding CSR field enum vtype/vill/one
+Adding CSR field enum vtype/vill/zero
+Adding CSR field enum vtype/vlmul/1-32
+Adding CSR field enum vtype/vlmul/1/2-32
+Adding CSR field enum vtype/vlmul/1/4-32
+Adding CSR field enum vtype/vlmul/1/8-32
+Adding CSR field enum vtype/vlmul/2-16
+Adding CSR field enum vtype/vlmul/4-8
+Adding CSR field enum vtype/vlmul/8-4
+Adding CSR field enum vtype/vma/one
+Adding CSR field enum vtype/vma/zero
+Adding CSR field enum vtype/vsew/_1024
+Adding CSR field enum vtype/vsew/_128
+Adding CSR field enum vtype/vsew/_16
+Adding CSR field enum vtype/vsew/_256
+Adding CSR field enum vtype/vsew/_32
+Adding CSR field enum vtype/vsew/_512
+Adding CSR field enum vtype/vsew/_64
+Adding CSR field enum vtype/vsew/_8
+Adding CSR field enum vtype/vta/one
+Adding CSR field enum vtype/vta/zero
+Adding CSR field enum vxrm/vxrm/rdn
+Adding CSR field enum vxrm/vxrm/rne
+Adding CSR field enum vxrm/vxrm/rnu
+Adding CSR field enum vxrm/vxrm/rod
+Info (ICV_ST) Starting coverage at 0x80000178
+Info (SIGNATURE_DUMP_SFW) Signature Write 1 0x800025e0 bytes 2 0xcad
+Info (ICV_FN) Finishing coverage at 0x80000810
+Info (ICV_WCF) Writing coverage file /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VNSRL-WV-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : Vi
+Info   Threshold             : 1
+Info   Instructions counted  : 16
+Info   Unique instructions   : 1/137 :   0.73%
+Info   Coverage points hit   : 20/12404 :   0.16%
+Info ---------------------------------------------------
+Info (SIGNATURE_DUMP_WTH) Intercept 'write_tohost'. Generate Signature file
+00100cad
+02464334
+0000d5fd
+d69d718f
+04660007
+e31ffa64
+c737ad3a
+e54c8c1e
+006860db
+7dd3dadf
+2c630016
+fbba7ae7
+195b306c
+f6007e80
+34b80001
+3aef5ff4
+00600387
+68140951
+a9313492
+b02d663e
+b2d302d5
+e4ec0002
+5233ae68
+135c3650
+1ec688d5
+37bf73b3
+c83b0435
+d1bc49d8
+0002a97f
+62f60005
+5b086787
+022ff8a5
+b63248d4
+1ffa0000
+ca99bd69
+4b6bf94c
+00013c84
+01ec0006
+aef50000
+51530006
+2c0b0000
+a735a7e3
+00356749
+00060000
+7dd8641d
+00620a96
+70e905b0
+7a180030
+09b39378
+00002cca
+5ab70000
+16b5302f
+6eaef276
+1b490004
+00e0426b
+000707b1
+000125fd
+0012f22b
+0003000c
+25250000
+387410b3
+6075c1a2
+951e8621
+4ff09378
+c737ad3a
+e54cc8c1
+7ca60001
+95b60003
+e03f001e
+0d090000
+195b62bf
+f600a3d1
+34b80fd4
+88d55ff4
+00c8037b
+52d154c0
+67dd3492
+b02df8a5
+00022547
+824d39ae
+5233a4dd
+d4982d5b
+1f930005
+009b8dd5
+c83b06d2
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+692d0001
+e9eb0005
+3d800000
+ebfe701f
+001a4cf5
+00160000
+39ae5969
+00d40523
+6f7e018f
+f1f70064
+062fa97f
+000116c2
+a8f40001
+1366849b
+1ea8cca9
+016a0000
+37bf4071
+c83b3c30
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+6c5774f5
+f6000147
+34b80fd4
+34925ff4
+00b20b02
+68140824
+f2233492
+b02d4071
+b2d3f1c5
+d84339ae
+5233a4dd
+d4983650
+18fc88d5
+37bf4071
+c83b3c30
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+5ff41a5c
+00680342
+605a067d
+34e60059
+0d49a4dd
+0001063f
+8de30003
+0c5e454b
+d4983650
+18fc88d5
+37bf4071
+c83b3c30
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+74d20034
+0b2d663e
+00022093
+c7e40003
+5233fa03
+d4983650
+18fc88d5
+37bf4071
+c83b3c30
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+12690002
+1a939d26
+bdfa63f2
+1a370006
+37bf4071
+c83b3c30
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+18fc0006
+37bf37bf
+c83b068d
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+0001641d
+000ca968
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+5b080000
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+b32a4c52
+03d5081b
+1181fb1a
+07e4ed8c
+484605f6
+b5aea4c9
+c8f5848f
+8dd5039d
+00078042
+00660667
+426bcf77
+e0e99494
+f6320013
+73b37056
+11171384
+86b081d4
+f22b0003
+93b00c47
+0cc9d6c8
+3b9b004e
+169daa96
+05250006
+a2167b52
+9fcb3c6f
+01310d4c
+97050001
+cbc7ad15
+024481e9
+445d0380
+ea35588f
+527e5a74
+027810dd
+005a0002
+bbad0012
+0237c9d8
+325a026c
+83a40213
+0003ec64
+0435b003
+0024d921
+b9b3275b
+a4a40002
+e5f22167
+25c13a4b
+09c2022f
+001d0002
+79e90527
+8f8b793b
+47c60024
+6c34a22e
+0009000e
+0003a568
+00aa37f2
+03c61a45
+a6610000
+fbc488a2
+5e1936fb
+000b032f
+38053024
+00003b91
+79e9001a
+0be793b3
+c47c5d71
+24e0658c
+7612848f
+6c6acd04
+9b1a8042
+da4c9092
+426b8dfb
+e0e9c207
+f6320012
+4edee156
+4bfb003d
+86b081d4
+f22b6484
+445d6678
+0cc95fe1
+3b9b3ddc
+169dbce8
+00180004
+a2167b52
+9fcb136a
+037f1999
+22a00000
+8bfc379b
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+06d2a804
+0038e37e
+3b3ec8f5
+d6100009
+d83322b6
+0ee60332
+00a4005a
+00130005
+97050e92
+c230cad1
+ea350044
+f4887e81
+00180000
+0002e065
+c34330e8
+013639ad
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+Info 
+Info ---------------------------------------------------
+Info CPU 'riscvOVPsim/cpu' STATISTICS
+Info   Type                  : riscv (RV32GCV)
+Info   Nominal MIPS          : 100
+Info   Final program counter : 0x8000003c
+Info   Simulated instructions: 506
+Info   Simulated MIPS        : run too short for meaningful result
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.06 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.13 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:09:30 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info Session ended: Sat Nov 11 20:09:30 2023
+

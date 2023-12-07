@@ -1,0 +1,1252 @@
+Info Session started: Sat Nov 11 20:10:03 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32GCV
+Info --override           riscvOVPsim/cpu/add_Extensions=AMFV
+Info --override           riscvOVPsim/cpu/vector_version=1.0
+Info --override           riscvOVPsim/cpu/VLEN=256
+Info --override           riscvOVPsim/cpu/SLEN=256
+Info --override           riscvOVPsim/cpu/ELEN=32
+Info --override           riscvOVPsim/cpu/Zvfh=T
+Info --override           riscvOVPsim/cpu/tval_ii_code=F
+Info --program            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VWMULU-VX-SEW8_LMUL4.elf
+Info --signaturedump     
+Info --customcontrol     
+Info --startcover         rvtest_code_begin
+Info --finishcover        rvtest_code_end
+Info --cover              basic
+Info --extensions         Vi
+Info --outputfile         /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VWMULU-VX-SEW8_LMUL4.basic.coverage.yaml
+Info --override           riscvOVPsim/cpu/sigdump/SignatureFile=/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VWMULU-VX-SEW8_LMUL4.signature.output
+Info --override           riscvOVPsim/cpu/sigdump/SignatureGranularity=4
+Info --override           riscvOVPsim/cpu/simulateexceptions=T
+Info --override           riscvOVPsim/cpu/defaultsemihost=F
+Info --logfile            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VWMULU-VX-SEW8_LMUL4.log
+Info --override           riscvOVPsim/cpu/user_version=2.3
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:10:03 2023
+
+
+Info (OR_OF) Target 'riscvOVPsim/cpu' has object file read from '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VWMULU-VX-SEW8_LMUL4.elf'
+Info (OR_PH) Program Headers:
+Info (OR_PH) Type           Offset     VirtAddr   PhysAddr   FileSiz    MemSiz     Flags Align
+Info (OR_PD) PROC           0x00004704 0x00000000 0x00000000 0x00000088 0x00000000 R--   1
+Info (OR_PD) LOAD           0x00001000 0x80000000 0x80000000 0x000007e8 0x000007e8 R-E   1000
+Info (OR_PD) LOAD           0x00002000 0x80001000 0x80001000 0x00002704 0x00002704 RW-   1000
+Info (SIGNATURE_DUMP_FSB) Found Symbol 'begin_signature' in application at 0x800025e0
+Info (SIGNATURE_DUMP_FSE) Found Symbol 'end_signature' in application at 0x800035e0
+Info (SIGNATURE_DUMP_EN) Signature File enabled, file '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VWMULU-VX-SEW8_LMUL4.signature.output'.
+Info (SIGNATURE_DUMP_ES) Extracting signature from 0x800025e0 size 4096 bytes
+Info (SIGNATURE_DUMP_SB) Symbol 'begin_signature' at 0x800025e0
+Info (SIGNATURE_DUMP_SE) Symbol 'end_signature' at 0x800035e0
+Info (ICV_PVSN) parameter 'vector_version' is '1.0'
+Info (ICV_ALI) Pseudo instructions will be translated
+Adding CSR fcsr
+Adding CSR fflags
+Adding CSR frm
+Adding CSR mstatus
+Adding CSR sstatus
+Adding CSR vcsr
+Adding CSR vl
+Adding CSR vlenb
+Adding CSR vstart
+Adding CSR vtype
+Adding CSR vxrm
+Adding CSR vxsat
+Adding CSR field fcsr/vxrm
+Adding CSR field fcsr/vxrm
+Adding CSR field fcsr/frm
+Adding CSR field fcsr/fflags
+Adding CSR field fcsr/vxsat
+Adding CSR field fcsr/vxsat
+Adding CSR field sstatus/spie
+Adding CSR field sstatus/sie
+Adding CSR field sstatus/ube
+Adding CSR field sstatus/fs
+Adding CSR field sstatus/vs
+Adding CSR field sstatus/vs
+Adding CSR field sstatus/mxr
+Adding CSR field sstatus/sd
+Adding CSR field sstatus/sum
+Adding CSR field sstatus/xs
+Adding CSR field sstatus/spp
+Adding CSR field vxrm/vxrm
+Adding CSR field frm/frm
+Adding CSR field vtype/vlmul
+Adding CSR field vtype/vill
+Adding CSR field vtype/vsew
+Adding CSR field vtype/vma
+Adding CSR field vtype/vta
+Adding CSR field fflags/fflags
+Adding CSR field mstatus/vs
+Adding CSR field mstatus/vs
+Adding CSR field enum fcsr/fflags/DZ
+Adding CSR field enum fcsr/fflags/NV
+Adding CSR field enum fcsr/fflags/NX
+Adding CSR field enum fcsr/fflags/OF
+Adding CSR field enum fcsr/fflags/UF
+Adding CSR field enum fcsr/frm/illegal
+Adding CSR field enum fcsr/frm/rdn
+Adding CSR field enum fcsr/frm/rmm
+Adding CSR field enum fcsr/frm/rne
+Adding CSR field enum fcsr/frm/rtz
+Adding CSR field enum fcsr/frm/rup
+Adding CSR field enum fcsr/vxrm/rdn
+Adding CSR field enum fcsr/vxrm/rdn
+Adding CSR field enum fcsr/vxrm/rne
+Adding CSR field enum fcsr/vxrm/rne
+Adding CSR field enum fcsr/vxrm/rnu
+Adding CSR field enum fcsr/vxrm/rnu
+Adding CSR field enum fcsr/vxrm/rod
+Adding CSR field enum fcsr/vxrm/rod
+Adding CSR field enum fcsr/vxsat/one
+Adding CSR field enum fcsr/vxsat/one
+Adding CSR field enum fcsr/vxsat/zero
+Adding CSR field enum fcsr/vxsat/zero
+Adding CSR field enum fflags/fflags/DZ
+Adding CSR field enum fflags/fflags/NV
+Adding CSR field enum fflags/fflags/NX
+Adding CSR field enum fflags/fflags/OF
+Adding CSR field enum fflags/fflags/UF
+Adding CSR field enum frm/frm/illegal
+Adding CSR field enum frm/frm/rdn
+Adding CSR field enum frm/frm/rmm
+Adding CSR field enum frm/frm/rne
+Adding CSR field enum frm/frm/rtz
+Adding CSR field enum frm/frm/rup
+Adding CSR field enum mstatus/vs/_initial
+Adding CSR field enum mstatus/vs/_initial
+Adding CSR field enum mstatus/vs/clean
+Adding CSR field enum mstatus/vs/clean
+Adding CSR field enum mstatus/vs/dirty
+Adding CSR field enum mstatus/vs/dirty
+Adding CSR field enum mstatus/vs/off
+Adding CSR field enum mstatus/vs/off
+Adding CSR field enum sstatus/fs/_initial
+Adding CSR field enum sstatus/fs/clean
+Adding CSR field enum sstatus/fs/dirty
+Adding CSR field enum sstatus/fs/off
+Adding CSR field enum sstatus/mxr/one
+Adding CSR field enum sstatus/mxr/zero
+Adding CSR field enum sstatus/sd/one
+Adding CSR field enum sstatus/sd/zero
+Adding CSR field enum sstatus/sie/one
+Adding CSR field enum sstatus/sie/zero
+Adding CSR field enum sstatus/spie/one
+Adding CSR field enum sstatus/spie/zero
+Adding CSR field enum sstatus/spp/one
+Adding CSR field enum sstatus/spp/zero
+Adding CSR field enum sstatus/sum/one
+Adding CSR field enum sstatus/sum/zero
+Adding CSR field enum sstatus/ube/one
+Adding CSR field enum sstatus/ube/zero
+Adding CSR field enum sstatus/vs/_initial
+Adding CSR field enum sstatus/vs/_initial
+Adding CSR field enum sstatus/vs/clean
+Adding CSR field enum sstatus/vs/clean
+Adding CSR field enum sstatus/vs/dirty
+Adding CSR field enum sstatus/vs/dirty
+Adding CSR field enum sstatus/vs/off
+Adding CSR field enum sstatus/vs/off
+Adding CSR field enum sstatus/xs/nonedcso
+Adding CSR field enum sstatus/xs/nonedsc
+Adding CSR field enum sstatus/xs/off
+Adding CSR field enum sstatus/xs/somed
+Adding CSR field enum vtype/vill/one
+Adding CSR field enum vtype/vill/zero
+Adding CSR field enum vtype/vlmul/1-32
+Adding CSR field enum vtype/vlmul/1/2-32
+Adding CSR field enum vtype/vlmul/1/4-32
+Adding CSR field enum vtype/vlmul/1/8-32
+Adding CSR field enum vtype/vlmul/2-16
+Adding CSR field enum vtype/vlmul/4-8
+Adding CSR field enum vtype/vlmul/8-4
+Adding CSR field enum vtype/vma/one
+Adding CSR field enum vtype/vma/zero
+Adding CSR field enum vtype/vsew/_1024
+Adding CSR field enum vtype/vsew/_128
+Adding CSR field enum vtype/vsew/_16
+Adding CSR field enum vtype/vsew/_256
+Adding CSR field enum vtype/vsew/_32
+Adding CSR field enum vtype/vsew/_512
+Adding CSR field enum vtype/vsew/_64
+Adding CSR field enum vtype/vsew/_8
+Adding CSR field enum vtype/vta/one
+Adding CSR field enum vtype/vta/zero
+Adding CSR field enum vxrm/vxrm/rdn
+Adding CSR field enum vxrm/vxrm/rne
+Adding CSR field enum vxrm/vxrm/rnu
+Adding CSR field enum vxrm/vxrm/rod
+Info (ICV_ST) Starting coverage at 0x80000178
+Info (SIGNATURE_DUMP_SFW) Signature Write 1 0x800025e0 bytes 2 0x0
+Info (ICV_FN) Finishing coverage at 0x800007e0
+Info (ICV_WCF) Writing coverage file /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VWMULU-VX-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : Vi
+Info   Threshold             : 1
+Info   Instructions counted  : 16
+Info   Unique instructions   : 1/137 :   0.73%
+Info   Coverage points hit   : 30/12404 :   0.24%
+Info ---------------------------------------------------
+Info (SIGNATURE_DUMP_WTH) Intercept 'write_tohost'. Generate Signature file
+00000000
+00000000
+0000d5fd
+00000000
+04660000
+e31ffa64
+c737ad3a
+e54c8c1e
+000060db
+0000dadf
+2c630000
+fbba7ae7
+195b0000
+f6000000
+34b80000
+3aef5ff4
+00000000
+68140000
+00003492
+b02d663e
+b2d30000
+00000000
+52330000
+00003650
+000088d5
+37bf0000
+c83b0000
+d1bc0000
+0000a97f
+62f60000
+5b086787
+0000f8a5
+60750000
+00000000
+00000000
+9b327ba8
+00004c52
+00000000
+17a20000
+00000000
+000005f6
+00000000
+fc9d0000
+0000cd04
+00008042
+da4c9686
+426b8dfb
+e0e90000
+f6320000
+73b3e156
+4bfb0000
+86b00000
+00006484
+00006678
+0cc90000
+00003ddc
+169d0000
+05252532
+00007b52
+9fcbe57f
+e92f674b
+97056592
+0000ad15
+4e1181e9
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+3b9b0000
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+c737ad3a
+e54c001f
+7ca6003a
+00c70037
+008c001e
+00e5004c
+195b62bf
+f600a3d1
+34b80fd4
+00065ff4
+00c80047
+002c54c0
+67dd3492
+b02d00ba
+006200bf
+824d39ae
+5233a4dd
+d4980000
+000f00d4
+003400b8
+005f00f4
+003a00ef
+a96800d9
+62f60026
+005400c0
+00680014
+0034c1a2
+006700dd
+00669378
+00b07ba8
+00f100c5
+03d5081b
+17a200ae
+0082ed8c
+484600dd
+00520033
+0036848f
+00d4cd04
+008800d5
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+5fa0da25
+7b84a55a
+d926de21
+05fa916e
+c73846b9
+2bd4629d
+7986e619
+fa05b946
+619ebe41
+18e75aa5
+a25dd02f
+f50a0000
+0ef1d32c
+33ccb748
+5ea1f30c
+39c6ee11
+7986d827
+33cc25da
+53acbf40
+679813ec
+33cc916e
+6699dc23
+659a3dc2
+af502cd3
+f00fc43b
+b14ed22d
+38c7ad52
+817e4cb3
+a35cdc23
+51ae32cd
+35ca4fb0
+d32c9768
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+6138b814
+f6009438
+34b80fd4
+13ec5ff4
+81e4a68c
+68140000
+0bf43492
+b02d92a0
+b2d3f1c5
+2e3839ae
+5233a4dd
+d4983650
+42f09900
+52e04071
+c83b7458
+d1bcb01c
+a9683168
+62f623dc
+c00c6787
+8dd8f8a5
+6075c1a2
+67988621
+82b0b01c
+415828a4
+b32a4c52
+03d57920
+6c60a9bc
+0b56c8d0
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+00000000
+9b320000
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+11102700
+1520663e
+0a901da8
+14ec2ce4
+52330c98
+23c00924
+18fc88d5
+24284071
+0b942358
+1a687dd8
+2150a97f
+62f60a5c
+0af86787
+3874f8a5
+6075c1a2
+951e3330
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+f00fc43b
+b14ed22d
+38c7ad52
+817e4cb3
+a35cdc23
+51ae32cd
+35ca4fb0
+d32c9768
+8778d42b
+17e8fb04
+3fc0708f
+6075be41
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+18fc0050
+37bf0098
+c83b00d5
+d1bc7dd8
+a9680071
+003700bf
+003c6787
+00c8f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+fde223d8
+dbee5e94
+982bc336
+3bc42fd0
+c7383ac5
+7c83d728
+d02fbb44
+a8577e81
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+fde223d8
+dbee5e94
+982bc336
+65e3c70c
+b64b71f6
+86604880
+5b080e0d
+3874f8a5
+0d47c1a2
+0bbb0108
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+fde223d8
+dbee5e94
+982bc336
+65e3c70c
+b64b71f6
+86604880
+700a8d4e
+63b91dcd
+04b11e73
+00000000
+00000000
+00000000
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+fde223d8
+dbee5e94
+982bc336
+65e3c70c
+b64b71f6
+86604880
+700a8d4e
+63b91dcd
+04b11e73
+355e64a2
+95a74545
+8b4ecba8
+00004c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+fde223d8
+dbee5e94
+982bc336
+65e3c70c
+b64b71f6
+86604880
+700a8d4e
+63b91dcd
+04b11e73
+355e64a2
+95a74545
+8b4ecba8
+cd1b37e5
+4f031546
+918f472f
+fa0519e6
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+fde223d8
+dbee5e94
+982bc336
+65e3c70c
+b64b71f6
+86604880
+700a8d4e
+63b91dcd
+04b11e73
+355e64a2
+95a74545
+8b4ecba8
+cd1b37e5
+4f031546
+918f472f
+ac98e804
+311c98a1
+1151057d
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+93b06678
+0cc9d6c8
+3b9b3ddc
+169dbce8
+05252532
+a2167b52
+9fcbe57f
+e92f674b
+97056592
+8bfcad15
+4e1181e9
+445da8cc
+ea35fe19
+527e81e3
+79e910dd
+0be793b3
+c47c5d71
+24e0658c
+47c6f638
+c3a22eae
+4ed86866
+e6b6a11c
+4daa96d5
+d7a568f0
+66652ebf
+dfcadfe1
+3be0154f
+69150191
+f1bcd84d
+734b985d
+353308fb
+4c45120b
+fde223d8
+dbee5e94
+982bc336
+65e3c70c
+b64b71f6
+86604880
+700a8d4e
+63b91dcd
+04b11e73
+355e64a2
+95a74545
+8b4ecba8
+cd1b37e5
+4f031546
+918f472f
+ac98e804
+311c98a1
+1151057d
+995ccbf8
+31a201a7
+dc447722
+00800042
+009b001a
+00960086
+00da004c
+008d00fb
+0042006b
+0009002c
+00e000e9
+003d0052
+00f60032
+00e10056
+007300b3
+0000003d
+004b00fb
+008100d4
+008600b0
+00640084
+00f2002b
+00660078
+009300b0
+00d600c8
+000c00c9
+003d00dc
+003b009b
+00bc00e8
+0016009d
+00250032
+00050025
+007b0052
+00a20016
+00e5007f
+009f00cb
+0067004b
+00e9002f
+00650092
+00970005
+00ad0015
+008b00fc
+008100e9
+004e0011
+00a800cc
+0044005d
+00fe0019
+00ea0035
+008100e3
+0052007e
+001000dd
+007900e9
+009300b3
+000b00e7
+005d0071
+00c4007c
+0065008c
+002400e0
+00f60038
+004700c6
+002e00ae
+00c300a2
+00680066
+004e00d8
+00a1001c
+00e600b6
+009600d5
+004d00aa
+Info 
+Info ---------------------------------------------------
+Info CPU 'riscvOVPsim/cpu' STATISTICS
+Info   Type                  : riscv (RV32GCV)
+Info   Nominal MIPS          : 100
+Info   Final program counter : 0x8000003c
+Info   Simulated instructions: 494
+Info   Simulated MIPS        : run too short for meaningful result
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.05 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.13 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:10:04 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info Session ended: Sat Nov 11 20:10:04 2023
+

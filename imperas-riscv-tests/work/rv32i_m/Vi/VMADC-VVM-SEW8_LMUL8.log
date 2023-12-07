@@ -1,0 +1,1252 @@
+Info Session started: Sat Nov 11 20:08:30 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32GCV
+Info --override           riscvOVPsim/cpu/add_Extensions=AMFV
+Info --override           riscvOVPsim/cpu/vector_version=1.0
+Info --override           riscvOVPsim/cpu/VLEN=256
+Info --override           riscvOVPsim/cpu/SLEN=256
+Info --override           riscvOVPsim/cpu/ELEN=32
+Info --override           riscvOVPsim/cpu/Zvfh=T
+Info --override           riscvOVPsim/cpu/tval_ii_code=F
+Info --program            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VMADC-VVM-SEW8_LMUL8.elf
+Info --signaturedump     
+Info --customcontrol     
+Info --startcover         rvtest_code_begin
+Info --finishcover        rvtest_code_end
+Info --cover              basic
+Info --extensions         Vi
+Info --outputfile         /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VMADC-VVM-SEW8_LMUL8.basic.coverage.yaml
+Info --override           riscvOVPsim/cpu/sigdump/SignatureFile=/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VMADC-VVM-SEW8_LMUL8.signature.output
+Info --override           riscvOVPsim/cpu/sigdump/SignatureGranularity=4
+Info --override           riscvOVPsim/cpu/simulateexceptions=T
+Info --override           riscvOVPsim/cpu/defaultsemihost=F
+Info --logfile            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VMADC-VVM-SEW8_LMUL8.log
+Info --override           riscvOVPsim/cpu/user_version=2.3
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:08:30 2023
+
+
+Info (OR_OF) Target 'riscvOVPsim/cpu' has object file read from '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VMADC-VVM-SEW8_LMUL8.elf'
+Info (OR_PH) Program Headers:
+Info (OR_PH) Type           Offset     VirtAddr   PhysAddr   FileSiz    MemSiz     Flags Align
+Info (OR_PD) PROC           0x00004704 0x00000000 0x00000000 0x00000088 0x00000000 R--   1
+Info (OR_PD) LOAD           0x00001000 0x80000000 0x80000000 0x000008ec 0x000008ec R-E   1000
+Info (OR_PD) LOAD           0x00002000 0x80001000 0x80001000 0x00002704 0x00002704 RW-   1000
+Info (SIGNATURE_DUMP_FSB) Found Symbol 'begin_signature' in application at 0x800025e0
+Info (SIGNATURE_DUMP_FSE) Found Symbol 'end_signature' in application at 0x800035e0
+Info (SIGNATURE_DUMP_EN) Signature File enabled, file '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VMADC-VVM-SEW8_LMUL8.signature.output'.
+Info (SIGNATURE_DUMP_ES) Extracting signature from 0x800025e0 size 4096 bytes
+Info (SIGNATURE_DUMP_SB) Symbol 'begin_signature' at 0x800025e0
+Info (SIGNATURE_DUMP_SE) Symbol 'end_signature' at 0x800035e0
+Info (ICV_PVSN) parameter 'vector_version' is '1.0'
+Info (ICV_ALI) Pseudo instructions will be translated
+Adding CSR fcsr
+Adding CSR fflags
+Adding CSR frm
+Adding CSR mstatus
+Adding CSR sstatus
+Adding CSR vcsr
+Adding CSR vl
+Adding CSR vlenb
+Adding CSR vstart
+Adding CSR vtype
+Adding CSR vxrm
+Adding CSR vxsat
+Adding CSR field fcsr/vxrm
+Adding CSR field fcsr/vxrm
+Adding CSR field fcsr/frm
+Adding CSR field fcsr/fflags
+Adding CSR field fcsr/vxsat
+Adding CSR field fcsr/vxsat
+Adding CSR field sstatus/spie
+Adding CSR field sstatus/sie
+Adding CSR field sstatus/ube
+Adding CSR field sstatus/fs
+Adding CSR field sstatus/vs
+Adding CSR field sstatus/vs
+Adding CSR field sstatus/mxr
+Adding CSR field sstatus/sd
+Adding CSR field sstatus/sum
+Adding CSR field sstatus/xs
+Adding CSR field sstatus/spp
+Adding CSR field vxrm/vxrm
+Adding CSR field frm/frm
+Adding CSR field vtype/vlmul
+Adding CSR field vtype/vill
+Adding CSR field vtype/vsew
+Adding CSR field vtype/vma
+Adding CSR field vtype/vta
+Adding CSR field fflags/fflags
+Adding CSR field mstatus/vs
+Adding CSR field mstatus/vs
+Adding CSR field enum fcsr/fflags/DZ
+Adding CSR field enum fcsr/fflags/NV
+Adding CSR field enum fcsr/fflags/NX
+Adding CSR field enum fcsr/fflags/OF
+Adding CSR field enum fcsr/fflags/UF
+Adding CSR field enum fcsr/frm/illegal
+Adding CSR field enum fcsr/frm/rdn
+Adding CSR field enum fcsr/frm/rmm
+Adding CSR field enum fcsr/frm/rne
+Adding CSR field enum fcsr/frm/rtz
+Adding CSR field enum fcsr/frm/rup
+Adding CSR field enum fcsr/vxrm/rdn
+Adding CSR field enum fcsr/vxrm/rdn
+Adding CSR field enum fcsr/vxrm/rne
+Adding CSR field enum fcsr/vxrm/rne
+Adding CSR field enum fcsr/vxrm/rnu
+Adding CSR field enum fcsr/vxrm/rnu
+Adding CSR field enum fcsr/vxrm/rod
+Adding CSR field enum fcsr/vxrm/rod
+Adding CSR field enum fcsr/vxsat/one
+Adding CSR field enum fcsr/vxsat/one
+Adding CSR field enum fcsr/vxsat/zero
+Adding CSR field enum fcsr/vxsat/zero
+Adding CSR field enum fflags/fflags/DZ
+Adding CSR field enum fflags/fflags/NV
+Adding CSR field enum fflags/fflags/NX
+Adding CSR field enum fflags/fflags/OF
+Adding CSR field enum fflags/fflags/UF
+Adding CSR field enum frm/frm/illegal
+Adding CSR field enum frm/frm/rdn
+Adding CSR field enum frm/frm/rmm
+Adding CSR field enum frm/frm/rne
+Adding CSR field enum frm/frm/rtz
+Adding CSR field enum frm/frm/rup
+Adding CSR field enum mstatus/vs/_initial
+Adding CSR field enum mstatus/vs/_initial
+Adding CSR field enum mstatus/vs/clean
+Adding CSR field enum mstatus/vs/clean
+Adding CSR field enum mstatus/vs/dirty
+Adding CSR field enum mstatus/vs/dirty
+Adding CSR field enum mstatus/vs/off
+Adding CSR field enum mstatus/vs/off
+Adding CSR field enum sstatus/fs/_initial
+Adding CSR field enum sstatus/fs/clean
+Adding CSR field enum sstatus/fs/dirty
+Adding CSR field enum sstatus/fs/off
+Adding CSR field enum sstatus/mxr/one
+Adding CSR field enum sstatus/mxr/zero
+Adding CSR field enum sstatus/sd/one
+Adding CSR field enum sstatus/sd/zero
+Adding CSR field enum sstatus/sie/one
+Adding CSR field enum sstatus/sie/zero
+Adding CSR field enum sstatus/spie/one
+Adding CSR field enum sstatus/spie/zero
+Adding CSR field enum sstatus/spp/one
+Adding CSR field enum sstatus/spp/zero
+Adding CSR field enum sstatus/sum/one
+Adding CSR field enum sstatus/sum/zero
+Adding CSR field enum sstatus/ube/one
+Adding CSR field enum sstatus/ube/zero
+Adding CSR field enum sstatus/vs/_initial
+Adding CSR field enum sstatus/vs/_initial
+Adding CSR field enum sstatus/vs/clean
+Adding CSR field enum sstatus/vs/clean
+Adding CSR field enum sstatus/vs/dirty
+Adding CSR field enum sstatus/vs/dirty
+Adding CSR field enum sstatus/vs/off
+Adding CSR field enum sstatus/vs/off
+Adding CSR field enum sstatus/xs/nonedcso
+Adding CSR field enum sstatus/xs/nonedsc
+Adding CSR field enum sstatus/xs/off
+Adding CSR field enum sstatus/xs/somed
+Adding CSR field enum vtype/vill/one
+Adding CSR field enum vtype/vill/zero
+Adding CSR field enum vtype/vlmul/1-32
+Adding CSR field enum vtype/vlmul/1/2-32
+Adding CSR field enum vtype/vlmul/1/4-32
+Adding CSR field enum vtype/vlmul/1/8-32
+Adding CSR field enum vtype/vlmul/2-16
+Adding CSR field enum vtype/vlmul/4-8
+Adding CSR field enum vtype/vlmul/8-4
+Adding CSR field enum vtype/vma/one
+Adding CSR field enum vtype/vma/zero
+Adding CSR field enum vtype/vsew/_1024
+Adding CSR field enum vtype/vsew/_128
+Adding CSR field enum vtype/vsew/_16
+Adding CSR field enum vtype/vsew/_256
+Adding CSR field enum vtype/vsew/_32
+Adding CSR field enum vtype/vsew/_512
+Adding CSR field enum vtype/vsew/_64
+Adding CSR field enum vtype/vsew/_8
+Adding CSR field enum vtype/vta/one
+Adding CSR field enum vtype/vta/zero
+Adding CSR field enum vxrm/vxrm/rdn
+Adding CSR field enum vxrm/vxrm/rne
+Adding CSR field enum vxrm/vxrm/rnu
+Adding CSR field enum vxrm/vxrm/rod
+Info (ICV_ST) Starting coverage at 0x80000178
+Info (SIGNATURE_DUMP_SFW) Signature Write 1 0x800025e0 bytes 1 0x21
+Info (ICV_FN) Finishing coverage at 0x800008b0
+Info (ICV_WCF) Writing coverage file /home/hassan/imperas-riscv-tests/work/rv32i_m/Vi/VMADC-VVM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : Vi
+Info   Threshold             : 1
+Info   Instructions counted  : 16
+Info   Unique instructions   : 1/137 :   0.73%
+Info   Coverage points hit   : 22/12404 :   0.18%
+Info ---------------------------------------------------
+Info (SIGNATURE_DUMP_WTH) Intercept 'write_tohost'. Generate Signature file
+a20f3221
+9bdf378a
+1ffc1155
+2ef98559
+60876233
+baaef112
+78954acd
+e8aa0157
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+78aa20f3
+1559bdf3
+5591ffc1
+2332ef98
+11264876
+acdbaaef
+15778954
+2f6e8aa0
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+df378aa2
+fc11559b
+f905591f
+8762332e
+aef11260
+954acdba
+195b5778
+f600a3d1
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+59bdf378
+91ffc115
+32ef9855
+26087623
+dbaaef11
+34b80fec
+3aef5ff4
+34267ad9
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+11559bdf
+05591ffc
+62332ef9
+f1126487
+34267ad9
+681454c0
+67dd3492
+b02d663e
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+ffc11559
+ef905591
+48762332
+67dd3526
+b02d663e
+b2d3f1c5
+824d39ae
+5233a4dd
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+591ffc11
+332ef905
+b2d3c762
+824d39ae
+5233a4dd
+d4983650
+18fc88d5
+37bf4071
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+985591ff
+762332ef
+d4983650
+18fc88d5
+37bf4071
+c83b3c30
+d1bc7dd8
+a968a97f
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+2ef98559
+36876233
+c83b3c30
+d1bc7dd8
+a968a97f
+62f6cb6d
+5b086787
+3874f8a5
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+2332ef98
+a968a876
+62f6cb6d
+5b086787
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+8762332e
+3874f8a5
+6075c1a2
+951e8621
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+95487623
+4ff09378
+9b327ba8
+b32a4c52
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+b32a6487
+03d5081b
+17a2fb1a
+0b56ed8c
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+0b56ed26
+484605f6
+b5aeeeb5
+fc9d848f
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+fc9d84f1
+8dd5cd04
+9b1a8042
+da4c9686
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+da4c96aa
+426b8dfb
+e0e9092c
+f6323d52
+73b3e156
+4bfb003d
+86b081d4
+f22b6484
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+deadbeef
+Info 
+Info ---------------------------------------------------
+Info CPU 'riscvOVPsim/cpu' STATISTICS
+Info   Type                  : riscv (RV32GCV)
+Info   Nominal MIPS          : 100
+Info   Final program counter : 0x8000003c
+Info   Simulated instructions: 546
+Info   Simulated MIPS        : run too short for meaningful result
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.09 seconds
+Info   System time           : 0.01 seconds
+Info   Elapsed time          : 0.10 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:08:30 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info Session ended: Sat Nov 11 20:08:30 2023
+

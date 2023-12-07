@@ -1,0 +1,84 @@
+Info Session started: Sat Nov 11 20:12:27 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32IMC
+Info --cover              basic
+Info --countthreshold     1
+Info --showuncovered     
+Info --nosimulation      
+Info --extensions         C
+Info --inputfiles         work/rv32i_m/C
+Info --outputfile         work/rv32i_m/C/basic.coverage.yaml
+Info --reportfile         work/rv32i_m/C/basic.coverage.txt
+Info --logfile            work/rv32i_m/C/basic.coverage.run.log
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:12:27 2023
+
+
+Info (ICV_PVSN) parameter 'user_version' is '20191213'
+Info (ICV_ALI) Pseudo instructions will be translated
+Info (OP_NOS) Simulator finishing because 'nosimulation' was specified
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.00 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.00 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:12:27 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info (ICV_RD) Reading file work/rv32i_m/C/C-SW-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-JR-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-SRLI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-SRAI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-SUB-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-J-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-OR-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-LW-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/I-C-NOP-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-ANDI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-BEQZ-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-LUI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-ADD-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-AND-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-LI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-SWSP-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/I-C-EBREAK-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-SLLI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-MV-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-ADDI4SPN-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-LWSP-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-ADDI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-BNEZ-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-JAL-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-ADDI16SP-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-XOR-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/C/C-JALR-01.basic.coverage.yaml
+Info (ICV_WCF) Writing coverage file work/rv32i_m/C/basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info (ICV_WCR) Writing coverage report work/rv32i_m/C/basic.coverage.txt
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : C
+Info   Threshold             : 1
+Info   Instructions counted  : 0
+Info   Unique instructions   : 24/25 :  96.00%
+Info   Coverage points hit   : 520/546 :  95.24%
+Info ---------------------------------------------------
+Info Session ended: Sat Nov 11 20:12:27 2023
+

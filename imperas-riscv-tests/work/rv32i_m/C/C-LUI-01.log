@@ -1,0 +1,258 @@
+Info Session started: Sat Nov 11 20:12:24 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32IMC
+Info --override           riscvOVPsim/cpu/tval_ii_code=F
+Info --program            /home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-LUI-01.elf
+Info --signaturedump     
+Info --customcontrol     
+Info --startcover         rvtest_code_begin
+Info --finishcover        rvtest_code_end
+Info --cover              basic
+Info --extensions         C
+Info --outputfile         /home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-LUI-01.basic.coverage.yaml
+Info --override           riscvOVPsim/cpu/sigdump/SignatureFile=/home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-LUI-01.signature.output
+Info --override           riscvOVPsim/cpu/sigdump/SignatureGranularity=4
+Info --override           riscvOVPsim/cpu/simulateexceptions=T
+Info --override           riscvOVPsim/cpu/defaultsemihost=F
+Info --logfile            /home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-LUI-01.log
+Info --override           riscvOVPsim/cpu/user_version=2.3
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:12:24 2023
+
+
+Info (OR_OF) Target 'riscvOVPsim/cpu' has object file read from '/home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-LUI-01.elf'
+Info (OR_PH) Program Headers:
+Info (OR_PH) Type           Offset     VirtAddr   PhysAddr   FileSiz    MemSiz     Flags Align
+Info (OR_PD) PROC           0x00003404 0x00000000 0x00000000 0x00000028 0x00000000 R--   1
+Info (OR_PD) LOAD           0x00001000 0x80000000 0x80000000 0x0000067c 0x0000067c R-E   1000
+Info (OR_PD) LOAD           0x00002000 0x80001000 0x80001000 0x00001404 0x00001404 RW-   1000
+Info (SIGNATURE_DUMP_FSB) Found Symbol 'begin_signature' in application at 0x80002010
+Info (SIGNATURE_DUMP_FSE) Found Symbol 'end_signature' in application at 0x800022c0
+Info (SIGNATURE_DUMP_EN) Signature File enabled, file '/home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-LUI-01.signature.output'.
+Info (SIGNATURE_DUMP_ES) Extracting signature from 0x80002010 size 688 bytes
+Info (SIGNATURE_DUMP_SB) Symbol 'begin_signature' at 0x80002010
+Info (SIGNATURE_DUMP_SE) Symbol 'end_signature' at 0x800022c0
+Info (ICV_PVSN) parameter 'user_version' is '2.3'
+Info (ICV_ALI) Pseudo instructions will be translated
+Info (ICV_ST) Starting coverage at 0x80000178
+Info (SIGNATURE_DUMP_SFW) Signature Write 1 0x80002010 bytes 4 0xf000
+Info (ICV_FN) Finishing coverage at 0x80000640
+Info (ICV_WCF) Writing coverage file /home/hassan/imperas-riscv-tests/work/rv32i_m/C/C-LUI-01.basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : C
+Info   Threshold             : 1
+Info   Instructions counted  : 204
+Info   Unique instructions   : 3/25 :  12.00%
+Info   Coverage points hit   : 42/546 :   7.69%
+Info ---------------------------------------------------
+Info (SIGNATURE_DUMP_WTH) Intercept 'write_tohost'. Generate Signature file
+0000f000
+00007000
+0001d000
+00011000
+0001d000
+00005000
+0000f000
+00004000
+0001a000
+0001e000
+0001b000
+0001f000
+00007000
+00007000
+0001f000
+00011000
+00014000
+00014000
+00019000
+00001000
+00012000
+0001e000
+00005000
+0000e000
+0001d000
+00010000
+00015000
+00011000
+00010000
+00018000
+00001000
+0001f000
+0001f000
+0001f000
+00001000
+0001f000
+0001f000
+00001000
+00001000
+0001f000
+00001000
+00002000
+00004000
+00008000
+00010000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+00001000
+00002000
+00004000
+00008000
+00010000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+0000f000
+0001e000
+0001d000
+0001b000
+00017000
+deadbeef
+deadbeef
+00000000
+00000000
+Info 
+Info ---------------------------------------------------
+Info CPU 'riscvOVPsim/cpu' STATISTICS
+Info   Type                  : riscv (RV32IMC)
+Info   Nominal MIPS          : 100
+Info   Final program counter : 0x80000034
+Info   Simulated instructions: 492
+Info   Simulated MIPS        : run too short for meaningful result
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.01 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.03 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:12:24 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info Session ended: Sat Nov 11 20:12:24 2023
+

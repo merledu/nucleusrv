@@ -1,0 +1,132 @@
+Info Session started: Sat Nov 11 20:07:06 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32I
+Info --override           riscvOVPsim/cpu/tval_ii_code=F
+Info --program            /home/hassan/imperas-riscv-tests/work/rv32i_m/I/I-MISALIGN_JMP-01.elf
+Info --signaturedump     
+Info --customcontrol     
+Info --startcover         rvtest_code_begin
+Info --finishcover        rvtest_code_end
+Info --cover              basic
+Info --extensions         I
+Info --outputfile         /home/hassan/imperas-riscv-tests/work/rv32i_m/I/I-MISALIGN_JMP-01.basic.coverage.yaml
+Info --override           riscvOVPsim/cpu/sigdump/SignatureFile=/home/hassan/imperas-riscv-tests/work/rv32i_m/I/I-MISALIGN_JMP-01.signature.output
+Info --override           riscvOVPsim/cpu/sigdump/SignatureGranularity=4
+Info --override           riscvOVPsim/cpu/simulateexceptions=T
+Info --override           riscvOVPsim/cpu/defaultsemihost=F
+Info --logfile            /home/hassan/imperas-riscv-tests/work/rv32i_m/I/I-MISALIGN_JMP-01.log
+Info --override           riscvOVPsim/cpu/user_version=2.3
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:07:06 2023
+
+
+Info (OR_OF) Target 'riscvOVPsim/cpu' has object file read from '/home/hassan/imperas-riscv-tests/work/rv32i_m/I/I-MISALIGN_JMP-01.elf'
+Info (OR_PH) Program Headers:
+Info (OR_PH) Type           Offset     VirtAddr   PhysAddr   FileSiz    MemSiz     Flags Align
+Info (OR_PD) PROC           0x00003204 0x00000000 0x00000000 0x0000001e 0x00000000 R--   1
+Info (OR_PD) LOAD           0x00001000 0x80000000 0x80000000 0x000003f8 0x000003f8 R-E   1000
+Info (OR_PD) LOAD           0x00002000 0x80001000 0x80001000 0x00001204 0x00001204 RW-   1000
+Info (SIGNATURE_DUMP_FSB) Found Symbol 'begin_signature' in application at 0x80002000
+Info (SIGNATURE_DUMP_FSE) Found Symbol 'end_signature' in application at 0x80002090
+Info (SIGNATURE_DUMP_EN) Signature File enabled, file '/home/hassan/imperas-riscv-tests/work/rv32i_m/I/I-MISALIGN_JMP-01.signature.output'.
+Info (SIGNATURE_DUMP_ES) Extracting signature from 0x80002000 size 144 bytes
+Info (SIGNATURE_DUMP_SB) Symbol 'begin_signature' at 0x80002000
+Info (SIGNATURE_DUMP_SE) Symbol 'end_signature' at 0x80002090
+Info (ICV_PVSN) parameter 'user_version' is '2.3'
+Info (ICV_ALI) Pseudo instructions will be translated
+Info (ICV_ST) Starting coverage at 0x80000178
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000198 00a0006f j       800001a2: Fetch from unaligned address (0x800001a2)
+Info (SIGNATURE_DUMP_SFW) Signature Write 1 0x80002000 bytes 4 0x2
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000220 00020067 jr      tp: Fetch from unaligned address (0x8000022a)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000238 00020067 jr      tp: Fetch from unaligned address (0x80000242)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000250 00220067 jr      2(tp): Fetch from unaligned address (0x8000025a)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000268 00320067 jr      3(tp): Fetch from unaligned address (0x80000272)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000294 00528563 beq     t0,t0,8000029e: Fetch from unaligned address (0x8000029e)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x800002c0 00629563 bne     t0,t1,800002ca: Fetch from unaligned address (0x800002ca)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x800002ec 0062c563 blt     t0,t1,800002f6: Fetch from unaligned address (0x800002f6)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000318 0062e563 bltu    t0,t1,80000322: Fetch from unaligned address (0x80000322)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000344 00535563 bge     t1,t0,8000034e: Fetch from unaligned address (0x8000034e)
+Warning (RISCV_IMA) CPU 'riscvOVPsim/cpu' 0x80000370 00537563 bgeu    t1,t0,8000037a: Fetch from unaligned address (0x8000037a)
+Info (SIGNATURE_DUMP_WTH) Intercept 'write_tohost'. Generate Signature file
+00000002
+00000000
+11111111
+22222222
+33333333
+44444444
+00000002
+00000000
+55555555
+00000002
+00000000
+66666666
+00000002
+00000000
+77777777
+00000002
+00000000
+88888888
+00000002
+00000000
+99999999
+00000002
+00000000
+aaaaaaaa
+00000002
+00000000
+bbbbbbbb
+00000002
+00000000
+cccccccc
+00000002
+00000000
+dddddddd
+00000002
+00000000
+eeeeeeee
+Info (ICV_WCF) Writing coverage file /home/hassan/imperas-riscv-tests/work/rv32i_m/I/I-MISALIGN_JMP-01.basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : I
+Info   Threshold             : 1
+Info   Instructions counted  : 187
+Info   Unique instructions   : 14/39 :  35.90%
+Info   Coverage points hit   : 88/2540 :   3.46%
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info CPU 'riscvOVPsim/cpu' STATISTICS
+Info   Type                  : riscv (RV32I)
+Info   Nominal MIPS          : 100
+Info   Final program counter : 0x8000003c
+Info   Simulated instructions: 321
+Info   Simulated MIPS        : run too short for meaningful result
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.02 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.04 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:07:06 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info Session ended: Sat Nov 11 20:07:06 2023
+

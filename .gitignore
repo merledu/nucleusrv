@@ -3,7 +3,6 @@ obj_dir
 *.fir
 *.anno.json
 *.f
-*.log
 ### Project Specific stuff
 test_run_dir/*
 .metals/*
@@ -121,7 +120,6 @@ local.properties
 *.o
 *.ko
 *.obj
-*.elf
 
 # Precompiled Headers
 *.gch
@@ -145,7 +143,6 @@ local.properties
 *.app
 *.i*86
 *.x86_64
-*.hex
 
 # Debug files
 *.dSYM/
@@ -326,7 +323,6 @@ xcuserdata
 *.xcuserstate
 ### Scala template
 *.class
-*.log
 
 # sbt specific
 .cache

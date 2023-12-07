@@ -1,0 +1,243 @@
+Info Session started: Sat Nov 11 20:11:55 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32GCV
+Info --override           riscvOVPsim/cpu/add_Extensions=AMFV
+Info --cover              basic
+Info --countthreshold     1
+Info --showuncovered     
+Info --nosimulation      
+Info --extensions         Vp
+Info --inputfiles         work/rv32i_m/Vp
+Info --outputfile         work/rv32i_m/Vp/basic.coverage.yaml
+Info --reportfile         work/rv32i_m/Vp/basic.coverage.txt
+Info --override           riscvOVPsim/cpu/vector_version=1.0
+Info --logfile            work/rv32i_m/Vp/basic.coverage.run.log
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:11:55 2023
+
+
+Info (ICV_PVSN) parameter 'vector_version' is '1.0'
+Info (ICV_ALI) Pseudo instructions will be translated
+Info (OP_NOS) Simulator finishing because 'nosimulation' was specified
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.00 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.00 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:11:55 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL8_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV-X-S-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL4_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL8_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL1_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL1_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL2_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV-X-S-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV8R-V-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV-S-X-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV-S-X-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV-S-X-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL2_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL1_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL2_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV1R-V-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL8_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV2R-V-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL4_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV4R-V-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VX-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VI-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW16_LMUL4_NANBOX.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VI-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1DOWN-VF-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHEREI16-VV-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-S-F-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VRGATHER-VV-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VI-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VCOMPRESS-VM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1DOWN-VX-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEDOWN-VX-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VMV-X-S-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDE1UP-VX-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VFMV-F-S-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vp/VSLIDEUP-VX-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_WCF) Writing coverage file work/rv32i_m/Vp/basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info (ICV_WCR) Writing coverage report work/rv32i_m/Vp/basic.coverage.txt
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : Vp
+Info   Threshold             : 1
+Info   Instructions counted  : 0
+Info   Unique instructions   : 21/21 : 100.00%
+Info   Coverage points hit   : 1542/1678 :  91.90%
+Info ---------------------------------------------------
+Info Session ended: Sat Nov 11 20:11:55 2023
+

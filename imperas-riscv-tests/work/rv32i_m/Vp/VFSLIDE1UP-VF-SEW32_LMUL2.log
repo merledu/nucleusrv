@@ -1,0 +1,604 @@
+Info Session started: Sat Nov 11 20:11:49 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32GCV
+Info --override           riscvOVPsim/cpu/add_Extensions=AMFV
+Info --override           riscvOVPsim/cpu/vector_version=1.0
+Info --override           riscvOVPsim/cpu/VLEN=256
+Info --override           riscvOVPsim/cpu/SLEN=256
+Info --override           riscvOVPsim/cpu/ELEN=32
+Info --override           riscvOVPsim/cpu/Zvfh=T
+Info --override           riscvOVPsim/cpu/tval_ii_code=F
+Info --program            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.elf
+Info --signaturedump     
+Info --customcontrol     
+Info --startcover         rvtest_code_begin
+Info --finishcover        rvtest_code_end
+Info --cover              basic
+Info --extensions         Vp
+Info --outputfile         /home/hassan/imperas-riscv-tests/work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.basic.coverage.yaml
+Info --override           riscvOVPsim/cpu/sigdump/SignatureFile=/home/hassan/imperas-riscv-tests/work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.signature.output
+Info --override           riscvOVPsim/cpu/sigdump/SignatureGranularity=4
+Info --override           riscvOVPsim/cpu/simulateexceptions=T
+Info --override           riscvOVPsim/cpu/defaultsemihost=F
+Info --logfile            /home/hassan/imperas-riscv-tests/work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.log
+Info --override           riscvOVPsim/cpu/user_version=2.3
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:11:49 2023
+
+
+Info (OR_OF) Target 'riscvOVPsim/cpu' has object file read from '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.elf'
+Info (OR_PH) Program Headers:
+Info (OR_PH) Type           Offset     VirtAddr   PhysAddr   FileSiz    MemSiz     Flags Align
+Info (OR_PD) PROC           0x00004404 0x00000000 0x00000000 0x00000088 0x00000000 R--   1
+Info (OR_PD) LOAD           0x00001000 0x80000000 0x80000000 0x00000fa8 0x00000fa8 R-E   1000
+Info (OR_PD) LOAD           0x00002000 0x80001000 0x80001000 0x00002404 0x00002404 RW-   1000
+Info (SIGNATURE_DUMP_FSB) Found Symbol 'begin_signature' in application at 0x80002a20
+Info (SIGNATURE_DUMP_FSE) Found Symbol 'end_signature' in application at 0x80003220
+Info (SIGNATURE_DUMP_EN) Signature File enabled, file '/home/hassan/imperas-riscv-tests/work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.signature.output'.
+Info (SIGNATURE_DUMP_ES) Extracting signature from 0x80002a20 size 2048 bytes
+Info (SIGNATURE_DUMP_SB) Symbol 'begin_signature' at 0x80002a20
+Info (SIGNATURE_DUMP_SE) Symbol 'end_signature' at 0x80003220
+Info (ICV_PVSN) parameter 'vector_version' is '1.0'
+Info (ICV_ALI) Pseudo instructions will be translated
+Info (ICV_ST) Starting coverage at 0x80000178
+Info (SIGNATURE_DUMP_SFW) Signature Write 1 0x80002a20 bytes 4 0x4996b43e
+Info (ICV_FN) Finishing coverage at 0x80000f70
+Info (ICV_WCF) Writing coverage file /home/hassan/imperas-riscv-tests/work/rv32i_m/Vp/VFSLIDE1UP-VF-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : Vp
+Info   Threshold             : 1
+Info   Instructions counted  : 32
+Info   Unique instructions   : 1/21 :   4.76%
+Info   Coverage points hit   : 64/1678 :   3.81%
+Info ---------------------------------------------------
+Info (SIGNATURE_DUMP_WTH) Intercept 'write_tohost'. Generate Signature file
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+c9712060
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+b7c44b1e
+43a0fe6a
+00000000
+3f800000
+333995e6
+4996b43e
+333995e6
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+c22cd70a
+c9712060
+43a0fe6a
+5b87e42c
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+3f800000
+43a0fe6a
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+43a0fe6a
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+c22cd70a
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+c22cd70a
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+43a0fe6a
+b7c44b1e
+3f800000
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+4996b43e
+333995e6
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+00000000
+c9712060
+c22cd70a
+b7c44b1e
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+c22cd70a
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+c9712060
+c9712060
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+c22cd70a
+c9712060
+43a0fe6a
+5b87e42c
+3f800000
+00000000
+4996b43e
+333995e6
+4996b43e
+333995e6
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+3f800000
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+00000000
+4996b43e
+c22cd70a
+5b87e42c
+c22cd70a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+43a0fe6a
+c9712060
+c22cd70a
+5b87e42c
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+c22cd70a
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+00000000
+4996b43e
+333995e6
+4996b43e
+333995e6
+5b87e42c
+c22cd70a
+b7c44b1e
+3f800000
+b7c44b1e
+4996b43e
+333995e6
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+4996b43e
+333995e6
+4996b43e
+333995e6
+5b87e42c
+c22cd70a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+00000000
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+4996b43e
+333995e6
+c9712060
+c22cd70a
+5b87e42c
+43a0fe6a
+b7c44b1e
+3f800000
+00000000
+4996b43e
+Info 
+Info ---------------------------------------------------
+Info CPU 'riscvOVPsim/cpu' STATISTICS
+Info   Type                  : riscv (RV32GCV)
+Info   Nominal MIPS          : 100
+Info   Final program counter : 0x8000003c
+Info   Simulated instructions: 978
+Info   Simulated MIPS        : run too short for meaningful result
+Info ---------------------------------------------------
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.02 seconds
+Info   System time           : 0.01 seconds
+Info   Elapsed time          : 0.07 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:11:49 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info Session ended: Sat Nov 11 20:11:49 2023
+

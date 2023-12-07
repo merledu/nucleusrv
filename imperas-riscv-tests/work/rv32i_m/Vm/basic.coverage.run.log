@@ -1,0 +1,239 @@
+Info Session started: Sat Nov 11 20:11:30 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32GCV
+Info --override           riscvOVPsim/cpu/add_Extensions=AMFV
+Info --cover              basic
+Info --countthreshold     1
+Info --showuncovered     
+Info --nosimulation      
+Info --extensions         Vm
+Info --inputfiles         work/rv32i_m/Vm
+Info --outputfile         work/rv32i_m/Vm/basic.coverage.yaml
+Info --reportfile         work/rv32i_m/Vm/basic.coverage.txt
+Info --override           riscvOVPsim/cpu/vector_version=1.0
+Info --logfile            work/rv32i_m/Vm/basic.coverage.run.log
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:11:30 2023
+
+
+Info (ICV_PVSN) parameter 'vector_version' is '1.0'
+Info (ICV_ALI) Pseudo instructions will be translated
+Info (OP_NOS) Simulator finishing because 'nosimulation' was specified
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.00 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.00 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:11:30 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VID-V-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSIF-M-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW32_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW16_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSOF-M-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMANDN-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VCPOP-M-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMSBF-M-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXOR-MM-SEW8_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VFIRST-M-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW32_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VIOTA-M-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW16_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNAND-MM-SEW8_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW32_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMXNOR-MM-SEW32_LMUL2.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMORN-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW16_LMUL4.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMNOR-MM-SEW8_LMUL8.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMAND-MM-SEW8_LMUL1.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/Vm/VMOR-MM-SEW16_LMUL2.basic.coverage.yaml
+Info (ICV_WCF) Writing coverage file work/rv32i_m/Vm/basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info (ICV_WCR) Writing coverage report work/rv32i_m/Vm/basic.coverage.txt
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : Vm
+Info   Threshold             : 1
+Info   Instructions counted  : 0
+Info   Unique instructions   : 15/15 : 100.00%
+Info   Coverage points hit   : 1187/1188 :  99.92%
+Info ---------------------------------------------------
+Info Session ended: Sat Nov 11 20:11:31 2023
+

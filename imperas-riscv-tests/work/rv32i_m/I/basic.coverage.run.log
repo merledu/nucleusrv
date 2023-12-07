@@ -1,0 +1,105 @@
+Info Session started: Sat Nov 11 20:07:06 2023
+
+Info PROGRAM /home/hassan/imperas-riscv-tests/riscv-ovpsim-plus/bin/Linux64/riscvOVPsimPlus.exe
+Info ------------- ENVIRONMENT -------------
+Info --------------------------------------
+Info -------- FLAGS (from command line)
+Info --variant            RV32I
+Info --cover              basic
+Info --countthreshold     1
+Info --showuncovered     
+Info --nosimulation      
+Info --extensions         I
+Info --inputfiles         work/rv32i_m/I
+Info --outputfile         work/rv32i_m/I/basic.coverage.yaml
+Info --reportfile         work/rv32i_m/I/basic.coverage.txt
+Info --logfile            work/rv32i_m/I/basic.coverage.run.log
+Imperas riscvOVPsimPlus
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Copyright (c) 2005-2023 Imperas Software Ltd.  Contains Imperas Proprietary Information.
+Licensed Software, All Rights Reserved.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+riscvOVPsimPlus started: Sat Nov 11 20:07:06 2023
+
+
+Info (ICV_PVSN) parameter 'user_version' is '20191213'
+Info (ICV_ALI) Pseudo instructions will be translated
+Info (OP_NOS) Simulator finishing because 'nosimulation' was specified
+Info 
+Info ---------------------------------------------------
+Info SIMULATION TIME STATISTICS
+Info   Simulated time        : 0.00 seconds
+Info   User time             : 0.00 seconds
+Info   System time           : 0.00 seconds
+Info   Elapsed time          : 0.00 seconds
+Info ---------------------------------------------------
+
+riscvOVPsimPlus finished: Sat Nov 11 20:07:07 2023
+
+
+riscvOVPsimPlus (64-Bit) v20231026.0 Open Virtual Platform simulator from www.IMPERAS.com.
+Visit www.IMPERAS.com for multicore debug, verification and analysis solutions.
+
+Info (ICV_RD) Reading file work/rv32i_m/I/I-RF_width-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/ADD-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-MISALIGN_JMP-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-EBREAK-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-NOP-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SRAI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SRLI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/LW-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SRA-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/XORI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SH-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SLTI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SW-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-DELAY_SLOTS-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SLL-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/ORI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/BEQ-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-ENDIANESS-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/LUI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-IO-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/BGEU-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/LH-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SB-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/ADDI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-RF_size-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SLTU-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/JALR-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-ECALL-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SRL-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/LB-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/BLT-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/ANDI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-MISALIGN_LDST-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/BGE-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SLLI-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/JAL-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/I-RF_x0-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SUB-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/AUIPC-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/OR-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/LHU-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/LBU-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/XOR-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/BLTU-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/BNE-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SLTIU-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/AND-01.basic.coverage.yaml
+Info (ICV_RD) Reading file work/rv32i_m/I/SLT-01.basic.coverage.yaml
+Info (ICV_WCF) Writing coverage file work/rv32i_m/I/basic.coverage.yaml
+Info (ICV_FIN) Instruction Coverage finished
+Info (ICV_WCR) Writing coverage report work/rv32i_m/I/basic.coverage.txt
+Info ---------------------------------------------------
+Info TOTAL INSTRUCTION COVERAGE : I
+Info   Threshold             : 1
+Info   Instructions counted  : 0
+Info   Unique instructions   : 38/39 :  97.44%
+Info   Coverage points hit   : 2533/2540 :  99.72%
+Info ---------------------------------------------------
+Info Session ended: Sat Nov 11 20:07:07 2023
+

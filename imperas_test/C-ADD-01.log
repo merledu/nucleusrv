@@ -1,0 +1,2 @@
+ClkCycle  pc_rdata  pc_wdata  insn      mode      rs1_addr  rs1_rdata rs2_addr  rs2_rdata rd_addr   rd_wdata  mem_addr  mem_rdata mem_wdata inst_str
+6         00000000  00000002  0000a82d  3         0         00000000  26        00000000  0         00000004  0000003a  00000000  00000000  
