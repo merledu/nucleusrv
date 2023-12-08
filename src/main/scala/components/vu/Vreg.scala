@@ -54,28 +54,29 @@ io.vs1_data := register(vs1_in)
 io.vs2_data := register(vs2_in)
 io.vs0_data := register(0.U)
 io.vs3_data := register(vs3_in)
+register(0) := ("b0101011110001101011100101011111000110".U).asSInt
 
   when (io.reg_write === 1.B && io.reg_read === 0.B) {
       register(vsd_in) := io.vd_data
       io.vs1_data := 0.S
       io.vs2_data := 0.S
-      io.vs0_data := 0.S
+      io.vs0_data := register(0)
       io.vs3_data := 0.S
   }.elsewhen(io.reg_write === 0.B && io.reg_read === 1.B){
     io.vs1_data := register(vs1_in)
     io.vs2_data := register(vs2_in)
-    io.vs0_data := register(0.U)
+    io.vs0_data := register(0)
     io.vs3_data := register(vs3_in)
   }.elsewhen(io.reg_write === 1.B && io.reg_read === 1.B){
     register(vsd_in) := io.vd_data
     io.vs1_data := register(vs1_in)
     io.vs2_data := register(vs2_in)
-    io.vs0_data := register(0.U)
+    io.vs0_data := register(0)
     io.vs3_data := register(vs3_in)
   }.otherwise{
     io.vs1_data := 0.S
     io.vs2_data := 0.S
-    io.vs0_data := 0.S
+    io.vs0_data := register(0)
     io.vs3_data := 0.S
 
   }
