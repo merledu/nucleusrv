@@ -50,6 +50,6 @@ object NRVDriver {
   // generate verilog
   def main(args: Array[String]): Unit = {
       val IMem =  if (args.length > 0) args(0) else "program.hex"
-      new ChiselStage().emitVerilog(new Top(Some("/home/hassan/nucleusrv/imperas_test/ADD-01.hex"), Some("/home/hassan/Documents/nucleusrv/riscv-arch-test/work/rv32i/I-ADD-01.elf.data.hex")))
+      new ChiselStage().emitVerilog(new Top(Some(IMem), Some("data.hex")))
   }
 }

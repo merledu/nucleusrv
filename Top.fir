@@ -2567,7 +2567,7 @@ circuit Top :
     input wdata_i : UInt<32>
     output rdata_o : UInt<32>
     defname = sram_top
-    parameter IFILE_IN = "/home/hassan/Documents/nucleusrv/riscv-arch-test/work/rv32i/I-ADD-01.elf.data.hex"
+    parameter IFILE_IN = "data.hex"
 
   module SRamTop :
     input clock : Clock
@@ -2627,7 +2627,7 @@ circuit Top :
     input wdata_i : UInt<32>
     output rdata_o : UInt<32>
     defname = sram_top
-    parameter IFILE_IN = "/home/hassan/nucleusrv/imperas_test/ADD-01.hex"
+    parameter IFILE_IN = "/home/hassan/nucleusrv/imperas_test/BLT-01.hex"
 
   module SRamTop_1 :
     input clock : Clock

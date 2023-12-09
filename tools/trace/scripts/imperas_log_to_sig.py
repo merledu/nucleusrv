@@ -14,6 +14,6 @@ with open(args.log, 'r') as file:
         if len(line.strip()) == 8:
             signatures.append(line.strip())
 
-with open(args.signature, 'x')as sig:
+with open(args.signature, 'w')as sig:
     for i in signatures:
         sig.write(i+'\n')

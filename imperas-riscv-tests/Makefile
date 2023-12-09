@@ -9,7 +9,7 @@
 export ROOTDIR    = $(shell pwd)
 export WORK      ?= $(ROOTDIR)/work
 
-include /home/hassan/nucleusrv/imperas-riscv-tests/Makefile.include
+include Makefile.include
 
 pipe:= |
 empty:=
@@ -58,7 +58,7 @@ $(info RISCV_DEVICE: $(RISCV_DEVICE) [origin: $(origin RISCV_DEVICE)])
 $(info =============================================================================)
 $(info )
 
-export RISCV_PREFIX       ?= riscv32-unknown-elf-
+export RISCV_PREFIX       ?= riscv64-unknown-elf-
 
 # Check Toolchain on PATH
 ifeq (,$(shell which $(RISCV_PREFIX)gcc))

@@ -3243,7 +3243,7 @@ module SRamTop(
   wire  _T_2 = io_req_valid & io_req_bits_isWrite; // @[SRamTop.scala 49:34]
   wire  _GEN_0 = io_req_valid & io_req_bits_isWrite ? 1'h0 : 1'h1; // @[SRamTop.scala 29:19 49:58 54:27]
   wire  _GEN_6 = io_req_valid & ~io_req_bits_isWrite | _T_2; // @[SRamTop.scala 40:52 43:22]
-  sram_top #(.IFILE_IN("/home/hassan/Documents/nucleusrv/riscv-arch-test/work/rv32i/I-ADD-01.elf.data.hex")) sram ( // @[SRamTop.scala 21:22]
+  sram_top #(.IFILE_IN("data.hex")) sram ( // @[SRamTop.scala 21:22]
     .clk_i(sram_clk_i),
     .rst_i(sram_rst_i),
     .csb_i(sram_csb_i),
@@ -3335,7 +3335,7 @@ module SRamTop_1(
   wire [31:0] sram_wdata_i; // @[SRamTop.scala 21:22]
   wire [31:0] sram_rdata_o; // @[SRamTop.scala 21:22]
   reg  validReg; // @[SRamTop.scala 14:27]
-  sram_top #(.IFILE_IN("/home/hassan/nucleusrv/imperas_test/ADD-01.hex")) sram ( // @[SRamTop.scala 21:22]
+  sram_top #(.IFILE_IN("/home/hassan/nucleusrv/imperas_test/BLT-01.hex")) sram ( // @[SRamTop.scala 21:22]
     .clk_i(sram_clk_i),
     .rst_i(sram_rst_i),
     .csb_i(sram_csb_i),
