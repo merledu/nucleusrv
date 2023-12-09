@@ -275,6 +275,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   vec_csr.io.vl := io.vl
   vec_csr.io.vtypei := io.vtypei
   vec_csr.io.vset := io.ctl_vset
+  vec_csr.io.ins := io.id_instruction
 
   io.v_z_imm := io.id_instruction(30, 20).asSInt
   io.vl_out := vec_csr.io.vl_out

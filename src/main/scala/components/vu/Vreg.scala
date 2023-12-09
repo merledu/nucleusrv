@@ -80,6 +80,9 @@ register(0) := ("b0101011110001101011100101011111000110".U).asSInt
     io.vs3_data := 0.S
 
   }
+  // when(io.wb__emul===  lmul_count){
+
+  // }
 
 when (io.ins(6,0)==="b0100111".U){
    val vs3_in_1 = io.vs3_addr + io.id_vc3

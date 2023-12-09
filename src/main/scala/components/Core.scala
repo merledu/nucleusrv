@@ -133,7 +133,7 @@ class Core(implicit val config:Configs) extends Module{
   //vector EX-MEM Registers
   val ex_mem_reg_v0_data = RegInit(0.U(128.W))
   val ex_mem_vs3_data = RegInit(0.S(128.W))
-  val mem_reg_vl = RegInit(false.B)
+  val mem_reg_vl = RegInit(0.U(32.W))
   val ex_reg_mem_to_reg = RegInit(false.B)
   val ex_reg_vec_alu_res = RegInit(0.S(128.W))
   // val ex_reg_lmul = RegInit(0.S(32.W))
@@ -162,6 +162,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_v_ins = RegInit(0.B)
 
   // MEM-WB Registers
+  val mem_reg_lsuType = RegInit(0.U(4.W))
   val mem_reg_rd = RegInit(0.U(32.W))
   val mem_reg_ins = RegInit(0.U(32.W))
   val mem_reg_result = RegInit(0.U(32.W))
@@ -266,23 +267,29 @@ dontTouch(vlsu.io)
 vlsu.io.instr := instruction
 vlsu.io.vtype := vtype
 var vlmul_count = WireInit(0.U(32.W))
+var load_count = WireInit(0.U(32.W))
+
 // val vtype = WireInit("b010".U(32.W))
 dontTouch(vlmul_count)
 // working on  only one vector 
     when (lmul==="b000".U  ){
         vlmul_count := 0.U
+        load_count := 3.U
     }
     // working on  only two vector continously
     .elsewhen (lmul==="b001".U ) {
         vlmul_count := 1.U
+        load_count := 7.U
     }
     // working on  only four vector continously
     .elsewhen (lmul==="b010".U ){
         vlmul_count := 3.U
+        load_count := 15.U
     }
     // working on  only eight vector continously
     .elsewhen (lmul==="b011".U ){
         vlmul_count := 7.U
+        load_count := 31.U
     }
     
     val emul_count = WireInit(0.U(32.W))
@@ -360,19 +367,27 @@ when(emul_reg =/= (emul_count ) &&  instruction(6,0)==="b0100111".U ){
 
     // }
     val delays = RegInit(1.U(32.W))
+    val load_delays = RegInit(1.U(32.W))
+    //instruction repeat according to grouping concept
      when(lmul_reg =/= vlmul_count && instruction(6,0)==="b1010111".U && instruction(14,12)=/="b111".U){
         next_pc_selector := 1.U
         lmul_reg := lmul_reg +1.U
         if_reg_lmul_v := lmul_reg  //paasing fetch stage
     }
-    
-    .elsewhen( (delays =/= vlcount1) && (instruction(6,0)==="b0100111".U || instruction(6,0)==="b0000111".U)){
+    //store instruction
+    .elsewhen( (delays =/= vlcount1) && instruction(6,0)==="b0100111".U){
       
       delays := delays+1.U
       if_reg_delay := delays
       next_pc_selector := 1.U
+    }//load instruction
+    .elsewhen( (load_delays =/= load_count) && (instruction(6,0)==="b0000111".U)){
+      load_delays := load_delays+1.U
+      next_pc_selector := 1.U
     }
+
     .otherwise{
+        load_delays := 0.U
         lmul_reg := 0.U
         next_pc_selector := 0.U
         if_reg_lmul_v := lmul_reg //paasing fetch stage
@@ -530,7 +545,7 @@ vs0_load := EX.vs0.asUInt
 //val eew_32_vs3_data = VecInit((0 until 4).map(i => EX.vs3_data_o(32*i+31, 32*i).asSInt))
 val vs3_data = VecInit((0 until 4).map(i => ex_reg_vs3(32*i+31, 32*i).asSInt))
 dontTouch(vs3_data)
-when (vlcount <= (ex_reg_vl.asUInt ) && ex_reg_ins(6,0) === "b0100111".U || ex_reg_ins(6,0) === "b0000111".U){
+when (vlcount <= (ex_reg_vl.asUInt ) && ex_reg_ins(6,0) === "b0100111".U){
   when(ex_reg_lsuType === 1.U)  {
     when(count =/= 4.U){
             //masking
@@ -616,14 +631,14 @@ when (vlcount <= (ex_reg_vl.asUInt ) && ex_reg_ins(6,0) === "b0100111".U || ex_r
               MEM.io.vs0 := "b1111".U
               MEM.io.v_writeData := vs3_data(count).asUInt
               MEM.io.v_addr := ex_reg_read_data1 + addrcount.asUInt
-              when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U) || (ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U)){
+              when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
                 addrcount := 0.U
           
               }.otherwise{
                 addrcount := addrcount + 4.U
               }
             }
-    when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U || ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U)){
+    when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
       addrcount := 0.U
 
     }.otherwise{
@@ -737,6 +752,7 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
 
 
   EX.vec_mem_res := ex_reg_vec_alu_res
+  mem_reg_lsuType := ex_reg_lsuType
   mem_reg_vec_alu_out := ex_reg_vec_alu_res
   mem_reg_vset := ex_reg_vset
   mem_reg_vec_vl := ex_reg_vl
@@ -764,26 +780,41 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
    dontTouch(rdata)
     val loop1 = RegInit(0.U(32.W))
     val loop2 = RegInit(0.U(32.W))
+    val load_vlcount = RegInit(0.U(32.W))
     var eew = ex_reg_ins(14,12)
-
-// when (vlcount <= (mem_reg_vl.asUInt ) && mem_reg_ins(6,0) === "b0000111".U){
-//   when(ex_reg_lsuType === 1.U)  {
-  when((loop1 <= 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
-    when(loop1<3.U){
-      rdata(loop1) := MEM.io.readData //io.dmemRsp.bits.dataResponse
-      loop1 := loop1 + 1.U
-    }.otherwise{
-      rdata3 := MEM.io.readData
-      loop1 := 0.U
-  }}.otherwise{
-    loop1 := 0.U
-  }
+when(mem_reg_lsuType === 1.U)  {
+  when (load_vlcount < (mem_reg_vl.asUInt ) && mem_reg_ins(6,0) === "b0000111".U){
+    when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
+        rdata(loop1) := MEM.io.readData //io.dmemRsp.bits.dataResponse
+        loop1 := loop1 + 1.U
+        load_vlcount := load_vlcount + 1.U
+      }.otherwise{
+        rdata3 := MEM.io.readData
+        loop1 := 0.U
+        load_vlcount := load_vlcount + 1.U
+    }
+    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt)){
+      when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
+        rdata(loop1) := Fill(32,1.U)
+        loop1 := loop1 + 1.U
+        load_vlcount := load_vlcount
+      }.otherwise{
+        rdata3 := Fill(32,1.U)
+        loop1 := 0.U
+        load_vlcount := load_vlcount
+    
+      }
+    }.elsewhen(mem_reg_ins(6,0)=/="b0000111".U){
+      load_vlcount := 0.U
+    }
+    }
+    
 
   
 
 
 //send masking bits to memory
-  when((loop2 <= 3.U) && (ex_reg_ins(6,0)==="b0000111".U)){
+  when((loop2 <= 3.U) && (ex_reg_ins(6,0)==="b0000111".U) && ex_reg_ins(25)===0.B){
     when(eew==="b000".U){ //for element 8 bbit
       mask_e_i := shift_v0(3,0)
       loop2 := loop2 + 1.U
@@ -804,11 +835,27 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
     loop2 := 0.U
   }
   }
-  // .elsewhen((loop2 === 0.U) && (ex_reg_ins(6,0)==="b0000111".U)){
-  //   mask_e_i := 
-  //   loop2 := 0.U
-  //   shift_v0 := ex_mem_reg_v0_data
-  // }
+  .elsewhen((loop2 === 4.U || loop2 === 0.U) && (ex_reg_ins(6,0)==="b0000111".U) && ex_reg_emul>=1.U  && ex_reg_ins(25)===0.B){
+    when(eew==="b000".U){ //for element 8 bbit
+      mask_e_i := shift_v0(3,0)
+      loop2 := 0.U
+      shift_v0 := shift_v0 >> 4.U
+    }
+   .elsewhen(eew==="b101".U){//for elements 16 bits
+      mask_e_i := shift_v0(1,0)
+      loop2 := 0.U
+      shift_v0 := shift_v0 >> 2.U
+    }
+   .elsewhen(eew==="b110".U){ //for elements 32 bits
+      mask_e_i := shift_v0(0)
+      // mask_e_i := Mux(loop2===0.U,ex_mem_vs3_data.asUInt(31,0),(ex_mem_reg_v0_data << 4.U)(3,0))//changes
+      loop2 := 0.U
+      shift_v0 := shift_v0 >> 1.U
+    }
+    .otherwise{
+    loop2 := 0.U
+  }
+  }
 
   .otherwise{
     mask_e_i := 0.U
@@ -821,43 +868,26 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
   dontTouch(mask_e_i)
    dontTouch(ex_mem_reg_v0_data)
   
-    // when (vlcount <= (mem_reg_vl.asUInt ) && mem_reg_ins(6,0) === "b0000111".U){
-    //   when(ex_reg_lsuType === 1.U)  {
-    //     when((loop =/= 4.U) && (mem_reg_ins(6,0)==="b0000111".U)){
-    //       //load  masking  
-    //       when(mem_reg_ins(25) === "b0".U){
-    //           when(vtype(7) === 0.U){
-    //             when (mem_reg_ins(14,12) === "b000".U ){//eew===8
-    //               eew8(loop) := Mux((mem_reg_ins(25) === "b1".U) || (mem_reg_ins(25)===0.B && vs0_load(0)===1.B),rdata(loop)(7,0),Mux((mem_reg_ins(25)===0.B && vs0_load(0)===0.B) ,mem_reg_vs3(7,0),Fill(32,1.U)))
-    //               // eew8(1) := rdata(loop)(15,8) & Fill(8,vs0_load(1))
-    //               // eew8(2) := rdata(loop)(23,16) & Fill(8,vs0_load(2))
-    //               // eew8(3) := rdata(loop)(31,24) & Fill(8,vs0_load(3))
-    //               vs0_load := vs0_load >> 4.U
-    //             }
-    //             // .elsewhen(mem_reg_ins(14,12) === "b001".U){ //eew16
-    //             //   eew16(0) := rdata(0)(15,0) & Fill(16,v00(0))
-    //             //   eew16(1) := rdata(0)(31,16) & Fill(16,v00(1))
-    //             //   vs0_load := vs0_load >> 2.U
-    //             // }.elsewhen(mem_reg_ins(14,12) === "b010".U){//eew32
-    //             //   vs0_load := vs0_load >> 1.U
-    //             // }
-    //             .otherwise{
-    //               eew8(0) := 0.U
-    //               eew8(1) := 0.U
-    //               eew8(2) := 0.U
-    //               eew8(3) := 0.U
-    //               vs0_load := vs0_load >> 0.U
-    //             }
-    //             }
-    //             .otherwise{
-    //               eew8(0) := 0.U
-    //               eew8(1) := 0.U
-    //               eew8(2) := 0.U
-    //               eew8(3) := 0.U
-    //             }
+  //load address calculate
+  val load_addr_count = RegInit(0.U(32.W))
+  when(ex_reg_ins(6,0) === "b0000111".U || ex_reg_ins(6,0) === "b0100111".U){
+    when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U || ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
+        load_addr_count := 0.U
+        MEM.io.load_addr := ex_reg_read_data1 + load_addr_count
+
+      }.otherwise{
+        load_addr_count := load_addr_count + 4.U
+        MEM.io.load_addr := ex_reg_read_data1 + load_addr_count
+      }
+  }.otherwise{
+    load_addr_count := 0.U
+    MEM.io.load_addr := 0.U
+  }
 
 
 dontTouch(rdata)
+  MEM.io.ins := ex_reg_ins
+  
   MEM.io.vd_Data := ex_mem_vs3_data.asUInt
   MEM.io.m_v0 := mask_e_i
   MEM.io.l_m_b := ex_reg_ins(25)

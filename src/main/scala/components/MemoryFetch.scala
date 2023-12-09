@@ -13,6 +13,8 @@ class MemoryFetch extends Module {
     val v_writeData: UInt = Input(UInt(32.W))
     val vs0: UInt = Input(UInt(4.W))
 
+    val ins: UInt = Input(UInt(32.W))
+    val load_addr: UInt = Input(UInt(32.W))
     val vd_Data: UInt = Input(UInt(32.W))
     val m_v0: UInt = Input(UInt(4.W))
     val l_m_b  = Input(Bool()) //define load mask bit
@@ -37,7 +39,7 @@ class MemoryFetch extends Module {
   dontTouch(addr)
   dontTouch(data)
   when(io.v_ins === 1.B){
-    addr := io.v_addr
+    addr := io.load_addr
     data := io.v_writeData
   }.otherwise{
     addr := io.aluResultIn
@@ -225,7 +227,7 @@ class MemoryFetch extends Module {
   }}
   .otherwise{
     when(io.readEnable===1.B){
-    when(eew === "b000".U) {
+    when(eew === "b000".U && l_m_b===0.B) {
         //load byte unsigned
         when(m_v0 === "b0001".U) {
           // addressing memory with 0,4,8...
@@ -251,6 +253,9 @@ class MemoryFetch extends Module {
           }.elsewhen(m_v0 === "b0101".U) {
           // addressing memory with 2,6,10...
           io.readData := Cat(Mux((l_m_b===0.B && mu===0.B),vd_data(31,24),Fill(8,1.U)),rdata(23,16),Mux((l_m_b===0.B && mu===0.B),vd_data(15,8),Fill(8,1.U)),rdata(7,0))
+        }.elsewhen(m_v0 === "b1010".U) {
+          // addressing memory with 2,6,10...
+          io.readData := Cat(rdata(31,24),Mux((l_m_b===0.B && mu===0.B),vd_data(23,16),Fill(8,1.U)),rdata(15,8),Mux((l_m_b===0.B && mu===0.B),vd_data(7,0),Fill(8,1.U)))
         }.elsewhen(m_v0 === "b1001".U) {
           // addressing memory with 2,6,10...
           io.readData := Cat(rdata(31,24), Mux((l_m_b===0.B && mu===0.B),vd_data(23,8),Fill(16,1.U)), rdata(7,0))
@@ -273,9 +278,9 @@ class MemoryFetch extends Module {
           // this condition would never occur but using to avoid Chisel generating VOID errors
           io.readData := rdata
         }.otherwise{
-          io.readData := 0.U
+          io.readData := rdata
         }
-      }.elsewhen(eew==="b101".U){ //1 element width=16 bits
+      }.elsewhen(eew==="b101".U  && l_m_b===0.B){ //1 element width=16 bits
            when(m_v0 === "b0011".U) {
           // addressing memory with 0,4,8...
           io.readData := rdata
@@ -289,17 +294,20 @@ class MemoryFetch extends Module {
           // addressing memory with 2,6,10...
           io.readData := Mux((l_m_b===0.B && mu===0.B),vd_data,Fill(32,1.U))
         }
-      }.elsewhen(eew==="b110".U){ //1 element width=32 bits
+      }.elsewhen(eew==="b110".U && l_m_b===0.B){ //1 element width=32 bits
            when(m_v0 === "b0001".U) {
           // addressing memory with 0,4,8...
               io.readData := rdata
         }.otherwise{
           io.readData := Mux((l_m_b===0.B && mu===0.B),vd_data,Fill(32,1.U))
         }}
+        .elsewhen(l_m_b===1.B){
+          io.readData := rdata
+        }
 
       .otherwise {
           // this condition would never occur but using to avoid Chisel generating VOID errors
-          io.readData := DontCare
+          io.readData := rdata
         }
         }
         .otherwise {
