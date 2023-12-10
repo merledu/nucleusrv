@@ -21,8 +21,8 @@
 // Specification: RV32I Base Integer Instruction Set, Version 2.1
 // Description: Testing instruction 'ADDI'.
 
-#include "/home/hassan/nucleusrv/imperas-riscv-tests/riscv-target/riscvOVPsimPlus/model_test.h"
-#include "/home/hassan/nucleusrv/imperas-riscv-tests/riscv-test-suite/env/arch_test.h"
+#include "model_test.h"
+#include "arch_test.h"
 RVTEST_ISA("RV32I")
 
 .section .text.init
