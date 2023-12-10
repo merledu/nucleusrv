@@ -42,7 +42,7 @@ val vtypeReg = RegInit(0.S(32.W))
 val vlReg = RegInit(0.S(32.W))
 val vstart = RegInit(0.S(32.W))
 
-when (io.vset === 1.B) {         
+when(io.vset===1.B){// when (io.ins(6,0)==="b1010111".U && io.ins(14,12)==="b111".U) {         
     vtypeReg := Cat(Fill(20, 0.U), io.vtypei).asSInt   //update 'vtype csr' with  vtype encoding, only when there is configuration setting instruction.
     vlReg := io.vl           //update 'vlReg' with 'io.vl_writeback', only when there is vsetvli instruction.
 }
@@ -50,4 +50,5 @@ when (io.vset === 1.B) {
 io.vl_out := vlReg
 io.vtype_out := vtypeReg
 io.vstart_out := vstart
+dontTouch(vtypeReg)
 }

@@ -95,6 +95,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val ctl_vset = Input(Bool())
     val vl_out = Output(SInt(32.W))
     val vstart_out = Output(SInt(32.W)) 
+    val id_vtype  = Input(SInt(32.W))
 
     val ctl_aluSrc1 = Output(UInt(2.W))
     val hdu_pcWrite = Output(Bool())
@@ -276,8 +277,14 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   vec_csr.io.vtypei := io.vtypei
   vec_csr.io.vset := io.ctl_vset
   vec_csr.io.ins := io.id_instruction
+  
 
-  io.v_z_imm := io.id_instruction(30, 20).asSInt
+//   when(io.id_instruction(6,0)==="b1010111".U && io.id_instruction(14,12)==="b111".U && (io.id_instruction(31)==="b0".U || io.id_instruction(31,30)==="b11".U)){
+//   io.v_z_imm := io.id_instruction(30,20).asSInt}
+//   .otherwise{
+//   vtype := vtype
+// }
+io.v_z_imm := io.id_vtype
   io.vl_out := vec_csr.io.vl_out
   io.vtypei_out := vec_csr.io.vtype_out
   io.vstart_out := vec_csr.io.vstart_out

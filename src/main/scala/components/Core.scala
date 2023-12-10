@@ -151,7 +151,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_ctl_v_memRead = RegInit(false.B)
   val ex_reg_ctl_v_MemWrite = RegInit(false.B)
   val ex_reg_reg_write = RegInit(false.B)
-  val ex_reg_vtype = RegInit(0.S(11.W))
+  val ex_reg_vtype = RegInit(0.S(32.W))
   val ex_reg_evl = RegInit(0.U(8.W))
   val ex_reg_emul = RegInit(0.U(4.W))
   val ex_reg_eew = RegInit(0.U(10.W))
@@ -229,7 +229,7 @@ class Core(implicit val config:Configs) extends Module{
  // grouping//
       //vsetvl not implement (rs2 value)
 var lmul = RegInit(0.U(3.W)) // by default lmul==1
-var vtype = RegInit(0.U(32.W))
+val vtype = RegInit(0.U(32.W))
 var vsew = RegInit(0.U(3.W))
 var valmax = RegInit(0.U(8.W))
 when(instruction(6,0)==="b1010111".U && instruction(14,12)==="b111".U && (instruction(31)==="b0".U || instruction(31,30)==="b11".U)){
@@ -261,7 +261,7 @@ when(instruction(6,0)==="b1010111".U && instruction(14,12)==="b111".U && (instru
 
 
 
-
+ID.id_vtype := vtype.asSInt
 val vlsu = Module (new VLSU)
 dontTouch(vlsu.io)
 vlsu.io.instr := instruction
@@ -774,6 +774,8 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
    val rdata3 = WireInit(0.U(32.W))
    val mask_e_i = WireInit(0.U(4.W))
    val shift_v0 = RegInit(0.U(128.W))
+   val shift_vd_data = RegInit(0.U(128.W))
+   shift_vd_data := ex_mem_vs3_data.asUInt
    val mem_reg_rdata = RegInit(0.U(32.W))
   //  mem_reg_rdata := MEM.io.readData
   //  shift_v0 := ex_mem_reg_v0_data
@@ -793,7 +795,7 @@ when(mem_reg_lsuType === 1.U)  {
         loop1 := 0.U
         load_vlcount := load_vlcount + 1.U
     }
-    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt)){
+    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt) && mem_reg_vtype(6)===1.U){ //tail agnostic
       when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
         rdata(loop1) := Fill(32,1.U)
         loop1 := loop1 + 1.U
@@ -804,7 +806,19 @@ when(mem_reg_lsuType === 1.U)  {
         load_vlcount := load_vlcount
     
       }
-    }.elsewhen(mem_reg_ins(6,0)=/="b0000111".U){
+    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt) && mem_reg_vtype(6)===0.U){ //tail agnostic
+      when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
+        rdata(loop1) := Fill(32,1.U)
+        loop1 := loop1 + 1.U
+        load_vlcount := load_vlcount
+      }.otherwise{
+        rdata3 := Fill(32,1.U)
+        loop1 := 0.U
+        load_vlcount := load_vlcount
+    
+      }
+    }
+    .elsewhen((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U || ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
       load_vlcount := 0.U
     }
     }
@@ -813,23 +827,28 @@ when(mem_reg_lsuType === 1.U)  {
   
 
 
-//send masking bits to memory
+//send masking bits and vd data to memory
   when((loop2 <= 3.U) && (ex_reg_ins(6,0)==="b0000111".U) && ex_reg_ins(25)===0.B){
     when(eew==="b000".U){ //for element 8 bbit
       mask_e_i := shift_v0(3,0)
+      shift_vd_data := shift_vd_data(31,0)
       loop2 := loop2 + 1.U
       shift_v0 := shift_v0 >> 4.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
    .elsewhen(eew==="b101".U){//for elements 16 bits
       mask_e_i := shift_v0(1,0)
+      shift_vd_data := shift_vd_data(31,0)
       loop2 := loop2 + 1.U
       shift_v0 := shift_v0 >> 2.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
    .elsewhen(eew==="b110".U){ //for elements 32 bits
       mask_e_i := shift_v0(0)
-      // mask_e_i := Mux(loop2===0.U,ex_mem_vs3_data.asUInt(31,0),(ex_mem_reg_v0_data << 4.U)(3,0))//changes
+      shift_vd_data := shift_vd_data(31,0)
       loop2 := loop2 + 1.U
       shift_v0 := shift_v0 >> 1.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
     .otherwise{
     loop2 := 0.U
@@ -838,19 +857,24 @@ when(mem_reg_lsuType === 1.U)  {
   .elsewhen((loop2 === 4.U || loop2 === 0.U) && (ex_reg_ins(6,0)==="b0000111".U) && ex_reg_emul>=1.U  && ex_reg_ins(25)===0.B){
     when(eew==="b000".U){ //for element 8 bbit
       mask_e_i := shift_v0(3,0)
+      shift_vd_data := shift_vd_data(31,0)
       loop2 := 0.U
       shift_v0 := shift_v0 >> 4.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
    .elsewhen(eew==="b101".U){//for elements 16 bits
       mask_e_i := shift_v0(1,0)
+      shift_vd_data := shift_vd_data(31,0)
       loop2 := 0.U
       shift_v0 := shift_v0 >> 2.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
    .elsewhen(eew==="b110".U){ //for elements 32 bits
       mask_e_i := shift_v0(0)
-      // mask_e_i := Mux(loop2===0.U,ex_mem_vs3_data.asUInt(31,0),(ex_mem_reg_v0_data << 4.U)(3,0))//changes
+      shift_vd_data := shift_vd_data(31,0)
       loop2 := 0.U
       shift_v0 := shift_v0 >> 1.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
     .otherwise{
     loop2 := 0.U
@@ -861,6 +885,7 @@ when(mem_reg_lsuType === 1.U)  {
     mask_e_i := 0.U
     loop2 := 0.U
     shift_v0 := ex_mem_reg_v0_data
+    shift_vd_data := ex_mem_vs3_data.asUInt
   }
 
 // }
