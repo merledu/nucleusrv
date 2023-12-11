@@ -1,0 +1,345 @@
+
+/home/hassan/nucleusrv/imperas-riscv-tests/work/rv32i_m/I/I-RF_size-01.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text.init:
+
+00000000 <rvtest_entry_point>:
+   0:	0440006f          	j	44 <reset_vector>
+
+00000004 <trap_vector>:
+   4:	342022f3          	csrr	t0,mcause
+   8:	00800313          	li	t1,8
+   c:	02628663          	beq	t0,t1,38 <write_tohost>
+  10:	00900313          	li	t1,9
+  14:	02628263          	beq	t0,t1,38 <write_tohost>
+  18:	00b00313          	li	t1,11
+  1c:	00628e63          	beq	t0,t1,38 <write_tohost>
+  20:	00000293          	li	t0,0
+  24:	00028463          	beqz	t0,2c <trap_vector+0x28>
+  28:	00028067          	jr	t0
+  2c:	342022f3          	csrr	t0,mcause
+  30:	0002d263          	bgez	t0,34 <handle_exception>
+
+00000034 <handle_exception>:
+  34:	5391e193          	ori	gp,gp,1337
+
+00000038 <write_tohost>:
+  38:	00002297          	auipc	t0,0x2
+  3c:	2c32a423          	sw	gp,712(t0) # 2300 <tohost>
+  40:	ff9ff06f          	j	38 <write_tohost>
+
+00000044 <reset_vector>:
+  44:	00002537          	lui	a0,0x2
+  48:	80050513          	addi	a0,a0,-2048 # 1800 <rvtest_code_end+0x14d0>
+  4c:	30052073          	csrs	mstatus,a0
+  50:	00000297          	auipc	t0,0x0
+  54:	fb428293          	addi	t0,t0,-76 # 4 <trap_vector>
+  58:	30529073          	csrw	mtvec,t0
+  5c:	00000297          	auipc	t0,0x0
+  60:	02428293          	addi	t0,t0,36 # 80 <rvtest_init>
+  64:	34129073          	csrw	mepc,t0
+  68:	f1402573          	csrr	a0,mhartid
+  6c:	30200073          	mret
+  70:	00000013          	nop
+  74:	00000013          	nop
+  78:	00000013          	nop
+  7c:	00000013          	nop
+
+00000080 <rvtest_init>:
+  80:	feedc0b7          	lui	ra,0xfeedc
+  84:	ead08093          	addi	ra,ra,-339 # feedbead <fromhost+0xfeed9aad>
+  88:	ff76e137          	lui	sp,0xff76e
+  8c:	f5610113          	addi	sp,sp,-170 # ff76df56 <fromhost+0xff76bb56>
+  90:	7fbb71b7          	lui	gp,0x7fbb7
+  94:	fab18193          	addi	gp,gp,-85 # 7fbb6fab <fromhost+0x7fbb4bab>
+  98:	bfddb237          	lui	tp,0xbfddb
+  9c:	7d520213          	addi	tp,tp,2005 # bfddb7d5 <fromhost+0xbfdd93d5>
+  a0:	00000297          	auipc	t0,0x0
+  a4:	0d828293          	addi	t0,t0,216 # 178 <rvtest_code_begin>
+  a8:	00002317          	auipc	t1,0x2
+  ac:	f5830313          	addi	t1,t1,-168 # 2000 <begin_signature>
+  b0:	b7fbb3b7          	lui	t2,0xb7fbb
+  b4:	6fa38393          	addi	t2,t2,1786 # b7fbb6fa <fromhost+0xb7fb92fa>
+  b8:	5bfde437          	lui	s0,0x5bfde
+  bc:	b7d40413          	addi	s0,s0,-1155 # 5bfddb7d <fromhost+0x5bfdb77d>
+  c0:	adfef4b7          	lui	s1,0xadfef
+  c4:	dbe48493          	addi	s1,s1,-578 # adfeedbe <fromhost+0xadfec9be>
+  c8:	56ff7537          	lui	a0,0x56ff7
+  cc:	6df50513          	addi	a0,a0,1759 # 56ff76df <fromhost+0x56ff52df>
+  d0:	ab7fc5b7          	lui	a1,0xab7fc
+  d4:	b6f58593          	addi	a1,a1,-1169 # ab7fbb6f <fromhost+0xab7f976f>
+  d8:	d5bfe637          	lui	a2,0xd5bfe
+  dc:	db760613          	addi	a2,a2,-585 # d5bfddb7 <fromhost+0xd5bfb9b7>
+  e0:	eadff6b7          	lui	a3,0xeadff
+  e4:	edb68693          	addi	a3,a3,-293 # eadfeedb <fromhost+0xeadfcadb>
+  e8:	f56ff737          	lui	a4,0xf56ff
+  ec:	76d70713          	addi	a4,a4,1901 # f56ff76d <fromhost+0xf56fd36d>
+  f0:	fab807b7          	lui	a5,0xfab80
+  f4:	bb678793          	addi	a5,a5,-1098 # fab7fbb6 <fromhost+0xfab7d7b6>
+  f8:	7d5c0837          	lui	a6,0x7d5c0
+  fc:	ddb80813          	addi	a6,a6,-549 # 7d5bfddb <fromhost+0x7d5bd9db>
+ 100:	beae08b7          	lui	a7,0xbeae0
+ 104:	eed88893          	addi	a7,a7,-275 # beadfeed <fromhost+0xbeaddaed>
+ 108:	df570937          	lui	s2,0xdf570
+ 10c:	f7690913          	addi	s2,s2,-138 # df56ff76 <fromhost+0xdf56db76>
+ 110:	6fab89b7          	lui	s3,0x6fab8
+ 114:	fbb98993          	addi	s3,s3,-69 # 6fab7fbb <fromhost+0x6fab5bbb>
+ 118:	b7d5ca37          	lui	s4,0xb7d5c
+ 11c:	fdda0a13          	addi	s4,s4,-35 # b7d5bfdd <fromhost+0xb7d59bdd>
+ 120:	dbeaeab7          	lui	s5,0xdbeae
+ 124:	feea8a93          	addi	s5,s5,-18 # dbeadfee <fromhost+0xdbeabbee>
+ 128:	6df57b37          	lui	s6,0x6df57
+ 12c:	ff7b0b13          	addi	s6,s6,-9 # 6df56ff7 <fromhost+0x6df54bf7>
+ 130:	b6fabbb7          	lui	s7,0xb6fab
+ 134:	7fbb8b93          	addi	s7,s7,2043 # b6fab7fb <fromhost+0xb6fa93fb>
+ 138:	db7d6c37          	lui	s8,0xdb7d6
+ 13c:	bfdc0c13          	addi	s8,s8,-1027 # db7d5bfd <fromhost+0xdb7d37fd>
+ 140:	edbebcb7          	lui	s9,0xedbeb
+ 144:	dfec8c93          	addi	s9,s9,-514 # edbeadfe <fromhost+0xedbe89fe>
+ 148:	76df5d37          	lui	s10,0x76df5
+ 14c:	6ffd0d13          	addi	s10,s10,1791 # 76df56ff <fromhost+0x76df32ff>
+ 150:	bb6fbdb7          	lui	s11,0xbb6fb
+ 154:	b7fd8d93          	addi	s11,s11,-1153 # bb6fab7f <fromhost+0xbb6f877f>
+ 158:	ddb7de37          	lui	t3,0xddb7d
+ 15c:	5bfe0e13          	addi	t3,t3,1471 # ddb7d5bf <fromhost+0xddb7b1bf>
+ 160:	eedbfeb7          	lui	t4,0xeedbf
+ 164:	adfe8e93          	addi	t4,t4,-1313 # eedbeadf <fromhost+0xeedbc6df>
+ 168:	f76dff37          	lui	t5,0xf76df
+ 16c:	56ff0f13          	addi	t5,t5,1391 # f76df56f <fromhost+0xf76dd16f>
+ 170:	fbb70fb7          	lui	t6,0xfbb70
+ 174:	ab7f8f93          	addi	t6,t6,-1353 # fbb6fab7 <fromhost+0xfbb6d6b7>
+
+00000178 <rvtest_code_begin>:
+ 178:	00002817          	auipc	a6,0x2
+ 17c:	e8880813          	addi	a6,a6,-376 # 2000 <begin_signature>
+
+00000180 <inst_0>:
+ 180:	42727037          	lui	zero,0x42727
+ 184:	e6f00013          	li	zero,-401
+ 188:	563330b7          	lui	ra,0x56333
+ 18c:	24908093          	addi	ra,ra,585 # 56333249 <fromhost+0x56330e49>
+ 190:	2d562137          	lui	sp,0x2d562
+ 194:	05210113          	addi	sp,sp,82 # 2d562052 <fromhost+0x2d55fc52>
+ 198:	526971b7          	lui	gp,0x52697
+ 19c:	36318193          	addi	gp,gp,867 # 52697363 <fromhost+0x52694f63>
+ 1a0:	736b8237          	lui	tp,0x736b8
+ 1a4:	92020213          	addi	tp,tp,-1760 # 736b7920 <fromhost+0x736b5520>
+ 1a8:	737462b7          	lui	t0,0x73746
+ 1ac:	57228293          	addi	t0,t0,1394 # 73746572 <fromhost+0x73744172>
+ 1b0:	6e205337          	lui	t1,0x6e205
+ 1b4:	e6f30313          	addi	t1,t1,-401 # 6e204e6f <fromhost+0x6e202a6f>
+ 1b8:	4d6973b7          	lui	t2,0x4d697
+ 1bc:	c6138393          	addi	t2,t2,-927 # 4d696c61 <fromhost+0x4d694861>
+ 1c0:	6f646437          	lui	s0,0x6f646
+ 1c4:	17340413          	addi	s0,s0,371 # 6f646173 <fromhost+0x6f643d73>
+ 1c8:	6b7944b7          	lui	s1,0x6b794
+ 1cc:	06348493          	addi	s1,s1,99 # 6b794063 <fromhost+0x6b791c63>
+ 1d0:	74657537          	lui	a0,0x74657
+ 1d4:	27350513          	addi	a0,a0,627 # 74657273 <fromhost+0x74654e73>
+ 1d8:	286e75b7          	lui	a1,0x286e7
+ 1dc:	f7358593          	addi	a1,a1,-141 # 286e6f73 <fromhost+0x286e4b73>
+ 1e0:	656b2637          	lui	a2,0x656b2
+ 1e4:	04860613          	addi	a2,a2,72 # 656b2048 <fromhost+0x656afc48>
+ 1e8:	205266b7          	lui	a3,0x20526
+ 1ec:	16468693          	addi	a3,a3,356 # 20526164 <fromhost+0x20523d64>
+ 1f0:	6f6d3737          	lui	a4,0x6f6d3
+ 1f4:	92c70713          	addi	a4,a4,-1748 # 6f6d292c <fromhost+0x6f6d052c>
+ 1f8:	697037b7          	lui	a5,0x69703
+ 1fc:	e6378793          	addi	a5,a5,-413 # 69702e63 <fromhost+0x69700a63>
+ 200:	00082023          	sw	zero,0(a6)
+ 204:	00182223          	sw	ra,4(a6)
+ 208:	00282423          	sw	sp,8(a6)
+ 20c:	00382623          	sw	gp,12(a6)
+ 210:	00482823          	sw	tp,16(a6)
+ 214:	00582a23          	sw	t0,20(a6)
+ 218:	00682c23          	sw	t1,24(a6)
+ 21c:	00782e23          	sw	t2,28(a6)
+ 220:	02882023          	sw	s0,32(a6)
+ 224:	02982223          	sw	s1,36(a6)
+ 228:	02a82423          	sw	a0,40(a6)
+ 22c:	02b82623          	sw	a1,44(a6)
+ 230:	02c82823          	sw	a2,48(a6)
+ 234:	02d82a23          	sw	a3,52(a6)
+ 238:	02e82c23          	sw	a4,56(a6)
+ 23c:	02f82e23          	sw	a5,60(a6)
+ 240:	00002217          	auipc	tp,0x2
+ 244:	e0020213          	addi	tp,tp,-512 # 2040 <test_A2_res>
+
+00000248 <inst_1>:
+ 248:	636f6837          	lui	a6,0x636f6
+ 24c:	46180813          	addi	a6,a6,1121 # 636f6461 <fromhost+0x636f4061>
+ 250:	6a6578b7          	lui	a7,0x6a657
+ 254:	b4088893          	addi	a7,a7,-1216 # 6a656b40 <fromhost+0x6a654740>
+ 258:	20287937          	lui	s2,0x20287
+ 25c:	86190913          	addi	s2,s2,-1951 # 20286861 <fromhost+0x20284461>
+ 260:	616a69b7          	lui	s3,0x616a6
+ 264:	56b98993          	addi	s3,s3,1387 # 616a656b <fromhost+0x616a416b>
+ 268:	61766a37          	lui	s4,0x61766
+ 26c:	520a0a13          	addi	s4,s4,1312 # 61766520 <fromhost+0x61764120>
+ 270:	2e205ab7          	lui	s5,0x2e205
+ 274:	c65a8a93          	addi	s5,s5,-923 # 2e204c65 <fromhost+0x2e202865>
+ 278:	636f7b37          	lui	s6,0x636f7
+ 27c:	d29b0b13          	addi	s6,s6,-727 # 636f6d29 <fromhost+0x636f4929>
+ 280:	73697bb7          	lui	s7,0x73697
+ 284:	02eb8b93          	addi	s7,s7,46 # 7369702e <fromhost+0x73694c2e>
+ 288:	66208c37          	lui	s8,0x66208
+ 28c:	96fc0c13          	addi	s8,s8,-1681 # 6620796f <fromhost+0x6620556f>
+ 290:	67652cb7          	lui	s9,0x67652
+ 294:	069c8c93          	addi	s9,s9,105 # 67652069 <fromhost+0x6764fc69>
+ 298:	65737d37          	lui	s10,0x65737
+ 29c:	361d0d13          	addi	s10,s10,865 # 65737361 <fromhost+0x65734f61>
+ 2a0:	75732db7          	lui	s11,0x75732
+ 2a4:	06dd8d93          	addi	s11,s11,109 # 7573206d <fromhost+0x7572fc6d>
+ 2a8:	3a291e37          	lui	t3,0x3a291
+ 2ac:	d0ae0e13          	addi	t3,t3,-758 # 3a290d0a <fromhost+0x3a28e90a>
+ 2b0:	68697eb7          	lui	t4,0x68697
+ 2b4:	320e8e93          	addi	t4,t4,800 # 68697320 <fromhost+0x68694f20>
+ 2b8:	61642f37          	lui	t5,0x61642
+ 2bc:	074f0f13          	addi	t5,t5,116 # 61642074 <fromhost+0x6163fc74>
+ 2c0:	75207fb7          	lui	t6,0x75207
+ 2c4:	265f8f93          	addi	t6,t6,613 # 75207265 <fromhost+0x75204e65>
+ 2c8:	01022023          	sw	a6,0(tp) # 0 <rvtest_entry_point>
+ 2cc:	01122223          	sw	a7,4(tp) # 4 <trap_vector>
+ 2d0:	01222423          	sw	s2,8(tp) # 8 <trap_vector+0x4>
+ 2d4:	01322623          	sw	s3,12(tp) # c <trap_vector+0x8>
+ 2d8:	01422823          	sw	s4,16(tp) # 10 <trap_vector+0xc>
+ 2dc:	01522a23          	sw	s5,20(tp) # 14 <trap_vector+0x10>
+ 2e0:	01622c23          	sw	s6,24(tp) # 18 <trap_vector+0x14>
+ 2e4:	01722e23          	sw	s7,28(tp) # 1c <trap_vector+0x18>
+ 2e8:	03822023          	sw	s8,32(tp) # 20 <trap_vector+0x1c>
+ 2ec:	03922223          	sw	s9,36(tp) # 24 <trap_vector+0x20>
+ 2f0:	03a22423          	sw	s10,40(tp) # 28 <trap_vector+0x24>
+ 2f4:	03b22623          	sw	s11,44(tp) # 2c <trap_vector+0x28>
+ 2f8:	03c22823          	sw	t3,48(tp) # 30 <trap_vector+0x2c>
+ 2fc:	03d22a23          	sw	t4,52(tp) # 34 <handle_exception>
+ 300:	03e22c23          	sw	t5,56(tp) # 38 <write_tohost>
+ 304:	03f22e23          	sw	t6,60(tp) # 3c <write_tohost+0x4>
+ 308:	00002217          	auipc	tp,0x2
+ 30c:	d7820213          	addi	tp,tp,-648 # 2080 <test_A3_res>
+
+00000310 <inst_2>:
+ 310:	00022023          	sw	zero,0(tp) # 0 <rvtest_entry_point>
+ 314:	00122223          	sw	ra,4(tp) # 4 <trap_vector>
+ 318:	00222423          	sw	sp,8(tp) # 8 <trap_vector+0x4>
+ 31c:	00322623          	sw	gp,12(tp) # c <trap_vector+0x8>
+ 320:	0ff0000f          	fence
+ 324:	00000073          	ecall
+ 328:	00000013          	nop
+ 32c:	00000013          	nop
+
+Disassembly of section .data:
+
+00002000 <begin_signature>:
+    2000:	ffff                	.2byte	0xffff
+    2002:	ffff                	.2byte	0xffff
+    2004:	ffff                	.2byte	0xffff
+    2006:	ffff                	.2byte	0xffff
+    2008:	ffff                	.2byte	0xffff
+    200a:	ffff                	.2byte	0xffff
+    200c:	ffff                	.2byte	0xffff
+    200e:	ffff                	.2byte	0xffff
+    2010:	ffff                	.2byte	0xffff
+    2012:	ffff                	.2byte	0xffff
+    2014:	ffff                	.2byte	0xffff
+    2016:	ffff                	.2byte	0xffff
+    2018:	ffff                	.2byte	0xffff
+    201a:	ffff                	.2byte	0xffff
+    201c:	ffff                	.2byte	0xffff
+    201e:	ffff                	.2byte	0xffff
+    2020:	ffff                	.2byte	0xffff
+    2022:	ffff                	.2byte	0xffff
+    2024:	ffff                	.2byte	0xffff
+    2026:	ffff                	.2byte	0xffff
+    2028:	ffff                	.2byte	0xffff
+    202a:	ffff                	.2byte	0xffff
+    202c:	ffff                	.2byte	0xffff
+    202e:	ffff                	.2byte	0xffff
+    2030:	ffff                	.2byte	0xffff
+    2032:	ffff                	.2byte	0xffff
+    2034:	ffff                	.2byte	0xffff
+    2036:	ffff                	.2byte	0xffff
+    2038:	ffff                	.2byte	0xffff
+    203a:	ffff                	.2byte	0xffff
+    203c:	ffff                	.2byte	0xffff
+    203e:	ffff                	.2byte	0xffff
+
+00002040 <test_A2_res>:
+    2040:	ffff                	.2byte	0xffff
+    2042:	ffff                	.2byte	0xffff
+    2044:	ffff                	.2byte	0xffff
+    2046:	ffff                	.2byte	0xffff
+    2048:	ffff                	.2byte	0xffff
+    204a:	ffff                	.2byte	0xffff
+    204c:	ffff                	.2byte	0xffff
+    204e:	ffff                	.2byte	0xffff
+    2050:	ffff                	.2byte	0xffff
+    2052:	ffff                	.2byte	0xffff
+    2054:	ffff                	.2byte	0xffff
+    2056:	ffff                	.2byte	0xffff
+    2058:	ffff                	.2byte	0xffff
+    205a:	ffff                	.2byte	0xffff
+    205c:	ffff                	.2byte	0xffff
+    205e:	ffff                	.2byte	0xffff
+    2060:	ffff                	.2byte	0xffff
+    2062:	ffff                	.2byte	0xffff
+    2064:	ffff                	.2byte	0xffff
+    2066:	ffff                	.2byte	0xffff
+    2068:	ffff                	.2byte	0xffff
+    206a:	ffff                	.2byte	0xffff
+    206c:	ffff                	.2byte	0xffff
+    206e:	ffff                	.2byte	0xffff
+    2070:	ffff                	.2byte	0xffff
+    2072:	ffff                	.2byte	0xffff
+    2074:	ffff                	.2byte	0xffff
+    2076:	ffff                	.2byte	0xffff
+    2078:	ffff                	.2byte	0xffff
+    207a:	ffff                	.2byte	0xffff
+    207c:	ffff                	.2byte	0xffff
+    207e:	ffff                	.2byte	0xffff
+
+00002080 <test_A3_res>:
+    2080:	ffff                	.2byte	0xffff
+    2082:	ffff                	.2byte	0xffff
+    2084:	ffff                	.2byte	0xffff
+    2086:	ffff                	.2byte	0xffff
+    2088:	ffff                	.2byte	0xffff
+    208a:	ffff                	.2byte	0xffff
+    208c:	ffff                	.2byte	0xffff
+    208e:	ffff                	.2byte	0xffff
+
+00002090 <end_signature>:
+	...
+
+00002100 <begin_regstate>:
+    2100:	0080                	.2byte	0x80
+	...
+
+00002200 <end_regstate>:
+    2200:	0004                	.2byte	0x4
+	...
+
+Disassembly of section .tohost:
+
+00002300 <tohost>:
+	...
+
+00002400 <fromhost>:
+	...
+
+Disassembly of section .riscv.attributes:
+
+00000000 <.riscv.attributes>:
+   0:	1d41                	.2byte	0x1d41
+   2:	0000                	.2byte	0x0
+   4:	7200                	.2byte	0x7200
+   6:	7369                	.2byte	0x7369
+   8:	01007663          	bgeu	zero,a6,14 <trap_vector+0x10>
+   c:	00000013          	nop
+  10:	7205                	.2byte	0x7205
+  12:	3376                	.2byte	0x3376
+  14:	6932                	.2byte	0x6932
+  16:	7032                	.2byte	0x7032
+  18:	0030                	.2byte	0x30
+  1a:	0108                	.2byte	0x108
+  1c:	0b0a                	.2byte	0xb0a
