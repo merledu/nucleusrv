@@ -1,5 +1,5 @@
 
-/home/hamna/Downloads/nucleusrv/imperas-riscv-tests/work/rv32i_m/I/ADD-01.elf:     file format elf32-littleriscv
+/home/hassan/nucleusrv/imperas-riscv-tests/work/rv32i_m/I/ADD-01.elf:     file format elf32-littleriscv
 
 
 Disassembly of section .text.init:
@@ -1406,8 +1406,8 @@ Disassembly of section .text.init:
 Disassembly of section .data:
 
 00002000 <rvtest_data_begin>:
-    2000:	cafe                	sw	t6,84(sp)
-    2002:	babe                	fsd	fa5,368(sp)
+    2000:	cafe                	.2byte	0xcafe
+    2002:	babe                	.2byte	0xbabe
 
 00002004 <rvtest_data_end>:
 	...
@@ -1707,11 +1707,11 @@ Disassembly of section .data:
 	...
 
 00002300 <begin_regstate>:
-    2300:	0080                	addi	s0,sp,64
+    2300:	0080                	.2byte	0x80
 	...
 
 00002400 <end_regstate>:
-    2400:	0004                	0x4
+    2400:	0004                	.2byte	0x4
 	...
 
 Disassembly of section .tohost:
@@ -1725,16 +1725,16 @@ Disassembly of section .tohost:
 Disassembly of section .riscv.attributes:
 
 00000000 <.riscv.attributes>:
-   0:	1d41                	addi	s10,s10,-16
-   2:	0000                	unimp
-   4:	7200                	flw	fs0,32(a2)
-   6:	7369                	lui	t1,0xffffa
+   0:	1d41                	.2byte	0x1d41
+   2:	0000                	.2byte	0x0
+   4:	7200                	.2byte	0x7200
+   6:	7369                	.2byte	0x7369
    8:	01007663          	bgeu	zero,a6,14 <offset+0x10>
    c:	00000013          	nop
-  10:	7205                	lui	tp,0xfffe1
-  12:	3376                	fld	ft6,376(sp)
-  14:	6932                	flw	fs2,12(sp)
-  16:	7032                	flw	ft0,44(sp)
-  18:	0030                	addi	a2,sp,8
-  1a:	0108                	addi	a0,sp,128
-  1c:	0b0a                	slli	s6,s6,0x2
+  10:	7205                	.2byte	0x7205
+  12:	3376                	.2byte	0x3376
+  14:	6932                	.2byte	0x6932
+  16:	7032                	.2byte	0x7032
+  18:	0030                	.2byte	0x30
+  1a:	0108                	.2byte	0x108
+  1c:	0b0a                	.2byte	0xb0a
