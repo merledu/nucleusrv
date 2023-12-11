@@ -45,7 +45,7 @@ class MemoryFetch extends Module {
     addr := io.aluResultIn
     data := io.writeData
   }
-  val  mu = WireInit(false.B)
+  val  mu = WireInit(true.B)
   val wdata = Wire(Vec(4, UInt(8.W)))
   val rdata = Wire(UInt(32.W))
   val offset = RegInit(0.U(2.W))

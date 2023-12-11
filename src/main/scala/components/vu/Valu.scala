@@ -239,7 +239,7 @@ io.v_output := 0.S
         .elsewhen (io.aluc === VMVx){
             when(io.vd_addr === 0.U){
                 val imm = Cat((0.S(96.W)),io.in_A).asSInt
-                io.v_output := 3.S(128.W)
+                io.v_output := 1.S(128.W)
   	        }.otherwise{
                 when (io.sew === "b011".U){
                     val imm = Cat(0.S(32.W), io.in_A).asSInt

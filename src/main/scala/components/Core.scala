@@ -162,6 +162,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_v_ins = RegInit(0.B)
 
   // MEM-WB Registers
+  val mem_pc4_out = RegInit(0.S(32.W))
   val mem_reg_lsuType = RegInit(0.U(4.W))
   val mem_reg_rd = RegInit(0.U(32.W))
   val mem_reg_ins = RegInit(0.U(32.W))
@@ -267,28 +268,40 @@ dontTouch(vlsu.io)
 vlsu.io.instr := instruction
 vlsu.io.vtype := vtype
 var vlmul_count = WireInit(0.U(32.W))
-var load_count = WireInit(0.U(32.W))
+var load_count = RegInit(0.U(32.W))
 
 // val vtype = WireInit("b010".U(32.W))
 dontTouch(vlmul_count)
 // working on  only one vector 
     when (lmul==="b000".U  ){
         vlmul_count := 0.U
-        load_count := 3.U
     }
     // working on  only two vector continously
     .elsewhen (lmul==="b001".U ) {
         vlmul_count := 1.U
-        load_count := 7.U
     }
     // working on  only four vector continously
     .elsewhen (lmul==="b010".U ){
         vlmul_count := 3.U
-        load_count := 15.U
     }
     // working on  only eight vector continously
     .elsewhen (lmul==="b011".U ){
         vlmul_count := 7.U
+    }
+    // working on  only one vector emul
+    when (vlsu.io.emul === 1.U && instruction(6,0)==="b0000111".U){
+        load_count := 3.U
+    }
+    // working on  only two vector continously emul
+    .elsewhen (vlsu.io.emul === 1.U) {
+        load_count := 7.U
+    }
+    // working on  only four vector continously emul
+    .elsewhen (vlsu.io.emul === 1.U && instruction(6,0)==="b0000111".U){
+        load_count := 15.U
+    }
+    // working on  only eight vector continously emul
+    .elsewhen (vlsu.io.emul === 1.U && instruction(6,0)==="b0000111".U){
         load_count := 31.U
     }
     
@@ -766,6 +779,7 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
   mem_reg_instruction := ex_reg_ins
   mem_reg_emul := ex_reg_emul
   mem_reg_vs3 := ex_reg_vs3
+  mem_pc4_out := ex_pc4_out
 
   /**
    * Write Back *
@@ -790,7 +804,11 @@ when(mem_reg_lsuType === 1.U)  {
         rdata(loop1) := MEM.io.readData //io.dmemRsp.bits.dataResponse
         loop1 := loop1 + 1.U
         load_vlcount := load_vlcount + 1.U
-      }.otherwise{
+      }.elsewhen((mem_pc4_out =/= ex_pc4_out)){
+      load_vlcount := 0.U
+      rdata3 := MEM.io.readData
+        loop1 := 0.U
+    }.otherwise{
         rdata3 := MEM.io.readData
         loop1 := 0.U
         load_vlcount := load_vlcount + 1.U
@@ -800,25 +818,33 @@ when(mem_reg_lsuType === 1.U)  {
         rdata(loop1) := Fill(32,1.U)
         loop1 := loop1 + 1.U
         load_vlcount := load_vlcount
-      }.otherwise{
+      }.elsewhen((mem_pc4_out =/= ex_pc4_out)){
+      load_vlcount := 0.U
+      rdata3 := MEM.io.readData
+        loop1 := 0.U
+    }.otherwise{
         rdata3 := Fill(32,1.U)
         loop1 := 0.U
         load_vlcount := load_vlcount
     
       }
-    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt) && mem_reg_vtype(6)===0.U){ //tail agnostic
+    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt) && mem_reg_vtype(6)===0.U){ //tail undisturbed
       when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
         rdata(loop1) := Fill(32,1.U)
         loop1 := loop1 + 1.U
         load_vlcount := load_vlcount
-      }.otherwise{
+      }.elsewhen((mem_pc4_out =/= ex_pc4_out)){
+      load_vlcount := 0.U
+      rdata3 := MEM.io.readData
+        loop1 := 0.U
+    }.otherwise{
         rdata3 := Fill(32,1.U)
         loop1 := 0.U
         load_vlcount := load_vlcount
     
       }
     }
-    .elsewhen((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U || ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
+    .elsewhen((id_pc4_out =/= ex_pc4_out) && ((ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U) || ((ex_reg_ins(6,0) === "b0000111".U) =/= (id_reg_ins(6,0) === "b0000111".U)))){
       load_vlcount := 0.U
     }
     }
@@ -931,15 +957,15 @@ dontTouch(rdata)
   // implementation of emul and wire in vector register file for increment in vector register for load
   val id_emul_count = RegInit(0.U(32.W))
   val id_emul_count_load = RegInit(0.U(32.W))
-
-  when(id_emul_count_load =/= (emul_count ) &&  mem_reg_instruction(6,0)==="b0000111".U ){
+//calculate increament of vetor register according to emul
+  when(id_emul_count_load =/= (emul_count ) &&  mem_reg_instruction(6,0)==="b0000111".U  && id_pc4_out === ex_pc4_out){
     when(id_emul_count =/= 3.U ){
       id_emul_count := id_emul_count + 1.U
     }.otherwise{
       id_emul_count_load := id_emul_count_load +1.U
       id_emul_count := 0.U
     }
-  }.elsewhen(id_emul_count_load =/= (emul_count + 1.U ) &&  mem_reg_instruction(6,0)==="b0000111".U ){
+  }.elsewhen(id_emul_count_load =/= (emul_count + 1.U ) &&  mem_reg_instruction(6,0)==="b0000111".U && id_pc4_out === ex_pc4_out){
     when(id_emul_count =/= 3.U ){
       id_emul_count := id_emul_count + 1.U
     }.otherwise{

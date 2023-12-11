@@ -284,7 +284,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
 //   .otherwise{
 //   vtype := vtype
 // }
-io.v_z_imm := io.id_vtype
+io.v_z_imm := io.id_instruction(30,20).asSInt
   io.vl_out := vec_csr.io.vl_out
   io.vtypei_out := vec_csr.io.vtype_out
   io.vstart_out := vec_csr.io.vstart_out
