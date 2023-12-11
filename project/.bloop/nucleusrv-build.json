@@ -2,15 +2,15 @@
     "version": "1.4.0",
     "project": {
         "name": "nucleusrv-build",
-        "directory": "/home/hassan/Documents/nucleusrv/project",
-        "workspaceDir": "/home/hassan/Documents/nucleusrv/project",
+        "directory": "/home/hassan/Downloads/nucleusrv/project",
+        "workspaceDir": "/home/hassan/Downloads/nucleusrv/project",
         "sources": [
-            "/home/hassan/Documents/nucleusrv/project/src/main/scala",
-            "/home/hassan/Documents/nucleusrv/project/src/main/scala-2.12",
-            "/home/hassan/Documents/nucleusrv/project/src/main/scala-2",
-            "/home/hassan/Documents/nucleusrv/project/src/main/java",
-            "/home/hassan/Documents/nucleusrv/project/src/main/scala-sbt-1.0",
-            "/home/hassan/Documents/nucleusrv/project/target/scala-2.12/sbt-1.0/src_managed/main"
+            "/home/hassan/Downloads/nucleusrv/project/src/main/scala",
+            "/home/hassan/Downloads/nucleusrv/project/src/main/scala-2.12",
+            "/home/hassan/Downloads/nucleusrv/project/src/main/scala-2",
+            "/home/hassan/Downloads/nucleusrv/project/src/main/java",
+            "/home/hassan/Downloads/nucleusrv/project/src/main/scala-sbt-1.0",
+            "/home/hassan/Downloads/nucleusrv/project/target/scala-2.12/sbt-1.0/src_managed/main"
         ],
         "dependencies": [
             
@@ -105,11 +105,11 @@
             "/home/hassan/.cache/coursier/v1/https/repo1.maven.org/maven2/com/squareup/okio/okio/1.17.2/okio-1.17.2.jar",
             "/home/hassan/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/config/1.3.3/config-1.3.3.jar"
         ],
-        "out": "/home/hassan/Documents/nucleusrv/project/.bloop/nucleusrv-build",
-        "classesDir": "/home/hassan/Documents/nucleusrv/project/.bloop/nucleusrv-build/scala-2.12/sbt-1.0/classes",
+        "out": "/home/hassan/Downloads/nucleusrv/project/.bloop/nucleusrv-build",
+        "classesDir": "/home/hassan/Downloads/nucleusrv/project/.bloop/nucleusrv-build/scala-2.12/sbt-1.0/classes",
         "resources": [
-            "/home/hassan/Documents/nucleusrv/project/src/main/resources",
-            "/home/hassan/Documents/nucleusrv/project/target/scala-2.12/sbt-1.0/resource_managed/main"
+            "/home/hassan/Downloads/nucleusrv/project/src/main/resources",
+            "/home/hassan/Downloads/nucleusrv/project/target/scala-2.12/sbt-1.0/resource_managed/main"
         ],
         "scala": {
             "organization": "org.scala-lang",
@@ -200,7 +200,7 @@
             "config": {
                 "home": "/usr/lib/jvm/java-11-openjdk-amd64",
                 "options": [
-                    "-Duser.dir=/home/hassan/Documents/nucleusrv/project"
+                    "-Duser.dir=/home/hassan/Downloads/nucleusrv/project"
                 ]
             },
             "mainClass": [
