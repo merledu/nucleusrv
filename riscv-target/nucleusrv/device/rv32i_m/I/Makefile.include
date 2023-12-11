@@ -8,7 +8,8 @@ endif
 RUN_TARGET=\
 	cd $(NUCLEUSRV) && sbt "testOnly nucleusrv.components.TopTest -- -DprogramFile=$(<).program.hex -DwriteVcd=1 -DdataFile=$(<).data.hex" \
     2> $(*).stdout; \
-    `grep '^[a-f0-9]\+$$' $(*).stdout > $(*).signature.output`;
+    `grep '^[a-f0-9]\+$$' $(*).stdout > $(*).signature.output`; \
+    python3 tools/trace/scripts/signature.py --signature=$(*).signature.output
 
 RISCV_PREFIX   ?= riscv32-unknown-elf-
 RISCV_GCC      ?= $(RISCV_PREFIX)gcc
@@ -17,6 +18,7 @@ RISCV_OBJDUMP  ?= $(RISCV_PREFIX)objdump
 RISCV_ELF2HEX  ?= $(RISCV_PREFIX)elf2hex
 RISCV_GCC_OPTS ?= -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles
 SBT ?= sbt
+ 
 
 COMPILE_TARGET=\
 	$$(RISCV_GCC) $(1) $$(RISCV_GCC_OPTS) \
