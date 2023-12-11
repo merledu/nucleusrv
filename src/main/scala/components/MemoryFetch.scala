@@ -318,7 +318,7 @@ class MemoryFetch extends Module {
   dontTouch(mu)
 
 
-  when(io.writeEnable && addr(31, 28) === "h8".asUInt()){
+  when(io.writeEnable){
     printf("%x\n", data)
   }
 
