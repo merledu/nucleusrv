@@ -8,14 +8,9 @@ endif
 RUN_TARGET=\
 	cd $(NUCLEUSRV) && sbt "testOnly nucleusrv.components.TopTest -- -DprogramFile=$(<).program.hex -DwriteVcd=1 -DdataFile=$(<).data.hex" \
     2> $(*).stdout; \
-<<<<<<< HEAD
-    `grep '^[a-f0-9]\+$$' $(*).stdout > $(*).signature.output`;
-    
-=======
     `grep '^[a-f0-9]\+$$' $(*).stdout > $(*).signature.output`; \
-    python3 tools/trace/scripts/signature.py --signature=$(*).signature.output --reference=imperas-riscv-tests/riscv-test-suite/rv32i_m/C/references/$(notdir $(*)).reference_output
+    python3 tools/trace/scripts/signature.py --signature=$(*).signature.output --reference=imperas-riscv-tests/riscv-test-suite/rv32i_m/C/references/$(notdir $(*)).reference_output;
 
->>>>>>> 8a09e3d71a28cbdd2e8479b1fe5af3ea6435c530
 RISCV_PREFIX   ?= riscv32-unknown-elf-
 RISCV_GCC      ?= $(RISCV_PREFIX)gcc
 RISCV_OBJCOPY  ?= $(RISCV_PREFIX)objcopy

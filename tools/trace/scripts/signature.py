@@ -23,12 +23,6 @@ parser.add_argument('--reference', type=str, help='reference file')
 args = parser.parse_args()
 # file_path1 = '/home/hamna/Downloads/nucleusrv/imperas-riscv-tests/riscv-test-suite/rv32i_m/C/references/C-ADDI16SP-01.reference_output'  
 # file_path2 = '/home/hamna/Downloads/nucleusrv/imperas-riscv-tests/work/rv32i_m/C/C-ADDI16SP-01.signature.output'  
-<<<<<<< HEAD
-
-trimmed_lines = count_lines_and_trim_file(args.reference, args.signature)
-
-
-=======
 
 trimmed_lines = count_lines_and_trim_file(args.reference, args.signature)
 
@@ -37,4 +31,3 @@ for line in trimmed_lines:
     print(line)
 
 print(f"Trimmed data written back to {args.signature}.")
->>>>>>> 8a09e3d71a28cbdd2e8479b1fe5af3ea6435c530
