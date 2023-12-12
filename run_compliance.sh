@@ -13,10 +13,11 @@ fi
 
 ISA=$1
 TEST=$2
+RISCV_DEVICE=$3
 
 cd $NUCLEUSRV/imperas-riscv-tests 
 
-make clean TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=I RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop
-make TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=I RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop | tee Test_result.txt
+make clean TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=$RISCV_DEVICE RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop
+make TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=$RISCV_DEVICE RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop | tee Test_result.txt
 
 cd ../
