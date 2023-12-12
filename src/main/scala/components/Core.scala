@@ -289,20 +289,20 @@ dontTouch(vlmul_count)
         vlmul_count := 7.U
     }
     // working on  only one vector emul
-    when (vlsu.io.emul === 1.U && instruction(6,0)==="b0000111".U){
-        load_count := 3.U
+    when (vlsu.io.emul === 1.U){
+        load_count := 4.U
     }
     // working on  only two vector continously emul
-    .elsewhen (vlsu.io.emul === 1.U) {
-        load_count := 7.U
+    .elsewhen (vlsu.io.emul === 2.U) {
+        load_count := 8.U
     }
     // working on  only four vector continously emul
-    .elsewhen (vlsu.io.emul === 1.U && instruction(6,0)==="b0000111".U){
-        load_count := 15.U
+    .elsewhen (vlsu.io.emul === 4.U){
+        load_count := 16.U
     }
     // working on  only eight vector continously emul
-    .elsewhen (vlsu.io.emul === 1.U && instruction(6,0)==="b0000111".U){
-        load_count := 31.U
+    .elsewhen (vlsu.io.emul === 8.U){
+        load_count := 32.U
     }
     
     val emul_count = WireInit(0.U(32.W))
@@ -324,61 +324,52 @@ dontTouch(vlmul_count)
 
   var next_pc_selector = WireInit(0.U(32.W))
   val lmul_reg = RegInit(0.U(32.W))
-  // val vc3 = RegInit(0.U(5.W))
-    // when(lmul_reg =/= vlmul_count && instruction(6,0)==="b1010111".U && instruction(14,12)=/="b111".U){
-    //     next_pc_selector := 1.U
-    //     lmul_reg := lmul_reg +1.U
-    //     if_reg_lmul_v := lmul_reg  //paasing fetch stage
-    // }
-    // .otherwise{
-    //     lmul_reg := 0.U
-    //     next_pc_selector := 0.U
-    //     if_reg_lmul_v := lmul_reg //paasing fetch stage
-    // }
-val emul_reg = RegInit(0.U(32.W))
-val vc3 = RegInit(0.U(32.W))
-when(emul_reg =/= (emul_count ) &&  instruction(6,0)==="b0100111".U ){
-  //paasing fetch stage
-        
-        when(vc3 =/= 3.U ){
-           vc3 := vc3 + 1.U
-           if_vc3 := emul_reg 
-           next_pc_selector := 1.U
-
-        //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
-        }.otherwise{
-          if_vc3 := emul_reg 
-          emul_reg := emul_reg +1.U
-          
-          vc3 := 0.U
-          next_pc_selector := 0.U
-        }
-}.elsewhen(emul_reg =/= (emul_count + 1.U ) &&  instruction(6,0)==="b0100111".U ){
-           when(vc3 =/= 3.U ){
-           vc3 := vc3 + 1.U
-           if_vc3 := emul_reg 
-           next_pc_selector := 1.U
-
-        //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
-        }.otherwise{
-          if_vc3 := emul_reg 
-          emul_reg := 0.U
-          
-          vc3 := 0.U
-          next_pc_selector := 0.U
-        }
-
-}
-.otherwise{
-
-          next_pc_selector := 0.U
-          if_vc3 := 0.U
-          // vc3 := 0.U
-
-        }
+  val id_reg_emul1 = RegInit(0.U(4.W))
+  val ex_reg_emul1 = RegInit(0.U(4.W))
+  val mem_reg_emul1 = RegInit(0.U(4.W))
+  val emul_reg = RegInit(0.U(32.W))
+  val vc3 = RegInit(0.U(32.W))
+  //count emul values for vector register for stor in decode stage and for load in write back stage
+when((pc.io.pc4 =/= if_pc4_out) && (if_reg_ins(6,0) === "b0000111".U && instruction(6,0) === "b0000111".U)){
+  emul_reg := 0.U
+  vc3 := 0.U
+  id_reg_emul1 := emul_reg
+  ID.id_vc3 := emul_reg
+            
+}.otherwise{
+  when(emul_reg =/= (emul_count ) &&  if_reg_ins(6,0)==="b0100111".U || if_reg_ins(6,0)==="b0000111".U){
+//paasing fetch stage
+    when(vc3 =/= 3.U ){
+      vc3 := vc3 + 1.U
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg
+    }.otherwise{
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg
+      emul_reg := emul_reg +1.U
+      vc3 := 0.U
+    }
+  }.elsewhen(emul_reg =/= (emul_count + 1.U ) &&  if_reg_ins(6,0)==="b0100111".U  || if_reg_ins(6,0)==="b0000111".U){
+      when(vc3 =/= 3.U ){
+      vc3 := vc3 + 1.U
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg
+    }.otherwise{
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg 
+      emul_reg := 0.U
+      vc3 := 0.U
+    }}.otherwise{
+      emul_reg := 0.U
+      id_reg_emul1 := 0.U
+      ID.id_vc3 := emul_reg
+    }}
 
 
-    // }
+    // id_reg_emul1 := if_vc3
+    ex_reg_emul1 := id_reg_emul1
+    mem_reg_emul1 := ex_reg_emul1
+
     val delays = RegInit(1.U(32.W))
     val load_delays = RegInit(1.U(32.W))
     //instruction repeat according to grouping concept
@@ -397,10 +388,8 @@ when(emul_reg =/= (emul_count ) &&  instruction(6,0)==="b0100111".U ){
     .elsewhen( (load_delays =/= load_count) && (instruction(6,0)==="b0000111".U)){
       load_delays := load_delays+1.U
       next_pc_selector := 1.U
-    }
-
-    .otherwise{
-        load_delays := 0.U
+    }.otherwise{
+        load_delays := 1.U
         lmul_reg := 0.U
         next_pc_selector := 0.U
         if_reg_lmul_v := lmul_reg //paasing fetch stage
@@ -449,7 +438,7 @@ dontTouch(next_pc_selector)
     id_reg_vs2_addr := ID.vs2_addr
     id_reg_lmul_v  := if_reg_lmul_v
     ID.id_lmul_vs1in_vs2in := if_reg_lmul_v
-    ID.id_vc3 := if_vc3
+    // ID.id_vc3 := if_vc3
     id_reg_evl := if_reg_evl
     id_reg_emul := if_reg_emul
     // ID.id_reg_emul1 := if_reg_emul
@@ -954,31 +943,8 @@ dontTouch(rdata)
   ID.ctl_vset := mem_reg_vset
   ID.vl := mem_reg_vec_vl
   ID.vtypei := mem_reg_vtype
-  // implementation of emul and wire in vector register file for increment in vector register for load
-  val id_emul_count = RegInit(0.U(32.W))
-  val id_emul_count_load = RegInit(0.U(32.W))
-//calculate increament of vetor register according to emul
-  when(id_emul_count_load =/= (emul_count ) &&  mem_reg_instruction(6,0)==="b0000111".U  && id_pc4_out === ex_pc4_out){
-    when(id_emul_count =/= 3.U ){
-      id_emul_count := id_emul_count + 1.U
-    }.otherwise{
-      id_emul_count_load := id_emul_count_load +1.U
-      id_emul_count := 0.U
-    }
-  }.elsewhen(id_emul_count_load =/= (emul_count + 1.U ) &&  mem_reg_instruction(6,0)==="b0000111".U && id_pc4_out === ex_pc4_out){
-    when(id_emul_count =/= 3.U ){
-      id_emul_count := id_emul_count + 1.U
-    }.otherwise{
-      id_emul_count_load := id_emul_count_load +1.U
-      id_emul_count := 0.U
-    }
-  }
-  .otherwise{
-    id_emul_count_load := 0.U
-    id_emul_count := 0.U
-  }
  
-  ID.wb_emul := id_emul_count_load
+  ID.wb_emul := mem_reg_emul1//id_emul_count_load //changes
   dontTouch(mem_stage_mem_to_reg)
   
   // }
