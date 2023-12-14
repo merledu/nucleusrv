@@ -109,7 +109,7 @@ class controldec extends Module {
             io.v_ins := 1.B
           
             val reg123 = RegInit(0.U(32.W))
-        when((reg123 =/= c) && opcode==="b0000111".U){
+        when((reg123 =/= 3.U) && opcode==="b0000111".U){
             reg123 := reg123 + 1.U
             io.RegWrite := 0.B
             io.V_MemToReg := 0.B

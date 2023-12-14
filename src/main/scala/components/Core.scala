@@ -131,7 +131,9 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_csr_data = RegInit(0.U)
 
   //vector EX-MEM Registers
-  val mem_reg_vl = RegInit(false.B)
+  val ex_mem_reg_v0_data = RegInit(0.U(128.W))
+  val ex_mem_vs3_data = RegInit(0.S(128.W))
+  val mem_reg_vl = RegInit(0.U(32.W))
   val ex_reg_mem_to_reg = RegInit(false.B)
   val ex_reg_vec_alu_res = RegInit(0.S(128.W))
   // val ex_reg_lmul = RegInit(0.S(32.W))
@@ -149,7 +151,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_ctl_v_memRead = RegInit(false.B)
   val ex_reg_ctl_v_MemWrite = RegInit(false.B)
   val ex_reg_reg_write = RegInit(false.B)
-  val ex_reg_vtype = RegInit(0.S(11.W))
+  val ex_reg_vtype = RegInit(0.S(32.W))
   val ex_reg_evl = RegInit(0.U(8.W))
   val ex_reg_emul = RegInit(0.U(4.W))
   val ex_reg_eew = RegInit(0.U(10.W))
@@ -160,6 +162,8 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_v_ins = RegInit(0.B)
 
   // MEM-WB Registers
+  val mem_pc4_out = RegInit(0.S(32.W))
+  val mem_reg_lsuType = RegInit(0.U(4.W))
   val mem_reg_rd = RegInit(0.U(32.W))
   val mem_reg_ins = RegInit(0.U(32.W))
   val mem_reg_result = RegInit(0.U(32.W))
@@ -172,6 +176,7 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_csr_data = RegInit(0.U)
 
   //vector MEM-WB Registers
+  val mem_reg_vs3 = RegInit(0.S(128.W))
   val mem_reg_instruction = RegInit(0.U(32.W))
   val mem_reg_vec_alu_out = RegInit(0.S(128.W))
   val mem_reg_vec_vl = RegInit(0.S(32.W))
@@ -225,7 +230,7 @@ class Core(implicit val config:Configs) extends Module{
  // grouping//
       //vsetvl not implement (rs2 value)
 var lmul = RegInit(0.U(3.W)) // by default lmul==1
-var vtype = RegInit(0.U(32.W))
+val vtype = RegInit(0.U(32.W))
 var vsew = RegInit(0.U(3.W))
 var valmax = RegInit(0.U(8.W))
 when(instruction(6,0)==="b1010111".U && instruction(14,12)==="b111".U && (instruction(31)==="b0".U || instruction(31,30)==="b11".U)){
@@ -242,12 +247,14 @@ when(instruction(6,0)==="b1010111".U && instruction(14,12)==="b111".U && (instru
 
 
 
-
+ID.id_vtype := vtype.asSInt
 val vlsu = Module (new VLSU)
 dontTouch(vlsu.io)
 vlsu.io.instr := instruction
 vlsu.io.vtype := vtype
 var vlmul_count = WireInit(0.U(32.W))
+var load_count = RegInit(0.U(32.W))
+
 // val vtype = WireInit("b010".U(32.W))
 dontTouch(vlmul_count)
 // working on  only one vector 
@@ -265,6 +272,22 @@ dontTouch(vlmul_count)
     // working on  only eight vector continously
     .elsewhen (lmul==="b011".U ){
         vlmul_count := 7.U
+    }
+    // working on  only one vector emul
+    when (vlsu.io.emul === 1.U){
+        load_count := 4.U
+    }
+    // working on  only two vector continously emul
+    .elsewhen (vlsu.io.emul === 2.U) {
+        load_count := 8.U
+    }
+    // working on  only four vector continously emul
+    .elsewhen (vlsu.io.emul === 4.U){
+        load_count := 16.U
+    }
+    // working on  only eight vector continously emul
+    .elsewhen (vlsu.io.emul === 8.U){
+        load_count := 32.U
     }
     
     val emul_count = WireInit(0.U(32.W))
@@ -286,75 +309,72 @@ dontTouch(vlmul_count)
 
   var next_pc_selector = WireInit(0.U(32.W))
   val lmul_reg = RegInit(0.U(32.W))
-  // val vc3 = RegInit(0.U(5.W))
-    // when(lmul_reg =/= vlmul_count && instruction(6,0)==="b1010111".U && instruction(14,12)=/="b111".U){
-    //     next_pc_selector := 1.U
-    //     lmul_reg := lmul_reg +1.U
-    //     if_reg_lmul_v := lmul_reg  //paasing fetch stage
-    // }
-    // .otherwise{
-    //     lmul_reg := 0.U
-    //     next_pc_selector := 0.U
-    //     if_reg_lmul_v := lmul_reg //paasing fetch stage
-    // }
-val emul_reg = RegInit(0.U(32.W))
-val vc3 = RegInit(0.U(32.W))
-when(emul_reg =/= (emul_count ) &&  instruction(6,0)==="b0100111".U ){
-  //paasing fetch stage
-        
-        when(vc3 =/= 3.U ){
-           vc3 := vc3 + 1.U
-           if_vc3 := emul_reg 
-           next_pc_selector := 1.U
-
-        //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
-        }.otherwise{
-          if_vc3 := emul_reg 
-          emul_reg := emul_reg +1.U
-          
-          vc3 := 0.U
-          next_pc_selector := 0.U
-        }
-}.elsewhen(emul_reg =/= (emul_count + 1.U ) &&  instruction(6,0)==="b0100111".U ){
-           when(vc3 =/= 3.U ){
-           vc3 := vc3 + 1.U
-           if_vc3 := emul_reg 
-           next_pc_selector := 1.U
-
-        //}.elsewhen (vc3 === 4.U && instruction(6,0)==="b0100111".U ){
-        }.otherwise{
-          if_vc3 := emul_reg 
-          emul_reg := 0.U
-          
-          vc3 := 0.U
-          next_pc_selector := 0.U
-        }
-
-}
-.otherwise{
-
-          next_pc_selector := 0.U
-          if_vc3 := 0.U
-          // vc3 := 0.U
-
-        }
+  val id_reg_emul1 = RegInit(0.U(4.W))
+  val ex_reg_emul1 = RegInit(0.U(4.W))
+  val mem_reg_emul1 = RegInit(0.U(4.W))
+  val emul_reg = RegInit(0.U(32.W))
+  val vc3 = RegInit(0.U(32.W))
+  //count emul values for vector register for stor in decode stage and for load in write back stage
+when((pc.io.pc4 =/= if_pc4_out) && (if_reg_ins(6,0) === "b0000111".U && instruction(6,0) === "b0000111".U)){
+  emul_reg := 0.U
+  vc3 := 0.U
+  id_reg_emul1 := emul_reg
+  ID.id_vc3 := emul_reg
+            
+}.otherwise{
+  when(emul_reg =/= (emul_count ) &&  if_reg_ins(6,0)==="b0100111".U || if_reg_ins(6,0)==="b0000111".U){
+//paasing fetch stage
+    when(vc3 =/= 3.U ){
+      vc3 := vc3 + 1.U
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg
+    }.otherwise{
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg
+      emul_reg := emul_reg +1.U
+      vc3 := 0.U
+    }
+  }.elsewhen(emul_reg =/= (emul_count + 1.U ) &&  if_reg_ins(6,0)==="b0100111".U  || if_reg_ins(6,0)==="b0000111".U){
+      when(vc3 =/= 3.U ){
+      vc3 := vc3 + 1.U
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg
+    }.otherwise{
+      id_reg_emul1 := emul_reg
+      ID.id_vc3 := emul_reg 
+      emul_reg := 0.U
+      vc3 := 0.U
+    }}.otherwise{
+      emul_reg := 0.U
+      id_reg_emul1 := 0.U
+      ID.id_vc3 := emul_reg
+    }}
 
 
-    // }
+    // id_reg_emul1 := if_vc3
+    ex_reg_emul1 := id_reg_emul1
+    mem_reg_emul1 := ex_reg_emul1
+
     val delays = RegInit(1.U(32.W))
+    val load_delays = RegInit(1.U(32.W))
+    //instruction repeat according to grouping concept
      when(lmul_reg =/= vlmul_count && instruction(6,0)==="b1010111".U && instruction(14,12)=/="b111".U){
         next_pc_selector := 1.U
         lmul_reg := lmul_reg +1.U
         if_reg_lmul_v := lmul_reg  //paasing fetch stage
     }
-    
-    .elsewhen( (delays =/= vlcount1) && (instruction(6,0)==="b0100111".U || instruction(6,0)==="b0000111".U)){
+    //store instruction
+    .elsewhen( (delays =/= vlcount1) && instruction(6,0)==="b0100111".U){
       
       delays := delays+1.U
       if_reg_delay := delays
       next_pc_selector := 1.U
-    }
-    .otherwise{
+    }//load instruction
+    .elsewhen( (load_delays =/= load_count) && (instruction(6,0)==="b0000111".U)){
+      load_delays := load_delays+1.U
+      next_pc_selector := 1.U
+    }.otherwise{
+        load_delays := 1.U
         lmul_reg := 0.U
         next_pc_selector := 0.U
         if_reg_lmul_v := lmul_reg //paasing fetch stage
@@ -403,7 +423,7 @@ dontTouch(next_pc_selector)
     id_reg_vs2_addr := ID.vs2_addr
     id_reg_lmul_v  := if_reg_lmul_v
     ID.id_lmul_vs1in_vs2in := if_reg_lmul_v
-    ID.id_vc3 := if_vc3
+    // ID.id_vc3 := if_vc3
     id_reg_evl := if_reg_evl
     id_reg_emul := if_reg_emul
     // ID.id_reg_emul1 := if_reg_emul
@@ -416,6 +436,7 @@ dontTouch(next_pc_selector)
   /*
    * Vector Execute Stage *
   **/
+  ex_mem_reg_v0_data := id_reg_v0_data.asUInt
   ex_reg_mem_to_reg := id_reg_mem_to_reg
   ex_pc4_out := id_pc4_out
   EX.func6 := id_reg_ins(31, 26)
@@ -480,6 +501,7 @@ dontTouch(next_pc_selector)
   ex_reg_vs3 := EX.vs3_data_o
   ex_reg_v_ins := id_reg_ctl_v_ins
   mem_reg_vl := ex_reg_vl.asUInt
+  ex_mem_vs3_data := id_reg_vs3_data
 
 
 
@@ -501,6 +523,7 @@ MEM.io.v_addr := 0.U
 MEM.io.v_writeData := 0.U
 MEM.io.vs0 := 0.U
 val v00 = RegInit(0.U(128.W))
+val vs0_load = RegInit(0.U(128.W))
 val vlcount = RegInit(0.U(32.W)) 
 val valcount = RegInit(0.U(32.W))
 val testhamna = RegInit(0.U(32.W))
@@ -509,10 +532,11 @@ dontTouch(vlcount)
 dontTouch(testhamna)
 dontTouch(valcountu)
 v00 := EX.vs0.asUInt
+vs0_load := EX.vs0.asUInt
 //val eew_32_vs3_data = VecInit((0 until 4).map(i => EX.vs3_data_o(32*i+31, 32*i).asSInt))
 val vs3_data = VecInit((0 until 4).map(i => ex_reg_vs3(32*i+31, 32*i).asSInt))
 dontTouch(vs3_data)
-when (vlcount <= (ex_reg_vl.asUInt ) && ex_reg_ins(6,0) === "b0100111".U || ex_reg_ins(6,0) === "b0000111".U){
+when (vlcount <= (ex_reg_vl.asUInt ) && ex_reg_ins(6,0) === "b0100111".U){
   when(ex_reg_lsuType === 1.U)  {
     when(count =/= 4.U){
             //masking
@@ -598,14 +622,14 @@ when (vlcount <= (ex_reg_vl.asUInt ) && ex_reg_ins(6,0) === "b0100111".U || ex_r
               MEM.io.vs0 := "b1111".U
               MEM.io.v_writeData := vs3_data(count).asUInt
               MEM.io.v_addr := ex_reg_read_data1 + addrcount.asUInt
-              when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U) || (ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U)){
+              when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
                 addrcount := 0.U
           
               }.otherwise{
                 addrcount := addrcount + 4.U
               }
             }
-    when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U || ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U)){
+    when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
       addrcount := 0.U
 
     }.otherwise{
@@ -659,45 +683,172 @@ when(((ex_reg_eew === 8.U && vlcount === (ex_reg_vl - 4.S).asUInt)|| (ex_reg_eew
   mem_reg_lmul_v := ex_reg_lmul_v
   mem_reg_instruction := ex_reg_ins
   mem_reg_emul := ex_reg_emul
-
+  mem_reg_vs3 := ex_reg_vs3
+  mem_pc4_out := ex_pc4_out
 
   /**
    * Write Back *
    **/
    val rdata = RegInit(VecInit(Seq.fill(4)(0.U(32.W))))
    val rdata3 = WireInit(0.U(32.W))
+   val mask_e_i = WireInit(0.U(4.W))
+   val shift_v0 = RegInit(0.U(128.W))
+   val shift_vd_data = RegInit(0.U(128.W))
+   shift_vd_data := ex_mem_vs3_data.asUInt
+   val mem_reg_rdata = RegInit(0.U(32.W))
+  //  mem_reg_rdata := MEM.io.readData
+  //  shift_v0 := ex_mem_reg_v0_data
    dontTouch(rdata)
-  var c = RegInit(0.U(5.W))
-    when (mem_reg_instruction(14,12) === "b110".U && mem_reg_instruction(6,0) ==="b0000111".U) {
-    c := 3.U
-    // }.elsewhen (mem_reg_instruction(14,12) === "b101".U && mem_reg_instruction(6,0) ==="b0000111".U) {
-    // c := 7.U
-    // }.elsewhen (mem_reg_instruction(14,12) === "b000".U && mem_reg_instruction(6,0) ==="b0000111".U) {
-    // c := 15.U
+    val loop1 = RegInit(0.U(32.W))
+    val loop2 = RegInit(0.U(32.W))
+    val load_vlcount = RegInit(0.U(32.W))
+    var eew = ex_reg_ins(14,12)
+when(mem_reg_lsuType === 1.U)  {
+  when (load_vlcount < (mem_reg_vl.asUInt ) && mem_reg_ins(6,0) === "b0000111".U){
+    when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
+        rdata(loop1) := MEM.io.readData //io.dmemRsp.bits.dataResponse
+        loop1 := loop1 + 1.U
+        load_vlcount := load_vlcount + 1.U
+      }.elsewhen((mem_pc4_out =/= ex_pc4_out)){
+      load_vlcount := 0.U
+      rdata3 := MEM.io.readData
+        loop1 := 0.U
+    }.otherwise{
+        rdata3 := MEM.io.readData
+        loop1 := 0.U
+        load_vlcount := load_vlcount + 1.U
+    }
+    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt) && mem_reg_vtype(6)===1.U){ //tail agnostic
+      when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
+        rdata(loop1) := Fill(32,1.U)
+        loop1 := loop1 + 1.U
+        load_vlcount := load_vlcount
+      }.elsewhen((mem_pc4_out =/= ex_pc4_out)){
+      load_vlcount := 0.U
+      rdata3 := MEM.io.readData
+        loop1 := 0.U
+    }.otherwise{
+        rdata3 := Fill(32,1.U)
+        loop1 := 0.U
+        load_vlcount := load_vlcount
+    
+      }
+    }.elsewhen(load_vlcount >= (mem_reg_vl.asUInt) && mem_reg_vtype(6)===0.U){ //tail undisturbed
+      when((loop1 < 3.U) && (mem_reg_ins(6,0)==="b0000111".U)){
+        rdata(loop1) := Fill(32,1.U)
+        loop1 := loop1 + 1.U
+        load_vlcount := load_vlcount
+      }.elsewhen((mem_pc4_out =/= ex_pc4_out)){
+      load_vlcount := 0.U
+      rdata3 := MEM.io.readData
+        loop1 := 0.U
+    }.otherwise{
+        rdata3 := Fill(32,1.U)
+        loop1 := 0.U
+        load_vlcount := load_vlcount
+    
+      }
+    }
+    .elsewhen((id_pc4_out =/= ex_pc4_out) && ((ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U) || ((ex_reg_ins(6,0) === "b0000111".U) =/= (id_reg_ins(6,0) === "b0000111".U)))){
+      load_vlcount := 0.U
+    }
+    }
+    
+
+  
+
+
+//send masking bits and vd data to memory
+  when((loop2 <= 3.U) && (ex_reg_ins(6,0)==="b0000111".U) && ex_reg_ins(25)===0.B){
+    when(eew==="b000".U){ //for element 8 bbit
+      mask_e_i := shift_v0(3,0)
+      shift_vd_data := shift_vd_data(31,0)
+      loop2 := loop2 + 1.U
+      shift_v0 := shift_v0 >> 4.U
+      shift_vd_data := shift_vd_data >> 32.U
+    }
+   .elsewhen(eew==="b101".U){//for elements 16 bits
+      mask_e_i := shift_v0(1,0)
+      shift_vd_data := shift_vd_data(31,0)
+      loop2 := loop2 + 1.U
+      shift_v0 := shift_v0 >> 2.U
+      shift_vd_data := shift_vd_data >> 32.U
+    }
+   .elsewhen(eew==="b110".U){ //for elements 32 bits
+      mask_e_i := shift_v0(0)
+      shift_vd_data := shift_vd_data(31,0)
+      loop2 := loop2 + 1.U
+      shift_v0 := shift_v0 >> 1.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
     .otherwise{
-    c := 9.U
+    loop2 := 0.U
+  }
+  }
+  .elsewhen((loop2 === 4.U || loop2 === 0.U) && (ex_reg_ins(6,0)==="b0000111".U) && ex_reg_emul>=1.U  && ex_reg_ins(25)===0.B){
+    when(eew==="b000".U){ //for element 8 bbit
+      mask_e_i := shift_v0(3,0)
+      shift_vd_data := shift_vd_data(31,0)
+      loop2 := 0.U
+      shift_v0 := shift_v0 >> 4.U
+      shift_vd_data := shift_vd_data >> 32.U
     }
-    dontTouch(c)
-    val loop = RegInit(0.U(32.W))
-    when((loop =/= c) && (mem_reg_instruction(6,0)==="b0000111".U)){
-      when(loop===0.U){
-          rdata(0) := io.dmemRsp.bits.dataResponse
-      }
-       .elsewhen(loop===1.U){
-          rdata(1) := io.dmemRsp.bits.dataResponse
-      }
-       .elsewhen(loop===2.U){
-          rdata(2) := io.dmemRsp.bits.dataResponse
-      }
+   .elsewhen(eew==="b101".U){//for elements 16 bits
+      mask_e_i := shift_v0(1,0)
+      shift_vd_data := shift_vd_data(31,0)
+      loop2 := 0.U
+      shift_v0 := shift_v0 >> 2.U
+      shift_vd_data := shift_vd_data >> 32.U
+    }
+   .elsewhen(eew==="b110".U){ //for elements 32 bits
+      mask_e_i := shift_v0(0)
+      shift_vd_data := shift_vd_data(31,0)
+      loop2 := 0.U
+      shift_v0 := shift_v0 >> 1.U
+      shift_vd_data := shift_vd_data >> 32.U
+    }
+    .otherwise{
+    loop2 := 0.U
+  }
+  }
+
+  .otherwise{
+    mask_e_i := 0.U
+    loop2 := 0.U
+    shift_v0 := ex_mem_reg_v0_data
+    shift_vd_data := ex_mem_vs3_data.asUInt
+  }
+
+// }
       
-      loop := loop + 1.U
-    }
-    .otherwise{
-        rdata3 := io.dmemRsp.bits.dataResponse
-        loop := 0.U
-    }
+  dontTouch(mask_e_i)
+   dontTouch(ex_mem_reg_v0_data)
+  
+  //load address calculate
+  val load_addr_count = RegInit(0.U(32.W))
+  when(ex_reg_ins(6,0) === "b0000111".U || ex_reg_ins(6,0) === "b0100111".U){
+    when((id_pc4_out =/= ex_pc4_out) && (ex_reg_ins(6,0) === "b0000111".U && id_reg_ins(6,0) === "b0000111".U || ex_reg_ins(6,0) === "b0100111".U && id_reg_ins(6,0) === "b0100111".U)){
+        load_addr_count := 0.U
+        MEM.io.load_addr := ex_reg_read_data1 + load_addr_count
+
+      }.otherwise{
+        load_addr_count := load_addr_count + 4.U
+        MEM.io.load_addr := ex_reg_read_data1 + load_addr_count
+      }
+  }.otherwise{
+    load_addr_count := 0.U
+    MEM.io.load_addr := 0.U
+  }
+
+
 dontTouch(rdata)
+  MEM.io.ins := ex_reg_ins
+  
+  MEM.io.vd_Data := ex_mem_vs3_data.asUInt
+  MEM.io.m_v0 := mask_e_i
+  MEM.io.l_m_b := ex_reg_ins(25)
+  MEM.io.eew := ex_reg_ins(14,12)
+  // MEM.io.mu := vtype
   mem_stage_mem_to_reg := ex_reg_mem_to_reg
   EX.vec_wb_res := mem_reg_vec_alu_out
   EX.vec_mem_res := ex_reg_vec_alu_res
@@ -710,31 +861,8 @@ dontTouch(rdata)
   ID.ctl_vset := mem_reg_vset
   ID.vl := mem_reg_vec_vl
   ID.vtypei := mem_reg_vtype
-  // implementation of emul and wire in vector register file for increment in vector register for load
-  val id_emul_count = RegInit(0.U(32.W))
-  val id_emul_count_load = RegInit(0.U(32.W))
-
-  when(id_emul_count_load =/= (emul_count ) &&  mem_reg_instruction(6,0)==="b0000111".U ){
-    when(id_emul_count =/= 3.U ){
-      id_emul_count := id_emul_count + 1.U
-    }.otherwise{
-      id_emul_count_load := id_emul_count_load +1.U
-      id_emul_count := 0.U
-    }
-  }.elsewhen(id_emul_count_load =/= (emul_count + 1.U ) &&  mem_reg_instruction(6,0)==="b0000111".U ){
-    when(id_emul_count =/= 3.U ){
-      id_emul_count := id_emul_count + 1.U
-    }.otherwise{
-      id_emul_count_load := id_emul_count_load +1.U
-      id_emul_count := 0.U
-    }
-  }
-  .otherwise{
-    id_emul_count_load := 0.U
-    id_emul_count := 0.U
-  }
  
-  ID.wb_emul := id_emul_count_load
+  ID.wb_emul := mem_reg_emul1//id_emul_count_load //changes
   dontTouch(mem_stage_mem_to_reg)
   
   // }
@@ -781,6 +909,9 @@ dontTouch(rdata)
   }
 
   val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+  //vector load store hazard dedection stall
+  val vec_stall = (instruction==="b0000111".U || if_reg_ins(6,0)==="b0100111".U)
+  dontTouch(vec_stall)
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall  //stall signal from outside
   
