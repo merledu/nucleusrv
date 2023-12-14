@@ -50,13 +50,10 @@ class vregfile extends Module {
   dontTouch(vs3_in)
   dontTouch(vsd_in)
 
-io.vs1_data := register(vs1_in)
-io.vs2_data := register(vs2_in)
-io.vs0_data := register(0.U)
-io.vs3_data := register(vs3_in)
+
 
   when (io.reg_write === 1.B && io.reg_read === 0.B) {
-      register(vsd_in) := io.vd_data
+    register(vsd_in) := io.vd_data    
       io.vs1_data := 0.S
       io.vs2_data := 0.S
       io.vs0_data := 0.S
@@ -67,11 +64,30 @@ io.vs3_data := register(vs3_in)
     io.vs0_data := register(0.U)
     io.vs3_data := register(vs3_in)
   }.elsewhen(io.reg_write === 1.B && io.reg_read === 1.B){
+
     register(vsd_in) := io.vd_data
-    io.vs1_data := register(vs1_in)
-    io.vs2_data := register(vs2_in)
-    io.vs0_data := register(0.U)
-    io.vs3_data := register(vs3_in)
+    when( vs1_in === vsd_in){
+      io.vs0_data := register(0.U)
+      io.vs1_data := io.vd_data
+      io.vs2_data := register(vs2_in)
+      io.vs3_data := register(vs3_in)
+    }.elsewhen(vs2_in === vsd_in){
+      io.vs0_data := register(0.U)
+      io.vs1_data := register(vs1_in)
+      io.vs2_data := io.vd_data
+      io.vs3_data := register(vs3_in)
+    }.elsewhen(vs3_in === vsd_in){
+      io.vs0_data := register(0.U)
+      io.vs1_data := register(vs1_in)
+      io.vs2_data := register(vs2_in)
+      io.vs3_data := io.vd_data
+    }.otherwise{
+      io.vs0_data := register(0.U)
+      io.vs1_data := register(vs1_in)
+      io.vs2_data := register(vs2_in)
+      io.vs3_data := register(vs3_in)
+    }
+
   }.otherwise{
     io.vs1_data := 0.S
     io.vs2_data := 0.S
@@ -79,6 +95,8 @@ io.vs3_data := register(vs3_in)
     io.vs3_data := 0.S
 
   }
+
+
 
 when (io.ins(6,0)==="b0100111".U){
    val vs3_in_1 = io.vs3_addr + io.id_vc3

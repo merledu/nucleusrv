@@ -229,8 +229,9 @@ io.v_output := 0.S
            val imm = io.in_A(31,0).asSInt
             io.v_output := VectorOp_vx(sew_32_b,imm,4.U,sew_32_vd)
         }.elsewhen(io.sew === "b000".U && io.aluc(2,0) === "b100".U && io.aluc =/= VMVx){
-	    	val imm = io.in_A(7,0).asSInt
-            io.v_output := VectorOp_vx(sew_8_b,imm,16.U,sew_8_vd)
+	    	val imm7 = io.in_A(7,0).asSInt
+            dontTouch(imm7)
+            io.v_output := VectorOp_vx(sew_8_b,imm7,16.U,sew_8_vd)
         }.elsewhen (io.sew === "b001".U && io.aluc(2,0) === "b100".U && io.aluc =/= VMVx){
 		    val imm = io.in_A(15,0).asSInt
             io.v_output := VectorOp_vx(sew_16_b,imm,8.U,sew_16_vd)

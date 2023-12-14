@@ -56,6 +56,11 @@ class Execute(M:Boolean = true) extends Module {
     val fu_reg_vs3 = Input(UInt(5.W))
     val fu_ex_reg_write = Input(Bool())
     val fu_mem_reg_write = Input(Bool())
+    val fu_mem_reg_vset =Input(Bool())
+    val fu_ex_reg_vset = Input(Bool())
+    val fu_ex_reg_instruction = Input(UInt(32.W))
+     val fu_mem_reg_instruction = Input(UInt(32.W))
+    // val fu_v_ins = Input(Bool())
     val v_MemWrite = Input(Bool())
     val vec_alu_res = Output(SInt(128.W))
     val vec_vl = Output(SInt(32.W))
@@ -94,6 +99,12 @@ class Execute(M:Boolean = true) extends Module {
   fu.reg_vs3 := io.fu_reg_vs3
   fu.ex_reg_write := io.fu_ex_reg_write
   fu.mem_reg_write := io.fu_mem_reg_write
+  fu.v_ins := io.v_ctl_v_ins
+  fu.ex_reg_vset := io.fu_ex_reg_vset
+  fu.mem_reg_vset := io.fu_mem_reg_vset 
+  fu.id_reg_instruction := io.id_ex_ins
+  fu.ex_reg_instruction := io.ex_reg_instruction
+  fu.mem_reg_instruction := io.mem_reg_instruction
 
   val inputMux1 = MuxCase(
     0.U,
@@ -221,7 +232,7 @@ class Execute(M:Boolean = true) extends Module {
     }
     vec_config.io.current_vl := io.vl.asSInt
     vlReg := vec_config.io.vl
-    io.vec_vl := vec_config.io.vl
+    io.vec_vl := vec_config.io.vl 
   }.otherwise{
     vec_config.io.zimm := 0.U
     vec_config.io.rs1 := 0.U
@@ -297,10 +308,10 @@ class Execute(M:Boolean = true) extends Module {
     .elsewhen (io.func7 === 1.U && mdu.io.ready){
       io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
     }
-    .otherwise{io.ALUresult := alu.io.result}
+    .otherwise{io.ALUresult := Mux(io.v_ctl_vset,vec_config.io.vl.asUInt,alu.io.result)}
   } 
   else {
-    io.ALUresult := alu.io.result
+    io.ALUresult := Mux(io.v_ctl_vset,vec_config.io.vl.asUInt,alu.io.result)
   }
 
   // io.ALUresult := alu.io.result

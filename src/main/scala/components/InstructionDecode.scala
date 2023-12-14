@@ -24,6 +24,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val ex_mem_result = Input(UInt(32.W))
     val mem_wb_result = Input(UInt(32.W))
     
+    
 
     val id_ex_regWr = Input(Bool())
     val ex_mem_regWr = Input(Bool())
