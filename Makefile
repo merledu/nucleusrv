@@ -38,7 +38,7 @@ clean:
 	rm *.f
 	
 compliance:
-	./run_compliance.sh $(ISA) $(TEST)
+	./run_compliance.sh $(ISA) $(TEST) $(DEVICE)
 
 IMEM=asm.txt
 
