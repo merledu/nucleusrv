@@ -470,6 +470,7 @@ dontTouch(next_pc_selector)
   EX.fu_mem_reg_vd := mem_reg_vec_vd_addr
   EX.fu_ex_reg_write := ex_reg_reg_write
   EX.fu_mem_reg_write := mem_reg_vec_reg_write
+  EX.fu_vset := id_reg_ctl_vset
   EX.fu_mem_reg_vset := mem_reg_vset
   EX.fu_ex_reg_vset := ex_reg_vset 
   EX.fu_ex_reg_vins := ex_reg_v_ins

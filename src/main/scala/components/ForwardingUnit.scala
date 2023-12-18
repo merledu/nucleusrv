@@ -25,6 +25,7 @@ class ForwardingUnit extends Module {
     val ex_reg_write = Input(Bool())
     val mem_reg_write = Input(Bool())
     val v_ins = Input(Bool())
+    val vset = Input(Bool())
     val ex_reg_vset = Input(Bool())
     val mem_reg_vset = Input(Bool())
 
@@ -57,6 +58,13 @@ class ForwardingUnit extends Module {
     io.forwardA := 2.U
   }.elsewhen(io.reg_vs1 === io.mem_reg_vd && io.mem_reg_vd =/= 0.U && io.mem_reg_write && io.v_ins === 1.B && io.id_reg_instruction(14,12) =/= "b100".U){
     io.forwardA := 2.U
+//vset 
+  }.elsewhen(io.reg_vs1 === io.ex_reg_vd && io.ex_reg_vd =/= 0.U && (io.ex_regWrite  ) && io.v_ins === 1.B && io.vset === 1.B ){
+    io.forwardA := 1.U 
+  }.elsewhen(io.reg_vs1 === io.mem_reg_vd && io.mem_reg_vd =/= 0.U && io.mem_regWrite  && io.v_ins === 1.B && io.vset === 1.B ){
+    io.forwardA := 2.U
+
+
     //vector to scalar data hazard: 
   }.elsewhen(io.reg_vs1 === io.ex_reg_vd && io.ex_reg_vd =/= 0.U && (io.ex_regWrite  ) && io.v_ins === 1.B && io.id_reg_instruction(14,12) === "b100".U ){
     io.forwardA := 1.U 
