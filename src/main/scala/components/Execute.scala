@@ -58,8 +58,8 @@ class Execute(M:Boolean = true) extends Module {
     val fu_mem_reg_write = Input(Bool())
     val fu_mem_reg_vset =Input(Bool())
     val fu_ex_reg_vset = Input(Bool())
-    val fu_ex_reg_instruction = Input(UInt(32.W))
-     val fu_mem_reg_instruction = Input(UInt(32.W))
+    val fu_ex_reg_vins = Input(Bool())
+     val fu_mem_reg_vins = Input(Bool())
     // val fu_v_ins = Input(Bool())
     val v_MemWrite = Input(Bool())
     val vec_alu_res = Output(SInt(128.W))
@@ -103,8 +103,8 @@ class Execute(M:Boolean = true) extends Module {
   fu.ex_reg_vset := io.fu_ex_reg_vset
   fu.mem_reg_vset := io.fu_mem_reg_vset 
   fu.id_reg_instruction := io.id_ex_ins
-  fu.ex_reg_instruction := io.ex_reg_instruction
-  fu.mem_reg_instruction := io.mem_reg_instruction
+  fu.ex_reg_vins:= io.fu_ex_reg_vins
+  fu.mem_reg_vins := io.fu_mem_reg_vins
 
   val inputMux1 = MuxCase(
     0.U,

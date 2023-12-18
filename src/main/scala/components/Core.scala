@@ -472,8 +472,8 @@ dontTouch(next_pc_selector)
   EX.fu_mem_reg_write := mem_reg_vec_reg_write
   EX.fu_mem_reg_vset := mem_reg_vset
   EX.fu_ex_reg_vset := ex_reg_vset 
-  EX.fu_ex_reg_instruction := ex_reg_ins
-  EX.fu_mem_reg_instruction := mem_reg_instruction 
+  EX.fu_ex_reg_vins := ex_reg_v_ins
+  EX.fu_mem_reg_vins := mem_reg_v_ins
   //EX.id_reg_vs3data := ID.vs3_data
 
   ex_reg_vtype := id_reg_z_imm
@@ -502,6 +502,7 @@ dontTouch(next_pc_selector)
   ex_reg_v_ins := id_reg_ctl_v_ins
   mem_reg_vl := ex_reg_vl.asUInt
   ex_mem_vs3_data := id_reg_vs3_data
+  mem_reg_v_ins := ex_reg_v_ins
 
 
 
