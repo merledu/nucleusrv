@@ -5,10 +5,10 @@ import chisel3.util._
 
 
 
-class MemoryFetch extends Module {
+class MemoryFetch(implicit val config:Configs) extends Module {
   val io = IO(new Bundle {
-    val aluResultIn: UInt = Input(UInt(32.W))
-    val writeData: UInt = Input(UInt(32.W))
+    val aluResultIn: UInt = Input(UInt(config.XLEN.W))
+    val writeData: UInt = Input(UInt(config.XLEN.W))
     val writeEnable: Bool = Input(Bool())
     val readEnable: Bool = Input(Bool())
     val readData: UInt = Output(UInt(32.W))

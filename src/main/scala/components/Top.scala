@@ -1,6 +1,5 @@
 package nucleusrv.components
 import chisel3._
-import nucleusrv.tracer._
 
 
 class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
@@ -9,7 +8,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     val pin = Output(UInt(32.W))
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
+  implicit val config:Configs = Configs(XLEN=32, M=true, C=true)
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -27,18 +26,4 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   dmem.io.req <> core.io.dmemReq
 
   io.pin := core.io.pin
-
-  if (config.TRACE) {
-    val tracer = Module(new Tracer())
-
-    Seq(
-      (tracer.io.rvfiUInt, core.io.rvfiUInt.get),
-      (tracer.io.rvfiSInt, core.io.rvfiSInt.get),
-      (tracer.io.rvfiBool, core.io.rvfiBool.get),
-      (tracer.io.rvfiRegAddr, core.io.rvfiRegAddr.get)
-    ).map(
-      tr => tr._1 <> tr._2
-    )
-    tracer.io.rvfiMode := core.io.rvfiMode.get
-  }
 }

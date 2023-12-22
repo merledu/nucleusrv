@@ -3,16 +3,16 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util.MuxCase
 
-class Execute(M:Boolean = false) extends Module {
+class Execute(M:Boolean = false)(implicit val config:Configs) extends Module {
   val io = IO(new Bundle {
-    val immediate = Input(UInt(32.W))
-    val readData1 = Input(UInt(32.W))
-    val readData2 = Input(UInt(32.W))
+    val immediate = Input(UInt(config.XLEN.W))
+    val readData1 = Input(UInt(config.XLEN.W))
+    val readData2 = Input(UInt(config.XLEN.W))
     val pcAddress = Input(UInt(32.W))
     val func7 = Input(UInt(7.W))
     val func3 = Input(UInt(3.W))
-    val mem_result = Input(UInt(32.W))
-    val wb_result = Input(UInt(32.W))
+    val mem_result = Input(UInt(config.XLEN.W))
+    val wb_result = Input(UInt(config.XLEN.W))
 
     val ex_mem_regWrite = Input(Bool())
     val mem_wb_regWrite = Input(Bool())
@@ -24,8 +24,8 @@ class Execute(M:Boolean = false) extends Module {
     val ctl_aluOp = Input(UInt(2.W))
     val ctl_aluSrc1 = Input(UInt(2.W))
 
-    val writeData = Output(UInt(32.W))
-    val ALUresult = Output(UInt(32.W))
+    val writeData = Output(UInt(config.XLEN.W))
+    val ALUresult = Output(UInt(config.XLEN.W))
 
     val stall = Output(Bool())
   })

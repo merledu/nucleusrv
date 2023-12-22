@@ -82,8 +82,8 @@ class sram_top(programFile:Option[String] ) extends BlackBox(
     Map("IFILE_IN" -> {if (programFile.isDefined) programFile.get else ""})
 ) with HasBlackBoxResource {
     val io = IO(new SRAMIO)
-    addResource("/sram_top.v")
-    addResource("/sram.v")
+    addResource("/sram_top.sv")
+    addResource("/sram.sv")
 }
 
 //package nucleusrv.components
