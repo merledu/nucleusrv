@@ -1,5 +1,6 @@
 module sram_top #(
-    parameter IFILE_IN = ""
+    parameter IFILE_IN = "",
+    parameter DATA_WIDTH
 )
 (
   input logic clk_i,
@@ -8,10 +9,10 @@ module sram_top #(
 // sram interface in
   input   logic        csb_i,
   input   logic [11:0] addr_i,
-  input   logic [31:0] wdata_i,
+  input   logic [DATA_WIDTH-1:0] wdata_i,
   input   logic [3:0]  wmask_i,
   input   logic        we_i,
-  output  logic [31:0] rdata_o
+  output  logic [DATA_WIDTH-1:0] rdata_o
 
 );
 
@@ -42,7 +43,7 @@ end
 
 sram #(
   .NUM_WMASKS (4),
-  .DATA_WIDTH (32),
+  .DATA_WIDTH (DATA_WIDTH),
   .ADDR_WIDTH (13),
   .RAM_DEPTH (1 << 13),
   // FIXME: This delay is arbitrary.

@@ -14,14 +14,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 //`default_nettype none
-// OpenRAM SRAM model
+// OpenRAM SRAM m "DATA_WIDTH" -> 32odel
 // Words: 256
 // Word size: 32
 // Write size: 8
 
 module sram #(
   parameter NUM_WMASKS = 4,
-  parameter DATA_WIDTH = 32,
+  parameter DATA_WIDTH,
   parameter ADDR_WIDTH = 13,
   parameter RAM_DEPTH = 1 << ADDR_WIDTH,
   // FIXME: This delay is arbitrary.

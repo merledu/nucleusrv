@@ -5,7 +5,7 @@ import chisel3.util._
 import chisel3.experimental._
 import chisel3.util.experimental._
 
-class SRamTop(val programFile:Option[String] ) extends Module {
+class SRamTop(val programFile:Option[String] )(implicit val config:Configs) extends Module {
     val io = IO(new Bundle {
         val req = Flipped(Decoupled(new MemRequestIO))
         val rsp = Decoupled(new MemResponseIO)
@@ -26,7 +26,7 @@ class SRamTop(val programFile:Option[String] ) extends Module {
 
     sram.io.clk_i := clk
     sram.io.rst_i := rst
-    sram.io.csb_i := 1.B
+    // sram.io.csb_i := 1.B
     sram.io.we_i := DontCare
     sram.io.wmask_i := DontCare
     sram.io.addr_i := DontCare
@@ -67,23 +67,24 @@ class SRamTop(val programFile:Option[String] ) extends Module {
     io.rsp.bits.dataResponse := sram.io.rdata_o
 }
 
-class SRAMIO extends Bundle {
+class SRAMIO(implicit val config:Configs) extends Bundle {
     val clk_i = Input(Bool())
     val rst_i = Input(Bool())
     val csb_i = Input(Bool())
     val we_i = Input(Bool())
     val wmask_i = Input(UInt(4.W))
     val addr_i = Input(UInt(13.W))
-    val wdata_i = Input(UInt(32.W))
-    val rdata_o = Output(UInt(32.W))
+    val wdata_i = Input(UInt(config.XLEN.W))
+    val rdata_o = Output(UInt(config.XLEN.W))
 }
 
-class sram_top(programFile:Option[String] ) extends BlackBox(
-    Map("IFILE_IN" -> {if (programFile.isDefined) programFile.get else ""})
+class sram_top(programFile:Option[String] )(implicit val config:Configs) extends BlackBox(
+    Map("IFILE_IN" -> {if (programFile.isDefined) programFile.get else ""},
+    "DATA_WIDTH" -> 64)
 ) with HasBlackBoxResource {
     val io = IO(new SRAMIO)
-    addResource("/sram_top.sv")
-    addResource("/sram.sv")
+    addResource("/sram_top.v")
+    addResource("/sram.v")
 }
 
 //package nucleusrv.components
