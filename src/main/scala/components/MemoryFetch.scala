@@ -6,12 +6,13 @@ import chisel3.util._
 
 
 class MemoryFetch(implicit val config:Configs) extends Module {
+  val XLEN = config.XLEN
   val io = IO(new Bundle {
-    val aluResultIn: UInt = Input(UInt(config.XLEN.W))
-    val writeData: UInt = Input(UInt(config.XLEN.W))
+    val aluResultIn: UInt = Input(UInt(XLEN.W))
+    val writeData: UInt = Input(UInt(XLEN.W))
     val writeEnable: Bool = Input(Bool())
     val readEnable: Bool = Input(Bool())
-    val readData: UInt = Output(UInt(32.W))
+    val readData: UInt = Output(UInt(XLEN.W))
     val stall: Bool = Output(Bool())
     val f3 = Input(UInt(3.W))
 
@@ -22,7 +23,7 @@ class MemoryFetch(implicit val config:Configs) extends Module {
   io.dccmRsp.ready := true.B
 
   val wdata = Wire(Vec(4, UInt(8.W)))
-  val rdata = Wire(UInt(32.W))
+  val rdata = Wire(UInt(XLEN.W))
   val offset = RegInit(0.U(2.W))
   val funct3 = RegInit(0.U(3.W))
   val offsetSW = io.aluResultIn(1,0)

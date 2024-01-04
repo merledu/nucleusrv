@@ -3,11 +3,12 @@ package nucleusrv.components
 import chisel3._
 
 class InstructionDecode(implicit val config:Configs) extends Module {
+  val XLEN   = config.XLEN
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
-    val writeData = Input(UInt(config.XLEN.W))
+    val writeData = Input(UInt(XLEN.W))
     val writeReg = Input(UInt(5.W))
-    val pcAddress = Input(UInt(32.W))
+    val pcAddress = Input(UInt(XLEN.W))
     val ctl_writeEnable = Input(Bool())
     val id_ex_mem_read = Input(Bool())
 //    val ex_mem_mem_write = Input(Bool())
@@ -20,15 +21,15 @@ class InstructionDecode(implicit val config:Configs) extends Module {
     val ex_mem_ins = Input(UInt(32.W))
     val mem_wb_ins = Input(UInt(32.W))
     val ex_ins = Input(UInt(32.W))
-    val ex_result = Input(UInt(32.W))
-    val ex_mem_result = Input(UInt(32.W))
-    val mem_wb_result = Input(UInt(32.W))
+    val ex_result = Input(UInt(XLEN.W))
+    val ex_mem_result = Input(UInt(XLEN.W))
+    val mem_wb_result = Input(UInt(XLEN.W))
     
     //Outputs
-    val immediate = Output(UInt(config.XLEN.W))
+    val immediate = Output(UInt(XLEN.W))
     val writeRegAddress = Output(UInt(5.W))
-    val readData1 = Output(UInt(config.XLEN.W))
-    val readData2 = Output(UInt(config.XLEN.W))
+    val readData1 = Output(UInt(XLEN.W))
+    val readData2 = Output(UInt(XLEN.W))
     val func7 = Output(UInt(7.W))
     val func3 = Output(UInt(3.W))
     val ctl_aluSrc = Output(Bool())
@@ -43,7 +44,7 @@ class InstructionDecode(implicit val config:Configs) extends Module {
     val hdu_pcWrite = Output(Bool())
     val hdu_if_reg_write = Output(Bool())
     val pcSrc = Output(Bool())
-    val pcPlusOffset = Output(UInt(32.W))
+    val pcPlusOffset = Output(UInt(XLEN.W))
     val ifid_flush = Output(Bool())
 
     val stall = Output(Bool())
@@ -121,8 +122,8 @@ class InstructionDecode(implicit val config:Configs) extends Module {
   io.immediate := immediate.io.out
 
   // Branch Forwarding
-  val input1 = Wire(UInt(32.W))
-  val input2 = Wire(UInt(32.W))
+  val input1 = Wire(UInt(XLEN.W))
+  val input2 = Wire(UInt(XLEN.W))
 
   when(registerRs1 === io.ex_mem_ins(11, 7)) {
     input1 := io.ex_mem_result
@@ -151,7 +152,7 @@ class InstructionDecode(implicit val config:Configs) extends Module {
   hdu.io.taken := bu.io.taken  
 
   //Forwarding for Jump
-  val j_offset = Wire(UInt(32.W))
+  val j_offset = Wire(UInt(XLEN.W))
     when(registerRs1 === io.ex_ins(11, 7)){
       j_offset := io.ex_result
     }.elsewhen(registerRs1 === io.ex_mem_ins(11, 7)) {

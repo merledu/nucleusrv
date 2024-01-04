@@ -6,6 +6,7 @@ import chisel3.experimental._
 import chisel3.util.experimental._
 
 class SRamTop(val programFile:Option[String] )(implicit val config:Configs) extends Module {
+    val XLEN = config.XLEN
     val io = IO(new Bundle {
         val req = Flipped(Decoupled(new MemRequestIO))
         val rsp = Decoupled(new MemResponseIO)
@@ -68,14 +69,15 @@ class SRamTop(val programFile:Option[String] )(implicit val config:Configs) exte
 }
 
 class SRAMIO(implicit val config:Configs) extends Bundle {
+    val XLEN = config.XLEN
     val clk_i = Input(Bool())
     val rst_i = Input(Bool())
     val csb_i = Input(Bool())
     val we_i = Input(Bool())
     val wmask_i = Input(UInt(4.W))
     val addr_i = Input(UInt(13.W))
-    val wdata_i = Input(UInt(config.XLEN.W))
-    val rdata_o = Output(UInt(config.XLEN.W))
+    val wdata_i = Input(UInt(XLEN.W))
+    val rdata_o = Output(UInt(XLEN.W))
 }
 
 class sram_top(programFile:Option[String] )(implicit val config:Configs) extends BlackBox(

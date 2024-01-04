@@ -22,14 +22,14 @@ class Core(implicit val config:Configs) extends Module{
   })
 
   // IF-ID Registers
-  val if_reg_pc = RegInit(0.U(32.W))
+  val if_reg_pc = RegInit(0.U(XLEN.W))
   val if_reg_ins = RegInit(0.U(32.W))
 
   // ID-EX Registers
-  val id_reg_pc = RegInit(0.U(32.W))
-  val id_reg_rd1 = RegInit(0.U(32.W))
-  val id_reg_rd2 = RegInit(0.U(32.W))
-  val id_reg_imm = RegInit(0.U(32.W))
+  val id_reg_pc = RegInit(0.U(XLEN.W))
+  val id_reg_rd1 = RegInit(0.U(XLEN.W))
+  val id_reg_rd2 = RegInit(0.U(XLEN.W))
+  val id_reg_imm = RegInit(0.U(XLEN.W))
   val id_reg_wra = RegInit(0.U(5.W))
   val id_reg_f7 = RegInit(0.U(7.W))
   val id_reg_f3 = RegInit(0.U(3.W))
@@ -45,10 +45,10 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_ctl_jump = RegInit(0.U(2.W))
 
   // EX-MEM Registers
-  val ex_reg_branch = RegInit(0.U(32.W))
-  val ex_reg_zero = RegInit(0.U(32.W))
-  val ex_reg_result = RegInit(0.U(32.W))
-  val ex_reg_wd = RegInit(0.U(32.W))
+  val ex_reg_branch = RegInit(0.U(XLEN.W))
+  val ex_reg_zero = RegInit(0.U(XLEN.W))
+  val ex_reg_result = RegInit(0.U(XLEN.W))
+  val ex_reg_wd = RegInit(0.U(XLEN.W))
   val ex_reg_wra = RegInit(0.U(5.W))
   val ex_reg_ins = RegInit(0.U(32.W))
   val ex_reg_ctl_memToReg = RegInit(0.U(2.W))
@@ -56,17 +56,17 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_ctl_memRead = RegInit(false.B)
   val ex_reg_ctl_memWrite = RegInit(false.B)
   val ex_reg_ctl_branch_taken = RegInit(false.B)
-  val ex_reg_pc = RegInit(0.U(32.W))
+  val ex_reg_pc = RegInit(0.U(XLEN.W))
 
   // MEM-WB Registers
-  val mem_reg_rd = RegInit(0.U(32.W))
+  val mem_reg_rd = RegInit(0.U(XLEN.W))
   val mem_reg_ins = RegInit(0.U(32.W))
-  val mem_reg_result = RegInit(0.U(32.W))
-  val mem_reg_branch = RegInit(0.U(32.W))
+  val mem_reg_result = RegInit(0.U(XLEN.W))
+  val mem_reg_branch = RegInit(0.U(XLEN.W))
   val mem_reg_wra = RegInit(0.U(5.W))
   val mem_reg_ctl_memToReg = RegInit(0.U(2.W))
   val mem_reg_ctl_regWrite = RegInit(false.B)
-  val mem_reg_pc = RegInit(0.U(32.W))
+  val mem_reg_pc = RegInit(0.U(XLEN.W))
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
@@ -276,7 +276,7 @@ class Core(implicit val config:Configs) extends Module{
    * Write Back Stage *
    ********************/
 
-  val wb_data = Wire(UInt(32.W))
+  val wb_data = Wire(UInt(XLEN.W))
   val wb_addr = Wire(UInt(5.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
