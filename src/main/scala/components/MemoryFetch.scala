@@ -91,6 +91,8 @@ class MemoryFetch(implicit val config:Configs) extends Module {
     .otherwise{
     io.dccmReq.bits.activeByteLane := "b1111".U
   }
+  val wdata1 = Cat(wdata(0), wdata(1))
+  val wdata2 = Cat(wdata(2), wdata(3))
 
   io.dccmReq.bits.dataRequest := wdata.asUInt()
   io.dccmReq.bits.addrRequest := (io.aluResultIn & "h00001fff".U) >> 2
