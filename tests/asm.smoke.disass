@@ -1,0 +1,52 @@
+
+asm.smoke.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+20000000 <test>:
+20000000:	0085                	add	ra,ra,1
+20000002:	40000513          	li	a0,1024
+20000006:	0c300593          	li	a1,195
+2000000a:	4641                	li	a2,16
+2000000c:	80b57057          	vsetvl	zero,a0,a1
+20000010:	6f05                	lui	t5,0x1
+20000012:	00000f97          	auipc	t6,0x0
+
+20000016 <add_test>:
+20000016:	02053057          	vadd.vi	v0,v0,10
+2000001a:	0085b857          	vadd.vi	v16,v8,11,v0.t
+2000001e:	03000457          	vadd.vv	v8,v16,v0
+20000022:	0083b857          	vadd.vi	v16,v8,7,v0.t
+20000026:	0300c457          	vadd.vx	v8,v16,ra
+
+2000002a <chaining_test>:
+2000002a:	0300cc57          	vadd.vx	v24,v16,ra
+2000002e:	2f83b457          	vxor.vi	v8,v24,7
+20000032:	9680b857          	vsll.vi	v16,v8,1
+
+20000036 <ld_test>:
+20000036:	020f0807          	vle8.v	v16,(t5)
+
+2000003a <loop>:
+2000003a:	167d                	add	a2,a2,-1
+2000003c:	fe69                	bnez	a2,20000016 <add_test>
+2000003e:	b00022f3          	csrr	t0,mcycle
+20000042:	8082                	ret
+
+20000044 <will_not_be_executed>:
+20000044:	02108157          	vadd.vv	v2,v1,v1
+
+20000048 <_start>:
+20000048:	4545                	li	a0,17
+2000004a:	0526                	sll	a0,a0,0x9
+2000004c:	30052073          	csrs	mstatus,a0
+20000050:	00f05073          	csrw	vcsr,0
+20000054:	20000117          	auipc	sp,0x20000
+20000058:	fac10113          	add	sp,sp,-84 # 40000000 <__stacktop>
+2000005c:	00000097          	auipc	ra,0x0
+20000060:	fa4080e7          	jalr	-92(ra) # 20000000 <test>
+20000064:	10000537          	lui	a0,0x10000
+20000068:	55fd                	li	a1,-1
+2000006a:	c14c                	sw	a1,4(a0)
+2000006c:	7cc05073          	csrw	0x7cc,0
