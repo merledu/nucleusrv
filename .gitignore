@@ -11,6 +11,7 @@ test_run_dir/*
 .bloop/*
 .idea/*
 tools/out/*
+__pycache__/*
 tools/main.hex
 generated-src/*
 .vscode/*
