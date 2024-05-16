@@ -5,7 +5,7 @@ import chisel3.util.MuxCase
 import nucleusrv.components.fpu._
 import chisel3.util.MuxLookup
 
-class Execute(M:Boolean = false, F:Boolean) extends Module {
+class Execute(M:Boolean = true, F:Boolean) extends Module {
   val io = IO(new Bundle {
     val immediate = Input(UInt(32.W))
     val readData1 = Input(UInt(32.W))

@@ -19,6 +19,10 @@
 // Word size: 32
 // Write size: 8
 
+/* verilator lint_off ASSIGNDLY */
+/* verilator lint_off UNUSED */
+/* verilator lint_off BLKSEQ */
+/* verilator lint_off WIDTH */
 module sram #(
   parameter NUM_WMASKS = 4,
   parameter DATA_WIDTH = 32,
