@@ -1,0 +1,288 @@
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering LB
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering LH
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering LW
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering LBU
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering LHU
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering SB
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering SH
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering SW
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering SLL
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering SLLI
+2024-05-19 23:28:49,877 riscv_instr.py 119 INFO Registering SRL
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SRLI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SRA
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SRAI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering ADD
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering ADDI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering NOP
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SUB
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering LUI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering AUIPC
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering XOR
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering XORI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering OR
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering ORI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering AND
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering ANDI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SLT
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SLTI
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SLTU
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering SLTIU
+2024-05-19 23:28:49,878 riscv_instr.py 119 INFO Registering BEQ
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering BNE
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering BLT
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering BGE
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering BLTU
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering BGEU
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering JAL
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering JALR
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering FENCE
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering FENCE_I
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering SFENCE_VMA
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering ECALL
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering EBREAK
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering URET
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering SRET
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering MRET
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering DRET
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering WFI
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering CSRRW
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering CSRRS
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering CSRRC
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering CSRRWI
+2024-05-19 23:28:49,879 riscv_instr.py 119 INFO Registering CSRRSI
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering CSRRCI
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering MUL
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering MULH
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering MULHSU
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering MULHU
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering DIV
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering DIVU
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering REM
+2024-05-19 23:28:49,880 riscv_instr.py 119 INFO Registering REMU
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_LW
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_SW
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_LWSP
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_SWSP
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_ADDI4SPN
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_ADDI
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_ADDI16SP
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_LI
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_LUI
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_SUB
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_ADD
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_NOP
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_MV
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_ANDI
+2024-05-19 23:28:49,881 riscv_instr.py 119 INFO Registering C_XOR
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_OR
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_AND
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_BEQZ
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_BNEZ
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_SRLI
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_SRAI
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_SLLI
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_J
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_JAL
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_JR
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_JALR
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering C_EBREAK
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering FLW
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering FSW
+2024-05-19 23:28:49,882 riscv_instr.py 119 INFO Registering FMADD_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FMSUB_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FNMSUB_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FNMADD_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FADD_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FSUB_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FMUL_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FDIV_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FSQRT_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FSGNJ_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FSGNJN_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FSGNJX_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FMIN_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FMAX_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FCVT_W_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FCVT_WU_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FMV_X_W
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FEQ_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FLT_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FLE_S
+2024-05-19 23:28:49,883 riscv_instr.py 119 INFO Registering FCLASS_S
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering FCVT_S_W
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering FCVT_S_WU
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering FMV_W_X
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering C_FLW
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering C_FSW
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering C_FLWSP
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering C_FSWSP
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering FLD
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering FSD
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering FMADD_D
+2024-05-19 23:28:49,884 riscv_instr.py 119 INFO Registering FMSUB_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FNMSUB_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FNMADD_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FADD_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FSUB_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FMUL_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FDIV_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FSQRT_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FSGNJ_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FSGNJN_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FSGNJX_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FMIN_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FMAX_D
+2024-05-19 23:28:49,885 riscv_instr.py 119 INFO Registering FCVT_S_D
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FCVT_D_S
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FEQ_D
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FLT_D
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FLE_D
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FCLASS_D
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FCVT_W_D
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FCVT_WU_D
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FCVT_D_W
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering FCVT_D_WU
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering C_FLD
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering C_FSD
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering C_FLDSP
+2024-05-19 23:28:49,886 riscv_instr.py 119 INFO Registering C_FSDSP
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering LR_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering SC_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOSWAP_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOADD_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOAND_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOOR_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOXOR_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOMIN_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOMAX_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOMINU_W
+2024-05-19 23:28:49,887 riscv_instr.py 119 INFO Registering AMOMAXU_W
+2024-05-19 23:28:52,827 riscv_instr_gen_config.py 475 INFO min_stack_len_per_program value = 8
+2024-05-19 23:28:52,829 riscv_instr_base_test.py 78 INFO riscv_instr_gen_config is randomized
+2024-05-19 23:28:52,839 riscv_utils.py 70 INFO 
++-----+---------------------------------+---------------+--------+---------------------------------------------------------------------------+
+|     | Name                            | Type          |   Size | Value                                                                     |
+|-----+---------------------------------+---------------+--------+---------------------------------------------------------------------------|
+|   0 | tname                           | <class 'str'> |     54 | riscv_instr_gen_config                                                    |
+|   1 | main_program_instr_cnt          | <class 'str'> |     71 | 45                                                                        |
+|   2 | sub_program_instr_cnt           | <class 'str'> |     70 | []                                                                        |
+|   3 | debug_program_instr_cnt         | <class 'str'> |     72 | 0                                                                         |
+|   4 | debug_sub_program_instr_cnt     | <class 'str'> |     76 | []                                                                        |
+|   5 | data_page_pattern               | <class 'str'> |     66 | data_pattern_t.ALL_ZERO                                                   |
+|   6 | vreg_init_method                | <class 'str'> |     65 | vreg_init_method_t.RANDOM_VALUES_VMV                                      |
+|   7 | max_directed_instr_stream_seq   | <class 'str'> |     78 | 20                                                                        |
+|   8 | m_mode_exception_delegation     | <class 'str'> |     76 | {}                                                                        |
+|   9 | s_mode_exception_delegation     | <class 'str'> |     76 | {}                                                                        |
+|  10 | m_mode_interrupt_delegation     | <class 'str'> |     76 | {}                                                                        |
+|  11 | s_mode_interrupt_delegation     | <class 'str'> |     76 | {}                                                                        |
+|  12 | init_privileged_mode            | <class 'str'> |     69 | privileged_mode_t.MACHINE_MODE                                            |
+|  13 | mstatus                         | <class 'str'> |     56 | 578628393                                                                 |
+|  14 | mie                             | <class 'str'> |     52 | 1026600382                                                                |
+|  15 | sstatus                         | <class 'str'> |     56 | 470711575                                                                 |
+|  16 | sie                             | <class 'str'> |     52 | 4100575                                                                   |
+|  17 | ustatus                         | <class 'str'> |     56 | 1456580308                                                                |
+|  18 | uie                             | <class 'str'> |     52 | 967570274                                                                 |
+|  19 | mstatus_mprv                    | <class 'str'> |     61 | 0                                                                         |
+|  20 | mstatus_mxr                     | <class 'str'> |     60 | 0                                                                         |
+|  21 | mstatus_sum                     | <class 'str'> |     60 | 0                                                                         |
+|  22 | mstatus_tvm                     | <class 'str'> |     60 | 0                                                                         |
+|  23 | mstatus_fs                      | <class 'str'> |     59 | 1                                                                         |
+|  24 | mstatus_vs                      | <class 'str'> |     59 | 0                                                                         |
+|  25 | mtvec_mode                      | <class 'str'> |     59 | mtvec_mode_t.DIRECT                                                       |
+|  26 | tvec_alignment                  | <class 'str'> |     63 | 2                                                                         |
+|  27 | fcsr_rm                         | <class 'str'> |     56 | f_rounding_mode_t.RMM                                                     |
+|  28 | enable_sfence                   | <class 'str'> |     62 | 1                                                                         |
+|  29 | gpr                             | <class 'str'> |     52 | [riscv_reg_t.T6, riscv_reg_t.T5, riscv_reg_t.A6, riscv_reg_t.T3]          |
+|  30 | scratch_reg                     | <class 'str'> |     60 | riscv_reg_t.T4                                                            |
+|  31 | pmp_reg                         | <class 'str'> |     56 | riscv_reg_t.A0                                                            |
+|  32 | sp                              | <class 'str'> |     51 | riscv_reg_t.S11                                                           |
+|  33 | tp                              | <class 'str'> |     51 | riscv_reg_t.S3                                                            |
+|  34 | ra                              | <class 'str'> |     51 | riscv_reg_t.S5                                                            |
+|  35 | check_misa_init_val             | <class 'str'> |     68 | 0                                                                         |
+|  36 | check_xstatus                   | <class 'str'> |     62 | 1                                                                         |
+|  37 | virtual_addr_translation_on     | <class 'str'> |     76 | 0                                                                         |
+|  38 | stack_len                       | <class 'str'> |     58 | 5000                                                                      |
+|  39 | kernel_stack_len                | <class 'str'> |     65 | 4000                                                                      |
+|  40 | kernel_program_instr_cnt        | <class 'str'> |     73 | 400                                                                       |
+|  41 | invalid_priv_mode_csrs          | <class 'str'> |     71 | []                                                                        |
+|  42 | num_of_sub_program              | <class 'str'> |     67 | 0                                                                         |
+|  43 | instr_cnt                       | <class 'str'> |     58 | 100                                                                       |
+|  44 | num_of_tests                    | <class 'str'> |     61 | 1                                                                         |
+|  45 | no_data_page                    | <class 'str'> |     61 | 1                                                                         |
+|  46 | no_branch_jump                  | <class 'str'> |     63 | 1                                                                         |
+|  47 | no_load_store                   | <class 'str'> |     62 | 0                                                                         |
+|  48 | no_csr_instr                    | <class 'str'> |     61 | 0                                                                         |
+|  49 | no_ebreak                       | <class 'str'> |     58 | 1                                                                         |
+|  50 | no_dret                         | <class 'str'> |     56 | 1                                                                         |
+|  51 | no_fence                        | <class 'str'> |     57 | 1                                                                         |
+|  52 | no_wfi                          | <class 'str'> |     55 | 1                                                                         |
+|  53 | enable_unaligned_load_store     | <class 'str'> |     76 | 0                                                                         |
+|  54 | illegal_instr_ratio             | <class 'str'> |     68 | 0                                                                         |
+|  55 | hint_instr_ratio                | <class 'str'> |     65 | 0                                                                         |
+|  56 | num_of_harts                    | <class 'str'> |     61 | 1                                                                         |
+|  57 | fix_sp                          | <class 'str'> |     55 | 0                                                                         |
+|  58 | use_push_data_section           | <class 'str'> |     70 | 0                                                                         |
+|  59 | boot_mode_opts                  | <class 'str'> |     63 | m                                                                         |
+|  60 | enable_page_table_exception     | <class 'str'> |     76 | 0                                                                         |
+|  61 | no_directed_instr               | <class 'str'> |     66 | 0                                                                         |
+|  62 | asm_test_suffix                 | <class 'str'> |     64 |                                                                           |
+|  63 | enable_interrupt                | <class 'str'> |     65 | 0                                                                         |
+|  64 | enable_nested_interrupt         | <class 'str'> |     72 | 0                                                                         |
+|  65 | enable_timer_irq                | <class 'str'> |     65 | 0                                                                         |
+|  66 | bare_program_mode               | <class 'str'> |     66 | 0                                                                         |
+|  67 | enable_illegal_csr_instruction  | <class 'str'> |     79 | 0                                                                         |
+|  68 | enable_access_invalid_csr_level | <class 'str'> |     80 | 0                                                                         |
+|  69 | enable_misaligned_instr         | <class 'str'> |     72 | 0                                                                         |
+|  70 | enable_dummy_csr_write          | <class 'str'> |     71 | 0                                                                         |
+|  71 | randomize_csr                   | <class 'str'> |     62 | 0                                                                         |
+|  72 | allow_sfence_exception          | <class 'str'> |     71 | 0                                                                         |
+|  73 | no_delegation                   | <class 'str'> |     62 | 1                                                                         |
+|  74 | force_m_delegation              | <class 'str'> |     67 | 0                                                                         |
+|  75 | force_s_delegation              | <class 'str'> |     67 | 0                                                                         |
+|  76 | support_supervisor_mode         | <class 'str'> |     72 | 0                                                                         |
+|  77 | disable_compressed_instr        | <class 'str'> |     73 | 0                                                                         |
+|  78 | require_signature_addr          | <class 'str'> |     71 | 0                                                                         |
+|  79 | signature_addr                  | <class 'str'> |     63 | 3735928559                                                                |
+|  80 | gen_debug_section               | <class 'str'> |     66 | 0                                                                         |
+|  81 | enable_ebreak_in_debug_rom      | <class 'str'> |     75 | 0                                                                         |
+|  82 | set_dcsr_ebreak                 | <class 'str'> |     64 | 0                                                                         |
+|  83 | num_debug_sub_program           | <class 'str'> |     70 | 0                                                                         |
+|  84 | enable_debug_single_step        | <class 'str'> |     73 | 0                                                                         |
+|  85 | single_step_iterations          | <class 'str'> |     71 | 1411432884                                                                |
+|  86 | set_mstatus_tw                  | <class 'str'> |     63 | 0                                                                         |
+|  87 | set_mstatus_mprv                | <class 'str'> |     65 | 0                                                                         |
+|  88 | min_stack_len_per_program       | <class 'str'> |     74 | 8                                                                         |
+|  89 | max_stack_len_per_program       | <class 'str'> |     74 | 64                                                                        |
+|  90 | max_branch_step                 | <class 'str'> |     64 | 20                                                                        |
+|  91 | reserved_regs                   | <class 'str'> |     62 | [riscv_reg_t.S3, riscv_reg_t.S11, riscv_reg_t.T4]                         |
+|  92 | enable_floating_point           | <class 'str'> |     70 | 1                                                                         |
+|  93 | enable_vector_extension         | <class 'str'> |     72 | 0                                                                         |
+|  94 | vector_instr_only               | <class 'str'> |     66 | 0                                                                         |
+|  95 | enable_b_extension              | <class 'str'> |     67 | 0                                                                         |
+|  96 | enable_bitmanip_groups          | <class 'str'> |     71 | ['ZBB', 'ZBS', 'ZBP', 'ZBE', 'ZBF', 'ZBC', 'ZBR', 'ZBM', 'ZBT', 'ZB_TMP'] |
+|  97 | dist_control_mode               | <class 'str'> |     66 | 0                                                                         |
+|  98 | category_dist                   | <class 'str'> |     62 | {}                                                                        |
+|  99 | march_isa                       | <class 'str'> |     58 | []                                                                        |
+| 100 | supported_interrupt_mode        | <class 'str'> |     73 | [mtvec_mode_t.DIRECT, mtvec_mode_t.VECTORED]                              |
+| 101 | XLEN                            | <class 'str'> |     53 | 32                                                                        |
+| 102 | SATP_MODE                       | <class 'str'> |     58 | satp_mode_t.BARE                                                          |
+| 103 | init_privil_mode                | <class 'str'> |     65 | privileged_mode_t.MACHINE_MODE                                            |
+| 104 | tvec_ceil                       | <class 'str'> |     58 | 4                                                                         |
++-----+---------------------------------+---------------+--------+---------------------------------------------------------------------------+
+2024-05-19 23:28:53,997 riscv_instr_base_test.py 70 INFO All directed instruction is applied
+2024-05-19 23:28:53,999 riscv_asm_program_gen.py 611 INFO Generating privileged mode routing for MACHINE_MODE
+2024-05-19 23:28:54,028 riscv_privileged_common_seq.py 139 INFO self.mstatus_val: 0x3800
+2024-05-19 23:28:54,253 riscv_instr_sequence.py 75 INFO Start generating 45 instruction
+2024-05-19 23:28:55,464 riscv_instr_sequence.py 85 INFO Finishing instruction generation
+2024-05-19 23:28:55,464 riscv_asm_program_gen.py 248 INFO Randomizing call stack..done
+2024-05-19 23:28:55,465 riscv_instr_sequence.py 201 INFO Finished post-processing instructions
+2024-05-19 23:28:55,465 riscv_asm_program_gen.py 117 INFO Post-processing main program...done
+2024-05-19 23:28:55,468 riscv_instr_sequence.py 291 INFO Injecting 0 illegal instructions, ratio 0/100
+2024-05-19 23:28:55,469 riscv_instr_sequence.py 303 INFO Injecting 0 HINT instructions, ratio 0/100
+2024-05-19 23:28:55,469 riscv_asm_program_gen.py 119 INFO Generating main program instruction stream...done
+2024-05-19 23:28:55,469 riscv_asm_program_gen.py 134 INFO Main/sub program generation...done
+2024-05-19 23:28:55,470 riscv_asm_program_gen.py 1063 INFO output/asm_test/riscv_floating_point_arithmetic_test_0.S is generated
+2024-05-19 23:28:55,470 riscv_instr_base_test.py 73 INFO TEST GENERATED USING SEED VALUE = 502750967
+2024-05-19 23:28:55,470 riscv_instr_base_test.py 74 INFO TEST GENERATION DONE
+2024-05-19 23:28:55,479 riscv_instr_base_test.py 90 INFO Total execution time: 3s
