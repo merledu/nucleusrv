@@ -1,10 +1,9 @@
-OUTPUT_FORMAT("elf32-littleriscv", "elf32-littleriscv",
-	      "elf32-littleriscv")
+OUTPUT_FORMAT("elf32-littleriscv", "elf32-littleriscv", "elf32-littleriscv")
 OUTPUT_ARCH(riscv)
 
 SECTIONS
 {
-  . = 0x00000000;
+  . = 0x1000;  /* Start at address 0x1000 */
   .text : { *(.text) }
   .text.init : { *(.text.init) }
   . = ALIGN(0x2000);
