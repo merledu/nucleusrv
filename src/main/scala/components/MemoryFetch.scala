@@ -185,7 +185,7 @@ class MemoryFetch extends Module {
   }
 
 
-  when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
+  when(io.writeEnable){
     printf("%x\n", io.writeData)
   }
 
