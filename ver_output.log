@@ -1,4 +1,4 @@
-make[2]: Entering directory '/home/shassan/nucleusrv/obj_dir'
+make[1]: Entering directory '/home/shassan/nucleusrv/obj_dir'
 ccache g++  -I.  -MMD -I/merledu1/tools/verilator-4.106/include -I/merledu1/tools/verilator-4.106/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow      -std=gnu++14 -Os -c -o tb_Top.o ../tb_Top.cpp
 ccache g++  -I.  -MMD -I/merledu1/tools/verilator-4.106/include -I/merledu1/tools/verilator-4.106/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow      -std=gnu++14 -Os -c -o VTop.o VTop.cpp
 ccache g++  -I.  -MMD -I/merledu1/tools/verilator-4.106/include -I/merledu1/tools/verilator-4.106/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow      -std=gnu++14 -Os -c -o VTop__1.o VTop__1.cpp
@@ -6,4 +6,4 @@ ccache g++  -I.  -MMD -I/merledu1/tools/verilator-4.106/include -I/merledu1/tool
 ccache g++  -I.  -MMD -I/merledu1/tools/verilator-4.106/include -I/merledu1/tools/verilator-4.106/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow      -std=gnu++14  -c -o VTop__Syms.o VTop__Syms.cpp
 Archive ar -cr VTop__ALL.a VTop.o VTop__1.o VTop__Slow.o VTop__Syms.o
 g++    tb_Top.o verilated.o VTop__ALL.a      -o VTop
-make[2]: Leaving directory '/home/shassan/nucleusrv/obj_dir'
+make[1]: Leaving directory '/home/shassan/nucleusrv/obj_dir'

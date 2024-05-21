@@ -2,7 +2,6 @@ package nucleusrv.tracer
 
 import chisel3._
 
-
 class TracerIO extends Bundle {
   val rvfiUInt   : Vec[UInt] = Input(Vec(4, UInt(32.W)))
   val rvfiSInt   : Vec[SInt] = Input(Vec(5, SInt(32.W)))
@@ -10,7 +9,6 @@ class TracerIO extends Bundle {
   val rvfiRegAddr: Vec[UInt] = Input(Vec(3, UInt(5.W)))
   val rvfiMode   : UInt      = Input(UInt(2.W))
 }
-
 
 class Tracer extends Module {
   val io: TracerIO = IO(new TracerIO)
@@ -41,12 +39,17 @@ class Tracer extends Module {
     "valid" -> io.rvfiBool(0)
   )
 
-  when (boolWires("valid") && (uintWires("insn") =/= 0.U)) {
+  // Register to store the previous instruction
+  val prevInsn: UInt = RegInit(0.U(32.W))
+
+  when (boolWires("valid") && (uintWires("insn") =/= 0.U) && (uintWires("insn") =/= prevInsn)) {
     printf(
       "ClkCycle: %d, pc_rdata: %x, pc_wdata: %x, insn: %x, mode: %d, rs1_addr: %d, rs1_rdata: %x, rs2_addr: %d, rs2_rdata: %x, rd_addr: %d, rd_wdata: %x, mem_addr: %x, mem_rdata: %x, mem_wdata: %x\n",
       clkCycle, uintWires("pc_rdata"), uintWires("pc_wdata"), uintWires("insn"), uintWires("mode"),
       uintWires("rs1_addr"), sintWires("rs1_rdata"), uintWires("rs2_addr"), sintWires("rs2_rdata"), uintWires("rd_addr"),
       sintWires("rd_wdata"), uintWires("mem_addr"), sintWires("mem_rdata"), sintWires("mem_wdata")
     )
+    // Update the previous instruction register
+    prevInsn := uintWires("insn")
   }
 }
