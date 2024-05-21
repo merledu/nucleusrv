@@ -6,7 +6,7 @@ Disassembly of section .text:
 
 80000000 <_start>:
 80000000:	f14022f3          	csrr	t0,mhartid
-80000004:	4301                	li	t1,0
+80000004:   4301                	li	t1,0
 80000006:	00628263          	beq	t0,t1,8000000a <_start+0xa>
 8000000a:	00000e97          	auipc	t4,0x0
 8000000e:	00ce8e93          	add	t4,t4,12 # 80000016 <h0_start>

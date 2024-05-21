@@ -48,15 +48,22 @@ def readAsm(asmFile):
             if match('[0-9a-f]+:\s+[0-9a-f]+\s+[a-z]+', line)
     }
 
-    for k in inst.keys():
-        if match('[a-z]+\s+.+', inst[k]):
-            inst[k]    = split('\s+', inst[k])
-            inst[k][1] = inst[k][1].split(',')
+    updated_inst = {}
+    for k, v in inst.items():
+        new_key = k
+        if len(k) == 4:
+            new_key = "0000" + k
+        if match(r'[a-z]+\s+.+', v):
+            v = split(r'\s+', v)
+            v[1] = v[1].split(',')
         else:
-            inst[k] = [inst[k]]
+            v = [v]
+        updated_inst[new_key] = v
+
+    inst.clear()
+    inst.update(updated_inst)
 
     return inst
-
 
 def sbtToLog(sbtFile, asmFile, logFile):
     sbt = readSBTlog(sbtFile)
@@ -71,6 +78,7 @@ def sbtToLog(sbtFile, asmFile, logFile):
             for k in sbt.keys():
                 f.write('{0:10}'.format(sbt[k][i]))
             inst_str = asm[sbt['insn'][i]]
+
             if len(inst_str) > 1:
                 f.write('{0:8}{1}\n'.format(inst_str[0], ', '.join(inst_str[1])))
             else:
