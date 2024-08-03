@@ -1,72 +1,55 @@
 package nucleusrv.components
 import chisel3._
-import caravan.bus.common.{AbstrRequest, AbstrResponse, BusConfig, BusDevice, BusHost}
-import caravan.bus.wishbone.{WBRequest, WBResponse, WishboneConfig}
-import caravan.bus.tilelink.{TLRequest, TLResponse, TilelinkConfig}
-import components.RVFIPORT
-import jigsaw.rams.fpga.BlockRam
+import chisel3.stage.ChiselStage
+import nucleusrv.tracer._
 
-class Top(programFile:Option[String]) extends Module{
+
+class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
+
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
-    val rvfi = new RVFIPORT
+    val fcsr = Output(UInt(32.W))
   })
 
-  implicit val config = WishboneConfig(32, 32) //WishboneConfig(32,32)
+  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
 
-  val core: Core = Module(new Core(/*req, rsp*/ new WBRequest /*WBRequest*/,new WBResponse /*WBResponse*/))
-  val imemAdapter = Module(new WishboneAdapter() /*TilelinkAdapter()*/) //instrAdapter
-  val dmemAdapter = Module(new WishboneAdapter() /*WishboneAdapter()*/) //dmemAdapter
+  val core: Core = Module(new Core())
+  core.io.stall := false.B
 
-  // TODO: Make RAMs generic
-  val imemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
-  val dmemCtrl = Module(BlockRam.createMaskableRAM(config, 1024))
+  val dmem = Module(new SRamTop(dataFile))
+  val imem = Module(new SRamTop(programFile))
 
   /*  Imem Interceonnections  */
-  imemAdapter.io.reqIn <> core.io.imemReq
-  core.io.imemRsp <> imemAdapter.io.rspOut
-  imemCtrl.io.req <> imemAdapter.io.reqOut
-  imemAdapter.io.rspIn <> imemCtrl.io.rsp
+  core.io.imemRsp <> imem.io.rsp
+  imem.io.req <> core.io.imemReq
+
 
   /*  Dmem Interconnections  */
-  dmemAdapter.io.reqIn <> core.io.dmemReq
-  core.io.dmemRsp <> dmemAdapter.io.rspOut
-  dmemCtrl.io.req <> dmemAdapter.io.reqOut
-  dmemAdapter.io.rspIn <> dmemCtrl.io.rsp
+  core.io.dmemRsp <> dmem.io.rsp
+  dmem.io.req <> core.io.dmemReq
 
-  io.rvfi <> core.io.rvfi
   io.pin := core.io.pin
+  io.fcsr := core.io.fcsr_o_data
 
+  if (config.TRACE) {
+    val tracer = Module(new Tracer())
+
+    Seq(
+      (tracer.io.rvfiUInt, core.io.rvfiUInt.get),
+      (tracer.io.rvfiSInt, core.io.rvfiSInt.get),
+      (tracer.io.rvfiBool, core.io.rvfiBool.get),
+      (tracer.io.rvfiRegAddr, core.io.rvfiRegAddr.get)
+    ).map(
+      tr => tr._1 <> tr._2
+    )
+    tracer.io.rvfiMode := core.io.rvfiMode.get
+  }
 }
-//class Top(programFile:Option[String]) extends Module{
-//  val io = IO(new Bundle() {
-//    val pin = Output(UInt(32.W))
-//    val rvfi = new RVFIPORT
-//  })
-//
-//  implicit val config = TilelinkConfig(32) //WishboneConfig(32,32)
-//
-//  val core: Core = Module(new Core(/*req, rsp*/ new TLRequest /*WBRequest*/,new TLResponse /*WBResponse*/))
-//  val imemAdapter = Module(new TilelinkAdapter() /*TilelinkAdapter()*/) //instrAdapter
-//  val dmemAdapter = Module(new TilelinkAdapter() /*WishboneAdapter()*/) //dmemAdapter
-//
-//  // TODO: Make RAMs generic
-//  val imemCtrl = Module(BlockRam.createNonMaskableRAM(programFile, config, 8192))
-//  val dmemCtrl = Module(BlockRam.createMaskableRAM(config, 1024))
-//
-//  /*  Imem Interceonnections  */
-//  imemAdapter.io.reqIn <> core.io.imemReq
-//  core.io.imemRsp <> imemAdapter.io.rspOut
-//  imemCtrl.io.req <> imemAdapter.io.reqOut
-//  imemAdapter.io.rspIn <> imemCtrl.io.rsp
-//
-//  /*  Dmem Interconnections  */
-//  dmemAdapter.io.reqIn <> core.io.dmemReq
-//  core.io.dmemRsp <> dmemAdapter.io.rspOut
-//  dmemCtrl.io.req <> dmemAdapter.io.reqOut
-//  dmemAdapter.io.rspIn <> dmemCtrl.io.rsp
-//
-//  io.rvfi <> core.io.rvfi
-//  io.pin := core.io.pin
-//
-//}
+
+object NRVDriver {
+  // generate verilog
+  def main(args: Array[String]): Unit = {
+      val IMem =  if (args.length > 0) args(0) else "program.hex"
+      new ChiselStage().emitVerilog(new Top(Some(IMem), Some("data.hex")))
+  }
+}

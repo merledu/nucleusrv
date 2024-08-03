@@ -33,6 +33,7 @@ class Core(implicit val config:Configs) extends Module{
   // IF-ID Registers
   val if_reg_pc = RegInit(0.U(32.W))
   val if_reg_ins = RegInit(0.U(32.W))
+  //csr logic
   val if_reg_csr_data = RegInit(0.U)
 
   // ID-EX Registers
@@ -92,9 +93,9 @@ class Core(implicit val config:Configs) extends Module{
 
   io.fcsr_o_data := ID.fscr_o_data
   
-  /*******
+  /*****************
    * Fetch Stage *
-   ******/
+   ******************/
 
   val pc = Module(new PC)
 
@@ -110,9 +111,9 @@ class Core(implicit val config:Configs) extends Module{
 
   if (C) {
 
-    /*******
+    /*****************
     * Realingner *
-    ******/
+    ******************/
     val RA = Module(new Realigner).io
 
     RA.ral_address_i     := pc.io.in.asUInt()
@@ -124,9 +125,9 @@ class Core(implicit val config:Configs) extends Module{
 
     ral_halt_o           := RA.ral_halt_o
 
-    /*****************
+    /*************************************************
     * Compressed Decoder (Fully Combinational) *
-    *****************/
+    *************************************************/
     val CD = Module(new CompressedDecoder).io
 
     CD.instruction_i := instruction_cd
@@ -168,9 +169,9 @@ class Core(implicit val config:Configs) extends Module{
   when(ID.ifid_flush) {
     if_reg_ins := 0.U
   }
-
+//csr logic
   if_reg_csr_data := id_reg_csr_data
-  val handle_interrupt = if_reg_csr_data(3)
+  val handle_interrupt = if_reg_csr_data(3) //bit 3 represents MSTATUS.MIE
   val halt_if = Wire(Bool())
   half_if := Mux(handle_interrupt, true.B, false.B)
   when(!half_if) {
@@ -183,10 +184,9 @@ class Core(implicit val config:Configs) extends Module{
       //  mtvec pc logic 
   }
 
-
-  /******
+  /****************
    * Decode Stage *
-   ******/
+   ****************/
 
   id_reg_rd1 := ID.readData1
   id_reg_rd2 := ID.readData2
@@ -218,14 +218,20 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  ID.csr_i_misa    := DontCare
-  ID.csr_i_mhartid := DontCare
+  //MISA CSR
+  val MISA_VALUE = Wire(UInt(32.W))
+                    //|      Extensions        |
+             //MXLwirizyxwvutsrqponmlkjihgfedcba
+  MISA_VALUE:="b01000000000000000001000100000100".U
+
+  ID.csr_i_misa    := MISA_VALUE
+  ID.csr_i_mhartid := 0.U //Atleast one hart must have a hart id of zero
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
 
-  /*******
+  /*****************
    * Execute Stage *
-  ******/
+  ******************/
 
   //ex_reg_branch := EX.branchAddress
 //  ex_reg_wd := EX.writeData
@@ -271,9 +277,9 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_ctl_regWrite := id_reg_ctl_regWrite
   }
 
-  /******
+  /****************
    * Memory Stage *
-   ******/
+   ****************/
 
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
@@ -323,9 +329,9 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
 
-  /********
+  /********************
    * Write Back Stage *
-   ********/
+   ********************/
 
   val wb_data = Wire(UInt(32.W))
   val wb_addr = Wire(UInt(5.W))
@@ -353,9 +359,9 @@ class Core(implicit val config:Configs) extends Module{
   ID.dmem_data := io.dmemRsp.bits.dataResponse
   io.pin := wb_data
 
-  /******
-  * RVFI PINS *
-  ******/
+  /**************
+  ** RVFI PINS **
+  **************/
   if (TRACE) {
     val npcDelay = Reg(Vec(4, UInt(32.W)))
     val rsAddrDelay = for (i <- 0 until 2) yield Reg(Vec(3, UInt(5.W)))

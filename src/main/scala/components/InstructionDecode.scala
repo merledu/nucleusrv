@@ -1,8 +1,9 @@
-
 package nucleusrv.components
-import chisel3._
 
-class InstructionDecode extends Module {
+import chisel3._
+import chisel3.util._
+
+class InstructionDecode(TRACE:Boolean) extends Module {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
     val writeData = Input(UInt(32.W))
@@ -23,13 +24,23 @@ class InstructionDecode extends Module {
     val ex_result = Input(UInt(32.W))
     val ex_mem_result = Input(UInt(32.W))
     val mem_wb_result = Input(UInt(32.W))
+
+    val id_ex_regWr = Input(Bool())
+    val ex_mem_regWr = Input(Bool())
+    val csr_Ex = Input(Bool())
+    val csr_Mem = Input(Bool())
+    val csr_Wb = Input(Bool())
+    val csr_Ex_data = Input(UInt(32.W))
+    val csr_Mem_data = Input(UInt(32.W))
+    val csr_Wb_data = Input(UInt(32.W))
+    val dmem_data = Input(UInt(32.W))
     
     //Outputs
     val immediate = Output(UInt(32.W))
     val writeRegAddress = Output(UInt(5.W))
     val readData1 = Output(UInt(32.W))
     val readData2 = Output(UInt(32.W))
-    val func7 = Output(UInt(1.W))
+    val func7 = Output(UInt(7.W))
     val func3 = Output(UInt(3.W))
     val ctl_aluSrc = Output(Bool())
     val ctl_memToReg = Output(UInt(2.W))
@@ -45,7 +56,46 @@ class InstructionDecode extends Module {
     val pcSrc = Output(Bool())
     val pcPlusOffset = Output(UInt(32.W))
     val ifid_flush = Output(Bool())
+
+    val stall = Output(Bool())
+
+    // CSR pins
+    val csr_i_misa        = Input(UInt(32.W))
+    val csr_i_mhartid     = Input(UInt(32.W))
+    val csr_o_data        = Output(UInt(32.W))
+    val is_csr            = Output(Bool())
+    val fscr_o_data       = Output(UInt(32.W))
+
+    // RVFI pins
+    val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
   })
+
+  // CSR
+  val csr = Module(new CSR())
+  csr.io.i_misa_value         := io.csr_i_misa
+  csr.io.i_mhartid_value      := io.csr_i_mhartid
+  csr.io.i_imm                := io.id_instruction(19,15)
+  csr.io.i_opr                := io.id_instruction(14,12)
+  csr.io.i_addr               := io.id_instruction(31,20)
+  csr.io.i_w_en               := io.is_csr && (io.id_instruction(19, 15) =/= 0.U)
+
+  io.is_csr                   := io.id_instruction(6, 0) === "b1110011".U
+  io.csr_o_data               := csr.io.o_data
+  io.fscr_o_data              := csr.io.fcsr_o_data
+
+  val csrController = Module(new CSRController())
+  csrController.io.regWrExecute    := io.id_ex_regWr
+  csrController.io.rdSelExecute    := io.id_ex_rd
+  csrController.io.csrWrExecute    := io.csr_Ex
+  csrController.io.regWrMemory     := io.ex_mem_regWr
+  csrController.io.rdSelMemory     := io.ex_mem_rd
+  csrController.io.csrWrMemory     := io.csr_Mem
+  csrController.io.regWrWriteback  := io.ctl_writeEnable
+  csrController.io.rdSelWriteback  := io.writeReg
+  csrController.io.csrWrWriteback  := io.csr_Wb
+  csrController.io.rs1SelDecode    := io.id_instruction(19,15)
+  csrController.io.csrInstDecode   := io.id_instruction(6, 0) === "b1110011".U
+  csrController.io.csrInstIsImmd   := 0.B
 
   //Hazard Detection Unit
   val hdu = Module(new HazardUnit)
@@ -82,17 +132,6 @@ class InstructionDecode extends Module {
     io.ctl_regWrite := false.B
   }
 
-  //CSR Unit
-  val csr = Module(new CSR)
-  csr.io.func3 := io.func3
-  csr.io.csr_addr := io.id_instruction(31, 20)
-  csr.io.imm := io.immediate
-  csr.io.rs1_data := io.readData1
-
-  val out = dontTouch(Wire(UInt(32.W)))
-  out := csr.io.out
-
-
   //Register File
   val registers = Module(new Registers)
   val registerRd = io.writeReg
@@ -100,9 +139,9 @@ class InstructionDecode extends Module {
   val registerRs2 = io.id_instruction(24, 20)
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable := io.ctl_writeEnable
+  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb
   registers.io.writeAddress := registerRd
-  registers.io.writeData := io.writeData
+  registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
 
   //Forwarding to fix structural hazard
   when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
@@ -194,5 +233,32 @@ class InstructionDecode extends Module {
 
   io.writeRegAddress := io.id_instruction(11, 7)
   io.func3 := io.id_instruction(14, 12)
-  io.func7 := io.id_instruction(30)
+  when((io.id_instruction(6,0) === "b0110011".U) | ((io.id_instruction(6,0) === "b0010011".U) & (io.func3 === 5.U))){
+    io.func7 := io.id_instruction(31,25)
+  }.otherwise{
+    io.func7 := 0.U
+  }
+
+  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
+
+  val csr_iData_cases = Array(
+    1.U -> io.ex_result,
+    2.U -> Mux(io.ex_mem_mem_read, io.dmem_data, io.ex_mem_result),
+    3.U -> io.writeData,
+    4.U -> io.csr_Ex_data,
+    5.U -> io.csr_Mem_data,
+    6.U -> io.csr_Wb_data
+  )
+
+  csr.io.i_data := MuxLookup(csrController.io.forwardRS1, registers.io.readData(1), csr_iData_cases)
+
+  // RVFI
+  if (TRACE) {
+    Seq(
+      registerRs1,
+      registerRs2
+    ).zipWithIndex.map(
+      tr => io.rs_addr.get(tr._2) := tr._1
+    )
+  }
 }
