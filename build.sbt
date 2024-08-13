@@ -1,6 +1,10 @@
 import sbt.Keys.javacOptions
 // See README.md for license details.
 
+ThisBuild / scalaVersion     := "2.12.10"
+ThisBuild / version          := "3.2.0"
+ThisBuild / organization     := "com.github.merledu"
+
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   Seq() ++ {
     // If we're building with Scala > 2.11, enable the compile option
@@ -29,9 +33,9 @@ def javacOptionsVersion(scalaVersion: String): Seq[String] = {
 
 name := "nucleusrv"
 
-version := "3.2.0"
+// version := "3.2.0"
 
-scalaVersion := "2.12.10"
+// scalaVersion := "2.12.10"
 
 crossScalaVersions := Seq("2.12.10", "2.11.12")
 
@@ -46,6 +50,7 @@ val defaultVersions = Map(
   "chisel3" -> "3.5.5",
   "chisel-iotesters" -> "2.5.6"
   )
+  lazy val vaquita = project in file("vaquita")
 
 lazy val root = (project in file(".")).settings(
   libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
@@ -61,7 +66,7 @@ lazy val root = (project in file(".")).settings(
   ),
   scalacOptions ++= scalacOptionsVersion(scalaVersion.value),
   javacOptions ++= javacOptionsVersion(scalaVersion.value)
-)
+) .dependsOn(vaquita)
 
 logBuffered in Test := false
 

@@ -1,4 +1,5 @@
 package nucleusrv.components
+import vaquita.vaquita_CoProcessor_interface
 
 import chisel3._
 import chisel3.util._
@@ -9,8 +10,11 @@ class Core(implicit val config:Configs) extends Module{
   val C      = config.C
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
+  val V      = config.V
 
   val io = IO(new Bundle {
+    val vec_ins = Output(UInt(32.W))
+    val rs1_data_out = Output(SInt(32.W))
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
 
@@ -88,7 +92,11 @@ class Core(implicit val config:Configs) extends Module{
   val ID = Module(new InstructionDecode(TRACE)).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
+  val vec_top_module1 = Module(new vaquita_CoProcessor_interface)
+  dontTouch(vec_top_module1.io)
 
+  vec_top_module1.io.instr := io.vec_ins
+  vec_top_module1.io.rs1_data := io.rs1_data_out
   io.fcsr_o_data := ID.fscr_o_data
   
   /*****************
@@ -193,7 +201,17 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_is_csr := ID.is_csr
   id_reg_csr_data := ID.csr_o_data
 //  IF.PcWrite := ID.hdu_pcWrite
-  ID.id_instruction := if_reg_ins
+  val opcode = if_reg_ins(6,0)
+  when((opcode==="b0000111".U || opcode==="b0100111".U || opcode==="b1010111".U) && V.B===1.B){
+    io.vec_ins := if_reg_ins
+    ID.id_instruction := if_reg_ins
+  }.otherwise{
+    ID.id_instruction := if_reg_ins
+    io.vec_ins := 0.U
+  }
+  io.rs1_data_out := ID.readData1.asSInt
+  dontTouch(io.rs1_data_out)
+  dontTouch(io.vec_ins)
   ID.pcAddress := if_reg_pc
   ID.dmem_resp_valid := io.dmemRsp.valid
 //  IF.PcSrc := ID.pcSrc

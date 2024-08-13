@@ -141,6 +141,41 @@ class Control extends Module {
         2.U, // jump
         0.U, // aluOp
         0.U
+      ),// vec load
+      // BitPat("b?????????????????????????0110011") -> List(
+      //   true.B, // aluSrc
+      //   0.U, // memToReg
+      //   true.B, // regWrite
+      //   false.B, // memRead
+      //   false.B, // memWrite
+      //   false.B, // branch
+      //   0.U, // jump
+      //   2.U, // aluOp
+      //   0.U // aluSrc1
+      // ),
+      // // vec store
+      // BitPat("b?????????????????????????0110011") -> List(
+      //   true.B, // aluSrc
+      //   0.U, // memToReg
+      //   false.B, // regWrite
+      //   false.B, // memRead
+      //   false.B, // memWrite
+      //   false.B, // branch
+      //   0.U, // jump
+      //   0.U, // aluOp
+      //   0.U // aluSrc1
+      // ),
+      // vec arithmatic
+      BitPat("b?????????????????????????1010111") -> List(
+        false.B, // aluSrc
+        0.U, // memToReg
+        false.B, // regWrite
+        false.B, // memRead
+        false.B, // memWrite
+        false.B, // branch
+        0.U, // jump
+        0.U, // aluOp
+        0.U
       )
     )
   )
