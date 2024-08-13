@@ -38,14 +38,13 @@ clean:
 	rm *.f
 	
 compliance:
-	./run_compliance.sh $(ISA) $(TEST)
-
+	./run_compliance.sh $(ISA) $(TEST) $(DEVICE)
 
 IMEM=asm.txt
 
 rtl:
 	sbt "runMain nucleusrv.components.NRVDriver $(IMEM)"
-	(echo '/* verilator lint_off ASSIGNDLY */' && echo '/* verilator lint_off UNUSED */' && echo '/* verilator lint_off BLKSEQ */' && echo '/* verilator lint_off DECLFILENAME */' && cat Top.v) > temp && mv temp Top.v
+	(echo '/* verilator lint_off ASSIGNDLY */' && echo '/* verilator lint_off UNUSED */' && echo '/* verilator lint_off BLKSEQ */' && echo '/* verilator lint_off DECLFILENAME */' && echo '/* verilator lint_off WIDTH */' && echo '/* verilator lint_off SYNCASYNCNET */' && cat Top.v) > temp && mv temp Top.v
 
 VERILATOR = verilator
 VERILATOR_FLAGS = -Wall --cc Top.v --exe tb_Top.cpp
@@ -56,6 +55,7 @@ ver:
 	   obj_dir/VTop > trace.log 2>&1
 
 sim: rtl ver
+
 PYTHON := $(shell command -v python3 || command -v python)
 ASM=test.s
 asmtohex:

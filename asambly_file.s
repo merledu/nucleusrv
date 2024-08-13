@@ -1,22 +1,20 @@
-    .text
-    .global     min_data_vec_32
-# void min_data_vec_32(int32_t *dest_data, int32_t *src1, int32_t *src2, int data_num);
-# a0=dest, a1=src1, a2=src2, a3=n
-#
-min_data_vec_32:
-.loop_32:
-    addi    a3,x0,3
-    vsetvli t0, a3, e32,m1   # Vectors of 8b
-    addi    t0,x0,3
-    slli    t1, t0, 2       # shift 2-bit
-    addi a1,x0,10
-    vle32.v v0, (a1)        # Load bytes
-    add     a1, a1, t1  	# Bump pointer
-    vle32.v v1, (a2)        # Load bytes
-    add     a2, a2, t1  	# Bump pointer
-    sub     a3, a3, t0  	# Decrement count
-    vmin.vv v2, v1, v0      # Vector Sub
-    vse32.v v2, (a0)    	# Store bytes
-    add     a0, a0, t1  	# Bump pointer
-    bnez    a3, .loop_32   	# Any more?
-    ret  
+.text
+.global main
+main:
+    addi x1 , x0,21
+    addi x2 , x0 , 42
+    addi x3 , x0 , 60
+    addi x4 , x0, 135
+    vsetvli x1,x2, e32, m1,tu,mu
+    vadd.vx v10, v1, x2
+    vadd.vx v15, v1, x3
+    addi x21 , x0,120
+    addi x22 , x0 , 80
+    addi x23 , x0,120
+    vse8.v v10 ,(x2)
+    vse8.v v15 ,(x4)
+    addi x12 , x0,42
+    addi x22 , x0 , 80
+    addi x23 , x0,120
+    vle32.v v20, (x12)
+    
