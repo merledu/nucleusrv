@@ -1,0 +1,3 @@
+[submodule "vaquita"]
+	path = vaquita
+	url = https://github.com/merledu/vaquita.git
