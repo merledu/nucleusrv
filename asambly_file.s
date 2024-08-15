@@ -11,8 +11,8 @@ main:
     addi x21 , x0,120
     addi x22 , x0 , 80
     addi x23 , x0,120
-    vse8.v v10 ,(x2)
-    vse8.v v15 ,(x4)
+    vse32.v v10 ,(x2)
+    vse32.v v15 ,(x4)
     addi x12 , x0,42
     addi x22 , x0 , 80
     addi x23 , x0,120

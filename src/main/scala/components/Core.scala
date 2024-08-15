@@ -1,10 +1,11 @@
 package nucleusrv.components
 import vaquita.vaquita_CoProcessor_top
+import vaquita.Vaquita_Config
 
 import chisel3._
 import chisel3.util._
 
-class Core(implicit val config:Configs) extends Module{
+class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) extends Module{
 
   val M      = config.M
   val C      = config.C
@@ -159,13 +160,30 @@ class Core(implicit val config:Configs) extends Module{
     func7 := 0.U
   }
 
+  val vec_load_store_bit = instruction(6,0)==="b0000111".U || instruction(6,0)==="b0100111".U
+  dontTouch(vec_load_store_bit)
+
+  val vec_load_store_counter = RegInit(((vec_config.vlen.U*1.U)/32.U)-1.U(32.W))
+  dontTouch(vec_load_store_counter)
+  val vec_stall = WireInit(false.B)
+  when(vec_load_store_bit===1.B && vec_load_store_counter=/=0.U){
+    vec_load_store_counter := vec_load_store_counter - 1.U
+    vec_stall := true.B
+  }.elsewhen(vec_load_store_bit===1.B && vec_load_store_counter===1.U){
+
+  }.otherwise{
+    vec_load_store_counter := RegInit(((128.U*1.U)/32.U)-1.U(32.W))
+    vec_stall := false.B
+  }
+
   val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
   pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
-  val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  val npc = Mux(vec_stall,pc.io.out,Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out))
+  // val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
   pc.io.in := npc
 
   when(ID.hdu_if_reg_write) {

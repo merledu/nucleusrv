@@ -2,6 +2,8 @@ package nucleusrv.components
 import chisel3._
 import chisel3.stage.ChiselStage
 import nucleusrv.tracer._
+import vaquita.Vaquita_Config
+
 
 
 class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
@@ -12,6 +14,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   })
 
   implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
+  implicit val vec_config = new Vaquita_Config {}
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
