@@ -1,5 +1,5 @@
 package nucleusrv.components
-import vaquita.vaquita_CoProcessor_top
+import vaquita.vec_top
 import vaquita.Vaquita_Config
 
 import chisel3._
@@ -16,11 +16,15 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
   val io = IO(new Bundle {
     val vec_ins = Output(UInt(32.W))
     val rs1_data_out = Output(SInt(32.W))
+    val vec_load_store_valid = Output(Bool())
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
 
     val dmemReq = Decoupled(new MemRequestIO)
     val dmemRsp = Flipped(Decoupled(new MemResponseIO))
+
+    val vec_dmemReq = Decoupled(new MemRequestIO)
+    val vec_dmemRsp = Flipped(Decoupled(new MemResponseIO))
 
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
@@ -93,7 +97,7 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
   val ID = Module(new InstructionDecode(TRACE)).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
-  val vec_top_module1 = Module(new vaquita_CoProcessor_top)
+  val vec_top_module1 = Module(new vec_top)
   dontTouch(vec_top_module1.io)
 
   vec_top_module1.io.instr := io.vec_ins
@@ -169,12 +173,13 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
   when(vec_load_store_bit===1.B && vec_load_store_counter=/=0.U){
     vec_load_store_counter := vec_load_store_counter - 1.U
     vec_stall := true.B
-  }.elsewhen(vec_load_store_bit===1.B && vec_load_store_counter===1.U){
-
-  }.otherwise{
+  }//.elsewhen(vec_load_store_bit===1.B && vec_load_store_counter===1.U){}
+.otherwise{
     vec_load_store_counter := RegInit(((128.U*1.U)/32.U)-1.U(32.W))
     vec_stall := false.B
   }
+
+  io.vec_load_store_valid := vec_load_store_bit
 
   val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
 
@@ -298,6 +303,9 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
 
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
+
+  io.vec_dmemReq <> vec_top_module1.io.dmemReq
+  vec_top_module1.io.dmemRsp <> io.vec_dmemRsp
 //  val stall = Wire(Bool())
 //  stall := (ex_reg_ctl_memWrite || ex_reg_ctl_memRead) && !io.dmemRsp.valid
 //  when(MEM.io.stall){
