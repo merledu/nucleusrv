@@ -252,6 +252,11 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
   /*****************
    * Execute Stage *
   ******************/
+  // vector start
+  val vaquita_rs1_in = EX.vec_rs1_data_out
+  vec_top_module1.io.hazard_rs1_data_in := vaquita_rs1_in
+  EX.vl_rs1_in := vec_top_module1.io.vl_rs1_out
+  // vector end
 
   //ex_reg_branch := EX.branchAddress
 //  ex_reg_wd := EX.writeData

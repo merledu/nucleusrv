@@ -28,8 +28,13 @@ class Execute(M:Boolean = false) extends Module {
     val ALUresult = Output(UInt(32.W))
 
     val stall = Output(Bool())
+    //vector changes
+    val vec_rs1_data_out = Output(UInt(32.W))
+    val vl_rs1_in = Input(UInt(32.W))
   })
-
+    //vector changes
+  val vec_config = io.id_ex_ins(6,0)==="b1010111".U && io.id_ex_ins(14,12)==="b111".U
+dontTouch(io.vl_rs1_in)
   val alu = Module(new ALU)
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit).io
@@ -42,7 +47,8 @@ class Execute(M:Boolean = false) extends Module {
   fu.mem_reg_rd := io.mem_wb_ins(11, 7)
   fu.reg_rs1 := io.id_ex_ins(19, 15)
   fu.reg_rs2 := io.id_ex_ins(24, 20)
-
+    //vector changes
+  val vl_rs1_reg = RegNext(io.vl_rs1_in)
   val inputMux1 = MuxCase(
     0.U,
     Array(
@@ -136,13 +142,15 @@ class Execute(M:Boolean = false) extends Module {
     .elsewhen (io.func7 === 1.U && mdu.io.ready){
       io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
     }
-    .otherwise{io.ALUresult := alu.io.result}
+    .otherwise{io.ALUresult := Mux(vec_config===1.B,io.vl_rs1_in,alu.io.result)}//vector changes
   } 
   else {
-    io.ALUresult := alu.io.result
+    io.ALUresult := Mux(vec_config===1.B,io.vl_rs1_in,alu.io.result)//vector changes
   }
 
   // io.ALUresult := alu.io.result
 
   io.writeData := inputMux2
+    //vector changes
+  io.vec_rs1_data_out := inputMux1
 }
