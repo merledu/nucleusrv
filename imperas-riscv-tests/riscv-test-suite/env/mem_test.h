@@ -14,123 +14,6 @@
 #define ACCESS_R        0x00000300
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-// DEFINE PTE
-////////////////////////////////////////////////////////////////////////////////
-
-#define PTE(_PADDR, _DAGUXWRV) \
-    (((_PADDR)/4) + (_DAGUXWRV))
-
-//#define PTE_X(_PADDR, _DAGUXWRV, _N, _PBMT) \
-//    (((_PADDR)/4) + (_DAGUXWRV) + (_N)<<63 + (_PBMT)<<61)
-
-////////////////////////////////////////////////////////////////////////////////
-// DAGUXWRV MACRO
-// D:   dirty
-// A:   accessed
-// G:   global
-// U:   user-accessible
-// X:   execute
-// W:   write
-// R:   read
-// V:   valid
-////////////////////////////////////////////////////////////////////////////////
-
-#define DAGUXWRV_INT(_D, _A, _G, _U, _X, _W, _R, _V) \
-    _D<<7 + _A<<6 + _G<<5 + _U<<4 + _X<<3 + _W<<2 + _R<<1 + _V<<0
-
-// leaf entries
-#define DAGUXWRV    DAGUXWRV_INT(1,1,1,1,1,1,1,1)
-#define DAG_XWRV    DAGUXWRV_INT(1,1,1,0,1,1,1,1)
-#define DAGU__RV    DAGUXWRV_INT(1,1,1,1,0,0,1,1)
-#define DAG___RV    DAGUXWRV_INT(1,1,1,0,0,0,1,1)
-#define DAGU_WRV    DAGUXWRV_INT(1,1,1,1,0,1,1,1)
-#define DAG__WRV    DAGUXWRV_INT(1,1,1,0,0,1,1,1)
-#define DAGUX__V    DAGUXWRV_INT(1,1,1,1,1,0,0,1)
-#define DAG_X__V    DAGUXWRV_INT(1,1,1,0,1,0,0,1)
-#define DAGUX_RV    DAGUXWRV_INT(1,1,1,1,1,0,1,1)
-#define DAG_X_RV    DAGUXWRV_INT(1,1,1,0,1,0,1,1)
-#define DA__XWRV    DAGUXWRV_INT(1,1,0,0,1,1,1,1)
-#define DA___WRV    DAGUXWRV_INT(1,1,0,0,0,1,1,1)
-#define _____WRV    DAGUXWRV_INT(0,0,0,0,0,1,1,1)
-
-// non-leaf entries
-#define NEXT_GV     DAGUXWRV_INT(0,0,1,0,0,0,0,1)
-
-// invalid entries
-#define DAG_XWR_    DAGUXWRV_INT(1,1,1,0,1,1,1,0)
-#define DAGUXWR_    DAGUXWRV_INT(1,1,1,1,1,1,1,0)
-#define DAG_XW_V    DAGUXWRV_INT(1,1,1,0,1,1,0,1)
-#define _AG_XWRV    DAGUXWRV_INT(0,1,1,0,1,1,1,1)
-#define _AGUXWRV    DAGUXWRV_INT(0,1,1,1,1,1,1,1)
-#define D_G_XWRV    DAGUXWRV_INT(1,0,1,0,1,1,1,1)
-#define D_GUXWRV    DAGUXWRV_INT(1,0,1,1,1,1,1,1)
-#define D______V    DAGUXWRV_INT(1,0,0,0,0,0,0,1)
-#define _A_____V    DAGUXWRV_INT(0,1,0,0,0,0,0,1)
-#define ___U___V    DAGUXWRV_INT(0,0,0,1,0,0,0,1)
-
-////////////////////////////////////////////////////////////////////////////////
-// SET UP PAGE TABLES (destroys t0-t1)
-////////////////////////////////////////////////////////////////////////////////
-
-.macro SETUP_SVX_32 _MODE, _ASID, _BASE, _CSR=satp
-        li          t1, \_MODE<<31      // mode
-        li          t0, \_ASID<<22      // ASID
-        or          t1, t1, t0
-        la          t0, \_BASE          // table base address
-        srli        t0, t0, 12
-        or          t1, t1, t0
-        csrw        \_CSR, t1
-.endm
-.macro SETUP_SVX_64 _MODE, _ASID, _BASE, _CSR=satp
-        li          t1, \_MODE<<60      // mode
-        li          t0, \_ASID<<44      // ASID
-        or          t1, t1, t0
-        la          t0, \_BASE          // table base address
-        srli        t0, t0, 12
-        or          t1, t1, t0
-        csrw        \_CSR, t1
-.endm
-.macro SETUP_SV32 _ASID, _BASE, _CSR=satp
-        SETUP_SVX_32  1, \_ASID, \_BASE, \_CSR
-.endm
-.macro SETUP_SV39 _ASID, _BASE, _CSR=satp
-        SETUP_SVX_64  8, \_ASID, \_BASE, \_CSR
-.endm
-.macro SETUP_SV48 _ASID, _BASE, _CSR=satp
-        SETUP_SVX_64  9, \_ASID, \_BASE, \_CSR
-.endm
-.macro SETUP_SV57 _ASID, _BASE, _CSR=satp
-        SETUP_SVX_64 10, \_ASID, \_BASE, \_CSR
-.endm
-
-////////////////////////////////////////////////////////////////////////////////
-// FIX UP 32-BIT TABLE ENTRY AT _SRC SO IT REFERENCES _DST (destroys t0-t2)
-////////////////////////////////////////////////////////////////////////////////
-
-.macro PTE_FIXUP_32 _SRC, _DST
-        la          t0, \_SRC
-        la          t1, \_DST
-        srli        t1, t1, 2
-        lw          t2, (t0)
-        or          t2, t2, t1
-        sw          t2, (t0)
-.endm
-
-////////////////////////////////////////////////////////////////////////////////
-// FIX UP 64-BIT TABLE ENTRY AT _SRC SO IT REFERENCES _DST (destroys t0-t2)
-////////////////////////////////////////////////////////////////////////////////
-
-.macro PTE_FIXUP_64 _SRC, _DST
-        la          t0, \_SRC
-        la          t1, \_DST
-        srli        t1, t1, 2
-        ld          t2, (t0)
-        or          t2, t2, t1
-        sd          t2, (t0)
-.endm
-
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINE PMP ENTRY OF GIVEN BASE AND SIZE
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,46 +145,6 @@ defaultUScratch:
         sw t2, 0(s4); \
         addi s4, s4, 4;
 
-#define TEST_MMU_ACCESS_X(_NUM, _ADDR, _MODE) \
-        li          s7, 0; \
-        li         s6, 0; \
-        li      t2, _ADDR; \
-        jalr    ra, t2, 0; \
-        li t2, (_NUM << 24)| ACCESS_X|_MODE; \
-        or t2, t2, s7; \
-        sw t2, 0(s4); \
-        sw s6, 4(s4); \
-        addi s4, s4, 8;
-
-#define TEST_MMU_ACCESS_W(_NUM, _ADDR, _MODE) \
-        li          s7, 0; \
-        li          s6, 0; \
-        li          a6, _ADDR; \
-        li    t0, 0x00018082; \
-        SREG    t0, 0(a6); \
-        nop; \
-        li t2, (_NUM << 24) | ACCESS_W|_MODE; \
-        or t2, t2, s7; \
-        sw t2, 0(s4); \
-        sw s6, 4(s4); \
-        addi s4, s4, 8;
-
-#define TEST_MMU_ACCESS_R(_NUM, _ADDR, _MODE) \
-        li          s7, 0; \
-        li          s6, 0; \
-        li          a6, _ADDR; \
-        LREG    s6, 0(a6); \
-        nop; \
-        li t2, (_NUM << 24) | ACCESS_R|_MODE; \
-        or t2, t2, s7; \
-        sw t2, 0(s4); \
-        sw s6, 4(s4); \
-        addi s4, s4, 8;
-
-#define JUMP_TO_ENTRY(_ADDR) \
-        li          t0, _ADDR; \
-        jalr        x0, t0, 0;
-
 .balign 64
 
 customHandler:
@@ -333,12 +176,10 @@ customHandler:
 
         // handle fault type
 1:      li          t0, 1
-        beq         t1, t0, 3f
-        li          t0, 12
-        beq         t1, t0, 3f
-        j           1f
+        bne         t1, t0, 1f
 
-3:      // instruction access fault: resume at ra
+
+        // instruction access fault: resume at ra
         //li          s7, 0x02
         csrw        mepc, ra
         j           2f

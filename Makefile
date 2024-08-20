@@ -32,7 +32,7 @@ verilator: $(gen_dir)/VTop
 clean:
 	rm -rf $(gen_dir) $(out_dir) test_run_dir
 	rm -rf obj_dir
-	rm *.v
+	#rm *.v
 	rm *.fir
 	rm *.anno.json
 	rm *.f

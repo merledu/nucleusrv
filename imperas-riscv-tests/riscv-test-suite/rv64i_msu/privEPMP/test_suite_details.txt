@@ -12,29 +12,29 @@ Architectural Test Suite Data for RV64PRIVEPMP PMP Memory Protection:
     84 test source files
     0 different instruction categories
     21 different instructions
-    120,690 total instructions
+    116,010 total instructions
 
 
 Other instructions (those not the focus of this suite)
-  jal : 4,007
+  jal : 2,447
   lui : 10,490
   addiw : 11,312
   csrrs : 8,398
   auipc : 3,472
-  addi : 37,269
+  addi : 35,709
   csrrw : 5,813
   mret : 2,495
   slli : 8,646
   xori : 1,596
   and : 1,848
   or : 5,628
-  beq : 4,167
+  beq : 252
   jalr : 661
-  FETCH : 795
-  bne : 7,233
   sw : 5,376
+  bne : 9,588
   lw : 1,344
-  fence : 28
+  FETCH : 795
   ecall : 84
+  fence : 28
   csrrc : 28
 

@@ -5,7 +5,7 @@ import chisel3.util._
 
 
 
-class MemoryFetch extends Module {
+class MemoryFetch(implicit val config:Configs) extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
     val writeData: UInt = Input(UInt(32.W))
@@ -185,7 +185,7 @@ class MemoryFetch extends Module {
   }
 
 
-  when(io.writeEnable){
+  when(io.writeEnable && config.V.B===0.B){
     printf("%x\n", io.writeData)
   }
 

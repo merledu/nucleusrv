@@ -6,14 +6,6 @@ This CHANGELOG contains information for the Imperas RISC-V test framework and te
 
 See the ChangeLog.md files in the simulator directories for their changes. 
 
-Date 2023-October-05  
-Release 20231005.0   
-
-Added new test suites for the virtual memory MMU system and page table walkers. This requires a commercial license.  
-There are currently different suites for Sv32, Sv39, Sv48.  
-The coverage of these tests uses SystemVerilog riscvISACOV functional coverage and is measured using the Imperas Trained Scenario Coverage.  
-Contact info@imperas.com for more information.
-
 ---
 Date 2023-June-26
 Release 20230626.0 

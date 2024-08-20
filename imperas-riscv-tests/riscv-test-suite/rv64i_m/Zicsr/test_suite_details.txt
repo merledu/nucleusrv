@@ -25,10 +25,10 @@ Architectural Test Suite Data for RV64ZICSR Zicsr - CSR Instructions:
 Instruction category: csr 
   csrrs : 2,105
   csrrw : 2,099
-  csrrci : 297
-  csrrc : 299
   csrrwi : 297
+  csrrc : 299
   csrrsi : 297
+  csrrci : 297
 
 Other instructions (those not the focus of this suite)
   jal : 6

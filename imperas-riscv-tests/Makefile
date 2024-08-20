@@ -58,7 +58,7 @@ $(info RISCV_DEVICE: $(RISCV_DEVICE) [origin: $(origin RISCV_DEVICE)])
 $(info =============================================================================)
 $(info )
 
-export RISCV_PREFIX       ?= riscv64-unknown-elf-
+export RISCV_PREFIX       ?= riscv32-unknown-elf-
 
 # Check Toolchain on PATH
 ifeq (,$(shell which $(RISCV_PREFIX)gcc))

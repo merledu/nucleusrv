@@ -26,8 +26,8 @@ Instruction category: csr
   csrrs : 1,209
   csrrw : 1,203
   csrrc : 171
-  csrrsi : 169
   csrrwi : 169
+  csrrsi : 169
   csrrci : 169
 
 Other instructions (those not the focus of this suite)

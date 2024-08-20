@@ -29,8 +29,8 @@ Instruction category: arithmetic
   sub : 510
   add : 1,524
 Instruction category: logical 
-  andi : 170
   ori : 170
+  andi : 170
   xori : 170
   xor : 172
   or : 172
@@ -40,8 +40,8 @@ Instruction category: branch
   bne : 171
   bge : 171
   blt : 171
-  bgeu : 171
   bltu : 171
+  bgeu : 171
 Instruction category: OPI_IMN 
   ecall : 37
 Instruction category: synch 
@@ -50,19 +50,19 @@ Instruction category: jump
   jal : 692
   jalr : 169
 Instruction category: load 
+  lw : 676
   lb : 169
   lh : 169
-  lw : 676
-  lbu : 169
   lhu : 169
+  lbu : 169
 Instruction category: store 
   sw : 6,473
   sh : 169
   sb : 169
 Instruction category: shift 
-  srai : 170
   slli : 170
   srli : 170
+  srai : 170
   sll : 172
   srl : 172
   sra : 172

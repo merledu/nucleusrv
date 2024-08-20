@@ -34,7 +34,7 @@ Other instructions (those not the focus of this suite)
   jalr : 38
   sw : 278
   beq : 65
-  lh : 1
+  ecall : 17
   lw : 168
   sub : 83
   blt : 39
@@ -43,11 +43,11 @@ Other instructions (those not the focus of this suite)
   bge : 20
   bne : 18
   fence : 16
-  ecall : 17
-  xori : 3
-  lhu : 1
   ebreak : 1
-  bgeu : 1
+  lh : 1
+  xori : 3
   sh : 1
   bltu : 1
+  bgeu : 1
+  lhu : 1
 

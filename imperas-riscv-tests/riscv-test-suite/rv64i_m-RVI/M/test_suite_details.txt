@@ -33,21 +33,21 @@ Other instructions (those not the focus of this suite)
   csrrw : 26
   mret : 13
   slli : 28,106
-  div : 678
+  remuw : 818
   sd : 9,562
   fence : 13
   ecall : 13
   beq : 39
-  mul : 682
-  mulh : 677
-  mulhu : 814
-  remw : 676
-  mulhsu : 741
-  remu : 822
-  mulw : 672
-  remuw : 818
-  rem : 666
   divw : 671
-  divuw : 821
   divu : 824
+  mulw : 672
+  mulhsu : 741
+  mulh : 677
+  mul : 682
+  mulhu : 814
+  rem : 666
+  divuw : 821
+  remw : 676
+  div : 678
+  remu : 822
 

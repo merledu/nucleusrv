@@ -1,0 +1,2305 @@
+
+/home/mohammad/Desktop/nucleusrv/imperas-riscv-tests/work/rv32i_m/Vi/VADD-VV-SEW32_LMUL1.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text.init:
+
+00000000 <rvtest_entry_point>:
+   0:	0440006f          	j	44 <reset_vector>
+
+00000004 <trap_vector>:
+   4:	342022f3          	csrr	t0,mcause
+   8:	00800313          	li	t1,8
+   c:	02628663          	beq	t0,t1,38 <write_tohost>
+  10:	00900313          	li	t1,9
+  14:	02628263          	beq	t0,t1,38 <write_tohost>
+  18:	00b00313          	li	t1,11
+  1c:	00628e63          	beq	t0,t1,38 <write_tohost>
+  20:	00000293          	li	t0,0
+  24:	00028463          	beqz	t0,2c <trap_vector+0x28>
+  28:	00028067          	jr	t0
+  2c:	342022f3          	csrr	t0,mcause
+  30:	0002d263          	bgez	t0,34 <handle_exception>
+
+00000034 <handle_exception>:
+  34:	5391e193          	ori	gp,gp,1337
+
+00000038 <write_tohost>:
+  38:	00003297          	auipc	t0,0x3
+  3c:	fc32a423          	sw	gp,-56(t0) # 3000 <tohost>
+  40:	ff9ff06f          	j	38 <write_tohost>
+
+00000044 <reset_vector>:
+  44:	00002537          	lui	a0,0x2
+  48:	80050513          	addi	a0,a0,-2048 # 1800 <rvtest_code_end+0x970>
+  4c:	30052073          	csrs	mstatus,a0
+  50:	00000297          	auipc	t0,0x0
+  54:	fb428293          	addi	t0,t0,-76 # 4 <trap_vector>
+  58:	30529073          	csrw	mtvec,t0
+  5c:	00000297          	auipc	t0,0x0
+  60:	02428293          	addi	t0,t0,36 # 80 <rvtest_init>
+  64:	34129073          	csrw	mepc,t0
+  68:	f1402573          	csrr	a0,mhartid
+  6c:	30200073          	mret
+  70:	00000013          	nop
+  74:	00000013          	nop
+  78:	00000013          	nop
+  7c:	00000013          	nop
+
+00000080 <rvtest_init>:
+  80:	feedc0b7          	lui	ra,0xfeedc
+  84:	ead08093          	addi	ra,ra,-339 # feedbead <fromhost+0xfeed8dad>
+  88:	ff76e137          	lui	sp,0xff76e
+  8c:	f5610113          	addi	sp,sp,-170 # ff76df56 <fromhost+0xff76ae56>
+  90:	7fbb71b7          	lui	gp,0x7fbb7
+  94:	fab18193          	addi	gp,gp,-85 # 7fbb6fab <fromhost+0x7fbb3eab>
+  98:	bfddb237          	lui	tp,0xbfddb
+  9c:	7d520213          	addi	tp,tp,2005 # bfddb7d5 <fromhost+0xbfdd86d5>
+  a0:	00000297          	auipc	t0,0x0
+  a4:	0d828293          	addi	t0,t0,216 # 178 <rvtest_code_begin>
+  a8:	00002317          	auipc	t1,0x2
+  ac:	f5830313          	addi	t1,t1,-168 # 2000 <rvtest_data_begin>
+  b0:	b7fbb3b7          	lui	t2,0xb7fbb
+  b4:	6fa38393          	addi	t2,t2,1786 # b7fbb6fa <fromhost+0xb7fb85fa>
+  b8:	5bfde437          	lui	s0,0x5bfde
+  bc:	b7d40413          	addi	s0,s0,-1155 # 5bfddb7d <fromhost+0x5bfdaa7d>
+  c0:	adfef4b7          	lui	s1,0xadfef
+  c4:	dbe48493          	addi	s1,s1,-578 # adfeedbe <fromhost+0xadfebcbe>
+  c8:	56ff7537          	lui	a0,0x56ff7
+  cc:	6df50513          	addi	a0,a0,1759 # 56ff76df <fromhost+0x56ff45df>
+  d0:	ab7fc5b7          	lui	a1,0xab7fc
+  d4:	b6f58593          	addi	a1,a1,-1169 # ab7fbb6f <fromhost+0xab7f8a6f>
+  d8:	d5bfe637          	lui	a2,0xd5bfe
+  dc:	db760613          	addi	a2,a2,-585 # d5bfddb7 <fromhost+0xd5bfacb7>
+  e0:	eadff6b7          	lui	a3,0xeadff
+  e4:	edb68693          	addi	a3,a3,-293 # eadfeedb <fromhost+0xeadfbddb>
+  e8:	f56ff737          	lui	a4,0xf56ff
+  ec:	76d70713          	addi	a4,a4,1901 # f56ff76d <fromhost+0xf56fc66d>
+  f0:	fab807b7          	lui	a5,0xfab80
+  f4:	bb678793          	addi	a5,a5,-1098 # fab7fbb6 <fromhost+0xfab7cab6>
+  f8:	7d5c0837          	lui	a6,0x7d5c0
+  fc:	ddb80813          	addi	a6,a6,-549 # 7d5bfddb <fromhost+0x7d5bccdb>
+ 100:	beae08b7          	lui	a7,0xbeae0
+ 104:	eed88893          	addi	a7,a7,-275 # beadfeed <fromhost+0xbeadcded>
+ 108:	df570937          	lui	s2,0xdf570
+ 10c:	f7690913          	addi	s2,s2,-138 # df56ff76 <fromhost+0xdf56ce76>
+ 110:	6fab89b7          	lui	s3,0x6fab8
+ 114:	fbb98993          	addi	s3,s3,-69 # 6fab7fbb <fromhost+0x6fab4ebb>
+ 118:	b7d5ca37          	lui	s4,0xb7d5c
+ 11c:	fdda0a13          	addi	s4,s4,-35 # b7d5bfdd <fromhost+0xb7d58edd>
+ 120:	dbeaeab7          	lui	s5,0xdbeae
+ 124:	feea8a93          	addi	s5,s5,-18 # dbeadfee <fromhost+0xdbeaaeee>
+ 128:	6df57b37          	lui	s6,0x6df57
+ 12c:	ff7b0b13          	addi	s6,s6,-9 # 6df56ff7 <fromhost+0x6df53ef7>
+ 130:	b6fabbb7          	lui	s7,0xb6fab
+ 134:	7fbb8b93          	addi	s7,s7,2043 # b6fab7fb <fromhost+0xb6fa86fb>
+ 138:	db7d6c37          	lui	s8,0xdb7d6
+ 13c:	bfdc0c13          	addi	s8,s8,-1027 # db7d5bfd <fromhost+0xdb7d2afd>
+ 140:	edbebcb7          	lui	s9,0xedbeb
+ 144:	dfec8c93          	addi	s9,s9,-514 # edbeadfe <fromhost+0xedbe7cfe>
+ 148:	76df5d37          	lui	s10,0x76df5
+ 14c:	6ffd0d13          	addi	s10,s10,1791 # 76df56ff <fromhost+0x76df25ff>
+ 150:	bb6fbdb7          	lui	s11,0xbb6fb
+ 154:	b7fd8d93          	addi	s11,s11,-1153 # bb6fab7f <fromhost+0xbb6f7a7f>
+ 158:	ddb7de37          	lui	t3,0xddb7d
+ 15c:	5bfe0e13          	addi	t3,t3,1471 # ddb7d5bf <fromhost+0xddb7a4bf>
+ 160:	eedbfeb7          	lui	t4,0xeedbf
+ 164:	adfe8e93          	addi	t4,t4,-1313 # eedbeadf <fromhost+0xeedbb9df>
+ 168:	f76dff37          	lui	t5,0xf76df
+ 16c:	56ff0f13          	addi	t5,t5,1391 # f76df56f <fromhost+0xf76dc46f>
+ 170:	fbb70fb7          	lui	t6,0xfbb70
+ 174:	ab7f8f93          	addi	t6,t6,-1353 # fbb6fab7 <fromhost+0xfbb6c9b7>
+
+00000178 <rvtest_code_begin>:
+ 178:	000020b7          	lui	ra,0x2
+ 17c:	20008093          	addi	ra,ra,512 # 2200 <test_1_data+0x1f0>
+ 180:	3000a073          	csrs	mstatus,ra
+ 184:	00000093          	li	ra,0
+ 188:	00309073          	fscsr	ra
+ 18c:	00003217          	auipc	tp,0x3
+ 190:	87420213          	addi	tp,tp,-1932 # 2a00 <begin_signature>
+ 194:	fff00393          	li	t2,-1
+ 198:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 19c:	00002417          	auipc	s0,0x2
+ 1a0:	46440413          	addi	s0,s0,1124 # 2600 <test_1_maskdata>
+ 1a4:	02046007          	vle32.v	v0,(s0)
+ 1a8:	fff00393          	li	t2,-1
+ 1ac:	00002297          	auipc	t0,0x2
+ 1b0:	e6428293          	addi	t0,t0,-412 # 2010 <test_1_data>
+ 1b4:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 1b8:	0202e087          	vle32.v	v1,(t0)
+ 1bc:	00400313          	li	t1,4
+ 1c0:	006282b3          	add	t0,t0,t1
+ 1c4:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 1c8:	0202e807          	vle32.v	v16,(t0)
+ 1cc:	00400313          	li	t1,4
+ 1d0:	006282b3          	add	t0,t0,t1
+ 1d4:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 1d8:	0202ef87          	vle32.v	v31,(t0)
+ 1dc:	00400313          	li	t1,4
+ 1e0:	006282b3          	add	t0,t0,t1
+ 1e4:	00800393          	li	t2,8
+ 1e8:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 1ec:	01008fd7          	vadd.vv	v31,v16,v1,v0.t
+ 1f0:	fff00393          	li	t2,-1
+ 1f4:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 1f8:	02026fa7          	vse32.v	v31,(tp)
+ 1fc:	02000393          	li	t2,32
+ 200:	00720233          	add	tp,tp,t2
+ 204:	fff00393          	li	t2,-1
+ 208:	00002297          	auipc	t0,0x2
+ 20c:	e1428293          	addi	t0,t0,-492 # 201c <test_1_data+0xc>
+ 210:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 214:	0202e007          	vle32.v	v0,(t0)
+ 218:	00400313          	li	t1,4
+ 21c:	006282b3          	add	t0,t0,t1
+ 220:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 224:	0202e887          	vle32.v	v17,(t0)
+ 228:	00400313          	li	t1,4
+ 22c:	006282b3          	add	t0,t0,t1
+ 230:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 234:	0202ef07          	vle32.v	v30,(t0)
+ 238:	00400313          	li	t1,4
+ 23c:	006282b3          	add	t0,t0,t1
+ 240:	00600393          	li	t2,6
+ 244:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 248:	03100f57          	vadd.vv	v30,v17,v0
+ 24c:	fff00393          	li	t2,-1
+ 250:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 254:	02026f27          	vse32.v	v30,(tp)
+ 258:	02000393          	li	t2,32
+ 25c:	00720233          	add	tp,tp,t2
+ 260:	fff00393          	li	t2,-1
+ 264:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 268:	00002417          	auipc	s0,0x2
+ 26c:	3d840413          	addi	s0,s0,984 # 2640 <test_1_maskdata+0x40>
+ 270:	02046007          	vle32.v	v0,(s0)
+ 274:	fff00393          	li	t2,-1
+ 278:	00002297          	auipc	t0,0x2
+ 27c:	db028293          	addi	t0,t0,-592 # 2028 <test_1_data+0x18>
+ 280:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 284:	0202e107          	vle32.v	v2,(t0)
+ 288:	00400313          	li	t1,4
+ 28c:	006282b3          	add	t0,t0,t1
+ 290:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 294:	0202e907          	vle32.v	v18,(t0)
+ 298:	00400313          	li	t1,4
+ 29c:	006282b3          	add	t0,t0,t1
+ 2a0:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 2a4:	0202ee87          	vle32.v	v29,(t0)
+ 2a8:	00400313          	li	t1,4
+ 2ac:	006282b3          	add	t0,t0,t1
+ 2b0:	00400393          	li	t2,4
+ 2b4:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 2b8:	01210ed7          	vadd.vv	v29,v18,v2,v0.t
+ 2bc:	fff00393          	li	t2,-1
+ 2c0:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 2c4:	02026ea7          	vse32.v	v29,(tp)
+ 2c8:	02000393          	li	t2,32
+ 2cc:	00720233          	add	tp,tp,t2
+ 2d0:	fff00393          	li	t2,-1
+ 2d4:	00002297          	auipc	t0,0x2
+ 2d8:	d6028293          	addi	t0,t0,-672 # 2034 <test_1_data+0x24>
+ 2dc:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 2e0:	0202e187          	vle32.v	v3,(t0)
+ 2e4:	00400313          	li	t1,4
+ 2e8:	006282b3          	add	t0,t0,t1
+ 2ec:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 2f0:	0202e987          	vle32.v	v19,(t0)
+ 2f4:	00400313          	li	t1,4
+ 2f8:	006282b3          	add	t0,t0,t1
+ 2fc:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ 300:	0202ee07          	vle32.v	v28,(t0)
+ 304:	00400313          	li	t1,4
+ 308:	006282b3          	add	t0,t0,t1
+ 30c:	00200393          	li	t2,2
+ 310:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 314:	03318e57          	vadd.vv	v28,v19,v3
+ 318:	fff00393          	li	t2,-1
+ 31c:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ 320:	02026e27          	vse32.v	v28,(tp)
+ 324:	02000393          	li	t2,32
+ 328:	00720233          	add	tp,tp,t2
+ 32c:	00002097          	auipc	ra,0x2
+ 330:	75408093          	addi	ra,ra,1876 # 2a80 <signature_2_0>
+ 334:	fff00413          	li	s0,-1
+ 338:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 33c:	00002697          	auipc	a3,0x2
+ 340:	34468693          	addi	a3,a3,836 # 2680 <test_1_maskdata+0x80>
+ 344:	0206e007          	vle32.v	v0,(a3)
+ 348:	fff00413          	li	s0,-1
+ 34c:	00002117          	auipc	sp,0x2
+ 350:	cf410113          	addi	sp,sp,-780 # 2040 <test_1_data+0x30>
+ 354:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 358:	02016207          	vle32.v	v4,(sp)
+ 35c:	00400193          	li	gp,4
+ 360:	00310133          	add	sp,sp,gp
+ 364:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 368:	02016a07          	vle32.v	v20,(sp)
+ 36c:	00400193          	li	gp,4
+ 370:	00310133          	add	sp,sp,gp
+ 374:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 378:	02016d87          	vle32.v	v27,(sp)
+ 37c:	00400193          	li	gp,4
+ 380:	00310133          	add	sp,sp,gp
+ 384:	00000413          	li	s0,0
+ 388:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 38c:	01420dd7          	vadd.vv	v27,v20,v4,v0.t
+ 390:	fff00413          	li	s0,-1
+ 394:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 398:	0200eda7          	vse32.v	v27,(ra)
+ 39c:	02000413          	li	s0,32
+ 3a0:	008080b3          	add	ra,ra,s0
+ 3a4:	fff00413          	li	s0,-1
+ 3a8:	00002117          	auipc	sp,0x2
+ 3ac:	ca410113          	addi	sp,sp,-860 # 204c <test_1_data+0x3c>
+ 3b0:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 3b4:	02016287          	vle32.v	v5,(sp)
+ 3b8:	00400193          	li	gp,4
+ 3bc:	00310133          	add	sp,sp,gp
+ 3c0:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 3c4:	02016a87          	vle32.v	v21,(sp)
+ 3c8:	00400193          	li	gp,4
+ 3cc:	00310133          	add	sp,sp,gp
+ 3d0:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 3d4:	02016d07          	vle32.v	v26,(sp)
+ 3d8:	00400193          	li	gp,4
+ 3dc:	00310133          	add	sp,sp,gp
+ 3e0:	00800413          	li	s0,8
+ 3e4:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 3e8:	03528d57          	vadd.vv	v26,v21,v5
+ 3ec:	fff00413          	li	s0,-1
+ 3f0:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 3f4:	0200ed27          	vse32.v	v26,(ra)
+ 3f8:	02000413          	li	s0,32
+ 3fc:	008080b3          	add	ra,ra,s0
+ 400:	fff00413          	li	s0,-1
+ 404:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 408:	00002697          	auipc	a3,0x2
+ 40c:	2b868693          	addi	a3,a3,696 # 26c0 <test_1_maskdata+0xc0>
+ 410:	0206e007          	vle32.v	v0,(a3)
+ 414:	fff00413          	li	s0,-1
+ 418:	00002117          	auipc	sp,0x2
+ 41c:	c4010113          	addi	sp,sp,-960 # 2058 <test_1_data+0x48>
+ 420:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 424:	02016307          	vle32.v	v6,(sp)
+ 428:	00400193          	li	gp,4
+ 42c:	00310133          	add	sp,sp,gp
+ 430:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 434:	02016b07          	vle32.v	v22,(sp)
+ 438:	00400193          	li	gp,4
+ 43c:	00310133          	add	sp,sp,gp
+ 440:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 444:	02016c87          	vle32.v	v25,(sp)
+ 448:	00400193          	li	gp,4
+ 44c:	00310133          	add	sp,sp,gp
+ 450:	00600413          	li	s0,6
+ 454:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 458:	01630cd7          	vadd.vv	v25,v22,v6,v0.t
+ 45c:	fff00413          	li	s0,-1
+ 460:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 464:	0200eca7          	vse32.v	v25,(ra)
+ 468:	02000413          	li	s0,32
+ 46c:	008080b3          	add	ra,ra,s0
+ 470:	fff00413          	li	s0,-1
+ 474:	00002117          	auipc	sp,0x2
+ 478:	bf010113          	addi	sp,sp,-1040 # 2064 <test_1_data+0x54>
+ 47c:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 480:	02016387          	vle32.v	v7,(sp)
+ 484:	00400193          	li	gp,4
+ 488:	00310133          	add	sp,sp,gp
+ 48c:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 490:	02016b87          	vle32.v	v23,(sp)
+ 494:	00400193          	li	gp,4
+ 498:	00310133          	add	sp,sp,gp
+ 49c:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 4a0:	02016c07          	vle32.v	v24,(sp)
+ 4a4:	00400193          	li	gp,4
+ 4a8:	00310133          	add	sp,sp,gp
+ 4ac:	00400413          	li	s0,4
+ 4b0:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 4b4:	03738c57          	vadd.vv	v24,v23,v7
+ 4b8:	fff00413          	li	s0,-1
+ 4bc:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ 4c0:	0200ec27          	vse32.v	v24,(ra)
+ 4c4:	02000413          	li	s0,32
+ 4c8:	008080b3          	add	ra,ra,s0
+ 4cc:	00002097          	auipc	ra,0x2
+ 4d0:	63408093          	addi	ra,ra,1588 # 2b00 <signature_3_0>
+ 4d4:	fff00213          	li	tp,-1
+ 4d8:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 4dc:	00002617          	auipc	a2,0x2
+ 4e0:	22460613          	addi	a2,a2,548 # 2700 <test_1_maskdata+0x100>
+ 4e4:	02066007          	vle32.v	v0,(a2)
+ 4e8:	fff00213          	li	tp,-1
+ 4ec:	00002117          	auipc	sp,0x2
+ 4f0:	b8410113          	addi	sp,sp,-1148 # 2070 <test_1_data+0x60>
+ 4f4:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 4f8:	02016407          	vle32.v	v8,(sp)
+ 4fc:	00400193          	li	gp,4
+ 500:	00310133          	add	sp,sp,gp
+ 504:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 508:	02016c07          	vle32.v	v24,(sp)
+ 50c:	00400193          	li	gp,4
+ 510:	00310133          	add	sp,sp,gp
+ 514:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 518:	02016b87          	vle32.v	v23,(sp)
+ 51c:	00400193          	li	gp,4
+ 520:	00310133          	add	sp,sp,gp
+ 524:	00200213          	li	tp,2
+ 528:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 52c:	01840bd7          	vadd.vv	v23,v24,v8,v0.t
+ 530:	fff00213          	li	tp,-1
+ 534:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 538:	0200eba7          	vse32.v	v23,(ra)
+ 53c:	02000213          	li	tp,32
+ 540:	004080b3          	add	ra,ra,tp
+ 544:	fff00213          	li	tp,-1
+ 548:	00002117          	auipc	sp,0x2
+ 54c:	b3410113          	addi	sp,sp,-1228 # 207c <test_1_data+0x6c>
+ 550:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 554:	02016487          	vle32.v	v9,(sp)
+ 558:	00400193          	li	gp,4
+ 55c:	00310133          	add	sp,sp,gp
+ 560:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 564:	02016c87          	vle32.v	v25,(sp)
+ 568:	00400193          	li	gp,4
+ 56c:	00310133          	add	sp,sp,gp
+ 570:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 574:	02016b07          	vle32.v	v22,(sp)
+ 578:	00400193          	li	gp,4
+ 57c:	00310133          	add	sp,sp,gp
+ 580:	00000213          	li	tp,0
+ 584:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 588:	03948b57          	vadd.vv	v22,v25,v9
+ 58c:	fff00213          	li	tp,-1
+ 590:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 594:	0200eb27          	vse32.v	v22,(ra)
+ 598:	02000213          	li	tp,32
+ 59c:	004080b3          	add	ra,ra,tp
+ 5a0:	fff00213          	li	tp,-1
+ 5a4:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 5a8:	00002617          	auipc	a2,0x2
+ 5ac:	19860613          	addi	a2,a2,408 # 2740 <test_1_maskdata+0x140>
+ 5b0:	02066007          	vle32.v	v0,(a2)
+ 5b4:	fff00213          	li	tp,-1
+ 5b8:	00002117          	auipc	sp,0x2
+ 5bc:	ad010113          	addi	sp,sp,-1328 # 2088 <test_1_data+0x78>
+ 5c0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 5c4:	02016507          	vle32.v	v10,(sp)
+ 5c8:	00400193          	li	gp,4
+ 5cc:	00310133          	add	sp,sp,gp
+ 5d0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 5d4:	02016d07          	vle32.v	v26,(sp)
+ 5d8:	00400193          	li	gp,4
+ 5dc:	00310133          	add	sp,sp,gp
+ 5e0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 5e4:	02016a87          	vle32.v	v21,(sp)
+ 5e8:	00400193          	li	gp,4
+ 5ec:	00310133          	add	sp,sp,gp
+ 5f0:	00800213          	li	tp,8
+ 5f4:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 5f8:	01a50ad7          	vadd.vv	v21,v26,v10,v0.t
+ 5fc:	fff00213          	li	tp,-1
+ 600:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 604:	0200eaa7          	vse32.v	v21,(ra)
+ 608:	02000213          	li	tp,32
+ 60c:	004080b3          	add	ra,ra,tp
+ 610:	fff00213          	li	tp,-1
+ 614:	00002117          	auipc	sp,0x2
+ 618:	a8010113          	addi	sp,sp,-1408 # 2094 <test_1_data+0x84>
+ 61c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 620:	02016587          	vle32.v	v11,(sp)
+ 624:	00400193          	li	gp,4
+ 628:	00310133          	add	sp,sp,gp
+ 62c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 630:	02016d87          	vle32.v	v27,(sp)
+ 634:	00400193          	li	gp,4
+ 638:	00310133          	add	sp,sp,gp
+ 63c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 640:	02016a07          	vle32.v	v20,(sp)
+ 644:	00400193          	li	gp,4
+ 648:	00310133          	add	sp,sp,gp
+ 64c:	00600213          	li	tp,6
+ 650:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 654:	03b58a57          	vadd.vv	v20,v27,v11
+ 658:	fff00213          	li	tp,-1
+ 65c:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 660:	0200ea27          	vse32.v	v20,(ra)
+ 664:	02000213          	li	tp,32
+ 668:	004080b3          	add	ra,ra,tp
+ 66c:	00002297          	auipc	t0,0x2
+ 670:	51428293          	addi	t0,t0,1300 # 2b80 <signature_4_0>
+ 674:	fff00413          	li	s0,-1
+ 678:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 67c:	00002497          	auipc	s1,0x2
+ 680:	10448493          	addi	s1,s1,260 # 2780 <test_1_maskdata+0x180>
+ 684:	0204e007          	vle32.v	v0,(s1)
+ 688:	fff00413          	li	s0,-1
+ 68c:	00002317          	auipc	t1,0x2
+ 690:	a1430313          	addi	t1,t1,-1516 # 20a0 <test_1_data+0x90>
+ 694:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 698:	02036607          	vle32.v	v12,(t1)
+ 69c:	00400393          	li	t2,4
+ 6a0:	00730333          	add	t1,t1,t2
+ 6a4:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 6a8:	02036e07          	vle32.v	v28,(t1)
+ 6ac:	00400393          	li	t2,4
+ 6b0:	00730333          	add	t1,t1,t2
+ 6b4:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 6b8:	02036987          	vle32.v	v19,(t1)
+ 6bc:	00400393          	li	t2,4
+ 6c0:	00730333          	add	t1,t1,t2
+ 6c4:	00400413          	li	s0,4
+ 6c8:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 6cc:	01c609d7          	vadd.vv	v19,v28,v12,v0.t
+ 6d0:	fff00413          	li	s0,-1
+ 6d4:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 6d8:	0202e9a7          	vse32.v	v19,(t0)
+ 6dc:	02000413          	li	s0,32
+ 6e0:	008282b3          	add	t0,t0,s0
+ 6e4:	fff00413          	li	s0,-1
+ 6e8:	00002317          	auipc	t1,0x2
+ 6ec:	9c430313          	addi	t1,t1,-1596 # 20ac <test_1_data+0x9c>
+ 6f0:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 6f4:	02036687          	vle32.v	v13,(t1)
+ 6f8:	00400393          	li	t2,4
+ 6fc:	00730333          	add	t1,t1,t2
+ 700:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 704:	02036e87          	vle32.v	v29,(t1)
+ 708:	00400393          	li	t2,4
+ 70c:	00730333          	add	t1,t1,t2
+ 710:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 714:	02036907          	vle32.v	v18,(t1)
+ 718:	00400393          	li	t2,4
+ 71c:	00730333          	add	t1,t1,t2
+ 720:	00200413          	li	s0,2
+ 724:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 728:	03d68957          	vadd.vv	v18,v29,v13
+ 72c:	fff00413          	li	s0,-1
+ 730:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 734:	0202e927          	vse32.v	v18,(t0)
+ 738:	02000413          	li	s0,32
+ 73c:	008282b3          	add	t0,t0,s0
+ 740:	fff00413          	li	s0,-1
+ 744:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 748:	00002497          	auipc	s1,0x2
+ 74c:	07848493          	addi	s1,s1,120 # 27c0 <test_1_maskdata+0x1c0>
+ 750:	0204e007          	vle32.v	v0,(s1)
+ 754:	fff00413          	li	s0,-1
+ 758:	00002317          	auipc	t1,0x2
+ 75c:	96030313          	addi	t1,t1,-1696 # 20b8 <test_1_data+0xa8>
+ 760:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 764:	02036707          	vle32.v	v14,(t1)
+ 768:	00400393          	li	t2,4
+ 76c:	00730333          	add	t1,t1,t2
+ 770:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 774:	02036f07          	vle32.v	v30,(t1)
+ 778:	00400393          	li	t2,4
+ 77c:	00730333          	add	t1,t1,t2
+ 780:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 784:	02036887          	vle32.v	v17,(t1)
+ 788:	00400393          	li	t2,4
+ 78c:	00730333          	add	t1,t1,t2
+ 790:	00000413          	li	s0,0
+ 794:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 798:	01e708d7          	vadd.vv	v17,v30,v14,v0.t
+ 79c:	fff00413          	li	s0,-1
+ 7a0:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 7a4:	0202e8a7          	vse32.v	v17,(t0)
+ 7a8:	02000413          	li	s0,32
+ 7ac:	008282b3          	add	t0,t0,s0
+ 7b0:	fff00413          	li	s0,-1
+ 7b4:	00002317          	auipc	t1,0x2
+ 7b8:	91030313          	addi	t1,t1,-1776 # 20c4 <test_1_data+0xb4>
+ 7bc:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 7c0:	02036787          	vle32.v	v15,(t1)
+ 7c4:	00400393          	li	t2,4
+ 7c8:	00730333          	add	t1,t1,t2
+ 7cc:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 7d0:	02036f87          	vle32.v	v31,(t1)
+ 7d4:	00400393          	li	t2,4
+ 7d8:	00730333          	add	t1,t1,t2
+ 7dc:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ 7e0:	02036807          	vle32.v	v16,(t1)
+ 7e4:	00400393          	li	t2,4
+ 7e8:	00730333          	add	t1,t1,t2
+ 7ec:	00800413          	li	s0,8
+ 7f0:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 7f4:	03f78857          	vadd.vv	v16,v31,v15
+ 7f8:	fff00413          	li	s0,-1
+ 7fc:	010473d7          	vsetvli	t2,s0,e32,m1,tu,mu
+ 800:	0202e827          	vse32.v	v16,(t0)
+ 804:	02000413          	li	s0,32
+ 808:	008282b3          	add	t0,t0,s0
+ 80c:	00002097          	auipc	ra,0x2
+ 810:	3f408093          	addi	ra,ra,1012 # 2c00 <signature_5_0>
+ 814:	fff00213          	li	tp,-1
+ 818:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 81c:	00002297          	auipc	t0,0x2
+ 820:	fe428293          	addi	t0,t0,-28 # 2800 <test_1_maskdata+0x200>
+ 824:	0202e007          	vle32.v	v0,(t0)
+ 828:	fff00213          	li	tp,-1
+ 82c:	00002117          	auipc	sp,0x2
+ 830:	8a410113          	addi	sp,sp,-1884 # 20d0 <test_1_data+0xc0>
+ 834:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 838:	02016807          	vle32.v	v16,(sp)
+ 83c:	00400193          	li	gp,4
+ 840:	00310133          	add	sp,sp,gp
+ 844:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 848:	02016087          	vle32.v	v1,(sp)
+ 84c:	00400193          	li	gp,4
+ 850:	00310133          	add	sp,sp,gp
+ 854:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 858:	02016787          	vle32.v	v15,(sp)
+ 85c:	00400193          	li	gp,4
+ 860:	00310133          	add	sp,sp,gp
+ 864:	00600213          	li	tp,6
+ 868:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 86c:	001807d7          	vadd.vv	v15,v1,v16,v0.t
+ 870:	fff00213          	li	tp,-1
+ 874:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 878:	0200e7a7          	vse32.v	v15,(ra)
+ 87c:	02000213          	li	tp,32
+ 880:	004080b3          	add	ra,ra,tp
+ 884:	fff00213          	li	tp,-1
+ 888:	00002117          	auipc	sp,0x2
+ 88c:	85410113          	addi	sp,sp,-1964 # 20dc <test_1_data+0xcc>
+ 890:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 894:	02016887          	vle32.v	v17,(sp)
+ 898:	00400193          	li	gp,4
+ 89c:	00310133          	add	sp,sp,gp
+ 8a0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 8a4:	02016007          	vle32.v	v0,(sp)
+ 8a8:	00400193          	li	gp,4
+ 8ac:	00310133          	add	sp,sp,gp
+ 8b0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 8b4:	02016707          	vle32.v	v14,(sp)
+ 8b8:	00400193          	li	gp,4
+ 8bc:	00310133          	add	sp,sp,gp
+ 8c0:	00400213          	li	tp,4
+ 8c4:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 8c8:	02088757          	vadd.vv	v14,v0,v17
+ 8cc:	fff00213          	li	tp,-1
+ 8d0:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 8d4:	0200e727          	vse32.v	v14,(ra)
+ 8d8:	02000213          	li	tp,32
+ 8dc:	004080b3          	add	ra,ra,tp
+ 8e0:	fff00213          	li	tp,-1
+ 8e4:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 8e8:	00002297          	auipc	t0,0x2
+ 8ec:	f5828293          	addi	t0,t0,-168 # 2840 <test_1_maskdata+0x240>
+ 8f0:	0202e007          	vle32.v	v0,(t0)
+ 8f4:	fff00213          	li	tp,-1
+ 8f8:	00001117          	auipc	sp,0x1
+ 8fc:	7f010113          	addi	sp,sp,2032 # 20e8 <test_1_data+0xd8>
+ 900:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 904:	02016907          	vle32.v	v18,(sp)
+ 908:	00400193          	li	gp,4
+ 90c:	00310133          	add	sp,sp,gp
+ 910:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 914:	02016107          	vle32.v	v2,(sp)
+ 918:	00400193          	li	gp,4
+ 91c:	00310133          	add	sp,sp,gp
+ 920:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 924:	02016687          	vle32.v	v13,(sp)
+ 928:	00400193          	li	gp,4
+ 92c:	00310133          	add	sp,sp,gp
+ 930:	00200213          	li	tp,2
+ 934:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 938:	002906d7          	vadd.vv	v13,v2,v18,v0.t
+ 93c:	fff00213          	li	tp,-1
+ 940:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 944:	0200e6a7          	vse32.v	v13,(ra)
+ 948:	02000213          	li	tp,32
+ 94c:	004080b3          	add	ra,ra,tp
+ 950:	fff00213          	li	tp,-1
+ 954:	00001117          	auipc	sp,0x1
+ 958:	7a010113          	addi	sp,sp,1952 # 20f4 <test_1_data+0xe4>
+ 95c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 960:	02016987          	vle32.v	v19,(sp)
+ 964:	00400193          	li	gp,4
+ 968:	00310133          	add	sp,sp,gp
+ 96c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 970:	02016187          	vle32.v	v3,(sp)
+ 974:	00400193          	li	gp,4
+ 978:	00310133          	add	sp,sp,gp
+ 97c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 980:	02016607          	vle32.v	v12,(sp)
+ 984:	00400193          	li	gp,4
+ 988:	00310133          	add	sp,sp,gp
+ 98c:	00000213          	li	tp,0
+ 990:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 994:	02398657          	vadd.vv	v12,v3,v19
+ 998:	fff00213          	li	tp,-1
+ 99c:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 9a0:	0200e627          	vse32.v	v12,(ra)
+ 9a4:	02000213          	li	tp,32
+ 9a8:	004080b3          	add	ra,ra,tp
+ 9ac:	00002097          	auipc	ra,0x2
+ 9b0:	2d408093          	addi	ra,ra,724 # 2c80 <signature_6_0>
+ 9b4:	fff00213          	li	tp,-1
+ 9b8:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ 9bc:	00002297          	auipc	t0,0x2
+ 9c0:	ec428293          	addi	t0,t0,-316 # 2880 <test_1_maskdata+0x280>
+ 9c4:	0202e007          	vle32.v	v0,(t0)
+ 9c8:	fff00213          	li	tp,-1
+ 9cc:	00001117          	auipc	sp,0x1
+ 9d0:	73410113          	addi	sp,sp,1844 # 2100 <test_1_data+0xf0>
+ 9d4:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 9d8:	02016a07          	vle32.v	v20,(sp)
+ 9dc:	00400193          	li	gp,4
+ 9e0:	00310133          	add	sp,sp,gp
+ 9e4:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 9e8:	02016207          	vle32.v	v4,(sp)
+ 9ec:	00400193          	li	gp,4
+ 9f0:	00310133          	add	sp,sp,gp
+ 9f4:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ 9f8:	02016587          	vle32.v	v11,(sp)
+ 9fc:	00400193          	li	gp,4
+ a00:	00310133          	add	sp,sp,gp
+ a04:	00800213          	li	tp,8
+ a08:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ a0c:	004a05d7          	vadd.vv	v11,v4,v20,v0.t
+ a10:	fff00213          	li	tp,-1
+ a14:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ a18:	0200e5a7          	vse32.v	v11,(ra)
+ a1c:	02000213          	li	tp,32
+ a20:	004080b3          	add	ra,ra,tp
+ a24:	fff00213          	li	tp,-1
+ a28:	00001117          	auipc	sp,0x1
+ a2c:	6e410113          	addi	sp,sp,1764 # 210c <test_1_data+0xfc>
+ a30:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ a34:	02016a87          	vle32.v	v21,(sp)
+ a38:	00400193          	li	gp,4
+ a3c:	00310133          	add	sp,sp,gp
+ a40:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ a44:	02016287          	vle32.v	v5,(sp)
+ a48:	00400193          	li	gp,4
+ a4c:	00310133          	add	sp,sp,gp
+ a50:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ a54:	02016507          	vle32.v	v10,(sp)
+ a58:	00400193          	li	gp,4
+ a5c:	00310133          	add	sp,sp,gp
+ a60:	00600213          	li	tp,6
+ a64:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ a68:	025a8557          	vadd.vv	v10,v5,v21
+ a6c:	fff00213          	li	tp,-1
+ a70:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ a74:	0200e527          	vse32.v	v10,(ra)
+ a78:	02000213          	li	tp,32
+ a7c:	004080b3          	add	ra,ra,tp
+ a80:	fff00213          	li	tp,-1
+ a84:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ a88:	00002297          	auipc	t0,0x2
+ a8c:	e3828293          	addi	t0,t0,-456 # 28c0 <test_1_maskdata+0x2c0>
+ a90:	0202e007          	vle32.v	v0,(t0)
+ a94:	fff00213          	li	tp,-1
+ a98:	00001117          	auipc	sp,0x1
+ a9c:	68010113          	addi	sp,sp,1664 # 2118 <test_1_data+0x108>
+ aa0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ aa4:	02016b07          	vle32.v	v22,(sp)
+ aa8:	00400193          	li	gp,4
+ aac:	00310133          	add	sp,sp,gp
+ ab0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ ab4:	02016307          	vle32.v	v6,(sp)
+ ab8:	00400193          	li	gp,4
+ abc:	00310133          	add	sp,sp,gp
+ ac0:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ ac4:	02016487          	vle32.v	v9,(sp)
+ ac8:	00400193          	li	gp,4
+ acc:	00310133          	add	sp,sp,gp
+ ad0:	00400213          	li	tp,4
+ ad4:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ ad8:	006b04d7          	vadd.vv	v9,v6,v22,v0.t
+ adc:	fff00213          	li	tp,-1
+ ae0:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ ae4:	0200e4a7          	vse32.v	v9,(ra)
+ ae8:	02000213          	li	tp,32
+ aec:	004080b3          	add	ra,ra,tp
+ af0:	fff00213          	li	tp,-1
+ af4:	00001117          	auipc	sp,0x1
+ af8:	63010113          	addi	sp,sp,1584 # 2124 <test_1_data+0x114>
+ afc:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ b00:	02016b87          	vle32.v	v23,(sp)
+ b04:	00400193          	li	gp,4
+ b08:	00310133          	add	sp,sp,gp
+ b0c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ b10:	02016387          	vle32.v	v7,(sp)
+ b14:	00400193          	li	gp,4
+ b18:	00310133          	add	sp,sp,gp
+ b1c:	01027057          	vsetvli	zero,tp,e32,m1,tu,mu
+ b20:	02016407          	vle32.v	v8,(sp)
+ b24:	00400193          	li	gp,4
+ b28:	00310133          	add	sp,sp,gp
+ b2c:	00200213          	li	tp,2
+ b30:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ b34:	027b8457          	vadd.vv	v8,v7,v23
+ b38:	fff00213          	li	tp,-1
+ b3c:	010271d7          	vsetvli	gp,tp,e32,m1,tu,mu
+ b40:	0200e427          	vse32.v	v8,(ra)
+ b44:	02000213          	li	tp,32
+ b48:	004080b3          	add	ra,ra,tp
+ b4c:	00002097          	auipc	ra,0x2
+ b50:	1b408093          	addi	ra,ra,436 # 2d00 <signature_7_0>
+ b54:	fff00413          	li	s0,-1
+ b58:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ b5c:	00002497          	auipc	s1,0x2
+ b60:	da448493          	addi	s1,s1,-604 # 2900 <test_1_maskdata+0x300>
+ b64:	0204e007          	vle32.v	v0,(s1)
+ b68:	fff00413          	li	s0,-1
+ b6c:	00001117          	auipc	sp,0x1
+ b70:	5c410113          	addi	sp,sp,1476 # 2130 <test_1_data+0x120>
+ b74:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ b78:	02016c07          	vle32.v	v24,(sp)
+ b7c:	00400193          	li	gp,4
+ b80:	00310133          	add	sp,sp,gp
+ b84:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ b88:	02016407          	vle32.v	v8,(sp)
+ b8c:	00400193          	li	gp,4
+ b90:	00310133          	add	sp,sp,gp
+ b94:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ b98:	02016387          	vle32.v	v7,(sp)
+ b9c:	00400193          	li	gp,4
+ ba0:	00310133          	add	sp,sp,gp
+ ba4:	00000413          	li	s0,0
+ ba8:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ bac:	008c03d7          	vadd.vv	v7,v8,v24,v0.t
+ bb0:	fff00413          	li	s0,-1
+ bb4:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ bb8:	0200e3a7          	vse32.v	v7,(ra)
+ bbc:	02000413          	li	s0,32
+ bc0:	008080b3          	add	ra,ra,s0
+ bc4:	fff00413          	li	s0,-1
+ bc8:	00001117          	auipc	sp,0x1
+ bcc:	57410113          	addi	sp,sp,1396 # 213c <test_1_data+0x12c>
+ bd0:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ bd4:	02016c87          	vle32.v	v25,(sp)
+ bd8:	00400193          	li	gp,4
+ bdc:	00310133          	add	sp,sp,gp
+ be0:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ be4:	02016487          	vle32.v	v9,(sp)
+ be8:	00400193          	li	gp,4
+ bec:	00310133          	add	sp,sp,gp
+ bf0:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ bf4:	02016307          	vle32.v	v6,(sp)
+ bf8:	00400193          	li	gp,4
+ bfc:	00310133          	add	sp,sp,gp
+ c00:	00800413          	li	s0,8
+ c04:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ c08:	029c8357          	vadd.vv	v6,v9,v25
+ c0c:	fff00413          	li	s0,-1
+ c10:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ c14:	0200e327          	vse32.v	v6,(ra)
+ c18:	02000413          	li	s0,32
+ c1c:	008080b3          	add	ra,ra,s0
+ c20:	fff00413          	li	s0,-1
+ c24:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ c28:	00002497          	auipc	s1,0x2
+ c2c:	d1848493          	addi	s1,s1,-744 # 2940 <test_1_maskdata+0x340>
+ c30:	0204e007          	vle32.v	v0,(s1)
+ c34:	fff00413          	li	s0,-1
+ c38:	00001117          	auipc	sp,0x1
+ c3c:	51010113          	addi	sp,sp,1296 # 2148 <test_1_data+0x138>
+ c40:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ c44:	02016d07          	vle32.v	v26,(sp)
+ c48:	00400193          	li	gp,4
+ c4c:	00310133          	add	sp,sp,gp
+ c50:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ c54:	02016507          	vle32.v	v10,(sp)
+ c58:	00400193          	li	gp,4
+ c5c:	00310133          	add	sp,sp,gp
+ c60:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ c64:	02016287          	vle32.v	v5,(sp)
+ c68:	00400193          	li	gp,4
+ c6c:	00310133          	add	sp,sp,gp
+ c70:	00600413          	li	s0,6
+ c74:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ c78:	00ad02d7          	vadd.vv	v5,v10,v26,v0.t
+ c7c:	fff00413          	li	s0,-1
+ c80:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ c84:	0200e2a7          	vse32.v	v5,(ra)
+ c88:	02000413          	li	s0,32
+ c8c:	008080b3          	add	ra,ra,s0
+ c90:	fff00413          	li	s0,-1
+ c94:	00001117          	auipc	sp,0x1
+ c98:	4c010113          	addi	sp,sp,1216 # 2154 <test_1_data+0x144>
+ c9c:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ ca0:	02016d87          	vle32.v	v27,(sp)
+ ca4:	00400193          	li	gp,4
+ ca8:	00310133          	add	sp,sp,gp
+ cac:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ cb0:	02016587          	vle32.v	v11,(sp)
+ cb4:	00400193          	li	gp,4
+ cb8:	00310133          	add	sp,sp,gp
+ cbc:	01047057          	vsetvli	zero,s0,e32,m1,tu,mu
+ cc0:	02016207          	vle32.v	v4,(sp)
+ cc4:	00400193          	li	gp,4
+ cc8:	00310133          	add	sp,sp,gp
+ ccc:	00400413          	li	s0,4
+ cd0:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ cd4:	02bd8257          	vadd.vv	v4,v11,v27
+ cd8:	fff00413          	li	s0,-1
+ cdc:	010471d7          	vsetvli	gp,s0,e32,m1,tu,mu
+ ce0:	0200e227          	vse32.v	v4,(ra)
+ ce4:	02000413          	li	s0,32
+ ce8:	008080b3          	add	ra,ra,s0
+ cec:	00002217          	auipc	tp,0x2
+ cf0:	09420213          	addi	tp,tp,148 # 2d80 <signature_8_0>
+ cf4:	fff00393          	li	t2,-1
+ cf8:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ cfc:	00002417          	auipc	s0,0x2
+ d00:	c8440413          	addi	s0,s0,-892 # 2980 <test_1_maskdata+0x380>
+ d04:	02046007          	vle32.v	v0,(s0)
+ d08:	fff00393          	li	t2,-1
+ d0c:	00001297          	auipc	t0,0x1
+ d10:	45428293          	addi	t0,t0,1108 # 2160 <test_1_data+0x150>
+ d14:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ d18:	0202ee07          	vle32.v	v28,(t0)
+ d1c:	00400313          	li	t1,4
+ d20:	006282b3          	add	t0,t0,t1
+ d24:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ d28:	0202e607          	vle32.v	v12,(t0)
+ d2c:	00400313          	li	t1,4
+ d30:	006282b3          	add	t0,t0,t1
+ d34:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ d38:	0202e187          	vle32.v	v3,(t0)
+ d3c:	00400313          	li	t1,4
+ d40:	006282b3          	add	t0,t0,t1
+ d44:	00200393          	li	t2,2
+ d48:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ d4c:	00ce01d7          	vadd.vv	v3,v12,v28,v0.t
+ d50:	fff00393          	li	t2,-1
+ d54:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ d58:	020261a7          	vse32.v	v3,(tp)
+ d5c:	02000393          	li	t2,32
+ d60:	00720233          	add	tp,tp,t2
+ d64:	fff00393          	li	t2,-1
+ d68:	00001297          	auipc	t0,0x1
+ d6c:	40428293          	addi	t0,t0,1028 # 216c <test_1_data+0x15c>
+ d70:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ d74:	0202ee87          	vle32.v	v29,(t0)
+ d78:	00400313          	li	t1,4
+ d7c:	006282b3          	add	t0,t0,t1
+ d80:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ d84:	0202e687          	vle32.v	v13,(t0)
+ d88:	00400313          	li	t1,4
+ d8c:	006282b3          	add	t0,t0,t1
+ d90:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ d94:	0202e107          	vle32.v	v2,(t0)
+ d98:	00400313          	li	t1,4
+ d9c:	006282b3          	add	t0,t0,t1
+ da0:	00000393          	li	t2,0
+ da4:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ da8:	02de8157          	vadd.vv	v2,v13,v29
+ dac:	fff00393          	li	t2,-1
+ db0:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ db4:	02026127          	vse32.v	v2,(tp)
+ db8:	02000393          	li	t2,32
+ dbc:	00720233          	add	tp,tp,t2
+ dc0:	fff00393          	li	t2,-1
+ dc4:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ dc8:	00002417          	auipc	s0,0x2
+ dcc:	bf840413          	addi	s0,s0,-1032 # 29c0 <test_1_maskdata+0x3c0>
+ dd0:	02046007          	vle32.v	v0,(s0)
+ dd4:	fff00393          	li	t2,-1
+ dd8:	00001297          	auipc	t0,0x1
+ ddc:	3a028293          	addi	t0,t0,928 # 2178 <test_1_data+0x168>
+ de0:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ de4:	0202ef07          	vle32.v	v30,(t0)
+ de8:	00400313          	li	t1,4
+ dec:	006282b3          	add	t0,t0,t1
+ df0:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ df4:	0202e707          	vle32.v	v14,(t0)
+ df8:	00400313          	li	t1,4
+ dfc:	006282b3          	add	t0,t0,t1
+ e00:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ e04:	0202e087          	vle32.v	v1,(t0)
+ e08:	00400313          	li	t1,4
+ e0c:	006282b3          	add	t0,t0,t1
+ e10:	00800393          	li	t2,8
+ e14:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ e18:	00ef00d7          	vadd.vv	v1,v14,v30,v0.t
+ e1c:	fff00393          	li	t2,-1
+ e20:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ e24:	020260a7          	vse32.v	v1,(tp)
+ e28:	02000393          	li	t2,32
+ e2c:	00720233          	add	tp,tp,t2
+ e30:	fff00393          	li	t2,-1
+ e34:	00001297          	auipc	t0,0x1
+ e38:	35028293          	addi	t0,t0,848 # 2184 <test_1_data+0x174>
+ e3c:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ e40:	0202ef87          	vle32.v	v31,(t0)
+ e44:	00400313          	li	t1,4
+ e48:	006282b3          	add	t0,t0,t1
+ e4c:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ e50:	0202e787          	vle32.v	v15,(t0)
+ e54:	00400313          	li	t1,4
+ e58:	006282b3          	add	t0,t0,t1
+ e5c:	0103f057          	vsetvli	zero,t2,e32,m1,tu,mu
+ e60:	0202e007          	vle32.v	v0,(t0)
+ e64:	00400313          	li	t1,4
+ e68:	006282b3          	add	t0,t0,t1
+ e6c:	00600393          	li	t2,6
+ e70:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ e74:	02ff8057          	vadd.vv	v0,v15,v31
+ e78:	fff00393          	li	t2,-1
+ e7c:	0103f357          	vsetvli	t1,t2,e32,m1,tu,mu
+ e80:	02026027          	vse32.v	v0,(tp)
+ e84:	02000393          	li	t2,32
+ e88:	00720233          	add	tp,tp,t2
+ e8c:	00000013          	nop
+
+00000e90 <rvtest_code_end>:
+ e90:	0ff0000f          	fence
+ e94:	00000073          	ecall
+	...
+
+Disassembly of section .data:
+
+00002000 <rvtest_data_begin>:
+    2000:	cafe                	.2byte	0xcafe
+    2002:	babe                	.2byte	0xbabe
+	...
+
+00002010 <test_1_data>:
+    2010:	151a01ef          	jal	gp,a2960 <fromhost+0x9f860>
+    2014:	86569d27          	.4byte	0x86569d27
+    2018:	de3d                	.2byte	0xde3d
+    201a:	429e                	.2byte	0x429e
+    201c:	9a51                	.2byte	0x9a51
+    201e:	2021                	vmsge.vx	v0,v0,zero,v0.t
+    2020:	d5fd                	.2byte	0xd5fd
+    2022:	91a8                	.2byte	0x91a8
+    2024:	6c65                	.2byte	0x6c65
+    2026:	250fbd8f          	.4byte	0x250fbd8f
+    202a:	0466                	.2byte	0x466
+    202c:	fa64                	.2byte	0xfa64
+    202e:	e31f ad3a c737      	.byte	0x1f, 0xe3, 0x3a, 0xad, 0x37, 0xc7
+    2034:	8c1e                	.2byte	0x8c1e
+    2036:	e54c                	.2byte	0xe54c
+    2038:	7ca660db          	.4byte	0x7ca660db
+    203c:	dadf 0692 c847      	.byte	0xdf, 0xda, 0x92, 0x06, 0x47, 0xc8
+    2042:	7ae72c63          	vmsge.vx	v24,v14,a4
+    2046:	fbba                	.2byte	0xfbba
+    2048:	195b62bf f600a3d1 	.8byte	0xf600a3d1195b62bf
+    2050:	0fd4                	.2byte	0xfd4
+    2052:	34b8                	.2byte	0x34b8
+    2054:	5ff4                	.2byte	0x5ff4
+    2056:	7ad93aef          	jal	s5,96002 <fromhost+0x92f02>
+    205a:	3426                	.2byte	0x3426
+    205c:	54c0                	vmsge.vx	v9,v0,zero,v0.t
+    205e:	6814                	.2byte	0x6814
+    2060:	3492                	.2byte	0x3492
+    2062:	67dd                	.2byte	0x67dd
+    2064:	663e                	.2byte	0x663e
+    2066:	b02d                	.2byte	0xb02d
+    2068:	f1c5                	.2byte	0xf1c5
+    206a:	39aeb2d3          	.4byte	0x39aeb2d3
+    206e:	824d                	.2byte	0x824d
+    2070:	a4dd                	.2byte	0xa4dd
+    2072:	36505233          	.4byte	0x36505233
+    2076:	d498                	.2byte	0xd498
+    2078:	88d5                	.2byte	0x88d5
+    207a:	18fc                	.2byte	0x18fc
+    207c:	4071                	.2byte	0x4071
+    207e:	3c3037bf 7dd8c83b 	.8byte	0x7dd8c83b3c3037bf
+    2086:	d1bc                	.2byte	0xd1bc
+    2088:	a97f                	.2byte	0xa97f
+    208a:	a968                	.2byte	0xa968
+    208c:	cb6d                	.2byte	0xcb6d
+    208e:	62f6                	.2byte	0x62f6
+    2090:	5b086787          	.4byte	0x5b086787
+    2094:	f8a5                	.2byte	0xf8a5
+    2096:	3874                	.2byte	0x3874
+    2098:	c1a2                	vmsge.vx	v3,v0,ra,v0.t
+    209a:	6075                	.2byte	0x6075
+    209c:	8621                	vmsge.vx	v12,v0,ra,v0.t
+    209e:	951e                	.2byte	0x951e
+    20a0:	9378                	.2byte	0x9378
+    20a2:	4ff0                	.2byte	0x4ff0
+    20a4:	7ba8                	.2byte	0x7ba8
+    20a6:	9b32                	.2byte	0x9b32
+    20a8:	4c52                	.2byte	0x4c52
+    20aa:	b32a                	.2byte	0xb32a
+    20ac:	03d5081b          	.4byte	0x3d5081b
+    20b0:	fb1a                	.2byte	0xfb1a
+    20b2:	17a2                	vmsge.vx	v15,v0,zero,v0.t
+    20b4:	ed8c                	.2byte	0xed8c
+    20b6:	0b56                	.2byte	0xb56
+    20b8:	05f6                	.2byte	0x5f6
+    20ba:	4846                	.2byte	0x4846
+    20bc:	eeb5                	.2byte	0xeeb5
+    20be:	b5ae                	.2byte	0xb5ae
+    20c0:	fc9d848f          	.4byte	0xfc9d848f
+    20c4:	cd04                	.2byte	0xcd04
+    20c6:	8dd5                	.2byte	0x8dd5
+    20c8:	8042                	vmsge.vx	v0,v0,ra,v0.t
+    20ca:	9b1a                	.2byte	0x9b1a
+    20cc:	9686                	.2byte	0x9686
+    20ce:	da4c                	.2byte	0xda4c
+    20d0:	426b8dfb          	.4byte	0x426b8dfb
+    20d4:	092c                	.2byte	0x92c
+    20d6:	e0e9                	.2byte	0xe0e9
+    20d8:	3d52                	.2byte	0x3d52
+    20da:	f632                	.2byte	0xf632
+    20dc:	e156                	.2byte	0xe156
+    20de:	003d73b3          	and	t2,s10,gp
+    20e2:	81d44bfb          	.4byte	0x81d44bfb
+    20e6:	86b0                	.2byte	0x86b0
+    20e8:	6484                	.2byte	0x6484
+    20ea:	6678f22b          	.4byte	0x6678f22b
+    20ee:	93b0                	.2byte	0x93b0
+    20f0:	d6c8                	.2byte	0xd6c8
+    20f2:	0cc9                	.2byte	0xcc9
+    20f4:	3ddc                	.2byte	0x3ddc
+    20f6:	bce83b9b          	.4byte	0xbce83b9b
+    20fa:	169d                	.2byte	0x169d
+    20fc:	2532                	.2byte	0x2532
+    20fe:	0525                	.2byte	0x525
+    2100:	7b52                	.2byte	0x7b52
+    2102:	a216                	.2byte	0xa216
+    2104:	e57f                	.2byte	0xe57f
+    2106:	674b9fcb          	.4byte	0x674b9fcb
+    210a:	6592e92f          	.4byte	0x6592e92f
+    210e:	9705                	.2byte	0x9705
+    2110:	ad15                	.2byte	0xad15
+    2112:	8bfc                	.2byte	0x8bfc
+    2114:	81e9                	.2byte	0x81e9
+    2116:	4e11                	.2byte	0x4e11
+    2118:	a8cc                	.2byte	0xa8cc
+    211a:	445d                	.2byte	0x445d
+    211c:	fe19                	.2byte	0xfe19
+    211e:	ea35                	.2byte	0xea35
+    2120:	527e81e3          	beq	t4,t2,2e42 <begin_regstate+0x42>
+    2124:	10dd                	.2byte	0x10dd
+    2126:	79e9                	.2byte	0x79e9
+    2128:	0be793b3          	.4byte	0xbe793b3
+    212c:	5d71                	.2byte	0x5d71
+    212e:	c47c                	.2byte	0xc47c
+    2130:	658c                	.2byte	0x658c
+    2132:	24e0                	vmsge.vx	v9,v0,zero,v0.t
+    2134:	f638                	.2byte	0xf638
+    2136:	47c6                	.2byte	0x47c6
+    2138:	2eae                	.2byte	0x2eae
+    213a:	c3a2                	vmsge.vx	v7,v0,ra,v0.t
+    213c:	6866                	.2byte	0x6866
+    213e:	4ed8                	.2byte	0x4ed8
+    2140:	a11c                	.2byte	0xa11c
+    2142:	e6b6                	.2byte	0xe6b6
+    2144:	96d5                	.2byte	0x96d5
+    2146:	4daa                	.2byte	0x4daa
+    2148:	68f0                	.2byte	0x68f0
+    214a:	d7a5                	.2byte	0xd7a5
+    214c:	66652ebf dfcadfe1 	.8byte	0xdfcadfe166652ebf
+    2154:	3be0154f          	fnmadd.d	fa0,ft0,ft10,ft7,rtz
+    2158:	0191                	.2byte	0x191
+    215a:	6915                	.2byte	0x6915
+    215c:	d84d                	.2byte	0xd84d
+    215e:	f1bc                	.2byte	0xf1bc
+    2160:	985d                	.2byte	0x985d
+    2162:	08fb734b          	fnmsub.s	ft6,fs6,fa5,ft1
+    2166:	120b3533          	.4byte	0x120b3533
+    216a:	4c45                	.2byte	0x4c45
+    216c:	23d8                	.2byte	0x23d8
+    216e:	fde2                	vmsge.vx	v27,v0,ra,v0.t
+    2170:	5e94                	.2byte	0x5e94
+    2172:	dbee                	.2byte	0xdbee
+    2174:	c336                	.2byte	0xc336
+    2176:	c70c982b          	.4byte	0xc70c982b
+    217a:	71f665e3          	bltu	a2,t6,3084 <tohost+0x84>
+    217e:	4880b64b          	fnmsub.s	fa2,ft1,fs0,fs1,rup
+    2182:	8660                	vmsge.vx	v12,v0,ra,v0.t
+    2184:	8d4e                	.2byte	0x8d4e
+    2186:	700a                	.2byte	0x700a
+    2188:	1dcd                	.2byte	0x1dcd
+    218a:	63b9                	.2byte	0x63b9
+    218c:	04b11e73          	csrrw	t3,0x4b,sp
+    2190:	64a2                	vmsge.vx	v9,v0,zero,v0.t
+    2192:	355e                	.2byte	0x355e
+    2194:	4545                	.2byte	0x4545
+    2196:	cba895a7          	.4byte	0xcba895a7
+    219a:	8b4e                	.2byte	0x8b4e
+    219c:	37e5                	.2byte	0x37e5
+    219e:	1546cd1b          	.4byte	0x1546cd1b
+    21a2:	472f4f03          	lbu	t5,1138(t5)
+    21a6:	e804918f          	.4byte	0xe804918f
+    21aa:	ac98                	.2byte	0xac98
+    21ac:	98a1                	vmsge.vx	v17,v0,ra,v0.t
+    21ae:	311c                	.2byte	0x311c
+    21b0:	057d                	.2byte	0x57d
+    21b2:	1151                	.2byte	0x1151
+    21b4:	cbf8                	.2byte	0xcbf8
+    21b6:	995c                	.2byte	0x995c
+    21b8:	31a201a7          	.4byte	0x31a201a7
+    21bc:	7722                	vmsge.vx	v14,v0,zero,v0.t
+    21be:	dc44                	.2byte	0xdc44
+    21c0:	7cbaceb7          	lui	t4,0x7cbac
+    21c4:	0a7a                	.2byte	0xa7a
+    21c6:	0d2e                	.2byte	0xd2e
+    21c8:	6618                	.2byte	0x6618
+    21ca:	09ff022f          	.4byte	0x9ff022f
+    21ce:	08dc                	.2byte	0x8dc
+    21d0:	944a                	.2byte	0x944a
+    21d2:	c180                	vmsge.vx	v3,v0,ra,v0.t
+    21d4:	21f4                	.2byte	0x21f4
+    21d6:	a77d                	.2byte	0xa77d
+    21d8:	24941503          	lh	a0,585(s0)
+    21dc:	7a71                	.2byte	0x7a71
+    21de:	a6f6                	.2byte	0xa6f6
+    21e0:	a4d8                	.2byte	0xa4d8
+    21e2:	f0ed                	.2byte	0xf0ed
+    21e4:	a918c6bb          	.4byte	0xa918c6bb
+    21e8:	0f74                	.2byte	0xf74
+    21ea:	9f12                	.2byte	0x9f12
+    21ec:	c86b2e3b          	.4byte	0xc86b2e3b
+    21f0:	add5                	.2byte	0xadd5
+    21f2:	3909                	.2byte	0x3909
+    21f4:	b3f6                	.2byte	0xb3f6
+    21f6:	f1fa                	.2byte	0xf1fa
+    21f8:	e33c2fbf 4736f5f4 	.8byte	0x4736f5f4e33c2fbf
+    2200:	2dde                	.2byte	0x2dde
+    2202:	4de5603b          	.4byte	0x4de5603b
+    2206:	bacc                	.2byte	0xbacc
+    2208:	e55f 44aa 8ca6      	.byte	0x5f, 0xe5, 0xaa, 0x44, 0xa6, 0x8c
+    220e:	04e512e3          	bne	a0,a4,2a52 <begin_signature+0x52>
+    2212:	6b3c                	.2byte	0x6b3c
+    2214:	d4c6                	.2byte	0xd4c6
+    2216:	c84e                	.2byte	0xc84e
+    2218:	650a                	.2byte	0x650a
+    221a:	18afc67b          	.4byte	0x18afc67b
+    221e:	49934117          	auipc	sp,0x49934
+    2222:	5f29                	.2byte	0x5f29
+    2224:	6a54                	.2byte	0x6a54
+    2226:	62ee                	.2byte	0x62ee
+    2228:	2e22                	vmsge.vx	v28,v0,zero,v0.t
+    222a:	4cdd                	.2byte	0x4cdd
+    222c:	c1ea                	.2byte	0xc1ea
+    222e:	786c                	.2byte	0x786c
+    2230:	4845                	.2byte	0x4845
+    2232:	7a6d                	.2byte	0x7a6d
+    2234:	9714                	.2byte	0x9714
+    2236:	8624                	.2byte	0x8624
+    2238:	18c8                	.2byte	0x18c8
+    223a:	9064                	.2byte	0x9064
+    223c:	cb49                	.2byte	0xcb49
+    223e:	44dc                	.2byte	0x44dc
+    2240:	b197d063          	bge	a5,s9,1540 <rvtest_code_end+0x6b0>
+    2244:	b7ed                	.2byte	0xb7ed
+    2246:	2f09                	.2byte	0x2f09
+    2248:	a5f6                	.2byte	0xa5f6
+    224a:	da7e                	.2byte	0xda7e
+    224c:	6ebc                	.2byte	0x6ebc
+    224e:	70ed                	.2byte	0x70ed
+    2250:	22bd                	.2byte	0x22bd
+    2252:	987f                	.2byte	0x987f
+    2254:	2906                	.2byte	0x2906
+    2256:	7451                	.2byte	0x7451
+    2258:	5389                	.2byte	0x5389
+    225a:	4bb0                	.2byte	0x4bb0
+    225c:	44d184f7          	.4byte	0x44d184f7
+    2260:	3b9cb04f          	fnmadd.d	ft0,fs9,fs9,ft7,rup
+    2264:	0d11                	.2byte	0xd11
+    2266:	b81a                	.2byte	0xb81a
+    2268:	42a8                	.2byte	0x42a8
+    226a:	5485                	.2byte	0x5485
+    226c:	f4bfda8f          	.4byte	0xf4bfda8f
+    2270:	3289                	.2byte	0x3289
+    2272:	b2b9                	.2byte	0xb2b9
+    2274:	042d5763          	bge	s10,sp,22c2 <test_1_data+0x2b2>
+    2278:	3374                	.2byte	0x3374
+    227a:	8fe0                	vmsge.vx	v31,v0,ra,v0.t
+    227c:	4b384f2b          	.4byte	0x4b384f2b
+    2280:	c1a7e90b          	.4byte	0xc1a7e90b
+    2284:	2d72                	.2byte	0x2d72
+    2286:	7945                	.2byte	0x7945
+    2288:	f676                	.2byte	0xf676
+    228a:	fd34                	.2byte	0xfd34
+    228c:	d89a                	.2byte	0xd89a
+    228e:	ccb17e27          	vsoxseg7ei64.v	v28,(sp),v11,v0.t
+    2292:	9dce                	.2byte	0x9dce
+    2294:	e19d838b          	.4byte	0xe19d838b
+    2298:	266cfb3f 8d1c81a4 	.8byte	0x8d1c81a4266cfb3f
+    22a0:	d9d8                	.2byte	0xd9d8
+    22a2:	18ba                	.2byte	0x18ba
+    22a4:	1ead                	.2byte	0x1ead
+    22a6:	0082cb27          	.4byte	0x82cb27
+    22aa:	3f40                	vmsge.vx	v30,v0,zero,v0.t
+    22ac:	df34                	.2byte	0xdf34
+    22ae:	fbdc                	.2byte	0xfbdc
+    22b0:	b976                	.2byte	0xb976
+    22b2:	a7cd                	.2byte	0xa7cd
+    22b4:	9522                	vmsge.vx	v10,v0,ra,v0.t
+    22b6:	75ba                	.2byte	0x75ba
+    22b8:	c0713693          	sltiu	a3,sp,-1017
+    22bc:	430c                	.2byte	0x430c
+    22be:	e8d4                	.2byte	0xe8d4
+    22c0:	7f5f 773d aa50      	.byte	0x5f, 0x7f, 0x3d, 0x77, 0x50, 0xaa
+    22c6:	731b3037          	lui	zero,0x731b3
+    22ca:	819f 6d4c ebb5      	.byte	0x9f, 0x81, 0x4c, 0x6d, 0xb5, 0xeb
+    22d0:	aeae                	.2byte	0xaeae
+    22d2:	ceb5                	.2byte	0xceb5
+    22d4:	a1c1                	vmsge.vx	v3,v0,ra,v0.t
+    22d6:	8cf6                	.2byte	0x8cf6
+    22d8:	6592                	.2byte	0x6592
+    22da:	67e8                	.2byte	0x67e8
+    22dc:	58cd                	.2byte	0x58cd
+    22de:	f970                	.2byte	0xf970
+    22e0:	48be                	.2byte	0x48be
+    22e2:	ea66                	.2byte	0xea66
+    22e4:	8c39                	.2byte	0x8c39
+    22e6:	9f00                	vmsge.vx	v30,v0,ra,v0.t
+    22e8:	a0d2                	.2byte	0xa0d2
+    22ea:	6d5e                	.2byte	0x6d5e
+    22ec:	6697dc2f          	.4byte	0x6697dc2f
+    22f0:	c950                	.2byte	0xc950
+    22f2:	51da                	.2byte	0x51da
+    22f4:	1f75                	.2byte	0x1f75
+    22f6:	2e62                	vmsge.vx	v28,v0,zero,v0.t
+    22f8:	dad9549b          	.4byte	0xdad9549b
+    22fc:	a864                	.2byte	0xa864
+    22fe:	f37f                	.2byte	0xf37f
+    2300:	ff0d                	.2byte	0xff0d
+    2302:	089d                	.2byte	0x89d
+    2304:	6916                	.2byte	0x6916
+    2306:	e1be                	.2byte	0xe1be
+    2308:	c2a7edcf          	fnmadd.d	fs11,fa5,fa0,fs8,unknown
+    230c:	37a7880f          	.4byte	0x37a7880f
+    2310:	4f34                	.2byte	0x4f34
+    2312:	f144                	.2byte	0xf144
+    2314:	4f8e                	.2byte	0x4f8e
+    2316:	099a                	.2byte	0x99a
+    2318:	68ce0f63          	beq	t3,a2,29b6 <test_1_maskdata+0x3b6>
+    231c:	cf6a                	.2byte	0xcf6a
+    231e:	59c13277          	.4byte	0x59c13277
+    2322:	88e87a8b          	.4byte	0x88e87a8b
+    2326:	62aadce3          	bge	s5,a0,315e <fromhost+0x5e>
+    232a:	09b827eb          	.4byte	0x9b827eb
+    232e:	2c78                	.2byte	0x2c78
+    2330:	9e71                	.2byte	0x9e71
+    2332:	143a                	.2byte	0x143a
+    2334:	6e45                	.2byte	0x6e45
+    2336:	851f 0a27 579e      	.byte	0x1f, 0x85, 0x27, 0x0a, 0x9e, 0x57
+    233c:	1975                	.2byte	0x1975
+    233e:	77f4                	.2byte	0x77f4
+    2340:	e826                	.2byte	0xe826
+    2342:	925a                	.2byte	0x925a
+    2344:	36bc                	.2byte	0x36bc
+    2346:	4e7a                	.2byte	0x4e7a
+    2348:	0c9c                	.2byte	0xc9c
+    234a:	b4fc                	.2byte	0xb4fc
+    234c:	f02fa737          	lui	a4,0xf02fa
+    2350:	f336                	.2byte	0xf336
+    2352:	02ac                	.2byte	0x2ac
+    2354:	831b5583          	lhu	a1,-1999(s6)
+    2358:	c054                	.2byte	0xc054
+    235a:	b5fe                	.2byte	0xb5fe
+    235c:	a31e0b3f d46f3d2c 	.8byte	0xd46f3d2ca31e0b3f
+    2364:	465bb10f          	.4byte	0x465bb10f
+    2368:	b174                	.2byte	0xb174
+    236a:	a5f0724f          	.4byte	0xa5f0724f
+    236e:	351e                	.2byte	0x351e
+    2370:	0dee                	.2byte	0xdee
+    2372:	1e98                	.2byte	0x1e98
+    2374:	5a59                	.2byte	0x5a59
+    2376:	ca49                	.2byte	0xca49
+    2378:	68d2                	.2byte	0x68d2
+    237a:	6a57d80b          	.4byte	0x6a57d80b
+    237e:	a392                	.2byte	0xa392
+    2380:	1c8d                	.2byte	0x1c8d
+    2382:	1d14                	.2byte	0x1d14
+    2384:	0fdf a774 5470      	.byte	0xdf, 0x0f, 0x74, 0xa7, 0x70, 0x54
+    238a:	a3f16ea3          	vmsge.vx	v29,v31,sp
+    238e:	f562                	vmsge.vx	v10,v0,ra,v0.t
+    2390:	07917d4b          	.4byte	0x7917d4b
+    2394:	64aa                	.2byte	0x64aa
+    2396:	66da                	.2byte	0x66da
+    2398:	191a                	.2byte	0x191a
+    239a:	f682                	vmsge.vx	v13,v0,ra,v0.t
+    239c:	fd2ce83f 67f9ab29 	.8byte	0x67f9ab29fd2ce83f
+    23a4:	3ffd                	.2byte	0x3ffd
+    23a6:	112e                	.2byte	0x112e
+    23a8:	b1e2                	vmsge.vx	v3,v0,ra,v0.t
+    23aa:	c4d9                	.2byte	0xc4d9
+    23ac:	9ed4e137          	lui	sp,0x9ed4e
+    23b0:	e54e                	.2byte	0xe54e
+    23b2:	b49a                	.2byte	0xb49a
+    23b4:	dd45                	.2byte	0xdd45
+    23b6:	d075                	.2byte	0xd075
+    23b8:	a72e                	.2byte	0xa72e
+    23ba:	74da                	.2byte	0x74da
+    23bc:	4db4                	.2byte	0x4db4
+    23be:	4832                	.2byte	0x4832
+    23c0:	97b5                	.2byte	0x97b5
+    23c2:	167d                	.2byte	0x167d
+    23c4:	6536                	.2byte	0x6536
+    23c6:	55eb8b53          	.4byte	0x55eb8b53
+    23ca:	6c0ae857          	.4byte	0x6c0ae857
+    23ce:	1cd8                	.2byte	0x1cd8
+    23d0:	4c811ecf          	.4byte	0x4c811ecf
+    23d4:	dbf1                	.2byte	0xdbf1
+    23d6:	8085                	.2byte	0x8085
+    23d8:	547cdce3          	bge	s9,t2,3130 <fromhost+0x30>
+    23dc:	7882                	vmsge.vx	v17,v0,zero,v0.t
+    23de:	65d2                	.2byte	0x65d2
+    23e0:	2ec4                	.2byte	0x2ec4
+    23e2:	b72d                	.2byte	0xb72d
+    23e4:	e841                	vmsge.vx	v16,v0,ra,v0.t
+    23e6:	954e                	.2byte	0x954e
+    23e8:	d636                	.2byte	0xd636
+    23ea:	88dab36f          	jal	t1,fffadc76 <fromhost+0xfffaab76>
+    23ee:	bc49                	.2byte	0xbc49
+    23f0:	5c04                	.2byte	0x5c04
+    23f2:	aea0                	vmsge.vx	v29,v0,ra,v0.t
+    23f4:	83a6                	.2byte	0x83a6
+    23f6:	ce74                	.2byte	0xce74
+    23f8:	ea0309d7          	.4byte	0xea0309d7
+    23fc:	8466                	.2byte	0x8466
+    23fe:	6249                	.2byte	0x6249
+    2400:	9ac4                	.2byte	0x9ac4
+    2402:	1cd2                	.2byte	0x1cd2
+    2404:	8b62                	vmsge.vx	v22,v0,ra,v0.t
+    2406:	cf8597f3          	csrrw	a5,0xcf8,a1
+    240a:	3b8b690b          	.4byte	0x3b8b690b
+    240e:	9bd8                	.2byte	0x9bd8
+    2410:	c006                	.2byte	0xc006
+    2412:	d0a8                	.2byte	0xd0a8
+    2414:	2386a257          	vaaddu.vv	v4,v24,v13
+    2418:	eed8                	.2byte	0xeed8
+    241a:	b489                	.2byte	0xb489
+    241c:	98a0                	vmsge.vx	v17,v0,ra,v0.t
+    241e:	977e                	.2byte	0x977e
+    2420:	bff5                	.2byte	0xbff5
+    2422:	4731                	.2byte	0x4731
+    2424:	501e                	.2byte	0x501e
+    2426:	93e2                	vmsge.vx	v7,v0,ra,v0.t
+    2428:	48de17c3          	fmadd.s	fa5,ft8,fa3,fs1,rtz
+    242c:	00c0e5cf          	fnmadd.s	fa1,ft1,fa2,ft0,unknown
+    2430:	5c2a                	.2byte	0x5c2a
+    2432:	a685                	.2byte	0xa685
+    2434:	a7dc                	.2byte	0xa7dc
+    2436:	0c01                	vmsge.vx	v24,v0,zero,v0.t
+    2438:	c096                	.2byte	0xc096
+    243a:	789c384f          	fnmadd.s	fa6,fs8,fs1,fa5,rup
+    243e:	9a1636bf 605cfd86 	.8byte	0x605cfd869a1636bf
+    2446:	bb19                	.2byte	0xbb19
+    2448:	3bbd                	.2byte	0x3bbd
+    244a:	397b2d27          	fsw	fs7,922(s6)
+    244e:	a14ee16b          	.4byte	0xa14ee16b
+    2452:	9d00                	vmsge.vx	v26,v0,ra,v0.t
+    2454:	4b98                	.2byte	0x4b98
+    2456:	50fe                	.2byte	0x50fe
+    2458:	c992                	.2byte	0xc992
+    245a:	253c                	.2byte	0x253c
+    245c:	4151                	.2byte	0x4151
+    245e:	7e59                	.2byte	0x7e59
+    2460:	7bca                	.2byte	0x7bca
+    2462:	430810e7          	.4byte	0x430810e7
+    2466:	5d09                	.2byte	0x5d09
+    2468:	751a                	.2byte	0x751a
+    246a:	b12c                	.2byte	0xb12c
+    246c:	faef84f7          	.4byte	0xfaef84f7
+    2470:	172a                	.2byte	0x172a
+    2472:	d181                	vmsge.vx	v3,v0,ra,v0.t
+    2474:	8616                	.2byte	0x8616
+    2476:	bccc                	.2byte	0xbccc
+    2478:	1cd2                	.2byte	0x1cd2
+    247a:	d2fa                	.2byte	0xd2fa
+    247c:	fd95                	.2byte	0xfd95
+    247e:	551c                	.2byte	0x551c
+    2480:	2e89                	.2byte	0x2e89
+    2482:	59c5                	.2byte	0x59c5
+    2484:	ef0924cb          	.4byte	0xef0924cb
+    2488:	d04ea4e7          	.4byte	0xd04ea4e7
+    248c:	c7c2                	vmsge.vx	v15,v0,ra,v0.t
+    248e:	d06e                	.2byte	0xd06e
+    2490:	116a                	.2byte	0x116a
+    2492:	2639                	.2byte	0x2639
+    2494:	e54e87ef          	jal	a5,fffeaae8 <fromhost+0xfffe79e8>
+    2498:	75ba                	.2byte	0x75ba
+    249a:	2ee6                	.2byte	0x2ee6
+    249c:	02f6                	.2byte	0x2f6
+    249e:	6f70                	.2byte	0x6f70
+    24a0:	1d84fa23          	vmsge.vx	v20,v24,s1,v0.t
+    24a4:	7767bb23          	vmsge.vx	v22,v22,a5
+    24a8:	7256                	.2byte	0x7256
+    24aa:	57ac                	.2byte	0x57ac
+    24ac:	1908                	.2byte	0x1908
+    24ae:	2f49                	.2byte	0x2f49
+    24b0:	621c                	.2byte	0x621c
+    24b2:	44ed                	.2byte	0x44ed
+    24b4:	a8dc                	.2byte	0xa8dc
+    24b6:	7bca                	.2byte	0x7bca
+    24b8:	431a                	.2byte	0x431a
+    24ba:	6c3c                	.2byte	0x6c3c
+    24bc:	2a06cf57          	vor.vx	v30,v0,a3
+    24c0:	3f659017          	auipc	zero,0x3f659
+    24c4:	fea4                	.2byte	0xfea4
+    24c6:	c121f1e3          	bgeu	gp,s2,20c8 <test_1_data+0xb8>
+    24ca:	b3e0                	vmsge.vx	v7,v0,ra,v0.t
+    24cc:	e222                	vmsge.vx	v4,v0,ra,v0.t
+    24ce:	45d2                	.2byte	0x45d2
+    24d0:	9d1e                	.2byte	0x9d1e
+    24d2:	656c77d7          	vsetvli	a5,s8,1622
+    24d6:	2032                	.2byte	0x2032
+    24d8:	1990                	.2byte	0x1990
+    24da:	4262d703          	lhu	a4,1062(t0)
+    24de:	800d                	.2byte	0x800d
+    24e0:	df44                	.2byte	0xdf44
+    24e2:	04e9                	.2byte	0x4e9
+    24e4:	ec8c6d4f          	.4byte	0xec8c6d4f
+    24e8:	a596                	.2byte	0xa596
+    24ea:	74a9                	.2byte	0x74a9
+    24ec:	387f                	.2byte	0x387f
+    24ee:	b569                	.2byte	0xb569
+    24f0:	bd833577          	.4byte	0xbd833577
+    24f4:	e07f                	.2byte	0xe07f
+    24f6:	78171b83          	lh	s7,1921(a4) # f02fa781 <fromhost+0xf02f7681>
+    24fa:	0f54                	.2byte	0xf54
+    24fc:	34b0                	.2byte	0x34b0
+    24fe:	dfaa                	.2byte	0xdfaa
+    2500:	403e                	.2byte	0x403e
+    2502:	cd14                	.2byte	0xcd14
+    2504:	6f94                	.2byte	0x6f94
+    2506:	295c                	.2byte	0x295c
+    2508:	3e91                	.2byte	0x3e91
+    250a:	9499                	.2byte	0x9499
+    250c:	3ce2                	vmsge.vx	v25,v0,zero,v0.t
+    250e:	1c21                	vmsge.vx	v24,v0,zero,v0.t
+    2510:	02e5                	.2byte	0x2e5
+    2512:	b282183b          	.4byte	0xb282183b
+    2516:	2175                	.2byte	0x2175
+    2518:	6f54                	.2byte	0x6f54
+    251a:	f116                	.2byte	0xf116
+    251c:	d5f6ba2b          	.4byte	0xd5f6ba2b
+    2520:	1354                	.2byte	0x1354
+    2522:	3260                	vmsge.vx	v4,v0,zero,v0.t
+    2524:	a880                	vmsge.vx	v17,v0,ra,v0.t
+    2526:	bfe6                	.2byte	0xbfe6
+    2528:	0749                	.2byte	0x749
+    252a:	6861381b          	.4byte	0x6861381b
+    252e:	7d7f                	.2byte	0x7d7f
+    2530:	d95f31c3          	fmadd.s	ft3,ft10,fs5,fs11,rup
+    2534:	7eb3d1d3          	.4byte	0x7eb3d1d3
+    2538:	6c5e                	.2byte	0x6c5e
+    253a:	43be                	.2byte	0x43be
+    253c:	b0c2                	vmsge.vx	v1,v0,ra,v0.t
+    253e:	3dba                	.2byte	0x3dba
+    2540:	b5d75b8f          	.4byte	0xb5d75b8f
+    2544:	00a2                	vmsge.vx	v1,v0,zero,v0.t
+    2546:	af26c687          	.4byte	0xaf26c687
+    254a:	c624                	.2byte	0xc624
+    254c:	70113c8b          	.4byte	0x70113c8b
+    2550:	7af6                	.2byte	0x7af6
+    2552:	a32d68eb          	.4byte	0xa32d68eb
+    2556:	be6e                	.2byte	0xbe6e
+    2558:	e671                	.2byte	0xe671
+    255a:	0218                	.2byte	0x218
+    255c:	a7e37497          	auipc	s1,0xa7e37
+    2560:	4749                	.2byte	0x4749
+    2562:	264c                	.2byte	0x264c
+    2564:	76a1                	vmsge.vx	v13,v0,zero,v0.t
+    2566:	b1f58857          	vnsrl.wv	v16,v31,v11,v0.t
+    256a:	d5a069cb          	.4byte	0xd5a069cb
+    256e:	58c9                	.2byte	0x58c9
+    2570:	fddf 4ba6 8424      	.byte	0xdf, 0xfd, 0xa6, 0x4b, 0x24, 0x84
+    2576:	9800                	vmsge.vx	v16,v0,ra,v0.t
+    2578:	e7e8                	.2byte	0xe7e8
+    257a:	752d                	.2byte	0x752d
+    257c:	a969                	.2byte	0xa969
+    257e:	c571                	.2byte	0xc571
+    2580:	1ae1                	vmsge.vx	v21,v0,zero,v0.t
+    2582:	240c63ef          	jal	t2,c87c2 <fromhost+0xc56c2>
+    2586:	9018                	.2byte	0x9018
+    2588:	0374                	.2byte	0x374
+    258a:	6198                	.2byte	0x6198
+    258c:	f7a5                	.2byte	0xf7a5
+    258e:	2126                	.2byte	0x2126
+    2590:	eda5                	.2byte	0xeda5
+    2592:	dfa5                	.2byte	0xdfa5
+    2594:	deff                	.2byte	0xdeff
+    2596:	c418                	.2byte	0xc418
+    2598:	23e5                	.2byte	0x23e5
+    259a:	1362                	vmsge.vx	v6,v0,zero,v0.t
+    259c:	d42a                	.2byte	0xd42a
+    259e:	fcde                	.2byte	0xfcde
+    25a0:	57cd                	.2byte	0x57cd
+    25a2:	e42fb93f 1a1d8176 	.8byte	0x1a1d8176e42fb93f
+    25aa:	f8e5                	.2byte	0xf8e5
+    25ac:	71a1                	vmsge.vx	v3,v0,zero,v0.t
+    25ae:	aa4804bf b5085f9f 	.8byte	0xb5085f9faa4804bf
+    25b6:	e26e                	.2byte	0xe26e
+    25b8:	bb8c                	.2byte	0xbb8c
+    25ba:	03a9                	.2byte	0x3a9
+    25bc:	43d1                	.2byte	0x43d1
+    25be:	0364275b          	.4byte	0x364275b
+    25c2:	7794                	.2byte	0x7794
+    25c4:	8e91                	.2byte	0x8e91
+    25c6:	43e5                	.2byte	0x43e5
+    25c8:	8ca2                	vmsge.vx	v25,v0,ra,v0.t
+    25ca:	f69d                	.2byte	0xf69d
+    25cc:	954e                	.2byte	0x954e
+    25ce:	3b8e                	.2byte	0x3b8e
+    25d0:	6d85                	.2byte	0x6d85
+    25d2:	ebb6                	.2byte	0xebb6
+    25d4:	7a8e                	.2byte	0x7a8e
+    25d6:	ca16                	.2byte	0xca16
+    25d8:	5788                	.2byte	0x5788
+    25da:	fab6fda3          	vmsge.vx	v27,v11,a3
+    25de:	4c5d                	.2byte	0x4c5d
+    25e0:	e4b0                	.2byte	0xe4b0
+    25e2:	b5b4                	.2byte	0xb5b4
+    25e4:	0091                	.2byte	0x91
+    25e6:	ba477deb          	.4byte	0xba477deb
+    25ea:	19cf1cfb          	.4byte	0x19cf1cfb
+    25ee:	e57483ef          	jal	t2,fff4b444 <fromhost+0xfff48344>
+    25f2:	aa12                	.2byte	0xaa12
+    25f4:	7f2d                	.2byte	0x7f2d
+    25f6:	f8d9                	.2byte	0xf8d9
+    25f8:	ca0d967b          	.4byte	0xca0d967b
+    25fc:	08d8                	.2byte	0x8d8
+    25fe:	9d32                	.2byte	0x9d32
+
+00002600 <test_1_maskdata>:
+    2600:	151a01ef          	jal	gp,a2f50 <fromhost+0x9fe50>
+    2604:	86569d27          	.4byte	0x86569d27
+    2608:	de3d                	.2byte	0xde3d
+    260a:	429e                	.2byte	0x429e
+    260c:	9a51                	.2byte	0x9a51
+    260e:	2021                	vmsge.vx	v0,v0,zero,v0.t
+    2610:	d5fd                	.2byte	0xd5fd
+    2612:	91a8                	.2byte	0x91a8
+    2614:	6c65                	.2byte	0x6c65
+    2616:	250fbd8f          	.4byte	0x250fbd8f
+    261a:	0466                	.2byte	0x466
+    261c:	fa64                	.2byte	0xfa64
+    261e:	e31f ad3a c737      	.byte	0x1f, 0xe3, 0x3a, 0xad, 0x37, 0xc7
+    2624:	8c1e                	.2byte	0x8c1e
+    2626:	e54c                	.2byte	0xe54c
+    2628:	7ca660db          	.4byte	0x7ca660db
+    262c:	dadf 0692 c847      	.byte	0xdf, 0xda, 0x92, 0x06, 0x47, 0xc8
+    2632:	7ae72c63          	vmsge.vx	v24,v14,a4
+    2636:	fbba                	.2byte	0xfbba
+    2638:	195b62bf f600a3d1 	.8byte	0xf600a3d1195b62bf
+    2640:	0fd4                	.2byte	0xfd4
+    2642:	34b8                	.2byte	0x34b8
+    2644:	5ff4                	.2byte	0x5ff4
+    2646:	7ad93aef          	jal	s5,965f2 <fromhost+0x934f2>
+    264a:	3426                	.2byte	0x3426
+    264c:	54c0                	vmsge.vx	v9,v0,zero,v0.t
+    264e:	6814                	.2byte	0x6814
+    2650:	3492                	.2byte	0x3492
+    2652:	67dd                	.2byte	0x67dd
+    2654:	663e                	.2byte	0x663e
+    2656:	b02d                	.2byte	0xb02d
+    2658:	f1c5                	.2byte	0xf1c5
+    265a:	39aeb2d3          	.4byte	0x39aeb2d3
+    265e:	824d                	.2byte	0x824d
+    2660:	a4dd                	.2byte	0xa4dd
+    2662:	36505233          	.4byte	0x36505233
+    2666:	d498                	.2byte	0xd498
+    2668:	88d5                	.2byte	0x88d5
+    266a:	18fc                	.2byte	0x18fc
+    266c:	4071                	.2byte	0x4071
+    266e:	3c3037bf 7dd8c83b 	.8byte	0x7dd8c83b3c3037bf
+    2676:	d1bc                	.2byte	0xd1bc
+    2678:	a97f                	.2byte	0xa97f
+    267a:	a968                	.2byte	0xa968
+    267c:	cb6d                	.2byte	0xcb6d
+    267e:	62f6                	.2byte	0x62f6
+    2680:	5b086787          	.4byte	0x5b086787
+    2684:	f8a5                	.2byte	0xf8a5
+    2686:	3874                	.2byte	0x3874
+    2688:	c1a2                	vmsge.vx	v3,v0,ra,v0.t
+    268a:	6075                	.2byte	0x6075
+    268c:	8621                	vmsge.vx	v12,v0,ra,v0.t
+    268e:	951e                	.2byte	0x951e
+    2690:	9378                	.2byte	0x9378
+    2692:	4ff0                	.2byte	0x4ff0
+    2694:	7ba8                	.2byte	0x7ba8
+    2696:	9b32                	.2byte	0x9b32
+    2698:	4c52                	.2byte	0x4c52
+    269a:	b32a                	.2byte	0xb32a
+    269c:	03d5081b          	.4byte	0x3d5081b
+    26a0:	fb1a                	.2byte	0xfb1a
+    26a2:	17a2                	vmsge.vx	v15,v0,zero,v0.t
+    26a4:	ed8c                	.2byte	0xed8c
+    26a6:	0b56                	.2byte	0xb56
+    26a8:	05f6                	.2byte	0x5f6
+    26aa:	4846                	.2byte	0x4846
+    26ac:	eeb5                	.2byte	0xeeb5
+    26ae:	b5ae                	.2byte	0xb5ae
+    26b0:	fc9d848f          	.4byte	0xfc9d848f
+    26b4:	cd04                	.2byte	0xcd04
+    26b6:	8dd5                	.2byte	0x8dd5
+    26b8:	8042                	vmsge.vx	v0,v0,ra,v0.t
+    26ba:	9b1a                	.2byte	0x9b1a
+    26bc:	9686                	.2byte	0x9686
+    26be:	da4c                	.2byte	0xda4c
+    26c0:	426b8dfb          	.4byte	0x426b8dfb
+    26c4:	092c                	.2byte	0x92c
+    26c6:	e0e9                	.2byte	0xe0e9
+    26c8:	3d52                	.2byte	0x3d52
+    26ca:	f632                	.2byte	0xf632
+    26cc:	e156                	.2byte	0xe156
+    26ce:	003d73b3          	and	t2,s10,gp
+    26d2:	81d44bfb          	.4byte	0x81d44bfb
+    26d6:	86b0                	.2byte	0x86b0
+    26d8:	6484                	.2byte	0x6484
+    26da:	6678f22b          	.4byte	0x6678f22b
+    26de:	93b0                	.2byte	0x93b0
+    26e0:	d6c8                	.2byte	0xd6c8
+    26e2:	0cc9                	.2byte	0xcc9
+    26e4:	3ddc                	.2byte	0x3ddc
+    26e6:	bce83b9b          	.4byte	0xbce83b9b
+    26ea:	169d                	.2byte	0x169d
+    26ec:	2532                	.2byte	0x2532
+    26ee:	0525                	.2byte	0x525
+    26f0:	7b52                	.2byte	0x7b52
+    26f2:	a216                	.2byte	0xa216
+    26f4:	e57f                	.2byte	0xe57f
+    26f6:	674b9fcb          	.4byte	0x674b9fcb
+    26fa:	6592e92f          	.4byte	0x6592e92f
+    26fe:	9705                	.2byte	0x9705
+    2700:	ad15                	.2byte	0xad15
+    2702:	8bfc                	.2byte	0x8bfc
+    2704:	81e9                	.2byte	0x81e9
+    2706:	4e11                	.2byte	0x4e11
+    2708:	a8cc                	.2byte	0xa8cc
+    270a:	445d                	.2byte	0x445d
+    270c:	fe19                	.2byte	0xfe19
+    270e:	ea35                	.2byte	0xea35
+    2710:	527e81e3          	beq	t4,t2,3432 <fromhost+0x332>
+    2714:	10dd                	.2byte	0x10dd
+    2716:	79e9                	.2byte	0x79e9
+    2718:	0be793b3          	.4byte	0xbe793b3
+    271c:	5d71                	.2byte	0x5d71
+    271e:	c47c                	.2byte	0xc47c
+    2720:	658c                	.2byte	0x658c
+    2722:	24e0                	vmsge.vx	v9,v0,zero,v0.t
+    2724:	f638                	.2byte	0xf638
+    2726:	47c6                	.2byte	0x47c6
+    2728:	2eae                	.2byte	0x2eae
+    272a:	c3a2                	vmsge.vx	v7,v0,ra,v0.t
+    272c:	6866                	.2byte	0x6866
+    272e:	4ed8                	.2byte	0x4ed8
+    2730:	a11c                	.2byte	0xa11c
+    2732:	e6b6                	.2byte	0xe6b6
+    2734:	96d5                	.2byte	0x96d5
+    2736:	4daa                	.2byte	0x4daa
+    2738:	68f0                	.2byte	0x68f0
+    273a:	d7a5                	.2byte	0xd7a5
+    273c:	66652ebf dfcadfe1 	.8byte	0xdfcadfe166652ebf
+    2744:	3be0154f          	fnmadd.d	fa0,ft0,ft10,ft7,rtz
+    2748:	0191                	.2byte	0x191
+    274a:	6915                	.2byte	0x6915
+    274c:	d84d                	.2byte	0xd84d
+    274e:	f1bc                	.2byte	0xf1bc
+    2750:	985d                	.2byte	0x985d
+    2752:	08fb734b          	fnmsub.s	ft6,fs6,fa5,ft1
+    2756:	120b3533          	.4byte	0x120b3533
+    275a:	4c45                	.2byte	0x4c45
+    275c:	23d8                	.2byte	0x23d8
+    275e:	fde2                	vmsge.vx	v27,v0,ra,v0.t
+    2760:	5e94                	.2byte	0x5e94
+    2762:	dbee                	.2byte	0xdbee
+    2764:	c336                	.2byte	0xc336
+    2766:	c70c982b          	.4byte	0xc70c982b
+    276a:	71f665e3          	bltu	a2,t6,3674 <fromhost+0x574>
+    276e:	4880b64b          	fnmsub.s	fa2,ft1,fs0,fs1,rup
+    2772:	8660                	vmsge.vx	v12,v0,ra,v0.t
+    2774:	8d4e                	.2byte	0x8d4e
+    2776:	700a                	.2byte	0x700a
+    2778:	1dcd                	.2byte	0x1dcd
+    277a:	63b9                	.2byte	0x63b9
+    277c:	04b11e73          	csrrw	t3,0x4b,sp
+    2780:	64a2                	vmsge.vx	v9,v0,zero,v0.t
+    2782:	355e                	.2byte	0x355e
+    2784:	4545                	.2byte	0x4545
+    2786:	cba895a7          	.4byte	0xcba895a7
+    278a:	8b4e                	.2byte	0x8b4e
+    278c:	37e5                	.2byte	0x37e5
+    278e:	1546cd1b          	.4byte	0x1546cd1b
+    2792:	472f4f03          	lbu	t5,1138(t5)
+    2796:	e804918f          	.4byte	0xe804918f
+    279a:	ac98                	.2byte	0xac98
+    279c:	98a1                	vmsge.vx	v17,v0,ra,v0.t
+    279e:	311c                	.2byte	0x311c
+    27a0:	057d                	.2byte	0x57d
+    27a2:	1151                	.2byte	0x1151
+    27a4:	cbf8                	.2byte	0xcbf8
+    27a6:	995c                	.2byte	0x995c
+    27a8:	31a201a7          	.4byte	0x31a201a7
+    27ac:	7722                	vmsge.vx	v14,v0,zero,v0.t
+    27ae:	dc44                	.2byte	0xdc44
+    27b0:	7cbaceb7          	lui	t4,0x7cbac
+    27b4:	0a7a                	.2byte	0xa7a
+    27b6:	0d2e                	.2byte	0xd2e
+    27b8:	6618                	.2byte	0x6618
+    27ba:	09ff022f          	.4byte	0x9ff022f
+    27be:	08dc                	.2byte	0x8dc
+    27c0:	944a                	.2byte	0x944a
+    27c2:	c180                	vmsge.vx	v3,v0,ra,v0.t
+    27c4:	21f4                	.2byte	0x21f4
+    27c6:	a77d                	.2byte	0xa77d
+    27c8:	24941503          	lh	a0,585(s0)
+    27cc:	7a71                	.2byte	0x7a71
+    27ce:	a6f6                	.2byte	0xa6f6
+    27d0:	a4d8                	.2byte	0xa4d8
+    27d2:	f0ed                	.2byte	0xf0ed
+    27d4:	a918c6bb          	.4byte	0xa918c6bb
+    27d8:	0f74                	.2byte	0xf74
+    27da:	9f12                	.2byte	0x9f12
+    27dc:	c86b2e3b          	.4byte	0xc86b2e3b
+    27e0:	add5                	.2byte	0xadd5
+    27e2:	3909                	.2byte	0x3909
+    27e4:	b3f6                	.2byte	0xb3f6
+    27e6:	f1fa                	.2byte	0xf1fa
+    27e8:	e33c2fbf 4736f5f4 	.8byte	0x4736f5f4e33c2fbf
+    27f0:	2dde                	.2byte	0x2dde
+    27f2:	4de5603b          	.4byte	0x4de5603b
+    27f6:	bacc                	.2byte	0xbacc
+    27f8:	e55f 44aa 8ca6      	.byte	0x5f, 0xe5, 0xaa, 0x44, 0xa6, 0x8c
+    27fe:	04e512e3          	bne	a0,a4,3042 <tohost+0x42>
+    2802:	6b3c                	.2byte	0x6b3c
+    2804:	d4c6                	.2byte	0xd4c6
+    2806:	c84e                	.2byte	0xc84e
+    2808:	650a                	.2byte	0x650a
+    280a:	18afc67b          	.4byte	0x18afc67b
+    280e:	49934117          	auipc	sp,0x49934
+    2812:	5f29                	.2byte	0x5f29
+    2814:	6a54                	.2byte	0x6a54
+    2816:	62ee                	.2byte	0x62ee
+    2818:	2e22                	vmsge.vx	v28,v0,zero,v0.t
+    281a:	4cdd                	.2byte	0x4cdd
+    281c:	c1ea                	.2byte	0xc1ea
+    281e:	786c                	.2byte	0x786c
+    2820:	4845                	.2byte	0x4845
+    2822:	7a6d                	.2byte	0x7a6d
+    2824:	9714                	.2byte	0x9714
+    2826:	8624                	.2byte	0x8624
+    2828:	18c8                	.2byte	0x18c8
+    282a:	9064                	.2byte	0x9064
+    282c:	cb49                	.2byte	0xcb49
+    282e:	44dc                	.2byte	0x44dc
+    2830:	b197d063          	bge	a5,s9,1b30 <rvtest_code_end+0xca0>
+    2834:	b7ed                	.2byte	0xb7ed
+    2836:	2f09                	.2byte	0x2f09
+    2838:	a5f6                	.2byte	0xa5f6
+    283a:	da7e                	.2byte	0xda7e
+    283c:	6ebc                	.2byte	0x6ebc
+    283e:	70ed                	.2byte	0x70ed
+    2840:	22bd                	.2byte	0x22bd
+    2842:	987f                	.2byte	0x987f
+    2844:	2906                	.2byte	0x2906
+    2846:	7451                	.2byte	0x7451
+    2848:	5389                	.2byte	0x5389
+    284a:	4bb0                	.2byte	0x4bb0
+    284c:	44d184f7          	.4byte	0x44d184f7
+    2850:	3b9cb04f          	fnmadd.d	ft0,fs9,fs9,ft7,rup
+    2854:	0d11                	.2byte	0xd11
+    2856:	b81a                	.2byte	0xb81a
+    2858:	42a8                	.2byte	0x42a8
+    285a:	5485                	.2byte	0x5485
+    285c:	f4bfda8f          	.4byte	0xf4bfda8f
+    2860:	3289                	.2byte	0x3289
+    2862:	b2b9                	.2byte	0xb2b9
+    2864:	042d5763          	bge	s10,sp,28b2 <test_1_maskdata+0x2b2>
+    2868:	3374                	.2byte	0x3374
+    286a:	8fe0                	vmsge.vx	v31,v0,ra,v0.t
+    286c:	4b384f2b          	.4byte	0x4b384f2b
+    2870:	c1a7e90b          	.4byte	0xc1a7e90b
+    2874:	2d72                	.2byte	0x2d72
+    2876:	7945                	.2byte	0x7945
+    2878:	f676                	.2byte	0xf676
+    287a:	fd34                	.2byte	0xfd34
+    287c:	d89a                	.2byte	0xd89a
+    287e:	ccb17e27          	vsoxseg7ei64.v	v28,(sp),v11,v0.t
+    2882:	9dce                	.2byte	0x9dce
+    2884:	e19d838b          	.4byte	0xe19d838b
+    2888:	266cfb3f 8d1c81a4 	.8byte	0x8d1c81a4266cfb3f
+    2890:	d9d8                	.2byte	0xd9d8
+    2892:	18ba                	.2byte	0x18ba
+    2894:	1ead                	.2byte	0x1ead
+    2896:	0082cb27          	.4byte	0x82cb27
+    289a:	3f40                	vmsge.vx	v30,v0,zero,v0.t
+    289c:	df34                	.2byte	0xdf34
+    289e:	fbdc                	.2byte	0xfbdc
+    28a0:	b976                	.2byte	0xb976
+    28a2:	a7cd                	.2byte	0xa7cd
+    28a4:	9522                	vmsge.vx	v10,v0,ra,v0.t
+    28a6:	75ba                	.2byte	0x75ba
+    28a8:	c0713693          	sltiu	a3,sp,-1017
+    28ac:	430c                	.2byte	0x430c
+    28ae:	e8d4                	.2byte	0xe8d4
+    28b0:	7f5f 773d aa50      	.byte	0x5f, 0x7f, 0x3d, 0x77, 0x50, 0xaa
+    28b6:	731b3037          	lui	zero,0x731b3
+    28ba:	819f 6d4c ebb5      	.byte	0x9f, 0x81, 0x4c, 0x6d, 0xb5, 0xeb
+    28c0:	aeae                	.2byte	0xaeae
+    28c2:	ceb5                	.2byte	0xceb5
+    28c4:	a1c1                	vmsge.vx	v3,v0,ra,v0.t
+    28c6:	8cf6                	.2byte	0x8cf6
+    28c8:	6592                	.2byte	0x6592
+    28ca:	67e8                	.2byte	0x67e8
+    28cc:	58cd                	.2byte	0x58cd
+    28ce:	f970                	.2byte	0xf970
+    28d0:	48be                	.2byte	0x48be
+    28d2:	ea66                	.2byte	0xea66
+    28d4:	8c39                	.2byte	0x8c39
+    28d6:	9f00                	vmsge.vx	v30,v0,ra,v0.t
+    28d8:	a0d2                	.2byte	0xa0d2
+    28da:	6d5e                	.2byte	0x6d5e
+    28dc:	6697dc2f          	.4byte	0x6697dc2f
+    28e0:	c950                	.2byte	0xc950
+    28e2:	51da                	.2byte	0x51da
+    28e4:	1f75                	.2byte	0x1f75
+    28e6:	2e62                	vmsge.vx	v28,v0,zero,v0.t
+    28e8:	dad9549b          	.4byte	0xdad9549b
+    28ec:	a864                	.2byte	0xa864
+    28ee:	f37f                	.2byte	0xf37f
+    28f0:	ff0d                	.2byte	0xff0d
+    28f2:	089d                	.2byte	0x89d
+    28f4:	6916                	.2byte	0x6916
+    28f6:	e1be                	.2byte	0xe1be
+    28f8:	c2a7edcf          	fnmadd.d	fs11,fa5,fa0,fs8,unknown
+    28fc:	37a7880f          	.4byte	0x37a7880f
+    2900:	4f34                	.2byte	0x4f34
+    2902:	f144                	.2byte	0xf144
+    2904:	4f8e                	.2byte	0x4f8e
+    2906:	099a                	.2byte	0x99a
+    2908:	68ce0f63          	beq	t3,a2,2fa6 <end_regstate+0xa6>
+    290c:	cf6a                	.2byte	0xcf6a
+    290e:	59c13277          	.4byte	0x59c13277
+    2912:	88e87a8b          	.4byte	0x88e87a8b
+    2916:	62aadce3          	bge	s5,a0,374e <fromhost+0x64e>
+    291a:	09b827eb          	.4byte	0x9b827eb
+    291e:	2c78                	.2byte	0x2c78
+    2920:	9e71                	.2byte	0x9e71
+    2922:	143a                	.2byte	0x143a
+    2924:	6e45                	.2byte	0x6e45
+    2926:	851f 0a27 579e      	.byte	0x1f, 0x85, 0x27, 0x0a, 0x9e, 0x57
+    292c:	1975                	.2byte	0x1975
+    292e:	77f4                	.2byte	0x77f4
+    2930:	e826                	.2byte	0xe826
+    2932:	925a                	.2byte	0x925a
+    2934:	36bc                	.2byte	0x36bc
+    2936:	4e7a                	.2byte	0x4e7a
+    2938:	0c9c                	.2byte	0xc9c
+    293a:	b4fc                	.2byte	0xb4fc
+    293c:	f02fa737          	lui	a4,0xf02fa
+    2940:	f336                	.2byte	0xf336
+    2942:	02ac                	.2byte	0x2ac
+    2944:	831b5583          	lhu	a1,-1999(s6)
+    2948:	c054                	.2byte	0xc054
+    294a:	b5fe                	.2byte	0xb5fe
+    294c:	a31e0b3f d46f3d2c 	.8byte	0xd46f3d2ca31e0b3f
+    2954:	465bb10f          	.4byte	0x465bb10f
+    2958:	b174                	.2byte	0xb174
+    295a:	a5f0724f          	.4byte	0xa5f0724f
+    295e:	351e                	.2byte	0x351e
+    2960:	0dee                	.2byte	0xdee
+    2962:	1e98                	.2byte	0x1e98
+    2964:	5a59                	.2byte	0x5a59
+    2966:	ca49                	.2byte	0xca49
+    2968:	68d2                	.2byte	0x68d2
+    296a:	6a57d80b          	.4byte	0x6a57d80b
+    296e:	a392                	.2byte	0xa392
+    2970:	1c8d                	.2byte	0x1c8d
+    2972:	1d14                	.2byte	0x1d14
+    2974:	0fdf a774 5470      	.byte	0xdf, 0x0f, 0x74, 0xa7, 0x70, 0x54
+    297a:	a3f16ea3          	vmsge.vx	v29,v31,sp
+    297e:	f562                	vmsge.vx	v10,v0,ra,v0.t
+    2980:	07917d4b          	.4byte	0x7917d4b
+    2984:	64aa                	.2byte	0x64aa
+    2986:	66da                	.2byte	0x66da
+    2988:	191a                	.2byte	0x191a
+    298a:	f682                	vmsge.vx	v13,v0,ra,v0.t
+    298c:	fd2ce83f 67f9ab29 	.8byte	0x67f9ab29fd2ce83f
+    2994:	3ffd                	.2byte	0x3ffd
+    2996:	112e                	.2byte	0x112e
+    2998:	b1e2                	vmsge.vx	v3,v0,ra,v0.t
+    299a:	c4d9                	.2byte	0xc4d9
+    299c:	9ed4e137          	lui	sp,0x9ed4e
+    29a0:	e54e                	.2byte	0xe54e
+    29a2:	b49a                	.2byte	0xb49a
+    29a4:	dd45                	.2byte	0xdd45
+    29a6:	d075                	.2byte	0xd075
+    29a8:	a72e                	.2byte	0xa72e
+    29aa:	74da                	.2byte	0x74da
+    29ac:	4db4                	.2byte	0x4db4
+    29ae:	4832                	.2byte	0x4832
+    29b0:	97b5                	.2byte	0x97b5
+    29b2:	167d                	.2byte	0x167d
+    29b4:	6536                	.2byte	0x6536
+    29b6:	55eb8b53          	.4byte	0x55eb8b53
+    29ba:	6c0ae857          	.4byte	0x6c0ae857
+    29be:	1cd8                	.2byte	0x1cd8
+    29c0:	4c811ecf          	.4byte	0x4c811ecf
+    29c4:	dbf1                	.2byte	0xdbf1
+    29c6:	8085                	.2byte	0x8085
+    29c8:	547cdce3          	bge	s9,t2,3720 <fromhost+0x620>
+    29cc:	7882                	vmsge.vx	v17,v0,zero,v0.t
+    29ce:	65d2                	.2byte	0x65d2
+    29d0:	2ec4                	.2byte	0x2ec4
+    29d2:	b72d                	.2byte	0xb72d
+    29d4:	e841                	vmsge.vx	v16,v0,ra,v0.t
+    29d6:	954e                	.2byte	0x954e
+    29d8:	d636                	.2byte	0xd636
+    29da:	88dab36f          	jal	t1,fffae266 <fromhost+0xfffab166>
+    29de:	bc49                	.2byte	0xbc49
+    29e0:	5c04                	.2byte	0x5c04
+    29e2:	aea0                	vmsge.vx	v29,v0,ra,v0.t
+    29e4:	83a6                	.2byte	0x83a6
+    29e6:	ce74                	.2byte	0xce74
+    29e8:	ea0309d7          	.4byte	0xea0309d7
+    29ec:	8466                	.2byte	0x8466
+    29ee:	6249                	.2byte	0x6249
+    29f0:	9ac4                	.2byte	0x9ac4
+    29f2:	1cd2                	.2byte	0x1cd2
+    29f4:	8b62                	vmsge.vx	v22,v0,ra,v0.t
+    29f6:	cf8597f3          	csrrw	a5,0xcf8,a1
+    29fa:	3b8b690b          	.4byte	0x3b8b690b
+    29fe:	9bd8                	.2byte	0x9bd8
+
+00002a00 <begin_signature>:
+    2a00:	deadbeef          	jal	t4,fffddfea <fromhost+0xfffdaeea>
+    2a04:	deadbeef          	jal	t4,fffddfee <fromhost+0xfffdaeee>
+    2a08:	deadbeef          	jal	t4,fffddff2 <fromhost+0xfffdaef2>
+    2a0c:	deadbeef          	jal	t4,fffddff6 <fromhost+0xfffdaef6>
+    2a10:	deadbeef          	jal	t4,fffddffa <fromhost+0xfffdaefa>
+    2a14:	deadbeef          	jal	t4,fffddffe <fromhost+0xfffdaefe>
+    2a18:	deadbeef          	jal	t4,fffde002 <fromhost+0xfffdaf02>
+    2a1c:	deadbeef          	jal	t4,fffde006 <fromhost+0xfffdaf06>
+    2a20:	deadbeef          	jal	t4,fffde00a <fromhost+0xfffdaf0a>
+    2a24:	deadbeef          	jal	t4,fffde00e <fromhost+0xfffdaf0e>
+    2a28:	deadbeef          	jal	t4,fffde012 <fromhost+0xfffdaf12>
+    2a2c:	deadbeef          	jal	t4,fffde016 <fromhost+0xfffdaf16>
+    2a30:	deadbeef          	jal	t4,fffde01a <fromhost+0xfffdaf1a>
+    2a34:	deadbeef          	jal	t4,fffde01e <fromhost+0xfffdaf1e>
+    2a38:	deadbeef          	jal	t4,fffde022 <fromhost+0xfffdaf22>
+    2a3c:	deadbeef          	jal	t4,fffde026 <fromhost+0xfffdaf26>
+    2a40:	deadbeef          	jal	t4,fffde02a <fromhost+0xfffdaf2a>
+    2a44:	deadbeef          	jal	t4,fffde02e <fromhost+0xfffdaf2e>
+    2a48:	deadbeef          	jal	t4,fffde032 <fromhost+0xfffdaf32>
+    2a4c:	deadbeef          	jal	t4,fffde036 <fromhost+0xfffdaf36>
+    2a50:	deadbeef          	jal	t4,fffde03a <fromhost+0xfffdaf3a>
+    2a54:	deadbeef          	jal	t4,fffde03e <fromhost+0xfffdaf3e>
+    2a58:	deadbeef          	jal	t4,fffde042 <fromhost+0xfffdaf42>
+    2a5c:	deadbeef          	jal	t4,fffde046 <fromhost+0xfffdaf46>
+    2a60:	deadbeef          	jal	t4,fffde04a <fromhost+0xfffdaf4a>
+    2a64:	deadbeef          	jal	t4,fffde04e <fromhost+0xfffdaf4e>
+    2a68:	deadbeef          	jal	t4,fffde052 <fromhost+0xfffdaf52>
+    2a6c:	deadbeef          	jal	t4,fffde056 <fromhost+0xfffdaf56>
+    2a70:	deadbeef          	jal	t4,fffde05a <fromhost+0xfffdaf5a>
+    2a74:	deadbeef          	jal	t4,fffde05e <fromhost+0xfffdaf5e>
+    2a78:	deadbeef          	jal	t4,fffde062 <fromhost+0xfffdaf62>
+    2a7c:	deadbeef          	jal	t4,fffde066 <fromhost+0xfffdaf66>
+
+00002a80 <signature_2_0>:
+    2a80:	deadbeef          	jal	t4,fffde06a <fromhost+0xfffdaf6a>
+    2a84:	deadbeef          	jal	t4,fffde06e <fromhost+0xfffdaf6e>
+    2a88:	deadbeef          	jal	t4,fffde072 <fromhost+0xfffdaf72>
+    2a8c:	deadbeef          	jal	t4,fffde076 <fromhost+0xfffdaf76>
+    2a90:	deadbeef          	jal	t4,fffde07a <fromhost+0xfffdaf7a>
+    2a94:	deadbeef          	jal	t4,fffde07e <fromhost+0xfffdaf7e>
+    2a98:	deadbeef          	jal	t4,fffde082 <fromhost+0xfffdaf82>
+    2a9c:	deadbeef          	jal	t4,fffde086 <fromhost+0xfffdaf86>
+    2aa0:	deadbeef          	jal	t4,fffde08a <fromhost+0xfffdaf8a>
+    2aa4:	deadbeef          	jal	t4,fffde08e <fromhost+0xfffdaf8e>
+    2aa8:	deadbeef          	jal	t4,fffde092 <fromhost+0xfffdaf92>
+    2aac:	deadbeef          	jal	t4,fffde096 <fromhost+0xfffdaf96>
+    2ab0:	deadbeef          	jal	t4,fffde09a <fromhost+0xfffdaf9a>
+    2ab4:	deadbeef          	jal	t4,fffde09e <fromhost+0xfffdaf9e>
+    2ab8:	deadbeef          	jal	t4,fffde0a2 <fromhost+0xfffdafa2>
+    2abc:	deadbeef          	jal	t4,fffde0a6 <fromhost+0xfffdafa6>
+    2ac0:	deadbeef          	jal	t4,fffde0aa <fromhost+0xfffdafaa>
+    2ac4:	deadbeef          	jal	t4,fffde0ae <fromhost+0xfffdafae>
+    2ac8:	deadbeef          	jal	t4,fffde0b2 <fromhost+0xfffdafb2>
+    2acc:	deadbeef          	jal	t4,fffde0b6 <fromhost+0xfffdafb6>
+    2ad0:	deadbeef          	jal	t4,fffde0ba <fromhost+0xfffdafba>
+    2ad4:	deadbeef          	jal	t4,fffde0be <fromhost+0xfffdafbe>
+    2ad8:	deadbeef          	jal	t4,fffde0c2 <fromhost+0xfffdafc2>
+    2adc:	deadbeef          	jal	t4,fffde0c6 <fromhost+0xfffdafc6>
+    2ae0:	deadbeef          	jal	t4,fffde0ca <fromhost+0xfffdafca>
+    2ae4:	deadbeef          	jal	t4,fffde0ce <fromhost+0xfffdafce>
+    2ae8:	deadbeef          	jal	t4,fffde0d2 <fromhost+0xfffdafd2>
+    2aec:	deadbeef          	jal	t4,fffde0d6 <fromhost+0xfffdafd6>
+    2af0:	deadbeef          	jal	t4,fffde0da <fromhost+0xfffdafda>
+    2af4:	deadbeef          	jal	t4,fffde0de <fromhost+0xfffdafde>
+    2af8:	deadbeef          	jal	t4,fffde0e2 <fromhost+0xfffdafe2>
+    2afc:	deadbeef          	jal	t4,fffde0e6 <fromhost+0xfffdafe6>
+
+00002b00 <signature_3_0>:
+    2b00:	deadbeef          	jal	t4,fffde0ea <fromhost+0xfffdafea>
+    2b04:	deadbeef          	jal	t4,fffde0ee <fromhost+0xfffdafee>
+    2b08:	deadbeef          	jal	t4,fffde0f2 <fromhost+0xfffdaff2>
+    2b0c:	deadbeef          	jal	t4,fffde0f6 <fromhost+0xfffdaff6>
+    2b10:	deadbeef          	jal	t4,fffde0fa <fromhost+0xfffdaffa>
+    2b14:	deadbeef          	jal	t4,fffde0fe <fromhost+0xfffdaffe>
+    2b18:	deadbeef          	jal	t4,fffde102 <fromhost+0xfffdb002>
+    2b1c:	deadbeef          	jal	t4,fffde106 <fromhost+0xfffdb006>
+    2b20:	deadbeef          	jal	t4,fffde10a <fromhost+0xfffdb00a>
+    2b24:	deadbeef          	jal	t4,fffde10e <fromhost+0xfffdb00e>
+    2b28:	deadbeef          	jal	t4,fffde112 <fromhost+0xfffdb012>
+    2b2c:	deadbeef          	jal	t4,fffde116 <fromhost+0xfffdb016>
+    2b30:	deadbeef          	jal	t4,fffde11a <fromhost+0xfffdb01a>
+    2b34:	deadbeef          	jal	t4,fffde11e <fromhost+0xfffdb01e>
+    2b38:	deadbeef          	jal	t4,fffde122 <fromhost+0xfffdb022>
+    2b3c:	deadbeef          	jal	t4,fffde126 <fromhost+0xfffdb026>
+    2b40:	deadbeef          	jal	t4,fffde12a <fromhost+0xfffdb02a>
+    2b44:	deadbeef          	jal	t4,fffde12e <fromhost+0xfffdb02e>
+    2b48:	deadbeef          	jal	t4,fffde132 <fromhost+0xfffdb032>
+    2b4c:	deadbeef          	jal	t4,fffde136 <fromhost+0xfffdb036>
+    2b50:	deadbeef          	jal	t4,fffde13a <fromhost+0xfffdb03a>
+    2b54:	deadbeef          	jal	t4,fffde13e <fromhost+0xfffdb03e>
+    2b58:	deadbeef          	jal	t4,fffde142 <fromhost+0xfffdb042>
+    2b5c:	deadbeef          	jal	t4,fffde146 <fromhost+0xfffdb046>
+    2b60:	deadbeef          	jal	t4,fffde14a <fromhost+0xfffdb04a>
+    2b64:	deadbeef          	jal	t4,fffde14e <fromhost+0xfffdb04e>
+    2b68:	deadbeef          	jal	t4,fffde152 <fromhost+0xfffdb052>
+    2b6c:	deadbeef          	jal	t4,fffde156 <fromhost+0xfffdb056>
+    2b70:	deadbeef          	jal	t4,fffde15a <fromhost+0xfffdb05a>
+    2b74:	deadbeef          	jal	t4,fffde15e <fromhost+0xfffdb05e>
+    2b78:	deadbeef          	jal	t4,fffde162 <fromhost+0xfffdb062>
+    2b7c:	deadbeef          	jal	t4,fffde166 <fromhost+0xfffdb066>
+
+00002b80 <signature_4_0>:
+    2b80:	deadbeef          	jal	t4,fffde16a <fromhost+0xfffdb06a>
+    2b84:	deadbeef          	jal	t4,fffde16e <fromhost+0xfffdb06e>
+    2b88:	deadbeef          	jal	t4,fffde172 <fromhost+0xfffdb072>
+    2b8c:	deadbeef          	jal	t4,fffde176 <fromhost+0xfffdb076>
+    2b90:	deadbeef          	jal	t4,fffde17a <fromhost+0xfffdb07a>
+    2b94:	deadbeef          	jal	t4,fffde17e <fromhost+0xfffdb07e>
+    2b98:	deadbeef          	jal	t4,fffde182 <fromhost+0xfffdb082>
+    2b9c:	deadbeef          	jal	t4,fffde186 <fromhost+0xfffdb086>
+    2ba0:	deadbeef          	jal	t4,fffde18a <fromhost+0xfffdb08a>
+    2ba4:	deadbeef          	jal	t4,fffde18e <fromhost+0xfffdb08e>
+    2ba8:	deadbeef          	jal	t4,fffde192 <fromhost+0xfffdb092>
+    2bac:	deadbeef          	jal	t4,fffde196 <fromhost+0xfffdb096>
+    2bb0:	deadbeef          	jal	t4,fffde19a <fromhost+0xfffdb09a>
+    2bb4:	deadbeef          	jal	t4,fffde19e <fromhost+0xfffdb09e>
+    2bb8:	deadbeef          	jal	t4,fffde1a2 <fromhost+0xfffdb0a2>
+    2bbc:	deadbeef          	jal	t4,fffde1a6 <fromhost+0xfffdb0a6>
+    2bc0:	deadbeef          	jal	t4,fffde1aa <fromhost+0xfffdb0aa>
+    2bc4:	deadbeef          	jal	t4,fffde1ae <fromhost+0xfffdb0ae>
+    2bc8:	deadbeef          	jal	t4,fffde1b2 <fromhost+0xfffdb0b2>
+    2bcc:	deadbeef          	jal	t4,fffde1b6 <fromhost+0xfffdb0b6>
+    2bd0:	deadbeef          	jal	t4,fffde1ba <fromhost+0xfffdb0ba>
+    2bd4:	deadbeef          	jal	t4,fffde1be <fromhost+0xfffdb0be>
+    2bd8:	deadbeef          	jal	t4,fffde1c2 <fromhost+0xfffdb0c2>
+    2bdc:	deadbeef          	jal	t4,fffde1c6 <fromhost+0xfffdb0c6>
+    2be0:	deadbeef          	jal	t4,fffde1ca <fromhost+0xfffdb0ca>
+    2be4:	deadbeef          	jal	t4,fffde1ce <fromhost+0xfffdb0ce>
+    2be8:	deadbeef          	jal	t4,fffde1d2 <fromhost+0xfffdb0d2>
+    2bec:	deadbeef          	jal	t4,fffde1d6 <fromhost+0xfffdb0d6>
+    2bf0:	deadbeef          	jal	t4,fffde1da <fromhost+0xfffdb0da>
+    2bf4:	deadbeef          	jal	t4,fffde1de <fromhost+0xfffdb0de>
+    2bf8:	deadbeef          	jal	t4,fffde1e2 <fromhost+0xfffdb0e2>
+    2bfc:	deadbeef          	jal	t4,fffde1e6 <fromhost+0xfffdb0e6>
+
+00002c00 <signature_5_0>:
+    2c00:	deadbeef          	jal	t4,fffde1ea <fromhost+0xfffdb0ea>
+    2c04:	deadbeef          	jal	t4,fffde1ee <fromhost+0xfffdb0ee>
+    2c08:	deadbeef          	jal	t4,fffde1f2 <fromhost+0xfffdb0f2>
+    2c0c:	deadbeef          	jal	t4,fffde1f6 <fromhost+0xfffdb0f6>
+    2c10:	deadbeef          	jal	t4,fffde1fa <fromhost+0xfffdb0fa>
+    2c14:	deadbeef          	jal	t4,fffde1fe <fromhost+0xfffdb0fe>
+    2c18:	deadbeef          	jal	t4,fffde202 <fromhost+0xfffdb102>
+    2c1c:	deadbeef          	jal	t4,fffde206 <fromhost+0xfffdb106>
+    2c20:	deadbeef          	jal	t4,fffde20a <fromhost+0xfffdb10a>
+    2c24:	deadbeef          	jal	t4,fffde20e <fromhost+0xfffdb10e>
+    2c28:	deadbeef          	jal	t4,fffde212 <fromhost+0xfffdb112>
+    2c2c:	deadbeef          	jal	t4,fffde216 <fromhost+0xfffdb116>
+    2c30:	deadbeef          	jal	t4,fffde21a <fromhost+0xfffdb11a>
+    2c34:	deadbeef          	jal	t4,fffde21e <fromhost+0xfffdb11e>
+    2c38:	deadbeef          	jal	t4,fffde222 <fromhost+0xfffdb122>
+    2c3c:	deadbeef          	jal	t4,fffde226 <fromhost+0xfffdb126>
+    2c40:	deadbeef          	jal	t4,fffde22a <fromhost+0xfffdb12a>
+    2c44:	deadbeef          	jal	t4,fffde22e <fromhost+0xfffdb12e>
+    2c48:	deadbeef          	jal	t4,fffde232 <fromhost+0xfffdb132>
+    2c4c:	deadbeef          	jal	t4,fffde236 <fromhost+0xfffdb136>
+    2c50:	deadbeef          	jal	t4,fffde23a <fromhost+0xfffdb13a>
+    2c54:	deadbeef          	jal	t4,fffde23e <fromhost+0xfffdb13e>
+    2c58:	deadbeef          	jal	t4,fffde242 <fromhost+0xfffdb142>
+    2c5c:	deadbeef          	jal	t4,fffde246 <fromhost+0xfffdb146>
+    2c60:	deadbeef          	jal	t4,fffde24a <fromhost+0xfffdb14a>
+    2c64:	deadbeef          	jal	t4,fffde24e <fromhost+0xfffdb14e>
+    2c68:	deadbeef          	jal	t4,fffde252 <fromhost+0xfffdb152>
+    2c6c:	deadbeef          	jal	t4,fffde256 <fromhost+0xfffdb156>
+    2c70:	deadbeef          	jal	t4,fffde25a <fromhost+0xfffdb15a>
+    2c74:	deadbeef          	jal	t4,fffde25e <fromhost+0xfffdb15e>
+    2c78:	deadbeef          	jal	t4,fffde262 <fromhost+0xfffdb162>
+    2c7c:	deadbeef          	jal	t4,fffde266 <fromhost+0xfffdb166>
+
+00002c80 <signature_6_0>:
+    2c80:	deadbeef          	jal	t4,fffde26a <fromhost+0xfffdb16a>
+    2c84:	deadbeef          	jal	t4,fffde26e <fromhost+0xfffdb16e>
+    2c88:	deadbeef          	jal	t4,fffde272 <fromhost+0xfffdb172>
+    2c8c:	deadbeef          	jal	t4,fffde276 <fromhost+0xfffdb176>
+    2c90:	deadbeef          	jal	t4,fffde27a <fromhost+0xfffdb17a>
+    2c94:	deadbeef          	jal	t4,fffde27e <fromhost+0xfffdb17e>
+    2c98:	deadbeef          	jal	t4,fffde282 <fromhost+0xfffdb182>
+    2c9c:	deadbeef          	jal	t4,fffde286 <fromhost+0xfffdb186>
+    2ca0:	deadbeef          	jal	t4,fffde28a <fromhost+0xfffdb18a>
+    2ca4:	deadbeef          	jal	t4,fffde28e <fromhost+0xfffdb18e>
+    2ca8:	deadbeef          	jal	t4,fffde292 <fromhost+0xfffdb192>
+    2cac:	deadbeef          	jal	t4,fffde296 <fromhost+0xfffdb196>
+    2cb0:	deadbeef          	jal	t4,fffde29a <fromhost+0xfffdb19a>
+    2cb4:	deadbeef          	jal	t4,fffde29e <fromhost+0xfffdb19e>
+    2cb8:	deadbeef          	jal	t4,fffde2a2 <fromhost+0xfffdb1a2>
+    2cbc:	deadbeef          	jal	t4,fffde2a6 <fromhost+0xfffdb1a6>
+    2cc0:	deadbeef          	jal	t4,fffde2aa <fromhost+0xfffdb1aa>
+    2cc4:	deadbeef          	jal	t4,fffde2ae <fromhost+0xfffdb1ae>
+    2cc8:	deadbeef          	jal	t4,fffde2b2 <fromhost+0xfffdb1b2>
+    2ccc:	deadbeef          	jal	t4,fffde2b6 <fromhost+0xfffdb1b6>
+    2cd0:	deadbeef          	jal	t4,fffde2ba <fromhost+0xfffdb1ba>
+    2cd4:	deadbeef          	jal	t4,fffde2be <fromhost+0xfffdb1be>
+    2cd8:	deadbeef          	jal	t4,fffde2c2 <fromhost+0xfffdb1c2>
+    2cdc:	deadbeef          	jal	t4,fffde2c6 <fromhost+0xfffdb1c6>
+    2ce0:	deadbeef          	jal	t4,fffde2ca <fromhost+0xfffdb1ca>
+    2ce4:	deadbeef          	jal	t4,fffde2ce <fromhost+0xfffdb1ce>
+    2ce8:	deadbeef          	jal	t4,fffde2d2 <fromhost+0xfffdb1d2>
+    2cec:	deadbeef          	jal	t4,fffde2d6 <fromhost+0xfffdb1d6>
+    2cf0:	deadbeef          	jal	t4,fffde2da <fromhost+0xfffdb1da>
+    2cf4:	deadbeef          	jal	t4,fffde2de <fromhost+0xfffdb1de>
+    2cf8:	deadbeef          	jal	t4,fffde2e2 <fromhost+0xfffdb1e2>
+    2cfc:	deadbeef          	jal	t4,fffde2e6 <fromhost+0xfffdb1e6>
+
+00002d00 <signature_7_0>:
+    2d00:	deadbeef          	jal	t4,fffde2ea <fromhost+0xfffdb1ea>
+    2d04:	deadbeef          	jal	t4,fffde2ee <fromhost+0xfffdb1ee>
+    2d08:	deadbeef          	jal	t4,fffde2f2 <fromhost+0xfffdb1f2>
+    2d0c:	deadbeef          	jal	t4,fffde2f6 <fromhost+0xfffdb1f6>
+    2d10:	deadbeef          	jal	t4,fffde2fa <fromhost+0xfffdb1fa>
+    2d14:	deadbeef          	jal	t4,fffde2fe <fromhost+0xfffdb1fe>
+    2d18:	deadbeef          	jal	t4,fffde302 <fromhost+0xfffdb202>
+    2d1c:	deadbeef          	jal	t4,fffde306 <fromhost+0xfffdb206>
+    2d20:	deadbeef          	jal	t4,fffde30a <fromhost+0xfffdb20a>
+    2d24:	deadbeef          	jal	t4,fffde30e <fromhost+0xfffdb20e>
+    2d28:	deadbeef          	jal	t4,fffde312 <fromhost+0xfffdb212>
+    2d2c:	deadbeef          	jal	t4,fffde316 <fromhost+0xfffdb216>
+    2d30:	deadbeef          	jal	t4,fffde31a <fromhost+0xfffdb21a>
+    2d34:	deadbeef          	jal	t4,fffde31e <fromhost+0xfffdb21e>
+    2d38:	deadbeef          	jal	t4,fffde322 <fromhost+0xfffdb222>
+    2d3c:	deadbeef          	jal	t4,fffde326 <fromhost+0xfffdb226>
+    2d40:	deadbeef          	jal	t4,fffde32a <fromhost+0xfffdb22a>
+    2d44:	deadbeef          	jal	t4,fffde32e <fromhost+0xfffdb22e>
+    2d48:	deadbeef          	jal	t4,fffde332 <fromhost+0xfffdb232>
+    2d4c:	deadbeef          	jal	t4,fffde336 <fromhost+0xfffdb236>
+    2d50:	deadbeef          	jal	t4,fffde33a <fromhost+0xfffdb23a>
+    2d54:	deadbeef          	jal	t4,fffde33e <fromhost+0xfffdb23e>
+    2d58:	deadbeef          	jal	t4,fffde342 <fromhost+0xfffdb242>
+    2d5c:	deadbeef          	jal	t4,fffde346 <fromhost+0xfffdb246>
+    2d60:	deadbeef          	jal	t4,fffde34a <fromhost+0xfffdb24a>
+    2d64:	deadbeef          	jal	t4,fffde34e <fromhost+0xfffdb24e>
+    2d68:	deadbeef          	jal	t4,fffde352 <fromhost+0xfffdb252>
+    2d6c:	deadbeef          	jal	t4,fffde356 <fromhost+0xfffdb256>
+    2d70:	deadbeef          	jal	t4,fffde35a <fromhost+0xfffdb25a>
+    2d74:	deadbeef          	jal	t4,fffde35e <fromhost+0xfffdb25e>
+    2d78:	deadbeef          	jal	t4,fffde362 <fromhost+0xfffdb262>
+    2d7c:	deadbeef          	jal	t4,fffde366 <fromhost+0xfffdb266>
+
+00002d80 <signature_8_0>:
+    2d80:	deadbeef          	jal	t4,fffde36a <fromhost+0xfffdb26a>
+    2d84:	deadbeef          	jal	t4,fffde36e <fromhost+0xfffdb26e>
+    2d88:	deadbeef          	jal	t4,fffde372 <fromhost+0xfffdb272>
+    2d8c:	deadbeef          	jal	t4,fffde376 <fromhost+0xfffdb276>
+    2d90:	deadbeef          	jal	t4,fffde37a <fromhost+0xfffdb27a>
+    2d94:	deadbeef          	jal	t4,fffde37e <fromhost+0xfffdb27e>
+    2d98:	deadbeef          	jal	t4,fffde382 <fromhost+0xfffdb282>
+    2d9c:	deadbeef          	jal	t4,fffde386 <fromhost+0xfffdb286>
+    2da0:	deadbeef          	jal	t4,fffde38a <fromhost+0xfffdb28a>
+    2da4:	deadbeef          	jal	t4,fffde38e <fromhost+0xfffdb28e>
+    2da8:	deadbeef          	jal	t4,fffde392 <fromhost+0xfffdb292>
+    2dac:	deadbeef          	jal	t4,fffde396 <fromhost+0xfffdb296>
+    2db0:	deadbeef          	jal	t4,fffde39a <fromhost+0xfffdb29a>
+    2db4:	deadbeef          	jal	t4,fffde39e <fromhost+0xfffdb29e>
+    2db8:	deadbeef          	jal	t4,fffde3a2 <fromhost+0xfffdb2a2>
+    2dbc:	deadbeef          	jal	t4,fffde3a6 <fromhost+0xfffdb2a6>
+    2dc0:	deadbeef          	jal	t4,fffde3aa <fromhost+0xfffdb2aa>
+    2dc4:	deadbeef          	jal	t4,fffde3ae <fromhost+0xfffdb2ae>
+    2dc8:	deadbeef          	jal	t4,fffde3b2 <fromhost+0xfffdb2b2>
+    2dcc:	deadbeef          	jal	t4,fffde3b6 <fromhost+0xfffdb2b6>
+    2dd0:	deadbeef          	jal	t4,fffde3ba <fromhost+0xfffdb2ba>
+    2dd4:	deadbeef          	jal	t4,fffde3be <fromhost+0xfffdb2be>
+    2dd8:	deadbeef          	jal	t4,fffde3c2 <fromhost+0xfffdb2c2>
+    2ddc:	deadbeef          	jal	t4,fffde3c6 <fromhost+0xfffdb2c6>
+    2de0:	deadbeef          	jal	t4,fffde3ca <fromhost+0xfffdb2ca>
+    2de4:	deadbeef          	jal	t4,fffde3ce <fromhost+0xfffdb2ce>
+    2de8:	deadbeef          	jal	t4,fffde3d2 <fromhost+0xfffdb2d2>
+    2dec:	deadbeef          	jal	t4,fffde3d6 <fromhost+0xfffdb2d6>
+    2df0:	deadbeef          	jal	t4,fffde3da <fromhost+0xfffdb2da>
+    2df4:	deadbeef          	jal	t4,fffde3de <fromhost+0xfffdb2de>
+    2df8:	deadbeef          	jal	t4,fffde3e2 <fromhost+0xfffdb2e2>
+    2dfc:	deadbeef          	jal	t4,fffde3e6 <fromhost+0xfffdb2e6>
+
+00002e00 <begin_regstate>:
+    2e00:	0080                	vmsge.vx	v1,v0,zero,v0.t
+	...
+
+00002f00 <end_regstate>:
+    2f00:	0004                	.2byte	0x4
+	...
+
+Disassembly of section .tohost:
+
+00003000 <tohost>:
+	...
+
+00003100 <fromhost>:
+	...
+
+Disassembly of section .riscv.attributes:
+
+00000000 <.riscv.attributes>:
+   0:	8741                	vmsge.vx	v14,v0,ra,v0.t
+   2:	0000                	vmsge.vx	v0,v0,zero,v0.t
+   4:	7200                	vmsge.vx	v4,v0,zero,v0.t
+   6:	7369                	.2byte	0x7369
+   8:	01007663          	bgeu	zero,a6,14 <trap_vector+0x10>
+   c:	007d                	.2byte	0x7d
+   e:	0000                	vmsge.vx	v0,v0,zero,v0.t
+  10:	7205                	.2byte	0x7205
+  12:	3376                	.2byte	0x3376
+  14:	6932                	.2byte	0x6932
+  16:	7032                	.2byte	0x7032
+  18:	5f30                	.2byte	0x5f30
+  1a:	326d                	.2byte	0x326d
+  1c:	3070                	.2byte	0x3070
+  1e:	615f 7032 5f30      	.byte	0x5f, 0x61, 0x32, 0x70, 0x30, 0x5f
+  24:	3266                	.2byte	0x3266
+  26:	3070                	.2byte	0x3070
+  28:	645f 7032 5f30      	.byte	0x5f, 0x64, 0x32, 0x70, 0x30, 0x5f
+  2e:	3176                	.2byte	0x3176
+  30:	3070                	.2byte	0x3070
+  32:	7a5f 6576 3233      	.byte	0x5f, 0x7a, 0x76, 0x65, 0x33, 0x32
+  38:	3166                	.2byte	0x3166
+  3a:	3070                	.2byte	0x3070
+  3c:	7a5f 6576 3233      	.byte	0x5f, 0x7a, 0x76, 0x65, 0x33, 0x32
+  42:	3178                	.2byte	0x3178
+  44:	3070                	.2byte	0x3070
+  46:	7a5f 6576 3436      	.byte	0x5f, 0x7a, 0x76, 0x65, 0x36, 0x34
+  4c:	3164                	.2byte	0x3164
+  4e:	3070                	.2byte	0x3070
+  50:	7a5f 6576 3436      	.byte	0x5f, 0x7a, 0x76, 0x65, 0x36, 0x34
+  56:	3166                	.2byte	0x3166
+  58:	3070                	.2byte	0x3070
+  5a:	7a5f 6576 3436      	.byte	0x5f, 0x7a, 0x76, 0x65, 0x36, 0x34
+  60:	3178                	.2byte	0x3178
+  62:	3070                	.2byte	0x3070
+  64:	7a5f 6c76 3231      	.byte	0x5f, 0x7a, 0x76, 0x6c, 0x31, 0x32
+  6a:	6238                	.2byte	0x6238
+  6c:	7031                	.2byte	0x7031
+  6e:	5f30                	.2byte	0x5f30
+  70:	767a                	.2byte	0x767a
+  72:	336c                	.2byte	0x336c
+  74:	6232                	.2byte	0x6232
+  76:	7031                	.2byte	0x7031
+  78:	5f30                	.2byte	0x5f30
+  7a:	767a                	.2byte	0x767a
+  7c:	366c                	.2byte	0x366c
+  7e:	6234                	.2byte	0x6234
+  80:	7031                	.2byte	0x7031
+  82:	0030                	.2byte	0x30
+  84:	0108                	.2byte	0x108
+  86:	0b0a                	.2byte	0xb0a
