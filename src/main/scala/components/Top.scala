@@ -43,10 +43,10 @@ val vec_read_h4 = RegNext(vec_h3)
   core.io.dmemReq.ready := 1.B
   dmem.io.rsp.ready := 1.B
   dmem.io.req.valid := 1.B
-  dmem.io.req.bits.dataRequest := Mux(vec_h3,core.io.vec_dmemReq.bits.dataRequest,core.io.dmemReq.bits.dataRequest)
-  dmem.io.req.bits.addrRequest := Mux(vec_h3,core.io.vec_dmemReq.bits.addrRequest,core.io.dmemReq.bits.addrRequest)
-  dmem.io.req.bits.isWrite := Mux(vec_h3,core.io.vec_dmemReq.bits.isWrite,core.io.dmemReq.bits.isWrite)
-  dmem.io.req.bits.activeByteLane := Mux(vec_h3,core.io.vec_dmemReq.bits.activeByteLane,core.io.dmemReq.bits.activeByteLane)
+  dmem.io.req.bits.dataRequest := Mux(vec_h3===1.B,core.io.vec_dmemReq.bits.dataRequest,core.io.dmemReq.bits.dataRequest)
+  dmem.io.req.bits.addrRequest := Mux(vec_h3===1.B,core.io.vec_dmemReq.bits.addrRequest,core.io.dmemReq.bits.addrRequest)
+  dmem.io.req.bits.isWrite := Mux(vec_h3===1.B,core.io.vec_dmemReq.bits.isWrite,core.io.dmemReq.bits.isWrite)
+  dmem.io.req.bits.activeByteLane := Mux(vec_h3===1.B,core.io.vec_dmemReq.bits.activeByteLane,core.io.dmemReq.bits.activeByteLane)
   
 
 

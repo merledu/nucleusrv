@@ -175,7 +175,7 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
     vec_stall := true.B
   }//.elsewhen(vec_load_store_bit===1.B && vec_load_store_counter===1.U){}
 .otherwise{
-    vec_load_store_counter := RegInit(((128.U*1.U)/32.U)-1.U(32.W))
+    vec_load_store_counter := RegInit(((vec_config.vlen.U*1.U)/32.U)-1.U(32.W))
     vec_stall := false.B
   }
 

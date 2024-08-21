@@ -2,9 +2,9 @@ RISCV=riscv32-unknown-elf-
 CC=$(RISCV)gcc
 OBJDUMP=$(RISCV)objdump
 OBJCOPY=$(RISCV)objcopy
-CFLAGS=-c -march=rv32i -mabi=ilp32 -ffreestanding -fomit-frame-pointer
+CFLAGS=-c -march=rv32gv -mabi=ilp32 -ffreestanding -fomit-frame-pointer
 OFLAGS=--disassemble-all --section=.text
-LFLAGS = -march=rv32im -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
+LFLAGS = -march=rv32gv -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
 
 PROGRAM ?= fibonacci
 TEST_DIR = tests/$(PROGRAM)
