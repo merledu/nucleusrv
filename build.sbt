@@ -1,3 +1,4 @@
+import sbt.Keys.javacOptions
 // See README.md for license details.
 
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
@@ -42,23 +43,30 @@ resolvers ++= Seq(
 
 // Provide a managed dependency on X if -DXVersion="" is supplied on the command line.
 val defaultVersions = Map(
-  "chisel3" -> "3.4.2",
-  "chisel-iotesters" -> "1.5.0"
+  "chisel3" -> "3.5.5",
+  "chisel-iotesters" -> "2.5.6"
   )
 
-libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
-  dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep)) }
-
-libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.3.2" % "test"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+lazy val root = (project in file(".")).settings(
+  libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
+    dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep))
+  } ++ Seq(
+    "edu.berkeley.cs" %% "chiseltest" % "0.5.6" % "test",
+    "org.scalatest" %% "scalatest" % "3.2.0" % "test"
+  ),
+  addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % defaultVersions("chisel3") cross CrossVersion.full),
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("snapshots"),
+    Resolver.sonatypeRepo("releases")
+  ),
+  scalacOptions ++= scalacOptionsVersion(scalaVersion.value),
+  javacOptions ++= javacOptionsVersion(scalaVersion.value)
+)
 
 logBuffered in Test := false
 
 parallelExecution in Test := false
 
-scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 
-javacOptions ++= javacOptionsVersion(scalaVersion.value)
 
 trapExit := false
