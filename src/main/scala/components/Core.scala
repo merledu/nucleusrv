@@ -165,17 +165,41 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
   }
 
   val vec_load_store_bit = instruction(6,0)==="b0000111".U || instruction(6,0)==="b0100111".U
-  dontTouch(vec_load_store_bit)
+val lmul = RegInit(1.U(32.W))  
+  
 
-  val vec_load_store_counter = RegInit(((vec_config.vlen.U*1.U)/32.U)-1.U(32.W))
+  val vec_load_store_counter = RegInit(((vec_config.vlen.U*lmul)/32.U)-1.U(32.W))
   dontTouch(vec_load_store_counter)
   val vec_stall = WireInit(false.B)
-  when(vec_load_store_bit===1.B && vec_load_store_counter=/=0.U){
+  when(vec_load_store_bit===1.B && vec_load_store_counter>0.U){
     vec_load_store_counter := vec_load_store_counter - 1.U
     vec_stall := true.B
   }//.elsewhen(vec_load_store_bit===1.B && vec_load_store_counter===1.U){}
 .otherwise{
-    vec_load_store_counter := RegInit(((vec_config.vlen.U*1.U)/32.U)-1.U(32.W))
+  when (instruction(6,0)==="b1010111".U && instruction(14,12)==="b111".U){
+    when (instruction(22,20)==="b000".U){
+      lmul := 1.U
+      vec_load_store_counter := ((vec_config.vlen.U*1.U)/32.U)-1.U
+    }
+    .elsewhen (instruction(22,20)==="b001".U){
+      lmul := 2.U
+      vec_load_store_counter := ((vec_config.vlen.U*2.U)/32.U)-1.U
+    }
+    .elsewhen (instruction(22,20)==="b010".U){
+      lmul := 4.U
+      vec_load_store_counter := ((vec_config.vlen.U*4.U)/32.U)-1.U
+    }
+    .elsewhen (instruction(22,20)==="b011".U){
+      lmul := 8.U
+      vec_load_store_counter := ((vec_config.vlen.U*8.U)/32.U)-1.U
+    }.otherwise{
+      lmul := 1.U
+      vec_load_store_counter := ((vec_config.vlen.U*lmul)/32.U)-1.U
+    }
+  }.otherwise{
+    lmul := lmul
+  }
+  //changes
     vec_stall := false.B
   }
 
