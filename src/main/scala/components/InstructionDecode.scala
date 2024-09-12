@@ -5,80 +5,80 @@ import chisel3.util._
 
 class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
   val io = IO(new Bundle {
-    val id_instruction = Input(UInt(32.W))
-    val writeData = Input(UInt(32.W))
-    val writeReg = Input(UInt(5.W))
-    val pcAddress = Input(UInt(32.W))
-    val ctl_writeEnable = Input(Bool())
-    val id_ex_mem_read = Input(Bool())
-    val ex_mem_mem_read = Input(Bool())
-    val dmem_resp_valid = Input(Bool())
-    val id_ex_rd = Input(UInt(5.W))
-    val ex_mem_rd = Input(UInt(5.W))
-    val id_ex_branch = Input(Bool())
+    val id_instruction        = Input(UInt(32.W))
+    val writeData             = Input(UInt(32.W))
+    val writeReg              = Input(UInt(5.W))
+    val pcAddress             = Input(UInt(32.W))
+    val ctl_writeEnable       = Input(Bool())
+    val id_ex_mem_read        = Input(Bool())
+    val ex_mem_mem_read       = Input(Bool())
+    val dmem_resp_valid       = Input(Bool())
+    val id_ex_rd              = Input(UInt(5.W))
+    val ex_mem_rd             = Input(UInt(5.W))
+    val id_ex_branch          = Input(Bool())
     //for forwarding
-    val ex_mem_ins = Input(UInt(32.W))
-    val mem_wb_ins = Input(UInt(32.W))
-    val ex_ins = Input(UInt(32.W))
-    val ex_result = Input(UInt(32.W))
-    val ex_mem_result = Input(UInt(32.W))
-    val mem_wb_result = Input(UInt(32.W))
+    val ex_mem_ins            = Input(UInt(32.W))
+    val mem_wb_ins            = Input(UInt(32.W))
+    val ex_ins                = Input(UInt(32.W))
+    val ex_result             = Input(UInt(32.W))
+    val ex_mem_result         = Input(UInt(32.W))
+    val mem_wb_result         = Input(UInt(32.W))
 
-    val id_ex_regWr = Input(Bool())
-    val ex_mem_regWr = Input(Bool())
-    val csr_Ex = Input(Bool())
-    val csr_Mem = Input(Bool())
-    val csr_Wb = Input(Bool())
-    val csr_Ex_data = Input(UInt(32.W))
-    val csr_Mem_data = Input(UInt(32.W))
-    val csr_Wb_data = Input(UInt(32.W))
-    val dmem_data = Input(UInt(32.W))
+    val id_ex_regWr           = Input(Bool())
+    val ex_mem_regWr          = Input(Bool())
+    val csr_Ex                = if(Zicsr) Some(Input(Bool())) else None
+    val csr_Mem               = if(Zicsr) Some(Input(Bool())) else None
+    val csr_Wb                = if(Zicsr) Some(Input(Bool())) else None
+    val csr_Ex_data           = if(Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_Mem_data          = if(Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_Wb_data           = if(Zicsr) Some(Input(UInt(32.W))) else None
+    val dmem_data             = if(Zicsr) Some(Input(UInt(32.W))) else None
     
     //Outputs
-    val immediate = Output(UInt(32.W))
-    val writeRegAddress = Output(UInt(5.W))
-    val readData1 = Output(UInt(32.W))
-    val readData2 = Output(UInt(32.W))
-    val func7 = Output(UInt(7.W))
-    val func3 = Output(UInt(3.W))
-    val ctl_aluSrc = Output(Bool())
-    val ctl_memToReg = Output(UInt(2.W))
-    val ctl_regWrite = Output(Bool())
-    val ctl_memRead = Output(Bool())
-    val ctl_memWrite = Output(Bool())
-    val ctl_branch = Output(Bool())
-    val ctl_aluOp = Output(UInt(2.W))
-    val ctl_jump = Output(UInt(2.W))
-    val ctl_aluSrc1 = Output(UInt(2.W))
-    val hdu_pcWrite = Output(Bool())
-    val hdu_if_reg_write = Output(Bool())
-    val pcSrc = Output(Bool())
-    val pcPlusOffset = Output(UInt(32.W))
-    val ifid_flush = Output(Bool())
+    val immediate             = Output(UInt(32.W))
+    val writeRegAddress       = Output(UInt(5.W))
+    val readData1             = Output(UInt(32.W))
+    val readData2             = Output(UInt(32.W))
+    val func7                 = Output(UInt(7.W))
+    val func3                 = Output(UInt(3.W))
+    val ctl_aluSrc            = Output(Bool())
+    val ctl_memToReg          = Output(UInt(2.W))
+    val ctl_regWrite          = Output(Bool())
+    val ctl_memRead           = Output(Bool())
+    val ctl_memWrite          = Output(Bool())
+    val ctl_branch            = Output(Bool())
+    val ctl_aluOp             = Output(UInt(2.W))
+    val ctl_jump              = Output(UInt(2.W))
+    val ctl_aluSrc1           = Output(UInt(2.W))
+    val hdu_pcWrite           = Output(Bool())
+    val hdu_if_reg_write      = Output(Bool())
+    val pcSrc                 = Output(Bool())
+    val pcPlusOffset          = Output(UInt(32.W))
+    val ifid_flush            = Output(Bool())
 
-    val stall = Output(Bool())
+    val stall                 = Output(Bool())
 
     // CSR pins
-    val csr_i_misa        = Input(UInt(32.W))
-    val csr_i_mhartid     = Input(UInt(32.W))
-    val csr_o_data        = Output(UInt(32.W))
-    val is_csr            = Output(Bool())
-    val fscr_o_data       = Output(UInt(32.W))
-    val mie_status          = Output(Bool())
-    val intrp_en            = Input(Bool())
+    val csr_i_misa            = if(Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_i_mhartid         = if(Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_o_data            = if(Zicsr) Some(Output(UInt(32.W))) else None
+    val is_csr                = if(Zicsr) Some(Output(Bool())) else None
+    val fscr_o_data           = if(Zicsr) Some(Output(UInt(32.W))) else None
+    val mie_status            = if(Zicsr) Some(Output(Bool())) else None
+    val intrp_en              = Input(Bool())
 
     // RVFI pins
-    val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
+    val rs_addr               = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
   })
 
-  val registers = Module(new Registers)
-  val registerRd = io.writeReg
-  val registerRs1 = io.id_instruction(19, 15)
-  val registerRs2 = io.id_instruction(24, 20)
-  registers.io.readAddress(0) := registerRs1
-  registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb  
-  registers.io.writeAddress := registerRd
+  val registers               = Module(new Registers)
+  val registerRd              = io.writeReg
+  val registerRs1             = io.id_instruction(19, 15)
+  val registerRs2             = io.id_instruction(24, 20)
+  registers.io.readAddress(0)   := registerRs1
+  registers.io.readAddress(1)   := registerRs2
+  registers.io.writeEnable      := io.ctl_writeEnable || io.csr_Wb  
+  registers.io.writeAddress     := registerRd
   
 
   // CSR
