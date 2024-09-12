@@ -11,7 +11,6 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
     val pcAddress = Input(UInt(32.W))
     val ctl_writeEnable = Input(Bool())
     val id_ex_mem_read = Input(Bool())
-//    val ex_mem_mem_write = Input(Bool())
     val ex_mem_mem_read = Input(Bool())
     val dmem_resp_valid = Input(Bool())
     val id_ex_rd = Input(UInt(5.W))
@@ -72,8 +71,19 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
     val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
   })
 
+  val registers = Module(new Registers)
+  val registerRd = io.writeReg
+  val registerRs1 = io.id_instruction(19, 15)
+  val registerRs2 = io.id_instruction(24, 20)
+  registers.io.readAddress(0) := registerRs1
+  registers.io.readAddress(1) := registerRs2
+  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb  
+  registers.io.writeAddress := registerRd
+  
+
   // CSR
-  val csr = Module(new CSR())
+  if (Zicsr){  
+    val csr = Module(new CSR())
     csr.io.i_misa_value         := io.csr_i_misa
     csr.io.i_mhartid_value      := io.csr_i_mhartid
     csr.io.i_imm                := io.id_instruction(19,15)
@@ -88,19 +98,34 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
     io.csr_o_data               := csr.io.o_data
     io.fscr_o_data              := csr.io.fcsr_o_data
 
-  val csrController = Module(new CSRController())
-  csrController.io.regWrExecute    := io.id_ex_regWr
-  csrController.io.rdSelExecute    := io.id_ex_rd
-  csrController.io.csrWrExecute    := io.csr_Ex
-  csrController.io.regWrMemory     := io.ex_mem_regWr
-  csrController.io.rdSelMemory     := io.ex_mem_rd
-  csrController.io.csrWrMemory     := io.csr_Mem
-  csrController.io.regWrWriteback  := io.ctl_writeEnable
-  csrController.io.rdSelWriteback  := io.writeReg
-  csrController.io.csrWrWriteback  := io.csr_Wb
-  csrController.io.rs1SelDecode    := io.id_instruction(19,15)
-  csrController.io.csrInstDecode   := io.id_instruction(6, 0) === "b1110011".U
-  csrController.io.csrInstIsImmd   := 0.B
+    val csrController = Module(new CSRController())
+    csrController.io.regWrExecute    := io.id_ex_regWr
+    csrController.io.rdSelExecute    := io.id_ex_rd
+    csrController.io.csrWrExecute    := io.csr_Ex
+    csrController.io.regWrMemory     := io.ex_mem_regWr
+    csrController.io.rdSelMemory     := io.ex_mem_rd
+    csrController.io.csrWrMemory     := io.csr_Mem
+    csrController.io.regWrWriteback  := io.ctl_writeEnable
+    csrController.io.rdSelWriteback  := io.writeReg
+    csrController.io.csrWrWriteback  := io.csr_Wb
+    csrController.io.rs1SelDecode    := io.id_instruction(19,15)
+    csrController.io.csrInstDecode   := io.id_instruction(6, 0) === "b1110011".U
+    csrController.io.csrInstIsImmd   := 0.B
+
+    val csr_iData_cases = Array(
+      1.U -> io.ex_result,
+      2.U -> Mux(io.ex_mem_mem_read, io.dmem_data, io.ex_mem_result),
+      3.U -> io.writeData,
+      4.U -> io.csr_Ex_data,
+      5.U -> io.csr_Mem_data,
+      6.U -> io.csr_Wb_data
+    )
+
+    csr.io.i_data := MuxLookup(1.U, registers.io.readData(1), csr_iData_cases)
+    registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb  
+  } else {
+    registers.io.writeEnable := io.ctl_writeEnable
+  }
 
   //Hazard Detection Unit
   val hdu = Module(new HazardUnit)
@@ -138,16 +163,7 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
   }
 
   //Register File
-  val registers = Module(new Registers)
-  val registerRd = io.writeReg
-  val registerRs1 = io.id_instruction(19, 15)
-  val registerRs2 = io.id_instruction(24, 20)
-  registers.io.readAddress(0) := registerRs1
-  registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb
-  registers.io.writeAddress := registerRd
   registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
-
   //Forwarding to fix structural hazard
   when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
     when(registerRs1 === 0.U){
@@ -246,16 +262,8 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
 
   io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
 
-  val csr_iData_cases = Array(
-    1.U -> io.ex_result,
-    2.U -> Mux(io.ex_mem_mem_read, io.dmem_data, io.ex_mem_result),
-    3.U -> io.writeData,
-    4.U -> io.csr_Ex_data,
-    5.U -> io.csr_Mem_data,
-    6.U -> io.csr_Wb_data
-  )
 
-  csr.io.i_data := MuxLookup(csrController.io.forwardRS1, registers.io.readData(1), csr_iData_cases)
+  
 
   // RVFI
   if (TRACE) {
