@@ -7,6 +7,7 @@ class Core(implicit val config:Configs) extends Module{
 
   val M      = config.M
   val C      = config.C
+  val Zicsr  = config.Zicsr
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
 
@@ -85,7 +86,7 @@ class Core(implicit val config:Configs) extends Module{
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val ID = Module(new InstructionDecode(TRACE)).io
+  val ID = Module(new InstructionDecode(Zicsr, TRACE)).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
 

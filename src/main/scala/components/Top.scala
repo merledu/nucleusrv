@@ -11,7 +11,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     val fcsr = Output(UInt(32.W))
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
+  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, Zicsr=true, TRACE=true)
 
   val core: Core = Module(new Core())
   
