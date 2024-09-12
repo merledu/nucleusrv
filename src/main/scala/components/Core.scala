@@ -53,8 +53,8 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_ctl_branch = RegInit(false.B)
   val id_reg_ctl_aluOp = RegInit(0.U(2.W))
   val id_reg_ctl_jump = RegInit(0.U(2.W))
-  val id_reg_is_csr = RegInit(false.B)
-  val id_reg_csr_data = RegInit(0.U)
+  val id_reg_is_csr = if (Zicsr) Some(RegInit(false.B)) else None
+  val id_reg_csr_data = if (Zicsr) Some(RegInit(0.U)) else None
 
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
@@ -69,8 +69,8 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_ctl_memWrite = RegInit(false.B)
   val ex_reg_ctl_branch_taken = RegInit(false.B)
   val ex_reg_pc = RegInit(0.U(32.W))
-  val ex_reg_is_csr = RegInit(false.B)
-  val ex_reg_csr_data = RegInit(0.U)
+  val ex_reg_is_csr = if (Zicsr) Some(RegInit(false.B)) else None
+  val ex_reg_csr_data = if (Zicsr) Some(RegInit(0.U)) else None
 
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -81,8 +81,8 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_ctl_memToReg = RegInit(0.U(2.W))
   val mem_reg_ctl_regWrite = RegInit(false.B)
   val mem_reg_pc = RegInit(0.U(32.W))
-  val mem_reg_is_csr = RegInit(false.B)
-  val mem_reg_csr_data = RegInit(0.U)
+  val mem_reg_is_csr = if (Zicsr) Some(RegInit(false.B)) else None
+  val mem_reg_csr_data = if (Zicsr) Some(RegInit(0.U)) else None
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
@@ -90,7 +90,7 @@ class Core(implicit val config:Configs) extends Module{
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
 
-  io.fcsr_o_data := ID.fscr_o_data
+  io.fcsr_o_data := ID.fcsr_o_data
   
   /*****************
    * Fetch Stage *
@@ -152,7 +152,7 @@ class Core(implicit val config:Configs) extends Module{
     func7 := 0.U
   }
 
-  val intrp_en = ID.mie_status & io.stall
+  val intrp_en = ID.mie_status.get & io.stall
   val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
 
   IF.stall := intrp_en || EX.stall || ID.stall || IF_stall //stall signal from outside
@@ -192,8 +192,11 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_ctl_aluOp := ID.ctl_aluOp
   id_reg_ctl_jump := ID.ctl_jump
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
-  id_reg_is_csr := ID.is_csr
-  id_reg_csr_data := ID.csr_o_data
+  if(Zicsr) {
+    id_reg_is_csr.get := ID.is_csr.get
+    id_reg_csr_data.get := ID.csr_o_data.get    
+  }
+  
 //  IF.PcWrite := ID.hdu_pcWrite
   ID.intrp_en := intrp_en
   ID.id_instruction := if_reg_ins
@@ -206,8 +209,8 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  ID.csr_i_misa    := DontCare
-  ID.csr_i_mhartid := DontCare
+  ID.csr_i_misa.get    := DontCare
+  ID.csr_i_mhartid.get := DontCare
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
 
@@ -235,8 +238,11 @@ class Core(implicit val config:Configs) extends Module{
   ex_reg_ins := id_reg_ins
   ex_reg_ctl_memToReg := id_reg_ctl_memToReg
   ex_reg_ctl_regWrite := id_reg_ctl_regWrite
-  ex_reg_is_csr := id_reg_is_csr
-  ex_reg_csr_data := id_reg_csr_data
+  if (Zicsr) {
+  ex_reg_is_csr.get := id_reg_is_csr.get
+  ex_reg_csr_data.get := id_reg_csr_data.get
+  }
+
 //  ex_reg_ctl_memRead := id_reg_ctl_memRead
 //  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
   ID.id_ex_mem_read := id_reg_ctl_memRead
@@ -251,8 +257,8 @@ class Core(implicit val config:Configs) extends Module{
   ID.id_ex_branch := Mux(id_reg_ins(6,0) === "b1100011".asUInt(), true.B, false.B )
   ID.ex_mem_rd := ex_reg_ins(11, 7)
   ID.ex_result := EX.ALUresult
-  ID.csr_Ex := id_reg_is_csr
-  ID.csr_Ex_data := id_reg_csr_data
+  ID.csr_Ex.get := id_reg_is_csr.get
+  ID.csr_Ex_data.get := id_reg_csr_data.get
 
   when(EX.stall){
     id_reg_wra := id_reg_wra
@@ -299,8 +305,11 @@ class Core(implicit val config:Configs) extends Module{
 //  }
   mem_reg_wra := ex_reg_wra
   mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
-  mem_reg_is_csr := ex_reg_is_csr
-  mem_reg_csr_data := ex_reg_csr_data
+  if(Zicsr) {
+    mem_reg_is_csr.get := ex_reg_is_csr.get
+    mem_reg_csr_data.get := ex_reg_csr_data.get
+  }
+
   EX.ex_mem_regWrite := ex_reg_ctl_regWrite
   MEM.io.aluResultIn := ex_reg_result
   MEM.io.writeData := ex_reg_wd
@@ -308,8 +317,8 @@ class Core(implicit val config:Configs) extends Module{
   MEM.io.writeEnable := ex_reg_ctl_memWrite
   MEM.io.f3 := ex_reg_ins(14,12)
   EX.mem_result := ex_reg_result
-  ID.csr_Mem := ex_reg_is_csr
-  ID.csr_Mem_data := ex_reg_csr_data
+  ID.csr_Mem.get := ex_reg_is_csr.get
+  ID.csr_Mem_data.get := ex_reg_csr_data.get
 
   /********************
    * Write Back Stage *
@@ -336,8 +345,8 @@ class Core(implicit val config:Configs) extends Module{
   EX.mem_wb_regWrite := mem_reg_ctl_regWrite
   ID.writeReg := wb_addr
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
-  ID.csr_Wb := mem_reg_is_csr
-  ID.csr_Wb_data := mem_reg_csr_data
+  ID.csr_Wb.get := mem_reg_is_csr.get
+  ID.csr_Wb_data.get := mem_reg_csr_data.get
   ID.dmem_data := io.dmemRsp.bits.dataResponse
   io.pin := wb_data
 

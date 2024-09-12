@@ -32,7 +32,7 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
     val csr_Ex_data           = if(Zicsr) Some(Input(UInt(32.W))) else None
     val csr_Mem_data          = if(Zicsr) Some(Input(UInt(32.W))) else None
     val csr_Wb_data           = if(Zicsr) Some(Input(UInt(32.W))) else None
-    val dmem_data             = if(Zicsr) Some(Input(UInt(32.W))) else None
+    val dmem_data             = Input(UInt(32.W))
     
     //Outputs
     val immediate             = Output(UInt(32.W))
@@ -63,7 +63,7 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
     val csr_i_mhartid         = if(Zicsr) Some(Input(UInt(32.W))) else None
     val csr_o_data            = if(Zicsr) Some(Output(UInt(32.W))) else None
     val is_csr                = if(Zicsr) Some(Output(Bool())) else None
-    val fscr_o_data           = if(Zicsr) Some(Output(UInt(32.W))) else None
+    val fcsr_o_data           = Output(UInt(32.W))
     val mie_status            = if(Zicsr) Some(Output(Bool())) else None
     val intrp_en              = Input(Bool())
 
@@ -77,37 +77,36 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
   val registerRs2             = io.id_instruction(24, 20)
   registers.io.readAddress(0)   := registerRs1
   registers.io.readAddress(1)   := registerRs2
-  registers.io.writeEnable      := io.ctl_writeEnable || io.csr_Wb  
   registers.io.writeAddress     := registerRd
   
 
   // CSR
   if (Zicsr){  
     val csr = Module(new CSR())
-    csr.io.i_misa_value         := io.csr_i_misa
-    csr.io.i_mhartid_value      := io.csr_i_mhartid
+    csr.io.i_misa_value         := io.csr_i_misa.get
+    csr.io.i_mhartid_value      := io.csr_i_mhartid.get
     csr.io.i_imm                := io.id_instruction(19,15)
     csr.io.i_opr                := io.id_instruction(14,12)
     csr.io.i_addr               := io.id_instruction(31,20)
-    csr.io.i_w_en               := io.is_csr && (io.id_instruction(19, 15) =/= 0.U)
+    csr.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
     csr.io.i_intrp_en           := io.intrp_en
     csr.io.pc_address           := io.pcAddress
 
-    io.mie_status               := csr.io.mie_status
-    io.is_csr                   := io.id_instruction(6, 0) === "b1110011".U
-    io.csr_o_data               := csr.io.o_data
-    io.fscr_o_data              := csr.io.fcsr_o_data
+    io.mie_status.get           := csr.io.mie_status
+    io.is_csr.get               := io.id_instruction(6, 0) === "b1110011".U
+    io.csr_o_data.get           := csr.io.o_data
+    io.fcsr_o_data          := csr.io.fcsr_o_data
 
     val csrController = Module(new CSRController())
     csrController.io.regWrExecute    := io.id_ex_regWr
     csrController.io.rdSelExecute    := io.id_ex_rd
-    csrController.io.csrWrExecute    := io.csr_Ex
+    csrController.io.csrWrExecute    := io.csr_Ex.get
     csrController.io.regWrMemory     := io.ex_mem_regWr
     csrController.io.rdSelMemory     := io.ex_mem_rd
-    csrController.io.csrWrMemory     := io.csr_Mem
+    csrController.io.csrWrMemory     := io.csr_Mem.get
     csrController.io.regWrWriteback  := io.ctl_writeEnable
     csrController.io.rdSelWriteback  := io.writeReg
-    csrController.io.csrWrWriteback  := io.csr_Wb
+    csrController.io.csrWrWriteback  := io.csr_Wb.get
     csrController.io.rs1SelDecode    := io.id_instruction(19,15)
     csrController.io.csrInstDecode   := io.id_instruction(6, 0) === "b1110011".U
     csrController.io.csrInstIsImmd   := 0.B
@@ -116,13 +115,13 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
       1.U -> io.ex_result,
       2.U -> Mux(io.ex_mem_mem_read, io.dmem_data, io.ex_mem_result),
       3.U -> io.writeData,
-      4.U -> io.csr_Ex_data,
-      5.U -> io.csr_Mem_data,
-      6.U -> io.csr_Wb_data
+      4.U -> io.csr_Ex_data.get,
+      5.U -> io.csr_Mem_data.get,
+      6.U -> io.csr_Wb_data.get
     )
 
     csr.io.i_data := MuxLookup(1.U, registers.io.readData(1), csr_iData_cases)
-    registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb  
+    registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb.get
   } else {
     registers.io.writeEnable := io.ctl_writeEnable
   }
@@ -163,7 +162,7 @@ class InstructionDecode(Zicsr:Boolean, TRACE:Boolean) extends Module {
   }
 
   //Register File
-  registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
+  registers.io.writeData := Mux(io.csr_Wb.get, io.csr_Wb_data.get, io.writeData)
   //Forwarding to fix structural hazard
   when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
     when(registerRs1 === 0.U){
