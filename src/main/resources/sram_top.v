@@ -48,8 +48,8 @@ end
 sram #(
   .NUM_WMASKS (4),
   .DATA_WIDTH (32),
-  .ADDR_WIDTH (13),
-  .RAM_DEPTH (1 << 13),
+  .ADDR_WIDTH (14),
+  .RAM_DEPTH (1 << 14),
   // FIXME: This delay is arbitrary.
   .DELAY (3),
   .IZERO (0) , // binary / Initial RAM with zeros (has priority over INITFILE)
