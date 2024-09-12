@@ -21,13 +21,29 @@ class CSRRegFile extends Module{
     val MTVEC_REG           = RegInit(0.U(32.W))
     val MEPC_REG            = RegInit(0.U(32.W))
     val MIE_REG             = RegInit(0.U(32.W))
+    val MSCRATCH_REG        = RegInit(0.U(32.W))
+    val MIP_REG             = RegInit(0.U(32.W))
+    val MTVAL_REG           = RegInit(0.U(32.W))
     
     // MSTATUS
-    val MSTATUS_TW_REG      = RegInit(0.U(1.W))
-    val MSTATUS_MPRV_REG    = RegInit(0.U(1.W))
-    val MSTATUS_MPP_REG     = RegInit(0.U(2.W))
-    val MSTATUS_MPIE_REG    = RegInit(0.U(1.W))
+    val MSTATUS_SIE_REG     = RegInit(0.U(1.W))
     val MSTATUS_MIE_REG     = RegInit(0.U(1.W))
+    val MSTATUS_SPIE_REG    = RegInit(0.U(1.W))
+    val MSTATUS_UBE_REG     = RegInit(0.U(1.W))
+    val MSTATUS_MPIE_REG    = RegInit(0.U(1.W))
+    val MSTATUS_SPP_REG     = RegInit(0.U(1.W))
+    val MSTATUS_VS_REG      = RegInit(0.U(2.W))
+    val MSTATUS_MPP_REG     = RegInit(0.U(2.W))
+    val MSTATUS_FS_REG      = RegInit(0.U(2.W))
+    val MSTATUS_XS_REG      = RegInit(0.U(2.W))
+    val MSTATUS_MPRV_REG    = RegInit(0.U(1.W))
+    val MSTATUS_SUM_REG     = RegInit(0.U(1.W))
+    val MSTATUS_MXR_REG     = RegInit(0.U(1.W))
+    val MSTATUS_TVM_REG     = RegInit(0.U(1.W))
+    val MSTATUS_TW_REG      = RegInit(0.U(1.W))
+    val MSTATUS_TSR_REG     = RegInit(0.U(1.W))
+    val MSTATUS_SD_REG      = RegInit(0.U(1.W))
+    val MSTATUS_WPRI_REG    = RegInit(0.U(11.W))
 
     //FCSR 
     val FCSR_NX_REG         = RegInit(0.U(1.W))
@@ -52,7 +68,7 @@ class CSRRegFile extends Module{
     // Wires
     val w_data                  = Wire(UInt(32.W))
     val r_data                  = Wire(UInt(32.W))
-    val MSTATUS_WIRE            = WireInit(Cat("b0".U(10.W), MSTATUS_TW_REG, "b0".U(3.W), MSTATUS_MPRV_REG, "b0".U(4.W), MSTATUS_MPP_REG, "b0".U(3.W), MSTATUS_MPIE_REG, "b0".U(3.W), MSTATUS_MIE_REG, "b0".U(3.W)))
+    val MSTATUS_WIRE            = WireInit(Cat(MSTATUS_SD_REG, MSTATUS_WPRI_REG(10, 3), MSTATUS_TSR_REG, MSTATUS_TW_REG, MSTATUS_TVM_REG, MSTATUS_MXR_REG, MSTATUS_SUM_REG, MSTATUS_MPRV_REG, MSTATUS_XS_REG, MSTATUS_FS_REG, MSTATUS_MPP_REG, MSTATUS_VS_REG, MSTATUS_SPP_REG, MSTATUS_MPIE_REG, MSTATUS_UBE_REG, MSTATUS_SPIE_REG, MSTATUS_WPRI_REG(2), MSTATUS_MIE_REG, MSTATUS_WPRI_REG(1), MSTATUS_SIE_REG, MSTATUS_WPRI_REG(0)))
     val MCAUSE_WLRL_WIRE        = WireInit(MCAUSE_REG(30,0))
     val MCAUSE_INTERRUPT_WIRE   = WireInit(MCAUSE_REG(31))
     val MTVEC_MODE_WIRE         = WireInit(MTVEC_REG(1,0))
@@ -69,16 +85,19 @@ class CSRRegFile extends Module{
     Seq(READ,WRITE,SET,CLEAR) zip Seq(csr_opr.READ, csr_opr.WRITE, csr_opr.SET, csr_opr.CLEAR) map (x => x._1 := x._2)
 
     val READ_CASES = Array(
-        AddressMap.MISA    -> MISA_REG,
-        AddressMap.MHARTID -> MHARTID_REG,
-        AddressMap.MSTATUS -> MSTATUS_WIRE,
-        AddressMap.MCAUSE  -> MCAUSE_REG,
-        AddressMap.MTVEC   -> MTVEC_REG,
-        AddressMap.MEPC    -> MEPC_REG,
-        AddressMap.MIE     -> MIE_REG,
-        AddressMap.FFLAGS  -> FFLAGS_WIRE,
-        AddressMap.FRM     -> FRM_WIRE,
-        AddressMap.FCSR    -> FCSR_WIRE
+        AddressMap.MISA         -> MISA_REG,
+        AddressMap.MHARTID      -> MHARTID_REG,
+        AddressMap.MSTATUS      -> MSTATUS_WIRE,
+        AddressMap.MCAUSE       -> MCAUSE_REG,
+        AddressMap.MTVEC        -> MTVEC_REG,
+        AddressMap.MEPC         -> MEPC_REG,
+        AddressMap.MIE          -> MIE_REG,
+        AddressMap.MSCRATCH     -> MSCRATCH_REG,
+        AddressMap.MIP          -> MIP_REG,
+        AddressMap.MTVAL        -> MTVAL_REG,
+        AddressMap.FFLAGS       -> FFLAGS_WIRE,
+        AddressMap.FRM          -> FRM_WIRE,
+        AddressMap.FCSR         -> FCSR_WIRE
     )
 
     r_data := MuxLookup(io.CSR.i_addr, DontCare, READ_CASES)
@@ -101,11 +120,25 @@ class CSRRegFile extends Module{
     when(io.CSR.i_w_en){
         switch(io.CSR.i_addr){
             is(AddressMap.MSTATUS){
+                MSTATUS_SD_REG   := w_data(31)
+                MSTATUS_WPRI_REG := Cat(w_data(30,23), w_data(4), w_data(2), w_data(0))
+                MSTATUS_TSR_REG  := w_data(22)
                 MSTATUS_TW_REG   := w_data(21)
+                MSTATUS_TVM_REG  := w_data(20) 
+                MSTATUS_MXR_REG  := w_data(19)
+                MSTATUS_SUM_REG  := w_data(18)
                 MSTATUS_MPRV_REG := w_data(17)
+                MSTATUS_XS_REG   := w_data(16,15)
+                MSTATUS_FS_REG   := w_data(14,13)
                 MSTATUS_MPP_REG  := w_data(12,11)
+                MSTATUS_VS_REG   := w_data(10,9)
+                MSTATUS_SPP_REG  := w_data(8)
                 MSTATUS_MPIE_REG := w_data(7)
+                MSTATUS_UBE_REG  := w_data(6)
+                MSTATUS_SPIE_REG := w_data(5)
                 MSTATUS_MIE_REG  := w_data(3)
+                MSTATUS_SIE_REG  := w_data(1)
+                
             }
             is(AddressMap.MCAUSE){
                 MCAUSE_REG       := w_data
@@ -118,6 +151,15 @@ class CSRRegFile extends Module{
             }
             is(AddressMap.MIE){
                 MIE_REG          := w_data
+            }
+            is(AddressMap.MSCRATCH){
+                MSCRATCH_REG     := w_data
+            }
+            is(AddressMap.MIP){
+                MIP_REG          := w_data
+            }
+            is(AddressMap.MTVAL){
+                MTVAL_REG        := w_data
             }
             is(AddressMap.FCSR){
                FCSR_NX_REG       := w_data(0)
@@ -140,4 +182,12 @@ class CSRRegFile extends Module{
         }
     }
     /*************************************************/
+    when (io.intrp_en){
+        MSTATUS_MPIE_REG := MSTATUS_MIE_REG
+        MSTATUS_MIE_REG  := 0.U
+        MEPC_REG         := io.pc_address
+        MSTATUS_MPP_REG  := "b11".U
+    }
+
+    io.MIE_Signal := MSTATUS_MIE_REG
 }

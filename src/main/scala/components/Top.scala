@@ -14,7 +14,11 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
 
   val core: Core = Module(new Core())
-  core.io.stall := false.B
+  
+  val Staller = Module(new Staller())
+  Staller.io.isMMIO := 0.U
+  Staller.io.isUART := 0.U
+  core.io.stall := Staller.io.stall
 
   val dmem = Module(new SRamTop(dataFile))
   val imem = Module(new SRamTop(programFile))

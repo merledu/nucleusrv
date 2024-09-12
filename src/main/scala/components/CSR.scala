@@ -15,6 +15,9 @@ class CSR extends Module{
         val i_addr              = Input(UInt(12.W))
         val i_w_en              = Input(Bool())
         val fcsr_o_data         = Output(UInt(32.W))
+        val mie_status          = Output(Bool())
+        val i_intrp_en          = Input(Bool())
+        val pc_address          = Input(Bool())
     })
 
     val csrRegFile = Module(new CSRRegFile)
@@ -29,4 +32,7 @@ class CSR extends Module{
 
     io.o_data                       := csrRegFile.io.CSR.o_data
     io.fcsr_o_data                  := Cat("b0".U(24.W),csrRegFile.io.FCSR.frm,csrRegFile.io.FCSR.nv,csrRegFile.io.FCSR.dz,csrRegFile.io.FCSR.of,csrRegFile.io.FCSR.uf,csrRegFile.io.FCSR.nx)
+    io.mie_status                   := csrRegFile.io.MIE_Signal
+    csrRegFile.io.intrp_en          := io.i_intrp_en
+    csrRegFile.io.pc_address        := io.pc_address   
 }

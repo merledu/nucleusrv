@@ -31,8 +31,11 @@ class CSR_IO extends Bundle{
 }
 
 class CSRRegFileIO extends Bundle{
-    val MISA    = new MISA()
-    val MHARTID = new MHARTID()
-    val CSR     = new CSR_IO()
-    val FCSR    = new FCSR()
+    val MISA       = new MISA()
+    val MHARTID    = new MHARTID()
+    val CSR        = new CSR_IO()
+    val FCSR       = new FCSR()
+    val MIE_Signal = Output(Bool())
+    val intrp_en   = Input(Bool())
+    val pc_address = Input(Bool())
 }

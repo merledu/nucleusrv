@@ -151,9 +151,10 @@ class Core(implicit val config:Configs) extends Module{
     func7 := 0.U
   }
 
+  val intrp_en = ID.mie_status & io.stall
   val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
 
-  IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
+  IF.stall := intrp_en || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
   pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
@@ -193,6 +194,7 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_is_csr := ID.is_csr
   id_reg_csr_data := ID.csr_o_data
 //  IF.PcWrite := ID.hdu_pcWrite
+  ID.intrp_en := intrp_en
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
   ID.dmem_resp_valid := io.dmemRsp.valid
