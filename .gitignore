@@ -358,3 +358,9 @@ hs_err_pid*
 
 .venv
 compliance/
+
+# Compliance
+config.ini
+nucleusrv/
+spike/
+riscof_work/

@@ -65,3 +65,20 @@ asmtohex:
 dv:
 	$(MAKE) asmtohex
 	$(MAKE) IMEM=assembly.hex sim	
+
+modify_top:
+	(echo '/* verilator lint_off ASSIGNDLY */' && \
+	echo '/* verilator lint_off UNUSED */' && \
+	echo '/* verilator lint_off BLKSEQ */' && \
+	echo '/* verilator lint_off DECLFILENAME */' && \
+	echo '/* verilator lint_off EOFNEWLINE */' && \
+	echo '/* verilator lint_off WIDTH */' && \
+	cat Top.v) > temp && mv temp Top.v
+
+sim-compliance:
+	sbt "runMain nucleusrv.components.NRVDriver $(IMEM) $(DMEM)"
+	make modify_top
+	@if [ ! -d obj_dir ]; then mkdir obj_dir; fi
+	verilator -Wall --cc Top.v --exe tb_Top.cpp > $(PTH)/ver_output.log 2>&1 
+	make -C obj_dir -f VTop.mk VTop
+	@obj_dir/VTop > $(PTH)/trace.log 2>&1 
