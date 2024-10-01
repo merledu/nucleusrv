@@ -94,7 +94,7 @@ class MemoryFetch extends Module {
   //val reqvalid = WireInit(0.B)
 
   io.dccmReq.bits.dataRequest := wdata.asUInt()
-  io.dccmReq.bits.addrRequest := (io.aluResultIn & "h00001fff".U) >> 2
+  io.dccmReq.bits.addrRequest := io.aluResultIn  //(io.aluResultIn & "h00001fff".U) >> 2
   io.dccmReq.bits.isWrite := io.writeEnable
 
   when(io.stall) {
@@ -106,7 +106,7 @@ class MemoryFetch extends Module {
   io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
   io.stall := (io.writeEnable || io.readEnable) && !io.dccmRsp.valid
 
-  rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
+  rdata := io.dccmRsp.bits.dataResponse //Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 
 
   when(io.readEnable) {
