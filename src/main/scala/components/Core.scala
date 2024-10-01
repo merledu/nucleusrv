@@ -235,43 +235,6 @@ when(!dccm_stall){
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
 
-// .otherwise{
-//   id_reg_rd1 := id_reg_rd1
-//   id_reg_rd2 := id_reg_rd2
-//   id_reg_imm := id_reg_imm
-//   id_reg_wra := ID.writeRegAddress
-//   id_reg_f3 := ID.func3
-//   id_reg_f7 := ID.func7
-//   id_reg_ins := if_reg_ins
-//   id_reg_pc := if_reg_pc
-//   id_reg_ctl_aluSrc := ID.ctl_aluSrc
-//   id_reg_ctl_memToReg := ID.ctl_memToReg
-//   id_reg_ctl_regWrite := ID.ctl_regWrite
-//   id_reg_ctl_memRead := ID.ctl_memRead
-//   id_reg_ctl_memWrite := ID.ctl_memWrite
-//   id_reg_ctl_branch := ID.ctl_branch
-//   id_reg_ctl_aluOp := ID.ctl_aluOp
-//   id_reg_ctl_jump := ID.ctl_jump
-//   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
-//   id_reg_is_csr := ID.is_csr
-//   id_reg_csr_data := ID.csr_o_data
-// //  IF.PcWrite := ID.hdu_pcWrite
-//   ID.id_instruction := if_reg_ins
-//   ID.pcAddress := if_reg_pc
-//   ID.dmem_resp_valid := io.dmemRsp.valid
-// //  IF.PcSrc := ID.pcSrc
-// //  IF.PCPlusOffset := ID.pcPlusOffset
-//   ID.ex_ins := id_reg_ins
-//   ID.ex_mem_ins := ex_reg_ins
-//   ID.mem_wb_ins := mem_reg_ins
-//   ID.ex_mem_result := ex_reg_result
-
-//   ID.csr_i_misa    := DontCare
-//   ID.csr_i_mhartid := DontCare
-//   ID.id_ex_regWr := id_reg_ctl_regWrite
-//   ID.ex_mem_regWr := ex_reg_ctl_regWrite  
-// }
-
   /*****************
    * Execute Stage *
   ******************/
@@ -431,14 +394,7 @@ when(!dccm_stall) {
       wb_addr := mem_reg_wra
     }
 
-
-//when (!dccm_stall) {
-//  io.pin := wb_data
-//}.otherwise{
-//  io.pin := io.pin
-//}
-
-io.pin := wb_data
+  io.pin := wb_data
 
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data
