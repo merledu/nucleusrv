@@ -4,7 +4,7 @@ gen_dir    = $(base_dir)/generated-src
 out_dir    = $(base_dir)/outputs
 
 SBT       = sbt
-SBT_FLAGS = -DprogramFile=tools/out/program.hex -DwriteVcd=1
+SBT_FLAGS = -DprogramFile=tools/out/program.hex -DwriteVcd=1 -J-Xmx4G  #to define jvm memory size to solve memory java heap space problem
 
 CXXFLAGS += -std=c++11 -Wall -Wno-unused-variable
 
@@ -43,7 +43,7 @@ compliance:
 IMEM=asm.txt
 
 rtl:
-	sbt "runMain nucleusrv.components.NRVDriver $(IMEM)"
+	sbt "runMain nucleusrv.components.NRVDriver $(IMEM)" -J-Xmx4G  #to define jvm memory size to solve memory java heap space problem
 	(echo '/* verilator lint_off ASSIGNDLY */' && echo '/* verilator lint_off UNUSED */' && echo '/* verilator lint_off BLKSEQ */' && echo '/* verilator lint_off DECLFILENAME */' && echo '/* verilator lint_off WIDTH */' && echo '/* verilator lint_off SYNCASYNCNET */' && cat Top.v) > temp && mv temp Top.v
 
 VERILATOR = verilator

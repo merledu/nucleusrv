@@ -7,8 +7,8 @@ if [ -f $FILE ]; then
         echo "$FILE exists."
 else 
         echo "$FILE does not exist."
-        echo "Running sbt testOnly TopTest"
-        sbt "testOnly nucleusrv.components.TopTest"
+        echo "Running sbt testOnly TopTest" 
+        sbt "testOnly nucleusrv.components.TopTest" -J-Xmx4G  #to define jvm memory size to solve memory java heap space problem
 fi
 
 ISA=$1
@@ -18,6 +18,7 @@ DEVICE=$3
 cd $NUCLEUSRV/imperas-riscv-tests 
 
 # make clean TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv32-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=$DEVICE RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop
+#make clean TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv32-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=$DEVICE RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop
 make TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv32-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=$DEVICE RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop | tee Test_result.txt
 
 cd ../
