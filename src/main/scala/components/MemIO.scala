@@ -12,8 +12,8 @@ class MemRequestIO extends Bundle {
   val dataRequest: UInt = Input(UInt(32.W))
   val activeByteLane: UInt = Input(UInt(4.W))
   val isWrite: Bool = Input(Bool())
-  val isInstructionFetch = Bool() // New: Indicate instruction fetch
-  val isInstructionWrite = Bool() // New: Indicate instruction write
+  // val isInstructionFetch = Bool() // New: Indicate instruction fetch
+  // val isInstructionWrite = Bool() // New: Indicate instruction write
 }
 
 class MemResponseIO extends Bundle {
