@@ -8,7 +8,7 @@ module instructioncache_sramTop #(
 // sram interface in
   input   logic        csb_i,
   input   logic [12:0] addr_i,
-  input   logic [31:0] wdata_i,
+  input   logic [255:0] wdata_i,
   input   logic [3:0]  wmask_i,
   input   logic        we_i,
   output  logic [31:0] rdata_o
@@ -17,7 +17,7 @@ module instructioncache_sramTop #(
 
 logic        csb;
 logic [12:0] addr_o;
-logic [31:0] wdata_o;
+logic [255:0] wdata_o;
 logic [3:0]  wmask_o;
 logic        we_o;
 logic [31:0] rdata_i;
@@ -41,8 +41,8 @@ always_ff @(negedge clk_i) begin
 end
 
 instructioncache_sram #(
-  .NUM_WMASKS (4),
-  .DATA_WIDTH (32),
+  .NUM_WMASKS (32),
+  .DATA_WIDTH (256),
   .ADDR_WIDTH (11),
   .RAM_DEPTH (1 << 11),
   // FIXME: This delay is arbitrary.
