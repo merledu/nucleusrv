@@ -8,7 +8,7 @@ module datacache_sramTop #(
 // sram interface in
   input   logic        csb_i,
   input   logic [12:0] addr_i,
-  input   logic [127:0] wdata_i,
+  input   logic [147:0] wdata_i,
   input   logic [3:0]  wmask_i,
   input   logic        we_i,
   output  logic [31:0] rdata_o
@@ -17,7 +17,7 @@ module datacache_sramTop #(
 
 logic        csb;
 logic [12:0] addr_o;
-logic [127:0] wdata_o;
+logic [147:0] wdata_o;
 logic [3:0]  wmask_o;
 logic        we_o;
 logic [31:0] rdata_i;
