@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class CacheFSM(NumWays: Int, OffsetBits: Int) extends Module {
+class FSM(NumWays: Int, OffsetBits: Int) extends Module {
   val io = IO(new Bundle {
     val CPURequest   = Input(Bool())
     val IsWrite      = Input(Bool())
