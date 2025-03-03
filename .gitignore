@@ -1,9 +1,10 @@
-obj_dir
+obj_dir/
 *.v
 *.fir
 *.anno.json
 *.f
 *.log
+riscof_work/
 ### Project Specific stuff
 test_run_dir/*
 .metals/*
