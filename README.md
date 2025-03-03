@@ -30,7 +30,7 @@ pip install git+https://github.com/5hayanB/riscof
 ```
 02.Clone arch-tests and validate yaml
 ```
-riscof --verbose info arch-tests --clone
+riscof --verbose info arch-test --clone
 riscof validateyaml --config=config.ini
 ```
 
