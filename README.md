@@ -18,6 +18,27 @@ Run this command is SBT shell
 ```bash
 testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile=/path/to/instructions/hex
 ```
+
+#### Running RISCOF
+**NOTE** Make sure to have Verilator, RISCV-GNU-Toolchain and Spike in your PATH
+
+01.Set-up Riscof
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install git+https://github.com/5hayanB/riscof
+```
+02.Clone arch-tests and validate yaml
+```
+riscof --verbose info arch-tests --clone
+riscof validateyaml --config=config.ini
+```
+
+03.Trigger Compliance Tests (it's going to take a while so hold on)
+```
+riscof run --config=config.ini --suite=riscv-arch-test/riscv-test-suite/ --env=riscv-arch-test/riscv-test-suite/env
+```
+
 #### Running Compliance Tests
 * Clone `riscv-arch-test` repo in nucleusrv root `git clone git@github.com:riscv-non-isa/riscv-arch-test.git -b 1.0`
 * Build the simulation executable as defined in "Building with SBT" section
