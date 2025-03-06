@@ -1,0 +1,12 @@
+{
+    "name":"Nucleusrv-Codespace",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers-extra/features/sbt-sdkman:2": {
+        "version": "1.10.5"
+      },
+      "ghcr.io/veryl-lang/devcontainer-features/verilator:1": {
+        "version": "v4.220"
+      }
+    }
+  }
