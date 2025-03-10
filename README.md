@@ -28,13 +28,17 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install git+https://github.com/5hayanB/riscof
 ```
-02.Clone arch-tests and validate yaml
+02.Update Config.ini to you NRV path
+```
+make update_config
+```
+03.Clone arch-tests and validate yaml
 ```
 riscof --verbose info arch-test --clone
 riscof validateyaml --config=config.ini
 ```
 
-03.Trigger Compliance Tests (it's going to take a while so hold on)
+04.Trigger Compliance Tests (it's going to take a while so hold on)
 ```
 riscof run --config=config.ini --suite=riscv-arch-test/riscv-test-suite/ --env=riscv-arch-test/riscv-test-suite/env
 ```
