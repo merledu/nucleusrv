@@ -65,3 +65,8 @@ asmtohex:
 dv:
 	$(MAKE) asmtohex
 	$(MAKE) IMEM=assembly.hex sim	
+
+CONFIG_FILE=config.ini
+
+update_config:
+	sed -i 's|/path/to/nucleusrv|$(CURDIR)|g' $(CONFIG_FILE)
