@@ -2,7 +2,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.stage.ChiselStage
 import nucleusrv.tracer._
-import vaquita.Vaquita_Config
+import vaquita.VaquitaConfig
 import chisel3.util._
 
 
@@ -18,7 +18,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   })
 
   implicit val config = new Configs {}
-  implicit val vec_config = new Vaquita_Config {}
+  implicit val vec_config = new VaquitaConfig {}
 
   val core: Core = Module(new Core())
   core.io.stall := false.B

@@ -1,11 +1,11 @@
 package nucleusrv.components
-import vaquita.vec_top
-import vaquita.Vaquita_Config
+import vaquita.VecTop
+import vaquita.VaquitaConfig
 
 import chisel3._
 import chisel3.util._
 
-class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) extends Module{
+class Core(implicit val config:Configs,implicit val vec_config:VaquitaConfig) extends Module{
 
   val M      = config.M
   val C      = config.C
@@ -97,7 +97,7 @@ class Core(implicit val config:Configs,implicit val vec_config:Vaquita_Config) e
   val ID = Module(new InstructionDecode(TRACE)).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
-  val vec_top_module1 = Module(new vec_top)
+  val vec_top_module1 = Module(new VecTop)
   dontTouch(vec_top_module1.io)
 
   vec_top_module1.io.instr := io.vec_ins
