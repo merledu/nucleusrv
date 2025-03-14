@@ -2,12 +2,12 @@ package nucleusrv.components
 
 import chisel3._
 import chisel3.util._
+import nucleusrv.tracer.{TracerI, delays}
 
 class Core(implicit val config:Configs) extends Module{
 
   val M      = config.M
   val C      = config.C
-  val F      = config.F
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
 
@@ -21,12 +21,8 @@ class Core(implicit val config:Configs) extends Module{
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
 
-    // RVFI Pins
-    val rvfiUInt    = if (TRACE) Some(Output(Vec(4, UInt(32.W)))) else None
-    val rvfiSInt    = if (TRACE) Some(Output(Vec(5, SInt(32.W)))) else None
-    val rvfiBool    = if (TRACE) Some(Output(Vec(1, Bool()))) else None
-    val rvfiRegAddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
-    val rvfiMode    = if (TRACE) Some(Output(UInt(2.W))) else None
+// RVFI Pins
+    val rvfi = if (TRACE) Some(Flipped(new TracerI)) else None
 
     val fcsr_o_data = Output(UInt(32.W))
   })
@@ -43,16 +39,6 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_wra = RegInit(0.U(5.W))
   val id_reg_f7 = RegInit(0.U(7.W))
   val id_reg_f3 = RegInit(0.U(3.W))
-
-  // - F Registers
-  val id_reg_fWrite    = if (F) Some(RegInit(0.B)) else None
-  val id_reg_iWrite    = if (F) Some(RegInit(0.B)) else None
-  val id_reg_fAluCtl   = if (F) Some(RegInit(0.U(5.W))) else None
-  val id_reg_readData3 = if (F) Some(RegInit(0.U(XLEN.W))) else None
-  val id_reg_rm        = if (F) Some(RegInit(0.U(3.W))) else None
-  val id_reg_rs3       = if (F) Some(RegInit(0.U(5.W))) else None
-  val id_reg_fRead     = if (F) Some(RegInit(0.B)) else None
-
   val id_reg_ins = RegInit(0.U(32.W))
   val id_reg_ctl_aluSrc = RegInit(false.B)
   val id_reg_ctl_aluSrc1 = RegInit(0.U(2.W))
@@ -82,10 +68,6 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_is_csr = RegInit(false.B)
   val ex_reg_csr_data = RegInit(0.U)
 
-  // - F Registers
-  val ex_reg_fWrite = if (F) Some(RegInit(0.B)) else None
-  val ex_reg_iWrite = if (F) Some(RegInit(0.B)) else None
-
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
   val mem_reg_ins = RegInit(0.U(32.W))
@@ -98,15 +80,11 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_is_csr = RegInit(false.B)
   val mem_reg_csr_data = RegInit(0.U)
 
-  // - F Register
-  val mem_reg_fWrite = if (F) Some(RegInit(0.B)) else None
-  val mem_reg_iWrite = if (F) Some(RegInit(0.B)) else None
-
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val ID = Module(new InstructionDecode(XLEN, F, TRACE)).io
-  val EX = Module(new Execute(M = M, F = F)).io
-  val MEM = Module(new MemoryFetch)
+  val ID = Module(new InstructionDecode(TRACE)).io
+  val EX = Module(new Execute(M = M)).io
+  val MEM = Module(new MemoryFetch(TRACE))
 
   io.fcsr_o_data := ID.fscr_o_data
   
@@ -123,8 +101,6 @@ class Core(implicit val config:Configs) extends Module{
   val ral_halt_o  = WireInit(false.B)
   val is_comp     = WireInit(false.B)
 
-  val c_ins_trace = if (C) Some(dontTouch(WireInit(0.U(32.W)))) else None
-
   if (C) {
 
     /*****************
@@ -132,7 +108,7 @@ class Core(implicit val config:Configs) extends Module{
     ******************/
     val RA = Module(new Realigner).io
 
-    RA.ral_address_i     := pc.io.in.asUInt()
+    RA.ral_address_i     := pc.io.out.asUInt
     RA.ral_instruction_i := IF.instruction
     RA.ral_jmp           := ID.pcSrc
 
@@ -150,13 +126,10 @@ class Core(implicit val config:Configs) extends Module{
     instruction  := CD.instruction_o
 
     is_comp := CD.is_comp
-
-    c_ins_trace.get := IF.instruction
-
   }
   else {
 
-    IF.address := pc.io.in.asUInt()
+    IF.address := pc.io.out.asUInt
     instruction := IF.instruction
 
   }
@@ -174,13 +147,26 @@ class Core(implicit val config:Configs) extends Module{
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
-  pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
-  val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  pc.io.halt := Mux((
+    (EX.stall || ID.stall || IF_stall)
+    | ral_halt_o
+  ), 1.B, 0.B)
+  val npc = dontTouch(Mux(
+    ID.hdu_pcWrite && IF.coreInstrReq.valid,
+    Mux(
+      ID.pcSrc,
+      ID.pcPlusOffset.asSInt,
+      Mux(is_comp, pc.io.pc2, pc.io.pc4)
+    ),
+    pc.io.out
+  ))
   pc.io.in := npc
 
   when(ID.hdu_if_reg_write) {
-    if_reg_pc := pc.io.out.asUInt()
-    if_reg_ins := instruction 
+    if_reg_pc := pc.io.out.asUInt
+    if_reg_ins := instruction
+    //if_reg_pc := RegNext(Mux(io.imemRsp.valid, pc.io.out.asUInt, DontCare))
+    //if_reg_ins := Mux(RegNext(io.imemRsp.valid), instruction, DontCare)
   }
   when(ID.ifid_flush) {
     if_reg_ins := 0.U
@@ -210,8 +196,6 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
   id_reg_is_csr := ID.is_csr
   id_reg_csr_data := ID.csr_o_data
-
-//  IF.PcWrite := ID.hdu_pcWrite
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
   ID.dmem_resp_valid := io.dmemRsp.valid
@@ -227,30 +211,6 @@ class Core(implicit val config:Configs) extends Module{
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
 
-  if (F) {
-    id_reg_fWrite.get    := ID.fpCUfWrite.get
-    id_reg_iWrite.get    := ID.fpCUiWrite.get
-    id_reg_fAluCtl.get   := ID.fAluCtl.get
-    id_reg_readData3.get := ID.readData3.get
-    id_reg_rm.get        := ID.rm.get
-    id_reg_rs3.get       := ID.rs3.get
-    id_reg_fRead.get     := ID.fpCURead.get
-    Seq(
-      id_reg_fWrite,
-      ex_reg_fWrite,
-      mem_reg_fWrite
-    ).zipWithIndex.foreach(
-      f => ID.fWrite.get(f._2) := f._1.get
-    )
-    Seq(
-      id_reg_iWrite,
-      ex_reg_iWrite,
-      mem_reg_iWrite
-    ).zipWithIndex.foreach(
-      f => ID.iWrite.get(f._2) := f._1.get
-    )
-  }
-
   /*****************
    * Execute Stage *
   ******************/
@@ -265,7 +225,6 @@ class Core(implicit val config:Configs) extends Module{
   EX.pcAddress := id_reg_pc
   EX.func3 := id_reg_f3
   EX.func7 := id_reg_f7
-
   EX.ctl_aluSrc := id_reg_ctl_aluSrc
   EX.ctl_aluOp := id_reg_ctl_aluOp
   EX.ctl_aluSrc1 := id_reg_ctl_aluSrc1
@@ -298,26 +257,6 @@ class Core(implicit val config:Configs) extends Module{
   when(EX.stall){
     id_reg_wra := id_reg_wra
     id_reg_ctl_regWrite := id_reg_ctl_regWrite
-
-    if (F) {
-      id_reg_fWrite.get := id_reg_fWrite.get
-      id_reg_iWrite.get := id_reg_iWrite.get
-    }
-  }
-
-  if (F) {
-    EX.fRead.get      := id_reg_fRead.get
-    EX.rs3.get        := id_reg_rs3.get
-    EX.readData3.get  := id_reg_readData3.get
-    EX.fAluCtl.get    := id_reg_fAluCtl.get
-    EX.rm.get         := id_reg_rm.get
-    ex_reg_fWrite.get := id_reg_fWrite.get
-    Seq(
-      ex_reg_fWrite,
-      mem_reg_fWrite
-    ).zipWithIndex.map(
-      f => EX.fWrite.get(f._2) := f._1.get
-    )
   }
 
   /****************
@@ -362,6 +301,7 @@ class Core(implicit val config:Configs) extends Module{
   mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
   mem_reg_is_csr := ex_reg_is_csr
   mem_reg_csr_data := ex_reg_csr_data
+  EX.ex_mem_regWrite := ex_reg_ctl_regWrite
   MEM.io.aluResultIn := ex_reg_result
   MEM.io.writeData := ex_reg_wd
   MEM.io.readEnable := ex_reg_ctl_memRead
@@ -371,18 +311,11 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
 
-  EX.ex_mem_regWrite := ex_reg_ctl_regWrite
-
-  if (F) {
-    mem_reg_fWrite.get := ex_reg_fWrite.get
-    mem_reg_iWrite.get := ex_reg_iWrite.get
-  }
-
   /********************
    * Write Back Stage *
    ********************/
 
-  val wb_data = Wire(UInt(32.W))
+  val wb_data = dontTouch(Wire(UInt(32.W)))
   val wb_addr = Wire(UInt(5.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
@@ -400,6 +333,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data
   EX.wb_result := wb_data
+  EX.mem_wb_regWrite := mem_reg_ctl_regWrite
   ID.writeReg := wb_addr
   ID.ctl_writeEnable := mem_reg_ctl_regWrite
   ID.csr_Wb := mem_reg_is_csr
@@ -407,68 +341,40 @@ class Core(implicit val config:Configs) extends Module{
   ID.dmem_data := io.dmemRsp.bits.dataResponse
   io.pin := wb_data
 
-  EX.mem_wb_regWrite := mem_reg_ctl_regWrite
-
   /**************
   ** RVFI PINS **
   **************/
   if (TRACE) {
-    val npcDelay = Reg(Vec(4, UInt(32.W)))
-    val rsAddrDelay = for (i <- 0 until 2) yield Reg(Vec(3, UInt(5.W)))
-    val rsDataDelay = for (i <- 0 until 2) yield Reg(Vec(2, SInt(32.W)))
-    val memAddrDelay = RegInit(0.U(32.W))
-    val memWdataDelay = RegInit(0.S(32.W))
-    val stallDelay = Reg(Vec(4, Bool()))
+    io.rvfi.get.bool := 1.B
+    io.rvfi.get.uint2 := 3.U
+    io.rvfi.get.uint4 := delays(2, MEM.io.wmask.get)
 
-    val insDelay = if (C) Some(dontTouch(Reg(Vec(4, UInt(32.W))))) else None
+    Vector(3, 3, 0).zipWithIndex.foreach(
+      r => io.rvfi.get.uint5(r._2) := delays(r._1, ID.raddr.get(r._2))
+    )
 
-    for (i <- 0 until 2) {
-      for (j <- 0 until 2) {
-        rsAddrDelay(i)(j + 1) := rsAddrDelay(i)(j)
-      }
-      rsAddrDelay(i)(0) := ID.rs_addr.get(i)
-      io.rvfiRegAddr.get(i + 1) := rsAddrDelay(i)(2)
-
-      rsDataDelay(i)(1) := rsDataDelay(i)(0)
-      io.rvfiSInt.get(i + 1) := rsDataDelay(i)(1)
-    }
-    for (i <- 0 until 3) {
-      npcDelay(i + 1) := npcDelay(i)
-      stallDelay(i + 1) := stallDelay(i)
-    }
-
-    if (C) {
-      for (i <- 0 until 3) {
-        insDelay.get(i + 1) := insDelay.get(i)
-      }
-      insDelay.get(0) := c_ins_trace.get
-    }
-
-
-    Seq(
-      (npcDelay(0), npc.asUInt),
-      (memAddrDelay, ex_reg_result),
-      (rsDataDelay(0)(0), id_reg_rd1.asSInt),
-      (rsDataDelay(1)(0), id_reg_rd2.asSInt),
-      (memWdataDelay, ex_reg_wd.asSInt),
-      (stallDelay(0), ID.hdu_if_reg_write),
-
-      (io.rvfiUInt.get(0), mem_reg_pc),
-      (io.rvfiUInt.get(1), npcDelay(3)),
-      (io.rvfiUInt.get(2), if (C) insDelay.get(3) else mem_reg_ins),
-      (io.rvfiUInt.get(3), memAddrDelay),
-
-      (io.rvfiMode.get, 3.U),
-
-      (io.rvfiRegAddr.get(0), wb_addr),
-
-      (io.rvfiSInt.get(0), wb_data.asSInt),
-      (io.rvfiSInt.get(3), MEM.io.readData.asSInt),
-      (io.rvfiSInt.get(4), memWdataDelay),
-
-      (io.rvfiBool.get(0), stallDelay(3))
-    ).map(
-      tr => tr._1 := tr._2
+    Vector(
+      mem_reg_ins,
+      ID.rd_wdata.get,
+      mem_reg_pc,
+      delays(5, npc.asUInt),
+      Mux(
+        delays(1, MEM.io.dccmReq.valid).asBool,
+        delays(1, ex_reg_result),
+        0.U
+      ),
+      Mux(
+        delays(1, ex_reg_ctl_memRead).asBool,
+        mem_reg_rd,
+        0.U
+      ),
+      Mux(
+        delays(1, ex_reg_ctl_memWrite).asBool,
+        delays(1, MEM.io.dccmReq.bits.dataRequest),
+        0.U
+      )
+    ).zipWithIndex.foreach(
+      r => io.rvfi.get.uint32(r._2) := r._1
     )
   }
 }

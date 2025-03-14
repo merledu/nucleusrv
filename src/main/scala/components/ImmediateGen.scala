@@ -1,9 +1,8 @@
-
 package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class ImmediateGen(F:Boolean) extends Module {
+class ImmediateGen extends Module {
   val io = IO(new Bundle {
     val instruction = Input(UInt(32.W))
     val out = Output(UInt(32.W))
@@ -11,15 +10,9 @@ class ImmediateGen(F:Boolean) extends Module {
   val opcode = io.instruction(6, 0)
 
   //I-type
-  when((Seq(
-    3, 15, 19, 27, 103, 115
-  ) ++ (
-    if (F) Seq(7) else Seq()
-  )).map(
-    f => opcode === f.U
-  ).reduce(
-    (a, b) => a || b
-  )) {
+  when(
+    opcode === 3.U || opcode === 15.U || opcode === 19.U || opcode === 27.U || opcode === 103.U || opcode === 115.U
+  ) {
     val imm_i = io.instruction(31, 20)
     val ext_i = Cat(Fill(20, imm_i(11)), imm_i)
     io.out := ext_i
@@ -32,13 +25,7 @@ class ImmediateGen(F:Boolean) extends Module {
       io.out := ext_u
     }
     //S-type
-    .elsewhen(
-      (Seq(35) ++ (if (F) Seq(39) else Seq())).map(
-        f => opcode === f.U
-      ).reduce(
-        (e, f) => e || f
-      )
-    ) {
+    .elsewhen(opcode === 35.U) {
       val imm_s = Cat(io.instruction(31, 25), io.instruction(11, 7))
       val ext_s = Cat(Fill(20, imm_s(11)), imm_s)
       io.out := ext_s

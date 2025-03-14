@@ -354,3 +354,18 @@ project/plugins/project/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+# Extras
+__pycache__/
+.venv/
+project/.bloop/
+project/metals.sbt
+project/project/
+firrtl_black_box_resource_files.f
+trace.log
+ver_output.log
+riscv-arch-test/
+riscof_work/
+.metals/
+.bloop/
+.ammonite/
+metals.sbt

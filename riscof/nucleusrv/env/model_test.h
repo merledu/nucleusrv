@@ -12,10 +12,20 @@
 
 //RV_COMPLIANCE_HALT
 #define RVMODEL_HALT                                              \
-  li x1, 1;                                                                   \
-  write_tohost:                                                               \
-    sw x1, tohost, t5;                                                        \
-    j write_tohost;
+  la a0, begin_signature; \
+  la a1, end_signature; \
+  li a2, 0x8000; \
+  sig_dump_loop: \
+  	lw t0, 0(a0); \
+  	sw t0, 0(a2); \
+  	addi a0, a0, 4; \
+  	bge a0, a1, end_sim; \
+  	j sig_dump_loop; \
+  end_sim: \
+  	li a0, 0x8004; \
+  	li a1, 0xCAFECAFE; \
+  	sw a1, 0(a0); \
+  	j end_sim;
 
 #define RVMODEL_BOOT
 

@@ -9,9 +9,10 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
     val fcsr = Output(UInt(32.W))
+    val rvfi = new TracerO
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
+  implicit val config:Configs = Configs(XLEN=32, M=false, C=false, TRACE=true)
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -32,17 +33,9 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   io.fcsr := core.io.fcsr_o_data
 
   if (config.TRACE) {
-    val tracer = Module(new Tracer())
-
-    Seq(
-      (tracer.io.rvfiUInt, core.io.rvfiUInt.get),
-      (tracer.io.rvfiSInt, core.io.rvfiSInt.get),
-      (tracer.io.rvfiBool, core.io.rvfiBool.get),
-      (tracer.io.rvfiRegAddr, core.io.rvfiRegAddr.get)
-    ).map(
-      tr => tr._1 <> tr._2
-    )
-    tracer.io.rvfiMode := core.io.rvfiMode.get
+    val tracer = Module(new Tracer)
+    tracer.rvfi_i <> core.io.rvfi.get
+    io.rvfi <> tracer.rvfi_o
   }
 }
 
@@ -50,6 +43,7 @@ object NRVDriver {
   // generate verilog
   def main(args: Array[String]): Unit = {
       val IMem =  if (args.length > 0) args(0) else "program.hex"
-      new ChiselStage().emitVerilog(new Top(Some(IMem), Some("data.hex")))
+      val DMem =  if (args.length > 1) args(1) else "dmem.hex"
+      new ChiselStage().emitVerilog(new Top(Some(IMem), Some(DMem)), args)
   }
 }

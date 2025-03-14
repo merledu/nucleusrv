@@ -3,9 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-import nucleusrv.components.fpu._
-
-class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
+class InstructionDecode(TRACE:Boolean) extends Module {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
     val writeData = Input(UInt(32.W))
@@ -61,68 +59,17 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
 
     val stall = Output(Bool())
 
-    // F pins
-    val fWrite     = if (F) Some(Input(Vec(3, Bool()))) else None
-    val iWrite     = if (F) Some(Input(Vec(3, Bool()))) else None
-    val fpCUfWrite = if (F) Some(Output(Bool())) else None
-    val fpCUiWrite = if (F) Some(Output(Bool())) else None
-    val fpCURead   = if (F) Some(Output(Bool())) else None
-    val fAluCtl    = if (F) Some(Output(UInt(5.W))) else None
-    val readData3  = if (F) Some(Output(UInt(32.W))) else None
-    val rm         = if (F) Some(Output(UInt(3.W))) else None
-    val rs3        = if (F) Some(Output(UInt(5.W))) else None
-
     // CSR pins
-    val csr_i_misa    = Input(UInt(32.W))
-    val csr_i_mhartid = Input(UInt(32.W))
-    val csr_o_data    = Output(UInt(32.W))
-    val is_csr        = Output(Bool())
-    val fscr_o_data   = Output(UInt(32.W))
+    val csr_i_misa        = Input(UInt(32.W))
+    val csr_i_mhartid     = Input(UInt(32.W))
+    val csr_o_data        = Output(UInt(32.W))
+    val is_csr            = Output(Bool())
+    val fscr_o_data       = Output(UInt(32.W))
 
     // RVFI pins
-    val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
+    val raddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
+    val rd_wdata = if (TRACE) Some(Output(UInt(32.W))) else None
   })
-
-  // F Extension
-  val fpDecoder  = if (F) Some(Module(new FPDecoder(XLEN)).io) else None
-  val fpRegFile  = if (F) Some(dontTouch(Module(new FPRegisters).io)) else None
-  val fpCU       = if (F) Some(Module(new FPControl).io) else None
-  val fWrite     = if (F) VecInit(
-    Seq(fpCU.get.fWrite) ++ (0 until io.fWrite.get.length).toSeq.map(
-      f => io.fWrite.get(f)
-    )
-  ) else VecInit(
-    for (i <- 0 until 4)
-      yield 0.B
-  )
-  val fRead      = if (F) fpCU.get.fRead else WireInit(0.B)
-  val fLoad      = if (F) fpCU.get.fLoad else WireInit(0.B)
-  val fStore     = if (F) fpCU.get.fStore else WireInit(0.B)
-  val iWrite     = if (F) VecInit(
-    Seq(fpCU.get.iWrite) ++ (0 until io.iWrite.get.length).toSeq.map(
-      f => io.iWrite.get(f)
-    )
-  ) else VecInit(
-    for (i <- 0 until 4)
-      yield 0.B
-  )
-
-  if (F) {
-    fpDecoder.get.inst := io.id_instruction
-
-    fpCU.get.opcode := io.id_instruction(6, 0)
-    fpCU.get.fmt    := fpDecoder.get.fmt
-    fpCU.get.funct5 := fpDecoder.get.funct5
-    fpCU.get.rm     := fpDecoder.get.rm
-    fpCU.get.rs2    := io.id_instruction(24, 20)
-
-    io.fpCUfWrite.get := fpCU.get.fWrite
-    io.fpCUiWrite.get := fpCU.get.iWrite
-    io.fAluCtl.get    := fpCU.get.aluCtl
-    io.rs3.get        := fpDecoder.get.funct5
-    io.fpCURead.get   := fpCU.get.fRead
-    io.rm.get         := fpDecoder.get.rm
-  }
 
   // CSR
   val csr = Module(new CSR())
@@ -152,7 +99,7 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
   csrController.io.csrInstIsImmd   := 0.B
 
   //Hazard Detection Unit
-  val hdu = Module(new HazardUnit(F))
+  val hdu = Module(new HazardUnit)
   hdu.io.dmem_resp_valid := io.dmem_resp_valid
   hdu.io.id_ex_memRead := io.id_ex_mem_read
 //  hdu.io.ex_mem_memWrite := io.ex_mem_mem_write
@@ -167,38 +114,23 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
   io.hdu_pcWrite := hdu.io.pc_write
   io.hdu_if_reg_write := hdu.io.if_reg_write
 
-  if (F) {
-    for (i <- 0 until hdu.io.fWrite.get.length) {
-      hdu.io.fWrite.get(i) := fWrite(i)
-    }
-  }
-
   //Control Unit
   val control = Module(new Control)
   control.io.in := io.id_instruction
   io.ctl_aluOp := control.io.aluOp
-  io.ctl_aluSrc := control.io.aluSrc || fRead
+  io.ctl_aluSrc := control.io.aluSrc
   io.ctl_aluSrc1 := control.io.aluSrc1
   io.ctl_branch := control.io.branch
-  io.ctl_memRead := control.io.memRead || fLoad
-  io.ctl_memToReg := Mux(fLoad, 1.U, control.io.memToReg)
+  io.ctl_memRead := control.io.memRead
+  io.ctl_memToReg := control.io.memToReg
   io.ctl_jump := control.io.jump
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
-    io.ctl_regWrite := control.io.regWrite || iWrite(0)
-    io.ctl_memWrite := control.io.memWrite || fStore
+    io.ctl_memWrite := control.io.memWrite
+    io.ctl_regWrite := control.io.regWrite
 
-    if (F) {
-      io.fpCUfWrite.get := fpCU.get.fWrite
-      io.fpCUiWrite.get := fpCU.get.iWrite
-    }
   }.otherwise {
     io.ctl_memWrite := false.B
     io.ctl_regWrite := false.B
-
-    if (F) {
-      io.fpCUfWrite.get := 0.B
-      io.fpCUiWrite.get := 0.B
-    }
   }
 
   //Register File
@@ -206,65 +138,35 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
   val registerRd = io.writeReg
   val registerRs1 = io.id_instruction(19, 15)
   val registerRs2 = io.id_instruction(24, 20)
+  val writeData = dontTouch(Mux(io.csr_Wb, io.csr_Wb_data, io.writeData))
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb || iWrite(3)
+  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb
   registers.io.writeAddress := registerRd
-  registers.io.writeData := Mux(io.csr_Wb, io.csr_Wb_data, io.writeData)
-
-  // Floating point Register File
-  val ffwd = fWrite(3) && fRead
-  if (F) {
-    Seq(
-      registerRd,           // rd
-      registerRs1,          // rs1
-      registerRs2,          // rs2
-      fpDecoder.get.funct5  // rs3
-    ).zipWithIndex.foreach(
-      f => dontTouch(fpRegFile.get.rAddr(f._2)) := f._1
-    )
-    
-    fpRegFile.get.wData.valid := fWrite(3)
-    fpRegFile.get.wData.bits  := io.writeData
-
-    when ((io.writeReg === fpDecoder.get.funct5) && ffwd) {
-      io.readData3.get := io.writeData
-    } otherwise {
-      io.readData3.get := fpRegFile.get.rData(2)
-    }
-  }
+  registers.io.writeData := writeData
 
   //Forwarding to fix structural hazard
-  when((io.ctl_writeEnable || ffwd) && (io.writeReg === registerRs1)){
+  when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
     when(registerRs1 === 0.U){
-      io.readData1 := Mux(ffwd, io.writeData, 0.U)
+      io.readData1 := 0.U
     }.otherwise{
       io.readData1 := io.writeData
     }
   }.otherwise{
-    io.readData1 := Mux(
-      fRead && !fStore,
-      if (F) fpRegFile.get.rData(0) else 0.U,
-      registers.io.readData(0)
-    )
+    io.readData1 := registers.io.readData(0)
   }
-  when((io.ctl_writeEnable || ffwd) && (io.writeReg === registerRs2)){
+  when(io.ctl_writeEnable && (io.writeReg === registerRs2)){
     when(registerRs2 === 0.U){
-      io.readData2 := Mux(ffwd, io.writeData, 0.U)
+      io.readData2 := 0.U
     }.otherwise{
       io.readData2 := io.writeData
     }
   }.otherwise{
-    io.readData2 := Mux(
-      fRead,
-      if (F) fpRegFile.get.rData(1) else 0.U,
-      registers.io.readData(1)
-    )
+    io.readData2 := registers.io.readData(1)
   }
-
   
 
-  val immediate = Module(new ImmediateGen(F))
+  val immediate = Module(new ImmediateGen)
   immediate.io.instruction := io.id_instruction
   io.immediate := immediate.io.out
 
@@ -272,23 +174,17 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
   val input1 = Wire(UInt(32.W))
   val input2 = Wire(UInt(32.W))
 
-  val fJmpFwd = VecInit(
-    fRead === fWrite(1),  // id_ex
-    fRead === fWrite(2),  // ex_mem
-    fRead === fWrite(3)   // mem_wb
-  )
-
-  when((registerRs1 === io.ex_mem_ins(11, 7)) && !fJmpFwd(1)) {
+  when(registerRs1 === io.ex_mem_ins(11, 7)) {
     input1 := io.ex_mem_result
-  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fJmpFwd(2)) {
+  }.elsewhen(registerRs1 === io.mem_wb_ins(11, 7)) {
       input1 := io.mem_wb_result
     }
     .otherwise {
       input1 := io.readData1
     }
-  when((registerRs2 === io.ex_mem_ins(11, 7)) && !fJmpFwd(1)) {
+  when(registerRs2 === io.ex_mem_ins(11, 7)) {
     input2 := io.ex_mem_result
-  }.elsewhen((registerRs2 === io.mem_wb_ins(11, 7)) && !fJmpFwd(2)) {
+  }.elsewhen(registerRs2 === io.mem_wb_ins(11, 7)) {
       input2 := io.mem_wb_result
     }
     .otherwise {
@@ -302,17 +198,17 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
   bu.io.rd1 := input1
   bu.io.rd2 := input2
   bu.io.take_branch := hdu.io.take_branch
-  hdu.io.taken := bu.io.taken
+  hdu.io.taken := bu.io.taken  
 
   //Forwarding for Jump
   val j_offset = Wire(UInt(32.W))
-    when((registerRs1 === io.ex_ins(11, 7)) && !fJmpFwd(0)) {
+    when(registerRs1 === io.ex_ins(11, 7)){
       j_offset := io.ex_result
-    }.elsewhen((registerRs1 === io.ex_mem_ins(11, 7)) && !fJmpFwd(1)) {
+    }.elsewhen(registerRs1 === io.ex_mem_ins(11, 7)) {
     j_offset := io.ex_mem_result
-  }.elsewhen((registerRs1 === io.mem_wb_ins(11, 7)) && !fJmpFwd(2)) {
+  }.elsewhen(registerRs1 === io.mem_wb_ins(11, 7)) {
     j_offset := io.mem_wb_result
-  }.elsewhen((registerRs1 === io.ex_ins(11, 7)) && !fJmpFwd(0)) {
+  }.elsewhen(registerRs1 === io.ex_ins(11, 7)){
     j_offset := io.ex_result
   }.otherwise {
       j_offset := io.readData1
@@ -328,7 +224,7 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
       io.pcPlusOffset := io.pcAddress + immediate.io.out
     }
 
-  when(bu.io.taken || io.ctl_jump =/= 0.U) {
+  when(bu.io.taken || (io.ctl_jump =/= 0.U)) {
     io.pcSrc := true.B
   }.otherwise {
     io.pcSrc := false.B
@@ -360,11 +256,13 @@ class InstructionDecode(XLEN:Int, F:Boolean, TRACE:Boolean) extends Module {
 
   // RVFI
   if (TRACE) {
-    Seq(
+    Vector(
       registerRs1,
-      registerRs2
-    ).zipWithIndex.map(
-      tr => io.rs_addr.get(tr._2) := tr._1
+      registerRs2,
+      registerRd
+    ).zipWithIndex.foreach(
+      tr => io.raddr.get(tr._2) := tr._1
     )
+    io.rd_wdata.get := writeData
   }
 }

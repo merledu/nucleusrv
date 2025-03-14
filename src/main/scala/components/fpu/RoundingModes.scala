@@ -1,7 +1,7 @@
 package nucleusrv.components.fpu
 
-import chisel3._, chisel3.util._
-
+import chisel3._,
+  chisel3.util._
 
 trait RoundingModes {
   def RNE(significand: UInt, grs: UInt) = MuxLookup(grs, significand, Seq(

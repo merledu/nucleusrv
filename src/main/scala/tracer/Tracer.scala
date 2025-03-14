@@ -2,54 +2,91 @@ package nucleusrv.tracer
 
 import chisel3._
 
-class TracerIO extends Bundle {
-  val rvfiUInt   : Vec[UInt] = Input(Vec(4, UInt(32.W)))
-  val rvfiSInt   : Vec[SInt] = Input(Vec(5, SInt(32.W)))
-  val rvfiBool   : Vec[Bool] = Input(Vec(1, Bool()))
-  val rvfiRegAddr: Vec[UInt] = Input(Vec(3, UInt(5.W)))
-  val rvfiMode   : UInt      = Input(UInt(2.W))
+trait RVFIParams {
+  val XLEN = 32
+  val NRET = 1
+  val ILEN = 32
 }
 
-class Tracer extends Module {
-  val io: TracerIO = IO(new TracerIO)
+// Needs to be modified for adding support of not implemented ports
+class TracerI extends Bundle {
+  val bool = Input(Bool())
+  val uint2 = Input(UInt(2.W))
+  val uint4 = Input(UInt(4.W))
+  val uint5 = Input(Vec(3, UInt(5.W)))
+  val uint32 = Input(Vec(7, UInt(32.W)))
+}
 
-  val clkCycle: UInt = RegInit(0.U(32.W))
-  clkCycle := clkCycle + 1.U
+class TracerO extends Bundle with RVFIParams {
+  // Instruction Metadata
+  val valid = Output(Vec(NRET, Bool()))
+  //val order = Output(Vec(NRET, UInt(64.W)))  // Not implemented yet
+  val insn = Output(Vec(NRET, UInt(ILEN.W)))
+  //val trap = Output(Vec(NRET, Bool()))  // Not implemented yet
+  //val halt = Output(Vec(NRET, Bool()))  // Not implemented yet
+  //val instr = Output(Vec(NRET, Bool()))  // Not implemented yet
+  val mode = Output(Vec(NRET, UInt(2.W)))
+  //val ixl = Output(Vec(NRET, UInt(2.W)))  // Not implemented yet
 
-  val uintWires: Map[String, UInt] = Map(
-    "pc_rdata" -> io.rvfiUInt(0),
-    "pc_wdata" -> io.rvfiUInt(1),
-    "insn"     -> io.rvfiUInt(2),
-    "mem_addr" -> io.rvfiUInt(3),
-    "mode"     -> io.rvfiMode,
-    "rs1_addr" -> io.rvfiRegAddr(1),
-    "rs2_addr" -> io.rvfiRegAddr(2),
-    "rd_addr"  -> io.rvfiRegAddr(0),
-  )
+  // Integer Register Read/Write
+  val rs1_addr = Output(Vec(NRET, UInt(5.W)))
+  val rs2_addr = Output(Vec(NRET, UInt(5.W)))
+  //val rs1_rdata = Output(Vec(NRET, UInt(XLEN.W)))  // Not implemented yet
+  //val rs2_rdata = Output(Vec(NRET, UInt(XLEN.W)))  // Not implemented yet
+  val rd_addr = Output(Vec(NRET, UInt(5.W)))
+  val rd_wdata = Output(Vec(NRET, UInt(XLEN.W)))
 
-  val sintWires: Map[String, SInt] = Map(
-    "rd_wdata"  -> io.rvfiSInt(0),
-    "rs1_rdata" -> io.rvfiSInt(1),
-    "rs2_rdata" -> io.rvfiSInt(2),
-    "mem_rdata" -> io.rvfiSInt(3),
-    "mem_wdata" -> io.rvfiSInt(4)
-  )
+  // Program Counter
+  val pc_rdata = Output(Vec(NRET, UInt(XLEN.W)))
+  val pc_wdata = Output(Vec(NRET, UInt(XLEN.W)))
 
-  val boolWires: Map[String, Bool] = Map(
-    "valid" -> io.rvfiBool(0)
-  )
+  // Memory Access
+  val mem_addr = Output(Vec(NRET, UInt(XLEN.W)))
+  //val mem_rmask = Output(Vec(NRET, UInt((XLEN / 8).W)))  // Not implemented yet
+  val mem_wmask = Output(Vec(NRET, UInt((XLEN / 8).W)))
+  val mem_rdata = Output(Vec(NRET, UInt(XLEN.W)))
+  val mem_wdata = Output(Vec(NRET, UInt(XLEN.W)))
+}
 
-  // Register to store the previous instruction
-  val prevInsn: UInt = RegInit(0.U(32.W))
+class Tracer extends RawModule {
+  val rvfi_i = IO(new TracerI)
+  val rvfi_o = IO(new TracerO)
 
-  when (boolWires("valid") && (uintWires("insn") =/= 0.U) && (uintWires("insn") =/= prevInsn)) {
-    printf(
-      "ClkCycle: %d, pc_rdata: %x, pc_wdata: %x, insn: %x, mode: %d, rs1_addr: %d, rs1_rdata: %x, rs2_addr: %d, rs2_rdata: %x, rd_addr: %d, rd_wdata: %x, mem_addr: %x, mem_rdata: %x, mem_wdata: %x\n",
-      clkCycle, uintWires("pc_rdata"), uintWires("pc_wdata"), uintWires("insn"), uintWires("mode"),
-      uintWires("rs1_addr"), sintWires("rs1_rdata"), uintWires("rs2_addr"), sintWires("rs2_rdata"), uintWires("rd_addr"),
-      sintWires("rd_wdata"), uintWires("mem_addr"), sintWires("mem_rdata"), sintWires("mem_wdata")
-    )
-    // Update the previous instruction register
-    prevInsn := uintWires("insn")
+  rvfi_o.valid(0) := rvfi_i.bool
+  rvfi_o.mode(0) := rvfi_i.uint2
+  rvfi_o.mem_wmask(0) := rvfi_i.uint4
+
+  Vector(
+    rvfi_o.rs1_addr,
+    rvfi_o.rs2_addr,
+    rvfi_o.rd_addr
+  ).zipWithIndex.foreach {
+    r => r._1(0) := rvfi_i.uint5(r._2)
+  }
+
+  Vector(
+    rvfi_o.insn,
+    //rvfi_o.rs1_rdata,
+    //rvfi_o.rs2_rdata,
+    rvfi_o.rd_wdata,
+    rvfi_o.pc_rdata,
+    rvfi_o.pc_wdata,
+    rvfi_o.mem_addr,
+    rvfi_o.mem_rdata,
+    rvfi_o.mem_wdata
+  ).zipWithIndex.foreach {
+    r => r._1(0) := rvfi_i.uint32(r._2)
+  }
+}
+
+object delays {
+  def apply(n: Int, src: Bits): Bits = {
+    if (n == 0) {
+      src
+    } else if (n == 1) {
+      RegNext(src)
+    } else {
+      RegNext(delays(n - 1, src))
+    }
   }
 }
