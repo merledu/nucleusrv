@@ -23,7 +23,7 @@ class HazardUnit extends Module {
   })
 
   io.ctl_mux := true.B
-  io.pc_write := true.B
+  dontTouch(io.pc_write) := true.B
   io.if_reg_write := true.B
   io.take_branch := true.B
   io.ifid_flush := false.B

@@ -146,7 +146,7 @@ class Core(implicit val config:Configs) extends Module{
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc //stall signal from outside
   
-  val halt = Mux(((EX.stall || ID.stall || IF_stall || io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
+  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
   pc.io.halt := halt
   val npc = Mux(
     ID.hdu_pcWrite,
