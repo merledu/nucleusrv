@@ -100,7 +100,7 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     io.wmask.get := Mux(io.writeEnable, "b1111".U, 0.U)
   }
 
-  io.dccmReq.bits.dataRequest := wdata.asUInt()
+  io.dccmReq.bits.dataRequest := wdata.asUInt
   io.dccmReq.bits.addrRequest := (io.aluResultIn & "h00001fff".U) >> 2
   io.dccmReq.bits.isWrite := io.writeEnable
   io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)

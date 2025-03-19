@@ -102,7 +102,6 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   val hdu = Module(new HazardUnit)
   hdu.io.dmem_resp_valid := io.dmem_resp_valid
   hdu.io.id_ex_memRead := io.id_ex_mem_read
-//  hdu.io.ex_mem_memWrite := io.ex_mem_mem_write
   hdu.io.ex_mem_memRead := io.ex_mem_mem_read
   hdu.io.id_ex_rd := io.id_ex_rd
   hdu.io.id_ex_branch := io.id_ex_branch

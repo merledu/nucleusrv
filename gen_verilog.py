@@ -8,7 +8,7 @@ from os import chdir
 ROOT = dirname(
     abspath(__file__)
 )
-OUT = join(ROOT, 'out')
+OUT = join(ROOT, 'out', 'nrv')
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     try:
         run(
-            f"sbt 'runMain nucleusrv.components.NRVDriver {args.imem} {args.dmem} --target-dir out'",
+            f"sbt 'runMain nucleusrv.components.NRVDriver {args.imem} {args.dmem} --target-dir {OUT}'",
             shell = True,
             text = True
         )
@@ -37,7 +37,7 @@ if __name__ == '__main__':
             '--exe',
             '--build',
             '--trace',
-            '../tb_Top.cpp',
+            '../../tb_Top.cpp',
             'Top.v'
         ], text = True)
         run(

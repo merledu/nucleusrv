@@ -15,25 +15,31 @@ class InstructionFetch extends Module {
   val rst = Wire(Bool())
   rst := reset.asBool
 
-  val valid_reg = dontTouch(RegInit(0.B))
-  val ready = RegInit(0.B)
+  dontTouch(io.stall)
+  val state_reg = dontTouch(RegInit(0.U))
+  val next_state = dontTouch(MuxCase(state_reg, Vector(
+    ((state_reg === 0.U) || ((state_reg === 2.U) && io.coreInstrResp.valid)) -> 1.U,  // valid
+    ((state_reg === 1.U) && io.coreInstrReq.ready && !io.stall) -> 2.U  // ready
+  )))
+  state_reg := next_state
+  io.coreInstrResp.ready := state_reg === 2.U
 
-  valid_reg := !(rst || io.stall) && !valid_reg
-  io.coreInstrReq.valid := valid_reg
+//  io.coreInstrReq.ready := Mux(rst, false.B, true.B)
 
-  Vector(
-    (io.coreInstrReq.bits.activeByteLane, "b1111".U),
-    (io.coreInstrReq.bits.isWrite, false.B),
-    (io.coreInstrReq.bits.addrRequest, io.address >> 2)
-  ) foreach(
-    i => i._1 := Mux(
-      dontTouch(io.coreInstrReq.ready) && valid_reg,
-      i._2, DontCare
-    )
-  )
+  io.coreInstrReq.bits.activeByteLane := "b1111".U
+  io.coreInstrReq.bits.isWrite := false.B
   io.coreInstrReq.bits.dataRequest := DontCare
 
-  ready := valid_reg
-  io.coreInstrResp.ready := ready
-  io.instruction := Mux(io.coreInstrResp.valid && ready, io.coreInstrResp.bits.dataResponse, DontCare)
+  io.coreInstrReq.bits.addrRequest := Mux(
+    io.coreInstrReq.ready,
+    io.address >> 2,
+    DontCare
+  )
+  io.coreInstrReq.valid := (state_reg === 1.U) & !io.stall
+
+  io.instruction := Mux(
+    io.coreInstrResp.valid,
+    io.coreInstrResp.bits.dataResponse,
+    DontCare
+  )
 }

@@ -2,7 +2,10 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util.MuxCase
 
-class Execute(M:Boolean = false) extends Module {
+class Execute(
+  M: Boolean = false,
+  TRACE: Boolean
+) extends Module {
   val io = IO(new Bundle {
     val immediate = Input(UInt(32.W))
     val readData1 = Input(UInt(32.W))
@@ -27,6 +30,8 @@ class Execute(M:Boolean = false) extends Module {
     val ALUresult = Output(UInt(32.W))
 
     val stall = Output(Bool())
+
+    val rs1_rdata = if (TRACE) Some(Output(UInt(32.W))) else None
   })
 
   val alu = Module(new ALU)
@@ -77,7 +82,7 @@ class Execute(M:Boolean = false) extends Module {
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
 
-  io.stall := false.B
+  dontTouch(io.stall) := false.B
   if(M){
     val mdu = Module (new MDU)
     mdu.io.src_a := aluIn1
@@ -144,4 +149,8 @@ class Execute(M:Boolean = false) extends Module {
   // io.ALUresult := alu.io.result
 
   io.writeData := inputMux2
+
+  if (TRACE) {
+    io.rs1_rdata.get := inputMux1
+  }
 }

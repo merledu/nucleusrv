@@ -14,7 +14,7 @@ class TracerI extends Bundle {
   val uint2 = Input(UInt(2.W))
   val uint4 = Input(UInt(4.W))
   val uint5 = Input(Vec(3, UInt(5.W)))
-  val uint32 = Input(Vec(7, UInt(32.W)))
+  val uint32 = Input(Vec(9, UInt(32.W)))
 }
 
 class TracerO extends Bundle with RVFIParams {
@@ -31,8 +31,8 @@ class TracerO extends Bundle with RVFIParams {
   // Integer Register Read/Write
   val rs1_addr = Output(Vec(NRET, UInt(5.W)))
   val rs2_addr = Output(Vec(NRET, UInt(5.W)))
-  //val rs1_rdata = Output(Vec(NRET, UInt(XLEN.W)))  // Not implemented yet
-  //val rs2_rdata = Output(Vec(NRET, UInt(XLEN.W)))  // Not implemented yet
+  val rs1_rdata = Output(Vec(NRET, UInt(XLEN.W)))  // Not implemented yet
+  val rs2_rdata = Output(Vec(NRET, UInt(XLEN.W)))  // Not implemented yet
   val rd_addr = Output(Vec(NRET, UInt(5.W)))
   val rd_wdata = Output(Vec(NRET, UInt(XLEN.W)))
 
@@ -66,8 +66,8 @@ class Tracer extends RawModule {
 
   Vector(
     rvfi_o.insn,
-    //rvfi_o.rs1_rdata,
-    //rvfi_o.rs2_rdata,
+    rvfi_o.rs1_rdata,
+    rvfi_o.rs2_rdata,
     rvfi_o.rd_wdata,
     rvfi_o.pc_rdata,
     rvfi_o.pc_wdata,
