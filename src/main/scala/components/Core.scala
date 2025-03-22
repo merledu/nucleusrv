@@ -1,6 +1,6 @@
 package nucleusrv.components
 import vaquita.VaquitaTop
-import vaquita.VaquitaConfig
+import vaquita.configparameter.VaquitaConfig
 
 import chisel3._
 import chisel3.util._
