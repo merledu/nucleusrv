@@ -151,7 +151,12 @@ class Core(implicit val config:Configs) extends Module{
     func7 := 0.U
   }
 
-  val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+  val IF_stall = Reg(Bool())
+  IF_stall := func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+  val IF_stall_indicator = Reg(Bool())
+  IF_stall_indicator := IF_stall
+  val current_pc = Reg(SInt(32.W))
+  current_pc := pc.io.out
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
@@ -167,6 +172,11 @@ when(!dccm_stall){
     }
     when(ID.ifid_flush) {
       if_reg_ins := 0.U
+    }
+    when(IF_stall){
+      if_reg_ins := 0.U
+      pc.io.in := current_pc
+      current_pc := current_pc
     }
 }
 .otherwise{
