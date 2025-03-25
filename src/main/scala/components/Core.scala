@@ -29,7 +29,7 @@ class Core(implicit val config:Configs) extends Module{
 
     val fcsr_o_data = Output(UInt(32.W))
   })
-
+  val dccm_stall = WireInit(0.B)
   // IF-ID Registers
   val if_reg_pc = RegInit(0.U(32.W))
   val if_reg_ins = RegInit(0.U(32.W))
@@ -151,28 +151,43 @@ class Core(implicit val config:Configs) extends Module{
     func7 := 0.U
   }
 
-  val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+  val IF_stall = Reg(Bool())
+  IF_stall := func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+  val IF_stall_indicator = Reg(Bool())
+  IF_stall_indicator := IF_stall
+  val current_pc = Reg(SInt(32.W))
+  current_pc := pc.io.out
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall //stall signal from outside
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
-  pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
+  pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid || dccm_stall) | ral_halt_o), 1.B, 0.B)
   val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
   pc.io.in := npc
 
-  when(ID.hdu_if_reg_write) {
-    if_reg_pc := pc.io.out.asUInt()
-    if_reg_ins := instruction 
-  }
-  when(ID.ifid_flush) {
-    if_reg_ins := 0.U
-  }
-
+when(!dccm_stall){
+    when(ID.hdu_if_reg_write) {
+      if_reg_pc := pc.io.out.asUInt()
+      if_reg_ins := instruction 
+    }
+    when(ID.ifid_flush) {
+      if_reg_ins := 0.U
+    }
+    when(IF_stall){
+      if_reg_ins := 0.U
+      pc.io.in := current_pc
+      current_pc := current_pc
+    }
+}
+.otherwise{
+  if_reg_ins := if_reg_ins
+  if_reg_pc := if_reg_pc
+}
 
   /****************
    * Decode Stage *
    ****************/
-
+when(!dccm_stall){
   id_reg_rd1 := ID.readData1
   id_reg_rd2 := ID.readData2
   id_reg_imm := ID.immediate
@@ -192,6 +207,28 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
   id_reg_is_csr := ID.is_csr
   id_reg_csr_data := ID.csr_o_data
+}.otherwise{
+  id_reg_rd1 := id_reg_rd1
+  id_reg_rd2 := id_reg_rd2
+  id_reg_imm := id_reg_imm
+  id_reg_wra := id_reg_wra
+  id_reg_f3 := id_reg_f3
+  id_reg_f7 := id_reg_f7
+  id_reg_ins := id_reg_ins
+  id_reg_pc := id_reg_pc
+  id_reg_ctl_aluSrc := id_reg_ctl_aluSrc
+  id_reg_ctl_memToReg := id_reg_ctl_memToReg
+  id_reg_ctl_regWrite := id_reg_ctl_regWrite
+  id_reg_ctl_memRead := id_reg_ctl_memRead
+  id_reg_ctl_memWrite := id_reg_ctl_memWrite
+  id_reg_ctl_branch := id_reg_ctl_branch
+  id_reg_ctl_aluOp := id_reg_ctl_aluOp
+  id_reg_ctl_jump := id_reg_ctl_jump
+  id_reg_ctl_aluSrc1 := id_reg_ctl_aluSrc1
+  id_reg_is_csr := id_reg_is_csr
+  id_reg_csr_data := id_reg_csr_data
+//  IF.PcWrite := ID.hdu_pcWrite
+}
 //  IF.PcWrite := ID.hdu_pcWrite
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
@@ -207,6 +244,43 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_i_mhartid := DontCare
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
+
+// .otherwise{
+//   id_reg_rd1 := id_reg_rd1
+//   id_reg_rd2 := id_reg_rd2
+//   id_reg_imm := id_reg_imm
+//   id_reg_wra := ID.writeRegAddress
+//   id_reg_f3 := ID.func3
+//   id_reg_f7 := ID.func7
+//   id_reg_ins := if_reg_ins
+//   id_reg_pc := if_reg_pc
+//   id_reg_ctl_aluSrc := ID.ctl_aluSrc
+//   id_reg_ctl_memToReg := ID.ctl_memToReg
+//   id_reg_ctl_regWrite := ID.ctl_regWrite
+//   id_reg_ctl_memRead := ID.ctl_memRead
+//   id_reg_ctl_memWrite := ID.ctl_memWrite
+//   id_reg_ctl_branch := ID.ctl_branch
+//   id_reg_ctl_aluOp := ID.ctl_aluOp
+//   id_reg_ctl_jump := ID.ctl_jump
+//   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
+//   id_reg_is_csr := ID.is_csr
+//   id_reg_csr_data := ID.csr_o_data
+// //  IF.PcWrite := ID.hdu_pcWrite
+//   ID.id_instruction := if_reg_ins
+//   ID.pcAddress := if_reg_pc
+//   ID.dmem_resp_valid := io.dmemRsp.valid
+// //  IF.PcSrc := ID.pcSrc
+// //  IF.PCPlusOffset := ID.pcPlusOffset
+//   ID.ex_ins := id_reg_ins
+//   ID.ex_mem_ins := ex_reg_ins
+//   ID.mem_wb_ins := mem_reg_ins
+//   ID.ex_mem_result := ex_reg_result
+
+//   ID.csr_i_misa    := DontCare
+//   ID.csr_i_mhartid := DontCare
+//   ID.id_ex_regWr := id_reg_ctl_regWrite
+//   ID.ex_mem_regWr := ex_reg_ctl_regWrite  
+// }
 
   /*****************
    * Execute Stage *
@@ -225,6 +299,8 @@ class Core(implicit val config:Configs) extends Module{
   EX.ctl_aluSrc := id_reg_ctl_aluSrc
   EX.ctl_aluOp := id_reg_ctl_aluOp
   EX.ctl_aluSrc1 := id_reg_ctl_aluSrc1
+  
+when (!dccm_stall) {
   //EX.ctl_branch := id_reg_ctl_branch
   //EX.ctl_jump := id_reg_ctl_jump
   ex_reg_pc := id_reg_pc
@@ -236,6 +312,17 @@ class Core(implicit val config:Configs) extends Module{
   ex_reg_csr_data := id_reg_csr_data
 //  ex_reg_ctl_memRead := id_reg_ctl_memRead
 //  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+}.otherwise{
+  ex_reg_pc := ex_reg_pc
+  ex_reg_wra := ex_reg_wra
+  ex_reg_ins := ex_reg_ins
+  ex_reg_ctl_memToReg := ex_reg_ctl_memToReg
+  ex_reg_ctl_regWrite := ex_reg_ctl_regWrite
+  ex_reg_is_csr := ex_reg_is_csr
+  ex_reg_csr_data := ex_reg_csr_data
+//  ex_reg_ctl_memRead := id_reg_ctl_memRead
+//  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+}
   ID.id_ex_mem_read := id_reg_ctl_memRead
   ID.ex_mem_mem_read := ex_reg_ctl_memRead
 //  ID.ex_mem_mem_write := ex_reg_ctl_memWrite
@@ -256,12 +343,18 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_ctl_regWrite := id_reg_ctl_regWrite
   }
 
+  when(EX.stall){
+    id_reg_wra := id_reg_wra
+    id_reg_ctl_regWrite := id_reg_ctl_regWrite
+  }
+
   /****************
    * Memory Stage *
    ****************/
 
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
+  dccm_stall := MEM.io.stall
 //  val stall = Wire(Bool())
 //  stall := (ex_reg_ctl_memWrite || ex_reg_ctl_memRead) && !io.dmemRsp.valid
 //  when(MEM.io.stall){
@@ -282,6 +375,8 @@ class Core(implicit val config:Configs) extends Module{
 ////    ex_reg_result := 0.U
 //
 //  } otherwise{
+
+when(!dccm_stall) {
     mem_reg_rd := MEM.io.readData
     mem_reg_result := ex_reg_result
 //    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
@@ -294,10 +389,29 @@ class Core(implicit val config:Configs) extends Module{
     ex_reg_wd := EX.writeData
     ex_reg_result := EX.ALUresult
 //  }
-  mem_reg_wra := ex_reg_wra
-  mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
-  mem_reg_is_csr := ex_reg_is_csr
-  mem_reg_csr_data := ex_reg_csr_data
+    mem_reg_wra := ex_reg_wra
+    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+    mem_reg_is_csr := ex_reg_is_csr
+    mem_reg_csr_data := ex_reg_csr_data
+    
+}.otherwise{
+    mem_reg_rd := mem_reg_rd
+    mem_reg_result := mem_reg_result
+//    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+    mem_reg_ctl_regWrite := mem_reg_ctl_regWrite
+    mem_reg_ins := mem_reg_ins
+    mem_reg_pc := mem_reg_pc
+    mem_reg_wra := mem_reg_wra
+    ex_reg_ctl_memRead := ex_reg_ctl_memRead
+    ex_reg_ctl_memWrite := ex_reg_ctl_memWrite
+    ex_reg_wd := ex_reg_wd
+    ex_reg_result := ex_reg_result
+//  }
+    mem_reg_wra := mem_reg_wra
+    mem_reg_ctl_memToReg := mem_reg_ctl_memToReg
+    mem_reg_is_csr := mem_reg_is_csr
+    mem_reg_csr_data := mem_reg_csr_data
+}
   EX.ex_mem_regWrite := ex_reg_ctl_regWrite
   MEM.io.aluResultIn := ex_reg_result
   MEM.io.writeData := ex_reg_wd
@@ -327,6 +441,15 @@ class Core(implicit val config:Configs) extends Module{
       wb_addr := mem_reg_wra
     }
 
+
+//when (!dccm_stall) {
+//  io.pin := wb_data
+//}.otherwise{
+//  io.pin := io.pin
+//}
+
+io.pin := wb_data
+
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data
   EX.wb_result := wb_data
@@ -336,7 +459,6 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Wb := mem_reg_is_csr
   ID.csr_Wb_data := mem_reg_csr_data
   ID.dmem_data := io.dmemRsp.bits.dataResponse
-  io.pin := wb_data
 
   /**************
   ** RVFI PINS **

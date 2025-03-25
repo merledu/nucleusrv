@@ -91,14 +91,22 @@ class MemoryFetch extends Module {
     io.dccmReq.bits.activeByteLane := "b1111".U
   }
 
-  io.dccmReq.bits.dataRequest := wdata.asUInt()
-  io.dccmReq.bits.addrRequest := (io.aluResultIn & "h00001fff".U) >> 2
-  io.dccmReq.bits.isWrite := io.writeEnable
-  io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
+  //val reqvalid = WireInit(0.B)
 
+  io.dccmReq.bits.dataRequest := wdata.asUInt()
+  io.dccmReq.bits.addrRequest := io.aluResultIn  //(io.aluResultIn & "h00001fff".U) >> 2
+  io.dccmReq.bits.isWrite := io.writeEnable
+
+  when(io.stall) {
+    io.dccmRsp.ready := false.B
+  }.otherwise {
+    io.dccmRsp.ready := true.B
+  }
+
+  io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
   io.stall := (io.writeEnable || io.readEnable) && !io.dccmRsp.valid
 
-  rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
+  rdata := io.dccmRsp.bits.dataResponse //Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 
 
   when(io.readEnable) {
@@ -185,7 +193,7 @@ class MemoryFetch extends Module {
   }
 
 
-  when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
+  when(io.writeEnable && ~io.stall){
     printf("%x\n", io.writeData)
   }
 

@@ -16,4 +16,5 @@ class MemRequestIO extends Bundle {
 
 class MemResponseIO extends Bundle {
   val dataResponse: UInt = Input(UInt(32.W))
+  val error       : Bool = Input(Bool())
 }

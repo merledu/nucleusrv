@@ -2,12 +2,14 @@ package nucleusrv.components
 
 import chisel3._ 
 import chiseltest._ 
-import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.FreeSpec
+import chiseltest.internal.VerilatorBackendAnnotation
+import chiseltest.experimental.TestOptionBuilder._
 
 //import chiseltest.experimental.TestOptionBuilder._
 //import chiseltest.internal.VerilatorBackendAnnotation
 
-class TopTest extends AnyFreeSpec with ChiselScalatestTester {
+class TopTest extends FreeSpec with ChiselScalatestTester {
   def getProgramFile: Option[String] = {
     if (scalaTestContext.value.get.configMap.contains("programFile")) {
       Some(scalaTestContext.value.get.configMap("programFile").toString)

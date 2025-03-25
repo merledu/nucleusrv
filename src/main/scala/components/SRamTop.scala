@@ -14,6 +14,7 @@ class SRamTop(val programFile:Option[String] ) extends Module {
     val validReg = RegInit(false.B)
     io.rsp.valid := validReg
     io.req.ready := true.B // assuming we are always ready to accept requests from device
+    io.rsp.bits.error := false.B
 
     val rdata = Wire(UInt(32.W))
 
