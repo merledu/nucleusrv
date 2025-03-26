@@ -203,7 +203,10 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  ID.csr_i_misa    := DontCare
+  val misa = (1 << 30).U | (1 << 8).U | 
+           Mux(M.B, (1 << 12).U, 0.U) | 
+           Mux(C.B, (1 << 2).U, 0.U)
+  ID.csr_i_misa    := misa
   ID.csr_i_mhartid := DontCare
   ID.id_ex_regWr := id_reg_ctl_regWrite
   ID.ex_mem_regWr := ex_reg_ctl_regWrite
