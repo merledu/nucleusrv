@@ -23,11 +23,19 @@ class CSRRegFile extends Module{
     val MIE_REG             = RegInit(0.U(32.W))
     
     // MSTATUS
+    val MSTATUS_TSR_REG     = RegInit(0.U(1.W))
     val MSTATUS_TW_REG      = RegInit(0.U(1.W))
+    val MSTATUS_TVM_REG     = RegInit(0.U(1.W))
+    val MSTATUS_MXR_REG     = RegInit(0.U(1.W))
+    val MSTATUS_SUM_REG     = RegInit(0.U(1.W))
     val MSTATUS_MPRV_REG    = RegInit(0.U(1.W))
     val MSTATUS_MPP_REG     = RegInit(0.U(2.W))
+    val MSTATUS_SPP_REG     = RegInit(0.U(1.W))
     val MSTATUS_MPIE_REG    = RegInit(0.U(1.W))
+    val MSTATUS_UBE_REG     = RegInit(0.U(1.W))
+    val MSTATUS_SPIE_REG    = RegInit(0.U(1.W))
     val MSTATUS_MIE_REG     = RegInit(0.U(1.W))
+    val MSTATUS_SIE_REG     = RegInit(0.U(1.W))
 
     //FCSR 
     val FCSR_NX_REG         = RegInit(0.U(1.W))
@@ -52,7 +60,7 @@ class CSRRegFile extends Module{
     // Wires
     val w_data                  = Wire(UInt(32.W))
     val r_data                  = Wire(UInt(32.W))
-    val MSTATUS_WIRE            = WireInit(Cat("b0".U(10.W), MSTATUS_TW_REG, "b0".U(3.W), MSTATUS_MPRV_REG, "b0".U(4.W), MSTATUS_MPP_REG, "b0".U(3.W), MSTATUS_MPIE_REG, "b0".U(3.W), MSTATUS_MIE_REG, "b0".U(3.W)))
+    val MSTATUS_WIRE            = WireInit(Cat("b0".U(9.W),MSTATUS_TSR_REG, MSTATUS_TW_REG, MSTATUS_TVM_REG, MSTATUS_MXR_REG, MSTATUS_SUM_REG, MSTATUS_MPRV_REG, "b0".U(4.W), MSTATUS_MPP_REG, "b0".U(2.W), MSTATUS_SPP_REG, MSTATUS_MPIE_REG, MSTATUS_UBE_REG, MSTATUS_SPIE_REG, "b0".U(1.W), MSTATUS_MIE_REG, "b0".U(1.W), MSTATUS_SIE_REG, "b0".U(1.W)))
     val MCAUSE_WLRL_WIRE        = WireInit(MCAUSE_REG(30,0))
     val MCAUSE_INTERRUPT_WIRE   = WireInit(MCAUSE_REG(31))
     val MTVEC_MODE_WIRE         = WireInit(MTVEC_REG(1,0))
@@ -101,11 +109,19 @@ class CSRRegFile extends Module{
     when(io.CSR.i_w_en){
         switch(io.CSR.i_addr){
             is(AddressMap.MSTATUS){
+                MSTATUS_TSR_REG  := w_data(22)
                 MSTATUS_TW_REG   := w_data(21)
+                MSTATUS_TVM_REG  := w_data(20)
+                MSTATUS_MXR_REG  := w_data(19)
+                MSTATUS_SUM_REG  := w_data(18)
                 MSTATUS_MPRV_REG := w_data(17)
                 MSTATUS_MPP_REG  := w_data(12,11)
+                MSTATUS_SPP_REG  := w_data(8)
                 MSTATUS_MPIE_REG := w_data(7)
+                MSTATUS_UBE_REG  := w_data(6)
+                MSTATUS_SPIE_REG := w_data(5)
                 MSTATUS_MIE_REG  := w_data(3)
+                MSTATUS_SIE_REG  := w_data(1)
             }
             is(AddressMap.MCAUSE){
                 MCAUSE_REG       := w_data
