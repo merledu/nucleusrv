@@ -1,6 +1,6 @@
 module instructioncache_sram #(
-  parameter NUM_WMASKS = 4,
-  parameter DATA_WIDTH = 32,
+  parameter NUM_WMASKS = 32, //32bytes in 1 block
+  parameter DATA_WIDTH = 256,
   parameter ADDR_WIDTH = 11, // 2^11 = 2048 words = 8KB
   parameter RAM_DEPTH = 1 << ADDR_WIDTH,
   // FIXME: This delay is arbitrary.
