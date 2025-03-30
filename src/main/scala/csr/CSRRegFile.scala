@@ -20,6 +20,8 @@ class CSRRegFile extends Module{
     val MCAUSE_REG          = RegInit(0.U(32.W))
     val MTVEC_REG           = RegInit(0.U(32.W))
     val MEPC_REG            = RegInit(0.U(32.W))
+    val MSCRATCH_REG        = RegInit(0.U(32.W))
+    val MTVAL_REG           = RegInit(0.U(32.W))
     
     // MSTATUS
     val MSTATUS_TSR_REG     = RegInit(0.U(1.W))
@@ -88,6 +90,8 @@ class CSRRegFile extends Module{
         AddressMap.MCAUSE  -> MCAUSE_REG,
         AddressMap.MTVEC   -> MTVEC_REG,
         AddressMap.MEPC    -> MEPC_REG,
+        AddressMap.MSCRATCH-> MSCRATCH_REG,
+        AddressMap.MTVAL   -> MTVAL_REG,
         AddressMap.MIE     -> MIE_WIRE,
         AddressMap.FFLAGS  -> FFLAGS_WIRE,
         AddressMap.FRM     -> FRM_WIRE,
@@ -136,6 +140,12 @@ class CSRRegFile extends Module{
             }
             is(AddressMap.MEPC){
                 MEPC_REG         := w_data
+            }
+            is(AddressMap.MSCRATCH){
+                MSCRATCH_REG     := w_data
+            }
+            is(AddressMap.MTVAL){
+                MTVAL_REG        := w_data
             }
             is(AddressMap.MIE){
                 MIE_MEIE_REG     := w_data(11)

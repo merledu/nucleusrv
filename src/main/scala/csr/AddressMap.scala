@@ -12,6 +12,8 @@ object AddressMap {
     val MIE              = "h304".U
     val MCAUSE           = "h342".U
     val MEPC             = "h341".U
+    val MSCRATCH         = "h340".U
+    val MTVAL            = "h343".U
     val FFLAGS           = "h001".U
     val FRM              = "h002".U
     val FCSR             = "h003".U
