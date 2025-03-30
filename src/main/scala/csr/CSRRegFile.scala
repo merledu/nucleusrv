@@ -24,6 +24,8 @@ class CSRRegFile extends Module{
     val MTVAL_REG           = RegInit(0.U(32.W))
     val MCYCLE_REG         = RegInit(0.U(32.W))
     val MCYCLEH_REG        = RegInit(0.U(32.W))
+    val MINSTRET_REG       = RegInit(0.U(32.W))
+    val MINSTRETH_REG      = RegInit(0.U(32.W))
     
     // MSTATUS
     val MSTATUS_TSR_REG     = RegInit(0.U(1.W))
@@ -96,6 +98,15 @@ class CSRRegFile extends Module{
     }
     /***************************************************/
 
+    /****************** instret counter ******************/
+    when(io.MINSTRET.i_instr_retired){
+        MINSTRET_REG := MINSTRET_REG + 1.U
+    }
+    when(io.MINSTRET.i_instr_retired && MINSTRET_REG === 0.U){
+        MINSTRETH_REG := MINSTRETH_REG + 1.U
+    }
+    /***************************************************/
+
     /****************** Read Logic ******************/
     var READ,WRITE,SET,CLEAR = Wire(UInt(2.W))
     Seq(READ,WRITE,SET,CLEAR) zip Seq(csr_opr.READ, csr_opr.WRITE, csr_opr.SET, csr_opr.CLEAR) map (x => x._1 := x._2)
@@ -115,7 +126,9 @@ class CSRRegFile extends Module{
         AddressMap.FRM     -> FRM_WIRE,
         AddressMap.FCSR    -> FCSR_WIRE,
         AddressMap.MCYCLE  -> MCYCLE_REG,
-        AddressMap.MCYCLEH -> MCYCLEH_REG
+        AddressMap.MCYCLEH -> MCYCLEH_REG,
+        AddressMap.MINSTRET-> MINSTRET_REG,
+        AddressMap.MINSTRETH-> MINSTRETH_REG
     )
 
     r_data := MuxLookup(io.CSR.i_addr, DontCare, READ_CASES)
@@ -200,6 +213,12 @@ class CSRRegFile extends Module{
             }
             is(AddressMap.MCYCLEH){
                 MCYCLEH_REG       := w_data
+            }
+            is(AddressMap.MINSTRET){
+                MINSTRET_REG      := w_data
+            }
+            is(AddressMap.MINSTRETH){
+                MINSTRETH_REG     := w_data
             }
         }
     }

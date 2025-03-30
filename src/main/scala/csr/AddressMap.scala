@@ -19,7 +19,9 @@ object AddressMap {
     val FRM              = "h002".U
     val FCSR             = "h003".U
 
-    // Performance counters
+    // Counters
     val MCYCLE           = "hB00".U
     val MCYCLEH          = "hB80".U
+    val MINSTRET         = "hB02".U
+    val MINSTRETH        = "hB82".U
 }

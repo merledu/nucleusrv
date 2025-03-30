@@ -342,6 +342,13 @@ class Core(implicit val config:Configs) extends Module{
   ID.dmem_data := io.dmemRsp.bits.dataResponse
   io.pin := wb_data
 
+  /*****************************
+  ** instruction retire logic **
+  *****************************/
+  val instruction_retired = WireInit(false.B)
+  instruction_retired := mem_reg_ins =/= 0.U && !ID.ifid_flush && !(MEM.io.stall || io.stall) && (!mem_reg_ctl_memToReg === 1.U || io.dmemRsp.valid)
+  ID.instr_retired := instruction_retired
+
   /**************
   ** RVFI PINS **
   **************/
