@@ -43,6 +43,11 @@ class CSRRegFile extends Module{
     val MIE_MTIE_REG        = RegInit(0.U(1.W))
     val MIE_MSIE_REG        = RegInit(0.U(1.W))
 
+    // MIP
+    val MIP_MEIP_REG        = RegInit(0.U(1.W))
+    val MIP_MTIP_REG        = RegInit(0.U(1.W))
+    val MIP_MSIP_REG        = RegInit(0.U(1.W))
+
     //FCSR 
     val FCSR_NX_REG         = RegInit(0.U(1.W))
     val FCSR_UF_REG         = RegInit(0.U(1.W))
@@ -68,6 +73,7 @@ class CSRRegFile extends Module{
     val r_data                  = Wire(UInt(32.W))
     val MSTATUS_WIRE            = WireInit(Cat("b0".U(9.W),MSTATUS_TSR_REG, MSTATUS_TW_REG, MSTATUS_TVM_REG, MSTATUS_MXR_REG, MSTATUS_SUM_REG, MSTATUS_MPRV_REG, "b0".U(4.W), MSTATUS_MPP_REG, "b0".U(2.W), MSTATUS_SPP_REG, MSTATUS_MPIE_REG, MSTATUS_UBE_REG, MSTATUS_SPIE_REG, "b0".U(1.W), MSTATUS_MIE_REG, "b0".U(1.W), MSTATUS_SIE_REG, "b0".U(1.W)))
     val MIE_WIRE                = WireInit(Cat("b0".U(21.W), MIE_MEIE_REG, "b0".U(3.W), MIE_MTIE_REG, "b0".U(3.W), MIE_MSIE_REG, "b0".U(3.W)))
+    val MIP_WIRE                = WireInit(Cat("b0".U(21.W), MIP_MEIP_REG, "b0".U(3.W), MIP_MTIP_REG, "b0".U(3.W), MIP_MSIP_REG, "b0".U(3.W)))
     val MCAUSE_WLRL_WIRE        = WireInit(MCAUSE_REG(30,0))
     val MCAUSE_INTERRUPT_WIRE   = WireInit(MCAUSE_REG(31))
     val MTVEC_MODE_WIRE         = WireInit(MTVEC_REG(1,0))
@@ -93,6 +99,7 @@ class CSRRegFile extends Module{
         AddressMap.MSCRATCH-> MSCRATCH_REG,
         AddressMap.MTVAL   -> MTVAL_REG,
         AddressMap.MIE     -> MIE_WIRE,
+        AddressMap.MIP     -> MIP_WIRE,
         AddressMap.FFLAGS  -> FFLAGS_WIRE,
         AddressMap.FRM     -> FRM_WIRE,
         AddressMap.FCSR    -> FCSR_WIRE
@@ -151,6 +158,11 @@ class CSRRegFile extends Module{
                 MIE_MEIE_REG     := w_data(11)
                 MIE_MTIE_REG     := w_data(7)
                 MIE_MSIE_REG     := w_data(3)
+            }
+            is(AddressMap.MIP){
+                MIP_MEIP_REG     := w_data(11)
+                MIP_MTIP_REG     := w_data(7)
+                MIP_MSIP_REG     := w_data(3)
             }
             is(AddressMap.FCSR){
                FCSR_NX_REG       := w_data(0)
