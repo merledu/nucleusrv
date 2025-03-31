@@ -52,6 +52,10 @@ class CSRRegFile extends Module{
     val MIP_MTIP_REG        = RegInit(0.U(1.W))
     val MIP_MSIP_REG        = RegInit(0.U(1.W))
 
+    // MCOUNTINHIBIT
+    val MCOUNTINHIBIT_CY_REG = RegInit(0.U(1.W))
+    val MCOUNTINHIBIT_IR_REG = RegInit(0.U(1.W))    
+
     //FCSR 
     val FCSR_NX_REG         = RegInit(0.U(1.W))
     val FCSR_UF_REG         = RegInit(0.U(1.W))
@@ -85,24 +89,25 @@ class CSRRegFile extends Module{
     val FFLAGS_WIRE             = WireInit(Cat("b0".U(27.W),FCSR_NV_REG,FCSR_DZ_REG,FCSR_OF_REG,FCSR_UF_REG,FCSR_NX_REG))
     val FRM_WIRE                = WireInit(Cat("b0".U(29.W),FCSR_FRM_REG))
     val FCSR_WIRE               = WireInit(Cat("b0".U(24.W),FCSR_FRM_REG,FCSR_NV_REG,FCSR_DZ_REG,FCSR_OF_REG,FCSR_UF_REG,FCSR_NX_REG))
+    val MCOUNTINHIBIT_WIRE      = WireInit(Cat("b0".U(29.W),MCOUNTINHIBIT_IR_REG, "b0".U(1.W), MCOUNTINHIBIT_CY_REG))
 
     val csr_opr = CSROperations()
     /*************************************************/
 
     /****************** cycle counter ******************/
-    val cycle_next = MCYCLE_REG + 1.U
-    MCYCLE_REG := cycle_next
-
-    when(cycle_next === 0.U){
-        MCYCLEH_REG := MCYCLEH_REG + 1.U
+    when(!MCOUNTINHIBIT_CY_REG){    
+        MCYCLE_REG := MCYCLE_REG + 1.U
+        when(MCYCLE_REG === 0.U){
+            MCYCLEH_REG := MCYCLEH_REG + 1.U
+        }
     }
     /***************************************************/
 
     /****************** instret counter ******************/
-    when(io.MINSTRET.i_instr_retired){
+    when(io.MINSTRET.i_instr_retired && !MCOUNTINHIBIT_IR_REG){
         MINSTRET_REG := MINSTRET_REG + 1.U
     }
-    when(io.MINSTRET.i_instr_retired && MINSTRET_REG === 0.U){
+    when(io.MINSTRET.i_instr_retired && MINSTRET_REG === 0.U && !MCOUNTINHIBIT_IR_REG){
         MINSTRETH_REG := MINSTRETH_REG + 1.U
     }
     /***************************************************/
@@ -128,7 +133,8 @@ class CSRRegFile extends Module{
         AddressMap.MCYCLE  -> MCYCLE_REG,
         AddressMap.MCYCLEH -> MCYCLEH_REG,
         AddressMap.MINSTRET-> MINSTRET_REG,
-        AddressMap.MINSTRETH-> MINSTRETH_REG
+        AddressMap.MINSTRETH-> MINSTRETH_REG,
+        AddressMap.MCOUNTINHIBIT-> MCOUNTINHIBIT_WIRE
     )
 
     r_data := MuxLookup(io.CSR.i_addr, DontCare, READ_CASES)
@@ -219,6 +225,10 @@ class CSRRegFile extends Module{
             }
             is(AddressMap.MINSTRETH){
                 MINSTRETH_REG     := w_data
+            }
+            is(AddressMap.MCOUNTINHIBIT){
+                MCOUNTINHIBIT_CY_REG := w_data(0)
+                MCOUNTINHIBIT_IR_REG := w_data(2)
             }
         }
     }

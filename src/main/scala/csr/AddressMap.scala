@@ -24,4 +24,5 @@ object AddressMap {
     val MCYCLEH          = "hB80".U
     val MINSTRET         = "hB02".U
     val MINSTRETH        = "hB82".U
+    val MCOUNTINHIBIT    = "h320".U
 }
