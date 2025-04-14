@@ -17,7 +17,8 @@ if __name__ == '__main__':
             'riscof',
             'run',
             '--suite', RISCV_TEST_SUITE,
-            '--env', RISCV_TEST_SUITE_ENV
+            '--env', RISCV_TEST_SUITE_ENV,
+            '--no-browser'
         ],
             text = True
         )

@@ -1,8 +1,11 @@
 package nucleusrv.components
 import chisel3._
 import chisel3.util.MuxCase
+import chisel3.util.MuxLookup
+import FBitPats._
 
 class Execute(
+  F: Boolean,
   M: Boolean = false,
   TRACE: Boolean
 ) extends Module {
@@ -16,8 +19,8 @@ class Execute(
     val mem_result = Input(UInt(32.W))
     val wb_result = Input(UInt(32.W))
 
-    val ex_mem_regWrite = Input(Bool())
-    val mem_wb_regWrite = Input(Bool())
+    val ex_mem_regWrite = Input(Vec(if (F) 2 else 1, Bool()))
+    val mem_wb_regWrite = Input(Vec(if (F) 2 else 1, Bool()))
     val id_ex_ins = Input(UInt(32.W))
     val ex_mem_ins = Input(UInt(32.W))
     val mem_wb_ins = Input(UInt(32.W))
@@ -32,20 +35,28 @@ class Execute(
     val stall = Output(Bool())
 
     val rs1_rdata = if (TRACE) Some(Output(UInt(32.W))) else None
+
+    val f_read = if (F) Some(Input(Vec(2, Vec(3, Bool())))) else None
+    val readData3 = if (F) Some(Input(UInt(32.W))) else None
+    val exceptions = if (F) Some(Output(Vec(5, Bool()))) else None
   })
 
   val alu = Module(new ALU)
   val aluCtl = Module(new AluControl)
-  val fu = Module(new ForwardingUnit).io
+  val fu = Module(new ForwardingUnit(F)).io
 
   // Forwarding Unt
 
-  fu.ex_regWrite := io.ex_mem_regWrite
-  fu.mem_regWrite := io.mem_wb_regWrite
+  fu.ex_regWrite <> io.ex_mem_regWrite
+  fu.mem_regWrite <> io.mem_wb_regWrite
   fu.ex_reg_rd := io.ex_mem_ins(11, 7)
   fu.mem_reg_rd := io.mem_wb_ins(11, 7)
   fu.reg_rs1 := io.id_ex_ins(19, 15)
   fu.reg_rs2 := io.id_ex_ins(24, 20)
+  if (F) {
+    fu.f_read.get <> io.f_read.get
+    fu.reg_rs3.get := io.id_ex_ins(31, 27)
+  }
 
   val inputMux1 = MuxCase(
     0.U,
@@ -63,6 +74,11 @@ class Execute(
       (fu.forwardB === 2.U) -> (io.wb_result)
     )
   )
+  val inputMux3 = if (F) Some(MuxLookup(fu.forwardC.get, 0.U, Vector(
+    io.readData3.get,
+    io.mem_result,
+    io.wb_result
+  ).zipWithIndex.map(f => f._2.U -> f._1))) else None
 
   val aluIn1 = MuxCase(
     inputMux1,
@@ -82,71 +98,115 @@ class Execute(
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
 
+  io.ALUresult := alu.io.result
   dontTouch(io.stall) := false.B
-  if(M){
-    val mdu = Module (new MDU)
-    mdu.io.src_a := aluIn1
-    mdu.io.src_b := aluIn2
-    mdu.io.op    := io.func3
+
+  val mdu = if (M) Some(Module (new MDU)) else None
+  val src_a_reg = if (M) Some(RegInit(0.U(32.W))) else None
+  val src_b_reg = if (M) Some(RegInit(0.U(32.W))) else None
+  val op_reg    = if (M) Some(RegInit(0.U(3.W))) else None
+  val div_en    = if (M) Some(RegInit(false.B)) else None
+  val f7_reg    = if (M) Some(RegInit(0.U(6.W))) else None
+  val counter   = if (M) Some(RegInit(0.U(6.W))) else None
+  if (M) {
+    mdu.get.io.src_a := aluIn1
+    mdu.get.io.src_b := aluIn2
+    mdu.get.io.op    := io.func3
     // mdu.io.valid := true.B
     // io.stall := false.B
     
-    val src_a_reg = RegInit(0.U(32.W))
-    val src_b_reg = RegInit(0.U(32.W))
-    val op_reg    = RegInit(0.U(3.W))
-    val div_en    = RegInit(false.B)
-    val f7_reg    = RegInit(0.U(6.W))
-    val counter   = RegInit(0.U(6.W))
 
     when(io.func7 === 1.U && (io.func3 === 0.U || io.func3 === 1.U || io.func3 === 2.U || io.func3 === 3.U)){
-      mdu.io.valid := true.B
+      mdu.get.io.valid := true.B
     }otherwise{
-      mdu.io.valid := false.B
+      mdu.get.io.valid := false.B
     }
     dontTouch(io.stall)
-    when(io.func7 === 1.U && ~div_en && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)){
-      mdu.io.valid := RegNext(true.B)
-      div_en := true.B
-      src_a_reg := aluIn1
-      src_b_reg := aluIn2
-      op_reg := io.func3
-      f7_reg := io.func7
+    when(io.func7 === 1.U && ~div_en.get && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)){
+      mdu.get.io.valid := RegNext(true.B)
+      div_en.get := true.B
+      src_a_reg.get := aluIn1
+      src_b_reg.get := aluIn2
+      op_reg.get := io.func3
+      f7_reg.get := io.func7
       io.stall := true.B
-      dontTouch(f7_reg)
+      dontTouch(f7_reg.get)
     }
 
-    when(div_en){
+    when(div_en.get){
       // io.stall := true.B
-      when (counter < 32.U){
+      when (counter.get < 32.U){
         io.stall := true.B
-        mdu.io.src_a := src_a_reg
-        mdu.io.src_b := src_b_reg
-        mdu.io.op    := op_reg
+        mdu.get.io.src_a := src_a_reg.get
+        mdu.get.io.src_b := src_b_reg.get
+        mdu.get.io.op    := op_reg.get
         // mdu.io.valid := true.B
-        counter := counter + 1.U
+        counter.get := counter.get + 1.U
       }.otherwise{
-        mdu.io.valid := false.B
-        div_en       := false.B
-        mdu.io.src_a := src_a_reg
-        mdu.io.src_b := src_b_reg
-        mdu.io.op    := op_reg
-        counter := 0.U
+        mdu.get.io.valid := false.B
+        div_en.get       := false.B
+        mdu.get.io.src_a := src_a_reg.get
+        mdu.get.io.src_b := src_b_reg.get
+        mdu.get.io.op    := op_reg.get
+        counter.get := 0.U
       }
     }//.otherwise{io.stall := false.B}
 
-    when(div_en && f7_reg === 1.U && mdu.io.ready){
-      io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
-    }
-    .elsewhen (io.func7 === 1.U && mdu.io.ready){
-      io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
-    }
-    .otherwise{io.ALUresult := alu.io.result}
-  } 
-  else {
-    io.ALUresult := alu.io.result
+    //when(div_en && f7_reg === 1.U && mdu.io.ready){
+    //  io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
+    //}
+    //.elsewhen (io.func7 === 1.U && mdu.io.ready){
+    //  io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
+    //}
+    //.otherwise{io.ALUresult := alu.io.result}
   }
 
-  // io.ALUresult := alu.io.result
+  val fpu = if (F) Some(Module(new FPU(8, 24)).io) else None
+  if (F) {
+    fpu.get.rm := io.func3
+    Vector(inputMux1, inputMux2, inputMux3.get).zipWithIndex foreach (
+      f => fpu.get.in(f._2) := f._1
+    )
+    fpu.get.aluOp := MuxCase(0.U, Vector(
+      fmadd_s,
+      fmsub_s,
+      fnmsub_s,
+      fnmadd_s,
+      fadd_s,
+      fsub_s,
+      fmul_s,
+      fdiv_s,
+      fsqrt_s,
+      fsgnj_s,
+      fsgnjn_s,
+      fsgnjx_s,
+      fmin_s,
+      fmax_s,
+      fcvt_w_s,
+      fcvt_wu_s,
+      fmv_x_w,
+      feq_s,
+      flt_s,
+      fle_s,
+      fclass_s,
+      fcvt_s_w,
+      fcvt_s_wu,
+      fmv_w_x
+    ).zipWithIndex.map(
+      f => (f._1 === io.id_ex_ins) -> (f._2 + 1).U
+    ))
+    fpu.get.div_sqrt_valid := 0.B
+    io.exceptions.get <> fpu.get.exceptions
+  }
+
+  io.ALUresult := MuxCase(alu.io.result, (
+    if (M) Vector(
+      (div_en.get && f7_reg.get === 1.U && mdu.get.io.ready) -> Mux(mdu.get.io.output.valid, mdu.get.io.output.bits, 0.U),
+      (io.func7 === 1.U && mdu.get.io.ready) -> Mux(mdu.get.io.output.valid, mdu.get.io.output.bits, 0.U)
+    ) else Vector()
+  ) ++ (
+    if (F) Vector() else Vector()
+  ))
 
   io.writeData := inputMux2
 

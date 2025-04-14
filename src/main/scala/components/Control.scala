@@ -2,7 +2,9 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class Control extends Module {
+import nucleusrv.components.FBitPats._
+
+class Control(F: Boolean) extends Module {
   val io = IO(new Bundle {
     val in = Input(UInt(32.W))
     val aluSrc = Output(Bool())
@@ -14,6 +16,9 @@ class Control extends Module {
     val aluOp = Output(UInt(2.W))
     val jump = Output(UInt(2.W))
     val aluSrc1 = Output(UInt(2.W))
+
+    val f_read = if (F) Some(Output(Vec(3, Bool()))) else None
+    val f_wr = if (F) Some(Output(Bool())) else None
   })
 
   val signals = ListLookup(
@@ -141,6 +146,81 @@ class Control extends Module {
         0.U, // aluOp
         0.U
       )
+    ) ++ (
+      if (F) Array(
+        flw -> List(
+          false.B, // aluSrc
+          1.U, // memToReg
+          false.B, // regWrite
+          true.B, // memRead
+          false.B, // memWrite
+          false.B, // branch
+          0.U, // jump
+          0.U, // aluOp
+          0.U
+        ),
+        fsw -> List(
+          false.B, // aluSrc
+          0.U, // memToReg
+          false.B, // regWrite
+          false.B, // memRead
+          true.B, // memWrite
+          false.B, // branch
+          0.U, // jump
+          0.U, // aluOp
+          0.U
+        )
+      ) ++ Array(
+        fmadd_s,
+        fmsub_s,
+        fnmsub_s,
+        fnmadd_s,
+        fadd_s,
+        fsub_s,
+        fmul_s,
+        fdiv_s,
+        fsqrt_s,
+        fsgnj_s,
+        fsgnjn_s,
+        fsgnjx_s,
+        fmin_s,
+        fmax_s,
+        fcvt_s_w,
+        fcvt_s_wu,
+        fmv_w_x
+      ).map(
+        _ -> List(
+          1.B, // aluSrc
+          0.U, // memToReg
+          0.B, // regWrite
+          false.B, // memRead
+          false.B, // memWrite
+          false.B, // branch
+          0.U, // jump
+          1.U, // aluOp
+          0.U // aluSrc1
+        )
+      ) ++ Array(
+        fcvt_w_s,
+        fcvt_wu_s,
+        fmv_x_w,
+        feq_s,
+        flt_s,
+        fle_s,
+        fclass_s
+      ).map(
+        _ -> List(
+          1.B, // aluSrc
+          0.U, // memToReg
+          1.B, // regWrite
+          false.B, // memRead
+          false.B, // memWrite
+          false.B, // branch
+          0.U, // jump
+          1.U, // aluOp
+          0.U // aluSrc1
+        )
+      ) else Array()
     )
   )
   io.aluSrc := signals(0)
@@ -152,4 +232,51 @@ class Control extends Module {
   io.jump := signals(6)
   io.aluOp := signals(7)
   io.aluSrc1 := signals(8)
+
+  if (F) {
+    val f_ctrl = VecInit(Vector(
+      flw,
+      fsw,
+      fmadd_s,
+      fmsub_s,
+      fnmsub_s,
+      fnmadd_s,
+      fadd_s,
+      fsub_s,
+      fmul_s,
+      fdiv_s,
+      fsqrt_s,
+      fsgnj_s,
+      fsgnjn_s,
+      fsgnjx_s,
+      fmin_s,
+      fmax_s,
+      fcvt_w_s,
+      fcvt_wu_s,
+      fmv_x_w,
+      feq_s,
+      flt_s,
+      fle_s,
+      fclass_s,
+      fcvt_s_w,
+      fcvt_s_wu,
+      fmv_w_x
+    ).map(_ === io.in))
+
+    Vector(
+      Range(2, 23),  // rs1
+      Range(1, 10) ++ Range(11, 16) ++ Range(19, 22),  // rs2
+      Range(2, 6)  // rs3
+    ).zipWithIndex.foreach(
+      f => io.f_read.get(f._2) := f._1.map(
+        x => f_ctrl(x)
+      ).reduce(_ || _)
+    )
+
+    io.f_wr.get := (
+      Vector(0) ++ Range(2, 16) ++ Range(23, 26)
+    ).map(
+      f => f_ctrl(f)
+    ).reduce(_ || _)
+  }
 }

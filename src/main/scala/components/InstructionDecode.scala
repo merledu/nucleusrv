@@ -3,13 +3,16 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class InstructionDecode(TRACE:Boolean) extends Module {
+class InstructionDecode(
+  F: Boolean,
+  TRACE: Boolean
+) extends Module {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
     val writeData = Input(UInt(32.W))
     val writeReg = Input(UInt(5.W))
     val pcAddress = Input(UInt(32.W))
-    val ctl_writeEnable = Input(Bool())
+    val ctl_writeEnable = Input(Vec(if (F) 2 else 1, Bool()))
     val id_ex_mem_read = Input(Bool())
 //    val ex_mem_mem_write = Input(Bool())
     val ex_mem_mem_read = Input(Bool())
@@ -34,7 +37,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val csr_Mem_data = Input(UInt(32.W))
     val csr_Wb_data = Input(UInt(32.W))
     val dmem_data = Input(UInt(32.W))
-    
+
     //Outputs
     val immediate = Output(UInt(32.W))
     val writeRegAddress = Output(UInt(5.W))
@@ -44,7 +47,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val func3 = Output(UInt(3.W))
     val ctl_aluSrc = Output(Bool())
     val ctl_memToReg = Output(UInt(2.W))
-    val ctl_regWrite = Output(Bool())
+    val ctl_regWrite = Output(Vec(if (F) 2 else 1, Bool()))
     val ctl_memRead = Output(Bool())
     val ctl_memWrite = Output(Bool())
     val ctl_branch = Output(Bool())
@@ -65,6 +68,11 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val csr_o_data        = Output(UInt(32.W))
     val is_csr            = Output(Bool())
     val fscr_o_data       = Output(UInt(32.W))
+
+    // F pins
+    val f_read_reg = if (F) Some(Input(Vec(3, Vec(2, Bool())))) else None
+    val f_read = if (F) Some(Output(Vec(3, Bool()))) else None
+    val readData3 = if (F) Some(Output(UInt(32.W))) else None
 
     // RVFI pins
     val raddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
@@ -91,7 +99,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   csrController.io.regWrMemory     := io.ex_mem_regWr
   csrController.io.rdSelMemory     := io.ex_mem_rd
   csrController.io.csrWrMemory     := io.csr_Mem
-  csrController.io.regWrWriteback  := io.ctl_writeEnable
+  csrController.io.regWrWriteback  := io.ctl_writeEnable(0)
   csrController.io.rdSelWriteback  := io.writeReg
   csrController.io.csrWrWriteback  := io.csr_Wb
   csrController.io.rs1SelDecode    := io.id_instruction(19,15)
@@ -114,7 +122,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   io.hdu_if_reg_write := hdu.io.if_reg_write
 
   //Control Unit
-  val control = Module(new Control)
+  val control = Module(new Control(F))
   control.io.in := io.id_instruction
   io.ctl_aluOp := control.io.aluOp
   io.ctl_aluSrc := control.io.aluSrc
@@ -125,37 +133,69 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   io.ctl_jump := control.io.jump
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
     io.ctl_memWrite := control.io.memWrite
-    io.ctl_regWrite := control.io.regWrite
-
+    io.ctl_regWrite(0) := control.io.regWrite
   }.otherwise {
     io.ctl_memWrite := false.B
-    io.ctl_regWrite := false.B
+    io.ctl_regWrite(0) := false.B
+  }
+  if (F) {
+    io.ctl_regWrite(1) := Mux(
+      hdu.io.ctl_mux && io.id_instruction =/= "h13".U,
+      control.io.f_wr.get,
+      0.B
+    )
+    io.f_read.get <> control.io.f_read.get
   }
 
   //Register File
-  val registers = Module(new Registers)
+  val registers = Module(new Registers(F))
   val registerRd = io.writeReg
   val registerRs1 = io.id_instruction(19, 15)
   val registerRs2 = io.id_instruction(24, 20)
+  val registerRs3 = if (F) Some(io.id_instruction(31, 27)) else None
   val writeData = dontTouch(Mux(io.csr_Wb, io.csr_Wb_data, io.writeData))
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable := io.ctl_writeEnable || io.csr_Wb
+  registers.io.writeEnable(0) := io.ctl_writeEnable(0) || io.csr_Wb
   registers.io.writeAddress := registerRd
   registers.io.writeData := writeData
+  if (F) {
+    registers.io.readAddress(2) := registerRs3.get
+    registers.io.f_read.get <> control.io.f_read.get
+    registers.io.writeEnable(1) := io.ctl_writeEnable(1)
+    registers.io.f_read.get <> control.io.f_read.get
+  }
 
   //Forwarding to fix structural hazard
-  when(io.ctl_writeEnable && (io.writeReg === registerRs1)){
-    when(registerRs1 === 0.U){
+  when (
+    (io.writeReg === registerRs1)
+    && (
+      if (F) (io.ctl_writeEnable(0) && !control.io.f_read.get(0)) || (io.ctl_writeEnable(1) && control.io.f_read.get(0))
+      else io.ctl_writeEnable(0)
+    )
+  ) {
+    when (
+      (registerRs1 === 0.U)
+      && (if (F) !control.io.f_read.get(0) else 1.B)
+    ) {
       io.readData1 := 0.U
     }.otherwise{
       io.readData1 := io.writeData
     }
-  }.otherwise{
+  }.otherwise {
     io.readData1 := registers.io.readData(0)
   }
-  when(io.ctl_writeEnable && (io.writeReg === registerRs2)){
-    when(registerRs2 === 0.U){
+  when (
+    (io.writeReg === registerRs2)
+    && (
+      if (F) (io.ctl_writeEnable(0) && !control.io.f_read.get(1)) || (io.ctl_writeEnable(1) && control.io.f_read.get(1))
+      else io.ctl_writeEnable(0)
+    )
+  ) {
+    when (
+      (registerRs2 === 0.U)
+      && (if (F) !control.io.f_read.get(1) else 1.B)
+    ) {
       io.readData2 := 0.U
     }.otherwise{
       io.readData2 := io.writeData
@@ -163,9 +203,16 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   }.otherwise{
     io.readData2 := registers.io.readData(1)
   }
+  if (F) {
+    io.readData3.get := Mux(
+      (io.writeReg === registerRs3.get) && (io.ctl_writeEnable(1) && control.io.f_read.get(2)),
+      io.writeData,
+      registers.io.readData(2)
+    )
+  }
   
 
-  val immediate = Module(new ImmediateGen)
+  val immediate = Module(new ImmediateGen(F))
   immediate.io.instruction := io.id_instruction
   io.immediate := immediate.io.out
 
@@ -173,22 +220,32 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   val input1 = Wire(UInt(32.W))
   val input2 = Wire(UInt(32.W))
 
-  when(registerRs1 === io.ex_mem_ins(11, 7)) {
+  when (
+    (registerRs1 === io.ex_mem_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(1)(0) else 1.B)
+  ) {
     input1 := io.ex_mem_result
-  }.elsewhen(registerRs1 === io.mem_wb_ins(11, 7)) {
-      input1 := io.mem_wb_result
-    }
-    .otherwise {
-      input1 := io.readData1
-    }
-  when(registerRs2 === io.ex_mem_ins(11, 7)) {
+  }.elsewhen (
+    (registerRs1 === io.mem_wb_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(2)(0) else 1.B)
+  ) {
+    input1 := io.mem_wb_result
+  }.otherwise {
+    input1 := io.readData1
+  }
+  when (
+    (registerRs2 === io.ex_mem_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(1)(1) else 1.B)
+  ) {
     input2 := io.ex_mem_result
-  }.elsewhen(registerRs2 === io.mem_wb_ins(11, 7)) {
-      input2 := io.mem_wb_result
-    }
-    .otherwise {
-      input2 := io.readData2
-    }
+  }.elsewhen (
+    (registerRs2 === io.mem_wb_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(2)(1) else 1.B)
+  ) {
+    input2 := io.mem_wb_result
+  }.otherwise {
+    input2 := io.readData2
+  }
 
   //Branch Unit
   val bu = Module(new BranchUnit)
@@ -201,17 +258,24 @@ class InstructionDecode(TRACE:Boolean) extends Module {
 
   //Forwarding for Jump
   val j_offset = Wire(UInt(32.W))
-    when(registerRs1 === io.ex_ins(11, 7)){
-      j_offset := io.ex_result
-    }.elsewhen(registerRs1 === io.ex_mem_ins(11, 7)) {
-    j_offset := io.ex_mem_result
-  }.elsewhen(registerRs1 === io.mem_wb_ins(11, 7)) {
-    j_offset := io.mem_wb_result
-  }.elsewhen(registerRs1 === io.ex_ins(11, 7)){
+  when(
+    (registerRs1 === io.ex_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(0)(0) else 1.B)
+  ) {
     j_offset := io.ex_result
+  }.elsewhen (
+    (registerRs1 === io.ex_mem_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(1)(0) else 1.B)
+  ) {
+    j_offset := io.ex_mem_result
+  }.elsewhen (
+    (registerRs1 === io.mem_wb_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(2)(0) else 1.B)
+  ) {
+    j_offset := io.mem_wb_result
   }.otherwise {
-      j_offset := io.readData1
-    }
+    j_offset := io.readData1
+  }
 
   //Offset Calculation (Jump/Branch)
   when(io.ctl_jump === 1.U) {

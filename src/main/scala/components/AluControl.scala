@@ -31,6 +31,8 @@ class AluControl extends Module {
 
   when(io.aluOp === 0.U) {
     io.out := 2.U
+  }.elsewhen(io.aluOp === 1.U) {
+    io.out := 15.U
   }.otherwise { //(io.aluOp === 2.U)
     switch(io.f3) {
       is(0.U) {
