@@ -64,6 +64,11 @@ class CSRRegFile extends Module{
     val FCSR_NV_REG         = RegInit(0.U(1.W))
     val FCSR_FRM_REG        = RegInit(0.U(3.W))
 
+    // time
+    val TIME_REG            = RegInit(0.U(32.W))
+    val TIMEH_REG           = RegInit(0.U(32.W))
+    /*************************************************/
+
     // Hardwired
     MISA_REG                := io.MISA.i_value
     MHARTID_REG             := io.MHARTID.i_value
@@ -103,6 +108,14 @@ class CSRRegFile extends Module{
     }
     /***************************************************/
 
+    /****************** time counter ******************/
+    // Increment time counter every cycle
+    TIME_REG := TIME_REG + 1.U
+    when(TIME_REG === 0.U){
+        TIMEH_REG := TIMEH_REG + 1.U
+    }
+    /***************************************************/
+
     /****************** instret counter ******************/
     when(io.MINSTRET.i_instr_retired && !MCOUNTINHIBIT_IR_REG){
         MINSTRET_REG := MINSTRET_REG + 1.U
@@ -134,7 +147,9 @@ class CSRRegFile extends Module{
         AddressMap.MCYCLEH -> MCYCLEH_REG,
         AddressMap.MINSTRET-> MINSTRET_REG,
         AddressMap.MINSTRETH-> MINSTRETH_REG,
-        AddressMap.MCOUNTINHIBIT-> MCOUNTINHIBIT_WIRE
+        AddressMap.MCOUNTINHIBIT-> MCOUNTINHIBIT_WIRE,
+        AddressMap.TIME    -> TIME_REG,
+        AddressMap.TIMEH   -> TIMEH_REG
     )
 
     r_data := MuxLookup(io.CSR.i_addr, DontCare, READ_CASES)
@@ -229,6 +244,12 @@ class CSRRegFile extends Module{
             is(AddressMap.MCOUNTINHIBIT){
                 MCOUNTINHIBIT_CY_REG := w_data(0)
                 MCOUNTINHIBIT_IR_REG := w_data(2)
+            }
+            is(AddressMap.TIME){
+                TIME_REG         := w_data
+            }
+            is(AddressMap.TIMEH){
+                TIMEH_REG        := w_data
             }
         }
     }
