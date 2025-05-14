@@ -11,6 +11,10 @@ class MHARTID extends Bundle{
     val i_value = Input(UInt(32.W))
 }
 
+class MINSTRET extends Bundle{
+    val i_instr_retired = Input(Bool())
+}
+
 class FCSR extends Bundle{
     val nx  = Output(UInt(1.W))
     val uf  = Output(UInt(1.W))
@@ -35,4 +39,5 @@ class CSRRegFileIO extends Bundle{
     val MHARTID = new MHARTID()
     val CSR     = new CSR_IO()
     val FCSR    = new FCSR()
+    val MINSTRET = new MINSTRET()
 }

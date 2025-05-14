@@ -34,6 +34,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val csr_Mem_data = Input(UInt(32.W))
     val csr_Wb_data = Input(UInt(32.W))
     val dmem_data = Input(UInt(32.W))
+    val instr_retired: Bool = Input(Bool())
     
     //Outputs
     val immediate = Output(UInt(32.W))
@@ -78,6 +79,7 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   csr.io.i_opr                := io.id_instruction(14,12)
   csr.io.i_addr               := io.id_instruction(31,20)
   csr.io.i_w_en               := io.is_csr && (io.id_instruction(19, 15) =/= 0.U)
+  csr.io.instr_retired       := io.instr_retired
 
   io.is_csr                   := io.id_instruction(6, 0) === "b1110011".U
   io.csr_o_data               := csr.io.o_data
