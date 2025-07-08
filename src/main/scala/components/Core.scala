@@ -101,8 +101,8 @@ class Core(implicit val config:Configs,implicit val vec_config:VaquitaConfig) ex
   val MEM = Module(new MemoryFetch)
   val vec_top_module1 = Module(new VaquitaTop)
   dontTouch(vec_top_module1.io)
-  io.vec_top_data_out <> vec_top_module1.io.vec_data_out
-  io.vec_data_out_fpga_core <> vec_top_module1.io.vec_data_out_fpga
+  // io.vec_top_data_out <> vec_top_module1.io.vec_data_out
+  // io.vec_data_out_fpga_core <> vec_top_module1.io.vec_data_out_fpga
 
   vec_top_module1.io.instr := io.vec_ins
   vec_top_module1.io.rs1_data := io.rs1_data_out
