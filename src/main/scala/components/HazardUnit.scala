@@ -23,11 +23,11 @@ class HazardUnit extends Module {
     val take_branch = Output(Bool())
   })
 
-  io.ctl_mux := true.B
-  io.pc_write := true.B
-  io.if_reg_write := true.B
-  io.take_branch := true.B
-  io.ifid_flush := false.B
+  // io.ctl_mux := true.B
+  // io.pc_write := true.B
+  // io.if_reg_write := true.B
+  // io.take_branch := true.B
+  // io.ifid_flush := false.B
 
 //  load-use hazard
   when(
@@ -42,13 +42,17 @@ class HazardUnit extends Module {
     io.pc_write := false.B
     io.if_reg_write := false.B
     io.take_branch := false.B
-  }
-
-  when(io.ex_mem_memRead && io.branch && (io.ex_mem_rd === io.id_rs1 || io.ex_mem_rd === io.id_rs2)){
+  }.elsewhen(io.ex_mem_memRead && io.branch && (io.ex_mem_rd === io.id_rs1 || io.ex_mem_rd === io.id_rs2)){
     io.ctl_mux := false.B
     io.pc_write := false.B
     io.if_reg_write := false.B
     io.take_branch := false.B
+  }.otherwise{
+      io.ctl_mux := true.B
+  io.pc_write := true.B
+  io.if_reg_write := true.B
+  io.take_branch := true.B
+  io.ifid_flush := false.B
   }
 
   //branch hazard

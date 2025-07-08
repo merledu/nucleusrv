@@ -28,6 +28,8 @@ class Core(implicit val config:Configs,implicit val vec_config:VaquitaConfig) ex
 
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
+    val vec_top_data_out = Output(Vec(32, Vec(vec_config.count_lanes, SInt(32.W))))
+    val vec_data_out_fpga_core = Output(Vec(8, Vec(vec_config.count_lanes, SInt(32.W))))  //to resolve fpga removing signals
 
     // RVFI Pins
     val rvfiUInt    = if (TRACE) Some(Output(Vec(4, UInt(32.W)))) else None
@@ -99,6 +101,8 @@ class Core(implicit val config:Configs,implicit val vec_config:VaquitaConfig) ex
   val MEM = Module(new MemoryFetch)
   val vec_top_module1 = Module(new VaquitaTop)
   dontTouch(vec_top_module1.io)
+  io.vec_top_data_out <> vec_top_module1.io.vec_data_out
+  io.vec_data_out_fpga_core <> vec_top_module1.io.vec_data_out_fpga
 
   vec_top_module1.io.instr := io.vec_ins
   vec_top_module1.io.rs1_data := io.rs1_data_out
@@ -203,7 +207,7 @@ val lmul = RegInit(1.U(32.W))
     vec_stall := false.B
   }
 
-  io.vec_load_store_valid := vec_load_store_bit
+  io.vec_load_store_valid := RegNext(RegNext(RegNext(vec_load_store_bit)))
 
   val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
 

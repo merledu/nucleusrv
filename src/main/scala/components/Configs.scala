@@ -5,5 +5,5 @@ case class Configs(
     M       : Boolean = false,
     C       : Boolean = false,
     V       : Boolean = true,
-    TRACE   : Boolean = true
+    TRACE   : Boolean = false
 )
