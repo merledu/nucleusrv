@@ -12,7 +12,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     val rvfi = new TracerO
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=true, F=true, C=false, TRACE=true)
+  implicit val config:Configs = Configs(XLEN=32, M=false, F=true, C=false, Zicsr=true, TRACE=true)
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -42,7 +42,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 object NRVDriver {
   // generate verilog
   def main(args: Array[String]): Unit = {
-      val IMem =  if (args.length > 0) args(0) else "program.hex"
+      val IMem =  if (args.length > 0) args(0) else "imem.hex"
       val DMem =  if (args.length > 1) args(1) else "dmem.hex"
       new ChiselStage().emitVerilog(new Top(Some(IMem), Some(DMem)), args)
   }

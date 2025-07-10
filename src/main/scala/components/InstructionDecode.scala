@@ -5,6 +5,7 @@ import chisel3.util._
 
 class InstructionDecode(
   F: Boolean,
+  Zicsr: Boolean,
   TRACE: Boolean
 ) extends Module {
   val io = IO(new Bundle {
@@ -63,11 +64,11 @@ class InstructionDecode(
     val stall = Output(Bool())
 
     // CSR pins
-    val csr_i_misa        = Input(UInt(32.W))
-    val csr_i_mhartid     = Input(UInt(32.W))
-    val csr_o_data        = Output(UInt(32.W))
-    val is_csr            = Output(Bool())
-    val fscr_o_data       = Output(UInt(32.W))
+    val csr_i_misa        = if (Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_i_mhartid     = if (Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_o_data        = if (Zicsr) Some(Output(UInt(32.W))) else None
+    val is_csr            = if (Zicsr) Some(Output(Bool())) else None
+    val fscr_o_data       = if (Zicsr) Some(Output(UInt(32.W))) else None
 
     // F pins
     val f_read_reg = if (F) Some(Input(Vec(3, Vec(2, Bool())))) else None
@@ -80,31 +81,35 @@ class InstructionDecode(
   })
 
   // CSR
-  val csr = Module(new CSR())
-  csr.io.i_misa_value         := io.csr_i_misa
-  csr.io.i_mhartid_value      := io.csr_i_mhartid
-  csr.io.i_imm                := io.id_instruction(19,15)
-  csr.io.i_opr                := io.id_instruction(14,12)
-  csr.io.i_addr               := io.id_instruction(31,20)
-  csr.io.i_w_en               := io.is_csr && (io.id_instruction(19, 15) =/= 0.U)
+  val csr = if (Zicsr) Some(Module(new CSR())) else None
+  if (Zicsr) {
+    csr.get.io.i_misa_value         := io.csr_i_misa.get
+    csr.get.io.i_mhartid_value      := io.csr_i_mhartid.get
+    csr.get.io.i_imm                := io.id_instruction(19,15)
+    csr.get.io.i_opr                := io.id_instruction(14,12)
+    csr.get.io.i_addr               := io.id_instruction(31,20)
+    csr.get.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
 
-  io.is_csr                   := io.id_instruction(6, 0) === "b1110011".U
-  io.csr_o_data               := csr.io.o_data
-  io.fscr_o_data              := csr.io.fcsr_o_data
+    io.is_csr.get                   := io.id_instruction(6, 0) === "b1110011".U
+    io.csr_o_data.get               := csr.get.io.o_data
+    io.fscr_o_data.get              := csr.get.io.fcsr_o_data
+  }
 
-  val csrController = Module(new CSRController())
-  csrController.io.regWrExecute    := io.id_ex_regWr
-  csrController.io.rdSelExecute    := io.id_ex_rd
-  csrController.io.csrWrExecute    := io.csr_Ex
-  csrController.io.regWrMemory     := io.ex_mem_regWr
-  csrController.io.rdSelMemory     := io.ex_mem_rd
-  csrController.io.csrWrMemory     := io.csr_Mem
-  csrController.io.regWrWriteback  := io.ctl_writeEnable(0)
-  csrController.io.rdSelWriteback  := io.writeReg
-  csrController.io.csrWrWriteback  := io.csr_Wb
-  csrController.io.rs1SelDecode    := io.id_instruction(19,15)
-  csrController.io.csrInstDecode   := io.id_instruction(6, 0) === "b1110011".U
-  csrController.io.csrInstIsImmd   := 0.B
+  val csrController = if (Zicsr) Some(Module(new CSRController())) else None
+  if (Zicsr) {
+    csrController.get.io.regWrExecute    := io.id_ex_regWr
+    csrController.get.io.rdSelExecute    := io.id_ex_rd
+    csrController.get.io.csrWrExecute    := io.csr_Ex
+    csrController.get.io.regWrMemory     := io.ex_mem_regWr
+    csrController.get.io.rdSelMemory     := io.ex_mem_rd
+    csrController.get.io.csrWrMemory     := io.csr_Mem
+    csrController.get.io.regWrWriteback  := io.ctl_writeEnable(0)
+    csrController.get.io.rdSelWriteback  := io.writeReg
+    csrController.get.io.csrWrWriteback  := io.csr_Wb
+    csrController.get.io.rs1SelDecode    := io.id_instruction(19,15)
+    csrController.get.io.csrInstDecode   := io.id_instruction(6, 0) === "b1110011".U
+    csrController.get.io.csrInstIsImmd   := 0.B
+  }
 
   //Hazard Detection Unit
   val hdu = Module(new HazardUnit)
@@ -153,6 +158,8 @@ class InstructionDecode(
   val registerRs1 = io.id_instruction(19, 15)
   val registerRs2 = io.id_instruction(24, 20)
   val registerRs3 = if (F) Some(io.id_instruction(31, 27)) else None
+  val readData1 = WireInit(0.U(32.W))
+  val readData2 = WireInit(0.U(32.W))
   val writeData = dontTouch(Mux(io.csr_Wb, io.csr_Wb_data, io.writeData))
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
@@ -178,13 +185,14 @@ class InstructionDecode(
       (registerRs1 === 0.U)
       && (if (F) !control.io.f_read.get(0) else 1.B)
     ) {
-      io.readData1 := 0.U
+      readData1 := 0.U
     }.otherwise{
-      io.readData1 := io.writeData
+      readData1 := io.writeData
     }
   }.otherwise {
-    io.readData1 := registers.io.readData(0)
+    readData1 := registers.io.readData(0)
   }
+  io.readData1 := readData1
   when (
     (io.writeReg === registerRs2)
     && (
@@ -196,13 +204,14 @@ class InstructionDecode(
       (registerRs2 === 0.U)
       && (if (F) !control.io.f_read.get(1) else 1.B)
     ) {
-      io.readData2 := 0.U
+      readData2 := 0.U
     }.otherwise{
-      io.readData2 := io.writeData
+      readData2 := io.writeData
     }
   }.otherwise{
-    io.readData2 := registers.io.readData(1)
+    readData2 := registers.io.readData(1)
   }
+  io.readData2 := readData2
   if (F) {
     io.readData3.get := Mux(
       (io.writeReg === registerRs3.get) && (io.ctl_writeEnable(1) && control.io.f_read.get(2)),
@@ -231,7 +240,7 @@ class InstructionDecode(
   ) {
     input1 := io.mem_wb_result
   }.otherwise {
-    input1 := io.readData1
+    input1 := readData1
   }
   when (
     (registerRs2 === io.ex_mem_ins(11, 7))
@@ -244,7 +253,7 @@ class InstructionDecode(
   ) {
     input2 := io.mem_wb_result
   }.otherwise {
-    input2 := io.readData2
+    input2 := readData2
   }
 
   //Branch Unit
@@ -274,7 +283,7 @@ class InstructionDecode(
   ) {
     j_offset := io.mem_wb_result
   }.otherwise {
-    j_offset := io.readData1
+    j_offset := readData1
   }
 
   //Offset Calculation (Jump/Branch)
@@ -315,7 +324,9 @@ class InstructionDecode(
     6.U -> io.csr_Wb_data
   )
 
-  csr.io.i_data := MuxLookup(csrController.io.forwardRS1, registers.io.readData(1), csr_iData_cases)
+  if (Zicsr) {
+    csr.get.io.i_data := MuxLookup(csrController.get.io.forwardRS1, registers.io.readData(0), csr_iData_cases)
+  }
 
   // RVFI
   if (TRACE) {

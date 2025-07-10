@@ -30,12 +30,12 @@ class CSRRegFile extends Module{
     val MSTATUS_MIE_REG     = RegInit(0.U(1.W))
 
     //FCSR 
-    val FCSR_NX_REG         = RegInit(0.U(1.W))
+    val FCSR_NX_REG         = RegInit(1.U(1.W))
     val FCSR_UF_REG         = RegInit(0.U(1.W))
     val FCSR_OF_REG         = RegInit(0.U(1.W))
-    val FCSR_DZ_REG         = RegInit(0.U(1.W))
-    val FCSR_NV_REG         = RegInit(0.U(1.W))
-    val FCSR_FRM_REG        = RegInit(0.U(3.W))
+    val FCSR_DZ_REG         = RegInit(1.U(1.W))
+    val FCSR_NV_REG         = RegInit(1.U(1.W))
+    val FCSR_FRM_REG        = RegInit(6.U(3.W))
 
     // Hardwired
     MISA_REG                := io.MISA.i_value

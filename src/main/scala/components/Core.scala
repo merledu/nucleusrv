@@ -9,6 +9,7 @@ class Core(implicit val config:Configs) extends Module{
   val M      = config.M
   val F      = config.F
   val C      = config.C
+  val Zicsr  = config.Zicsr
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
 
@@ -90,11 +91,11 @@ class Core(implicit val config:Configs) extends Module{
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val ID = Module(new InstructionDecode(F, TRACE)).io
+  val ID = Module(new InstructionDecode(F, Zicsr, TRACE)).io
   val EX = Module(new Execute(F, M = M, TRACE = TRACE)).io
   val MEM = Module(new MemoryFetch(TRACE))
 
-  io.fcsr_o_data := ID.fscr_o_data
+  io.fcsr_o_data := ID.fscr_o_data.get
   
   /*****************
    * Fetch Stage *
@@ -197,8 +198,8 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_ctl_aluOp := ID.ctl_aluOp
   id_reg_ctl_jump := ID.ctl_jump
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
-  id_reg_is_csr := ID.is_csr
-  id_reg_csr_data := ID.csr_o_data
+  id_reg_is_csr := ID.is_csr.get
+  id_reg_csr_data := ID.csr_o_data.get
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
   ID.dmem_resp_valid := io.dmemRsp.valid
@@ -208,8 +209,8 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  ID.csr_i_misa    := DontCare
-  ID.csr_i_mhartid := DontCare
+  ID.csr_i_misa.get    := DontCare
+  ID.csr_i_mhartid.get := DontCare
   ID.id_ex_regWr := id_reg_ctl_regWrite(0)
   ID.ex_mem_regWr := ex_reg_ctl_regWrite(0)
 
