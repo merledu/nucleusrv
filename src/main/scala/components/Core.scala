@@ -25,8 +25,6 @@ class Core(implicit val config:Configs) extends Module{
 
     // RVFI Pins
     val rvfi = if (TRACE) Some(Flipped(new TracerI)) else None
-
-    val fcsr_o_data = Output(UInt(32.W))
   })
 
   // IF-ID Registers
@@ -95,7 +93,6 @@ class Core(implicit val config:Configs) extends Module{
   val EX = Module(new Execute(F, M = M, TRACE = TRACE)).io
   val MEM = Module(new MemoryFetch(TRACE))
 
-  io.fcsr_o_data := ID.fscr_o_data.get
   
   /*****************
    * Fetch Stage *

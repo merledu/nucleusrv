@@ -8,11 +8,17 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
-    val fcsr = Output(UInt(32.W))
     val rvfi = new TracerO
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=false, F=true, C=false, Zicsr=true, TRACE=true)
+  implicit val config:Configs = Configs(
+    XLEN = 32,
+    M = false,
+    F = true,
+    C = false,
+    Zicsr = true,
+    TRACE = true
+  )
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -30,7 +36,6 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   dmem.io.req <> core.io.dmemReq
 
   io.pin := core.io.pin
-  io.fcsr := core.io.fcsr_o_data
 
   if (config.TRACE) {
     val tracer = Module(new Tracer)
@@ -42,8 +47,14 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 object NRVDriver {
   // generate verilog
   def main(args: Array[String]): Unit = {
-      val IMem =  if (args.length > 0) args(0) else "imem.hex"
-      val DMem =  if (args.length > 1) args(1) else "dmem.hex"
-      new ChiselStage().emitVerilog(new Top(Some(IMem), Some(DMem)), args)
+      val IMem = if (args.contains("--imem")) Some(args(args.indexOf("--imem") + 1)) else None
+      val DMem = if (args.contains("--dmem")) Some(args(args.indexOf("--dmem") + 1)) else None
+      new ChiselStage().emitVerilog(
+        new Top(IMem, DMem),
+        if (args.contains("--target-dir")) args.slice(
+          args.indexOf("--target-dir"),
+          args.indexOf("--target-dir") + 2
+        ) else Array()
+      )
   }
 }
