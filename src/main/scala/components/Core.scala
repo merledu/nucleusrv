@@ -226,7 +226,6 @@ class Core(implicit val config:Configs) extends Module{
   ******************/
 
   //ex_reg_branch := EX.branchAddress
-//  ex_reg_result := EX.ALUresult
   //ex_reg_ctl_branch_taken := EX.branch_taken
   EX.immediate := id_reg_imm
   EX.readData1 := id_reg_rd1
@@ -243,7 +242,7 @@ class Core(implicit val config:Configs) extends Module{
   ex_reg_wra := id_reg_wra
   ex_reg_ins := id_reg_ins
   ex_reg_ctl_memToReg := id_reg_ctl_memToReg
-  ex_reg_ctl_regWrite := id_reg_ctl_regWrite
+  ex_reg_ctl_regWrite <> id_reg_ctl_regWrite
   ex_reg_is_csr := id_reg_is_csr
   ex_reg_csr_data := id_reg_csr_data
 //  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
@@ -262,7 +261,7 @@ class Core(implicit val config:Configs) extends Module{
 
   when(EX.stall){
     id_reg_wra := id_reg_wra
-    id_reg_ctl_regWrite := id_reg_ctl_regWrite
+    id_reg_ctl_regWrite <> id_reg_ctl_regWrite
   }
 
   if (F) {
@@ -291,13 +290,12 @@ class Core(implicit val config:Configs) extends Module{
 //    ex_reg_ctl_memRead := ex_reg_ctl_memRead
 //    ex_reg_ctl_memWrite := ex_reg_ctl_memWrite
 ////    ex_reg_wd := ex_reg_wd
-////    ex_reg_result := 0.U
 //
 //  } otherwise{
     mem_reg_rd := MEM.io.readData
     mem_reg_result := ex_reg_result
 //    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
-    mem_reg_ctl_regWrite := ex_reg_ctl_regWrite
+    mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
     mem_reg_ins := ex_reg_ins
     mem_reg_pc := ex_reg_pc
     mem_reg_wra := ex_reg_wra
@@ -310,7 +308,7 @@ class Core(implicit val config:Configs) extends Module{
   mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
   mem_reg_is_csr := ex_reg_is_csr
   mem_reg_csr_data := ex_reg_csr_data
-  EX.ex_mem_regWrite := ex_reg_ctl_regWrite
+  EX.ex_mem_regWrite <> ex_reg_ctl_regWrite
   MEM.io.aluResultIn := ex_reg_result
   MEM.io.writeData := ex_reg_wd
   MEM.io.readEnable := ex_reg_ctl_memRead
@@ -347,9 +345,9 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data
   EX.wb_result := wb_data
-  EX.mem_wb_regWrite := mem_reg_ctl_regWrite
+  EX.mem_wb_regWrite <> mem_reg_ctl_regWrite
   ID.writeReg := wb_addr
-  ID.ctl_writeEnable := mem_reg_ctl_regWrite
+  ID.ctl_writeEnable <> mem_reg_ctl_regWrite
   ID.csr_Wb := mem_reg_is_csr
   ID.csr_Wb_data := mem_reg_csr_data
   ID.dmem_data := io.dmemRsp.bits.dataResponse

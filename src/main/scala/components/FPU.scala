@@ -22,7 +22,7 @@ object FSignInject {
 
 class FPUIO extends Bundle {
   val in = Input(Vec(3, UInt(32.W)))
-  val aluOp = Input(UInt(4.W))
+  val aluOp = Input(UInt(5.W))
   val rm = Input(UInt(3.W))
   val div_sqrt_valid = Input(Bool())
 

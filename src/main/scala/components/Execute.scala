@@ -98,7 +98,7 @@ class Execute(
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
 
-  io.ALUresult := alu.io.result
+  //io.ALUresult := alu.io.result
   dontTouch(io.stall) := false.B
 
   val mdu = if (M) Some(Module (new MDU)) else None
@@ -161,7 +161,38 @@ class Execute(
     //.otherwise{io.ALUresult := alu.io.result}
   }
 
-  val fpu = if (F) Some(Module(new FPU(8, 24)).io) else None
+  val fpu = if (F) Some(dontTouch(Module(new FPU(8, 24)).io)) else None
+  val f_mono_cycle_inst = if (F) Some(WireInit(Vector(
+    flw,
+    fsw,
+    fmadd_s,
+    fmsub_s,
+    fnmsub_s,
+    fnmadd_s,
+    fadd_s,
+    fsub_s,
+    fmul_s,
+    fsgnj_s,
+    fsgnjn_s,
+    fsgnjx_s,
+    fmin_s,
+    fmax_s,
+    fcvt_w_s,
+    fcvt_wu_s,
+    fmv_x_w,
+    feq_s,
+    flt_s,
+    fle_s,
+    fclass_s,
+    fcvt_s_w,
+    fcvt_s_wu,
+    fmv_w_x
+  ).map(
+    f => f === io.id_ex_ins
+  ).reduce(
+    (x, y) => x || y
+  ))) else None
+  val f_multi_cycle_inst = if (F) Some(Vector()) else None
   if (F) {
     fpu.get.rm := io.func3
     Vector(inputMux1, inputMux2, inputMux3.get).zipWithIndex foreach (
@@ -205,7 +236,9 @@ class Execute(
       (io.func7 === 1.U && mdu.get.io.ready) -> Mux(mdu.get.io.output.valid, mdu.get.io.output.bits, 0.U)
     ) else Vector()
   ) ++ (
-    if (F) Vector() else Vector()
+    if (F) Vector(
+      f_mono_cycle_inst.get -> fpu.get.out
+    ) else Vector()
   ))
 
   io.writeData := inputMux2
