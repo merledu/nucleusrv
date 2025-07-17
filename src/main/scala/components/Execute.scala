@@ -36,7 +36,7 @@ class Execute(
 
     val rs1_rdata = if (TRACE) Some(Output(UInt(32.W))) else None
 
-    val f_read = if (F) Some(Input(Vec(2, Vec(3, Bool())))) else None
+    val f_read = if (F) Some(Input(Vec(3, Bool()))) else None
     val readData3 = if (F) Some(Input(UInt(32.W))) else None
     val exceptions = if (F) Some(Output(Vec(5, Bool()))) else None
   })

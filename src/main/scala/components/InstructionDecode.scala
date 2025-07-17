@@ -170,7 +170,6 @@ class InstructionDecode(
     registers.io.readAddress(2) := registerRs3.get
     registers.io.f_read.get <> control.io.f_read.get
     registers.io.writeEnable(1) := io.ctl_writeEnable(1)
-    registers.io.f_read.get <> control.io.f_read.get
   }
 
   //Forwarding to fix structural hazard

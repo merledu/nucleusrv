@@ -266,7 +266,7 @@ class Core(implicit val config:Configs) extends Module{
 
   if (F) {
     ex_reg_f_read.get <> id_reg_f_read.get
-    EX.f_read.get(0) <> ex_reg_f_read.get
+    EX.f_read.get <> id_reg_f_read.get
     EX.readData3.get := id_reg_rd3.get
   }
 
@@ -320,7 +320,6 @@ class Core(implicit val config:Configs) extends Module{
 
   if (F) {
     mem_reg_f_read.get <> ex_reg_f_read.get
-    EX.f_read.get(1) <> mem_reg_f_read.get
   }
 
   /********************

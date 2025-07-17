@@ -113,7 +113,7 @@ class nucleusrv(pluginTemplate):
       #      not please change appropriately
       self.compile_cmd = self.compile_cmd+' -mabi='+('lp64 ' if 64 in ispec['supported_xlen'] else 'ilp32 ')
 
-      self.sbt = "sbt 'runMain nucleusrv.components.NRVDriver {0} {1} --target-dir out/{2}'"
+      self.sbt = "sbt 'runMain nucleusrv.components.NRVDriver --imem {0} --dmem {1} --target-dir out/{2}'"
 
     def runTests(self, testList):
 
@@ -181,7 +181,7 @@ class nucleusrv(pluginTemplate):
                 ),
                 f'cd {os.path.join('out', test_name)}',
                 "(echo '/* verilator lint_off WIDTH */' && cat Top.v) > temp && mv temp Top.v",
-                'verilator --cc --exe --build --trace ../../tb_Top.cpp Top.v',
+                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
                 f'./obj_dir/VTop &> {sig_file}'
             ))
           else:

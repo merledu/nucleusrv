@@ -15,7 +15,7 @@ class ForwardingUnit(F: Boolean) extends Module {
     val forwardB = Output(UInt(2.W))
 
     // F
-    val f_read = if (F) Some(Input(Vec(2, Vec(3, Bool())))) else None
+    val f_read = if (F) Some(Input(Vec(3, Bool()))) else None
     val reg_rs3 = if (F) Some(Input(UInt(5.W))) else None
     val forwardC = if (F) Some(Output(UInt(2.W))) else None
   })
@@ -27,7 +27,7 @@ class ForwardingUnit(F: Boolean) extends Module {
     (io.reg_rs1 === io.ex_reg_rd)
     && Mux(io.ex_regWrite(0), io.ex_reg_rd =/= 0.U, 1.B)
     && (
-      if (F) (!io.f_read.get(0)(0) && io.ex_regWrite(0)) || (io.f_read.get(0)(0) && io.ex_regWrite(1))
+      if (F) (!io.f_read.get(0) && io.ex_regWrite(0)) || (io.f_read.get(0) && io.ex_regWrite(1))
       else io.ex_regWrite(0)
     )
   ) {
@@ -36,7 +36,7 @@ class ForwardingUnit(F: Boolean) extends Module {
     (io.reg_rs1 === io.mem_reg_rd)
     && Mux(io.mem_regWrite(0), io.mem_reg_rd =/= 0.U, 1.B)
     && (
-      if (F) (!io.f_read.get(1)(0) && io.mem_regWrite(0)) || (io.f_read.get(1)(0) && io.mem_regWrite(1))
+      if (F) (!io.f_read.get(0) && io.mem_regWrite(0)) || (io.f_read.get(0) && io.mem_regWrite(1))
       else io.mem_regWrite(0)
     )
   ) {
@@ -49,7 +49,7 @@ class ForwardingUnit(F: Boolean) extends Module {
     (io.reg_rs2 === io.ex_reg_rd)
     && Mux(io.ex_regWrite(0), io.ex_reg_rd =/= 0.U, 1.B)
     && (
-      if (F) (!io.f_read.get(0)(1) && io.ex_regWrite(0)) || (io.f_read.get(0)(1) && io.ex_regWrite(1))
+      if (F) (!io.f_read.get(1) && io.ex_regWrite(0)) || (io.f_read.get(1) && io.ex_regWrite(1))
       else io.ex_regWrite(0)
     )
   ) {
@@ -58,7 +58,7 @@ class ForwardingUnit(F: Boolean) extends Module {
     (io.reg_rs2 === io.mem_reg_rd)
     && Mux(io.mem_regWrite(0), io.mem_reg_rd =/= 0.U, 1.B)
     && (
-      if (F) (!io.f_read.get(1)(1) && io.mem_regWrite(0)) || (io.f_read.get(1)(1) && io.mem_regWrite(1))
+      if (F) (!io.f_read.get(1) && io.mem_regWrite(0)) || (io.f_read.get(1) && io.mem_regWrite(1))
       else io.mem_regWrite(0)
     )
   ) {
@@ -70,12 +70,12 @@ class ForwardingUnit(F: Boolean) extends Module {
   if (F) {
     when (
       (io.reg_rs3.get === io.ex_reg_rd)
-      && (io.f_read.get(0)(2) && io.ex_regWrite(1))
+      && (io.f_read.get(2) && io.ex_regWrite(1))
     ) {
       io.forwardC.get := 1.U
     }.elsewhen (
       (io.reg_rs3.get === io.mem_reg_rd)
-      && (io.f_read.get(1)(2) && io.mem_regWrite(1))
+      && (io.f_read.get(2) && io.mem_regWrite(1))
     ) {
       io.forwardC.get := 2.U
     }.otherwise {
