@@ -47,6 +47,16 @@ class InstructionDecode(TRACE:Boolean) extends Module {
     val ifid_flush = Output(Bool())
 
     val stall = Output(Bool())
+    
+    // CSR and system instruction outputs
+    val csr_read = Output(Bool())
+    val csr_write = Output(Bool())
+    val csr_op = Output(UInt(3.W))
+    val csr_addr = Output(UInt(12.W))
+    val is_ecall = Output(Bool())
+    val is_ebreak = Output(Bool())
+    val is_mret = Output(Bool())
+    val is_system = Output(Bool())
 
     // RVFI pins
     val rs_addr = if (TRACE) Some(Output(Vec(2, UInt(5.W)))) else None
@@ -78,6 +88,17 @@ class InstructionDecode(TRACE:Boolean) extends Module {
   io.ctl_memRead := control.io.memRead
   io.ctl_memToReg := control.io.memToReg
   io.ctl_jump := control.io.jump
+  
+  // CSR and system instruction signals
+  io.csr_read := control.io.csr_read
+  io.csr_write := control.io.csr_write
+  io.csr_op := control.io.csr_op
+  io.csr_addr := io.id_instruction(31, 20)  // CSR address is in imm[11:0] field
+  io.is_ecall := control.io.is_ecall
+  io.is_ebreak := control.io.is_ebreak
+  io.is_mret := control.io.is_mret
+  io.is_system := control.io.is_system
+  
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
     io.ctl_memWrite := control.io.memWrite
     io.ctl_regWrite := control.io.regWrite

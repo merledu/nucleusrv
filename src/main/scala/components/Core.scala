@@ -50,6 +50,16 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_ctl_branch = RegInit(false.B)
   val id_reg_ctl_aluOp = RegInit(0.U(2.W))
   val id_reg_ctl_jump = RegInit(0.U(2.W))
+  
+  // CSR pipeline registers
+  val id_reg_csr_read = RegInit(false.B)
+  val id_reg_csr_write = RegInit(false.B)
+  val id_reg_csr_op = RegInit(0.U(3.W))
+  val id_reg_csr_addr = RegInit(0.U(12.W))
+  val id_reg_is_ecall = RegInit(false.B)
+  val id_reg_is_ebreak = RegInit(false.B)
+  val id_reg_is_mret = RegInit(false.B)
+  val id_reg_is_system = RegInit(false.B)
 
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
@@ -64,6 +74,16 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_ctl_memWrite = RegInit(false.B)
   val ex_reg_ctl_branch_taken = RegInit(false.B)
   val ex_reg_pc = RegInit(0.U(32.W))
+  
+  // CSR EX-MEM pipeline registers
+  val ex_reg_csr_data = RegInit(0.U(32.W))
+  val ex_reg_csr_write = RegInit(false.B)
+  val ex_reg_csr_addr = RegInit(0.U(12.W))
+  val ex_reg_exception = RegInit(false.B)
+  val ex_reg_exception_pc = RegInit(0.U(32.W))
+  val ex_reg_mret_pc = RegInit(0.U(32.W))
+  val ex_reg_take_trap = RegInit(false.B)
+  val ex_reg_take_mret = RegInit(false.B)
 
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -80,6 +100,9 @@ class Core(implicit val config:Configs) extends Module{
   val ID = Module(new InstructionDecode(TRACE)).io
   val EX = Module(new Execute(M = M)).io
   val MEM = Module(new MemoryFetch)
+  
+  // CSR Unit
+  val CSR_UNIT = Module(new CSRUnit).io
 
   /*****************
    * Fetch Stage *
@@ -143,7 +166,23 @@ class Core(implicit val config:Configs) extends Module{
   
   // pc.io.halt := Mux(io.imemReq.valid || ~EX.stall || ~ID.stall, 0.B, 1.B)
   pc.io.halt := Mux(((EX.stall || ID.stall || IF_stall || ~io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
-  val npc = Mux(ID.hdu_pcWrite, Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4)), pc.io.out)
+  
+  // PC control with trap and MRET handling
+  val npc = Wire(SInt(32.W))
+  when(ex_reg_take_trap) {
+    // Exception/interrupt occurred - jump to trap vector
+    npc := ex_reg_exception_pc.asSInt()
+  }.elsewhen(ex_reg_take_mret) {
+    // MRET instruction - return from trap
+    npc := ex_reg_mret_pc.asSInt()
+  }.elsewhen(ID.hdu_pcWrite) {
+    // Normal PC control (branches, jumps)
+    npc := Mux(ID.pcSrc, ID.pcPlusOffset.asSInt(), Mux(is_comp, pc.io.pc2, pc.io.pc4))
+  }.otherwise {
+    // Default PC increment
+    npc := pc.io.out
+  }
+  
   pc.io.in := npc
 
   when(ID.hdu_if_reg_write) {
@@ -176,6 +215,16 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_ctl_aluOp := ID.ctl_aluOp
   id_reg_ctl_jump := ID.ctl_jump
   id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
+  
+  // CSR control signals
+  id_reg_csr_read := ID.csr_read
+  id_reg_csr_write := ID.csr_write
+  id_reg_csr_op := ID.csr_op
+  id_reg_csr_addr := ID.csr_addr
+  id_reg_is_ecall := ID.is_ecall
+  id_reg_is_ebreak := ID.is_ebreak
+  id_reg_is_mret := ID.is_mret
+  id_reg_is_system := ID.is_system
 //  IF.PcWrite := ID.hdu_pcWrite
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
@@ -214,6 +263,28 @@ class Core(implicit val config:Configs) extends Module{
   ex_reg_ctl_regWrite := id_reg_ctl_regWrite
 //  ex_reg_ctl_memRead := id_reg_ctl_memRead
 //  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+  
+  // CSR Unit connections
+  CSR_UNIT.csr_op := id_reg_csr_op
+  CSR_UNIT.csr_read := id_reg_csr_read
+  CSR_UNIT.csr_write := id_reg_csr_write
+  CSR_UNIT.is_ecall := id_reg_is_ecall
+  CSR_UNIT.is_ebreak := id_reg_is_ebreak
+  CSR_UNIT.is_mret := id_reg_is_mret
+  CSR_UNIT.csr_addr := id_reg_csr_addr
+  CSR_UNIT.rs1_data := id_reg_rd1
+  CSR_UNIT.rs1_addr := id_reg_ins(19, 15)
+  CSR_UNIT.pc := id_reg_pc
+  CSR_UNIT.inst_retired := true.B // For now, assume every instruction retires
+  
+  // Capture CSR outputs in pipeline registers
+  ex_reg_csr_data := CSR_UNIT.csr_data
+  ex_reg_exception := CSR_UNIT.exception
+  ex_reg_exception_pc := CSR_UNIT.exception_pc
+  ex_reg_mret_pc := CSR_UNIT.mret_pc
+  ex_reg_take_trap := CSR_UNIT.take_trap
+  ex_reg_take_mret := CSR_UNIT.take_mret
+  
   ID.id_ex_mem_read := id_reg_ctl_memRead
   ID.ex_mem_mem_read := ex_reg_ctl_memRead
 //  ID.ex_mem_mem_write := ex_reg_ctl_memWrite
@@ -292,6 +363,10 @@ class Core(implicit val config:Configs) extends Module{
     wb_addr := mem_reg_wra
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
       wb_data := mem_reg_pc+4.U
+      wb_addr := mem_reg_wra
+  }.elsewhen(mem_reg_ctl_memToReg === 3.U) {
+      // CSR data path
+      wb_data := ex_reg_csr_data
       wb_addr := mem_reg_wra
     }
     .otherwise {

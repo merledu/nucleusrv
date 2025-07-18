@@ -15,7 +15,31 @@ class Control extends Module {
     val aluOp = Output(UInt(2.W))
     val jump = Output(UInt(2.W))
     val aluSrc1 = Output(UInt(2.W))
+    
+    // New CSR and system instruction signals
+    val csr_read = Output(Bool())
+    val csr_write = Output(Bool())
+    val csr_op = Output(UInt(3.W))
+    val is_ecall = Output(Bool())
+    val is_ebreak = Output(Bool())
+    val is_mret = Output(Bool())
+    val is_system = Output(Bool())
   })
+
+  import Instructions._
+
+  // Extract instruction fields
+  val opcode = io.in(6, 0)
+  val funct3 = io.in(14, 12)
+  val funct12 = io.in(31, 20)
+  val rs1 = io.in(19, 15)
+
+  // Detect system instructions
+  val is_system_inst = opcode === SYSTEM_OPCODE
+  val is_csr_inst = is_system_inst && (funct3 =/= 0.U)
+  val is_ecall_inst = is_system_inst && (funct3 === 0.U) && (funct12 === ECALL_FUNCT12) && (rs1 === 0.U)
+  val is_ebreak_inst = is_system_inst && (funct3 === 0.U) && (funct12 === EBREAK_FUNCT12) && (rs1 === 0.U)
+  val is_mret_inst = is_system_inst && (funct3 === 0.U) && (funct12 === MRET_FUNCT12) && (rs1 === 0.U)
 
   val signals = ListLookup(
     io.in,
@@ -129,16 +153,40 @@ class Control extends Module {
         2.U, // jump
         0.U, // aluOp
         0.U
+      ),
+      // System instructions (CSR, ECALL, EBREAK, MRET)
+      BitPat("b?????????????????????????1110011") -> List(
+        false.B, // aluSrc
+        3.U, // memToReg (CSR data to register)
+        true.B, // regWrite (for CSR reads)
+        false.B, // memRead
+        false.B, // memWrite
+        false.B, // branch
+        0.U, // jump
+        0.U, // aluOp
+        0.U
       )
     )
   )
+  
   io.aluSrc := signals(0)
   io.memToReg := signals(1)
-  io.regWrite := signals(2)
+  io.regWrite := signals(2) && (!is_ecall_inst && !is_ebreak_inst && !is_mret_inst)  // Don't write for system calls
   io.memRead := signals(3)
   io.memWrite := signals(4)
   io.branch := signals(5)
   io.jump := signals(6)
   io.aluOp := signals(7)
   io.aluSrc1 := signals(8)
+  
+  // CSR and system instruction control signals
+  io.csr_read := is_csr_inst
+  io.csr_write := is_csr_inst && (funct3 === CSRRW || funct3 === CSRRS || funct3 === CSRRC ||
+                                  funct3 === CSRRWI || funct3 === CSRRSI || funct3 === CSRRCI) &&
+                                  (rs1 =/= 0.U || funct3 === CSRRW || funct3 === CSRRWI)
+  io.csr_op := funct3
+  io.is_ecall := is_ecall_inst
+  io.is_ebreak := is_ebreak_inst
+  io.is_mret := is_mret_inst
+  io.is_system := is_system_inst
 }
