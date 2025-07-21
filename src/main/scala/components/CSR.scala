@@ -28,5 +28,13 @@ class CSR extends Module{
     csrRegFile.io.CSR.i_w_en        := io.i_w_en
 
     io.o_data                       := csrRegFile.io.CSR.o_data
-    io.fcsr_o_data                  := Cat("b0".U(24.W),csrRegFile.io.FCSR.frm,csrRegFile.io.FCSR.nv,csrRegFile.io.FCSR.dz,csrRegFile.io.FCSR.of,csrRegFile.io.FCSR.uf,csrRegFile.io.FCSR.nx)
+    io.fcsr_o_data                  := Cat(
+                                          "b0".U(24.W),
+                                          csrRegFile.io.FCSR.frm,
+                                          csrRegFile.io.FCSR.nv,
+                                          csrRegFile.io.FCSR.dz,
+                                          csrRegFile.io.FCSR.of,
+                                          csrRegFile.io.FCSR.uf,
+                                          csrRegFile.io.FCSR.nx
+                                       )
 }

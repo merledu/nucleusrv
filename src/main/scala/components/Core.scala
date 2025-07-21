@@ -54,6 +54,7 @@ class Core(implicit val config:Configs) extends Module{
 
   val id_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
   val id_reg_rd3 = if (F) Some(RegInit(0.U(32.W))) else None
+  val id_reg_fcsr_o_data = if (F) Some(RegInit(0.U(32.W))) else None
 
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
@@ -141,14 +142,16 @@ class Core(implicit val config:Configs) extends Module{
   }
 
   val func3 = instruction(14, 12)
-  val func7 = Wire(UInt(6.W))
-  when(instruction(6,0) === "b0110011".U){
+  val func7 = Wire(UInt(7.W))
+  when((instruction(6,0) === "b0110011".U) || (instruction(6, 0) === "b1010011".U)){
     func7 := instruction(31,25)
   }.otherwise{
     func7 := 0.U
   }
 
-  val IF_stall = func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+  val IF_stall = (
+    func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
+  ) || ((func7 === "b0001100".U) || (func7 === "b0101100".U))
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc //stall signal from outside
   
@@ -214,6 +217,7 @@ class Core(implicit val config:Configs) extends Module{
   if (F) {
     id_reg_f_read.get <> ID.f_read.get
     id_reg_rd3.get := ID.readData3.get
+    id_reg_fcsr_o_data.get := ID.fcsr_o_data.get
     for (i <- 0 until 2) {
       ID.f_read_reg.get(0)(i) := id_reg_f_read.get(i)
       ID.f_read_reg.get(1)(i) := ex_reg_f_read.get(i)
@@ -268,6 +272,7 @@ class Core(implicit val config:Configs) extends Module{
     ex_reg_f_read.get <> id_reg_f_read.get
     EX.f_read.get <> id_reg_f_read.get
     EX.readData3.get := id_reg_rd3.get
+    EX.fcsr_o_data.get := id_reg_fcsr_o_data.get
   }
 
   /****************
@@ -281,8 +286,6 @@ class Core(implicit val config:Configs) extends Module{
 //  when(MEM.io.stall){
 //    mem_reg_rd := mem_reg_rd
 //    mem_reg_result := mem_reg_result
-////    mem_reg_wra := mem_reg_wra
-//    ex_reg_wra := ex_reg_wra
 //    ex_reg_ctl_memToReg := ex_reg_ctl_memToReg
 ////    mem_reg_ctl_memToReg := mem_reg_ctl_memToReg
 //    mem_reg_pc := mem_reg_pc
@@ -298,7 +301,6 @@ class Core(implicit val config:Configs) extends Module{
     mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
     mem_reg_ins := ex_reg_ins
     mem_reg_pc := ex_reg_pc
-    mem_reg_wra := ex_reg_wra
     ex_reg_ctl_memRead := id_reg_ctl_memRead
     ex_reg_ctl_memWrite := id_reg_ctl_memWrite
     ex_reg_wd := EX.writeData

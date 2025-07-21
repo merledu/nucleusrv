@@ -306,7 +306,11 @@ class InstructionDecode(
 
   io.writeRegAddress := io.id_instruction(11, 7)
   io.func3 := io.id_instruction(14, 12)
-  when((io.id_instruction(6,0) === "b0110011".U) | ((io.id_instruction(6,0) === "b0010011".U) & (io.func3 === 5.U))){
+  when(
+    (io.id_instruction(6,0) === "b0110011".U) | (
+      (io.id_instruction(6,0) === "b0010011".U) & (io.func3 === 5.U)
+    ) | (io.id_instruction(6, 0) === "b1010011".U)
+  ){
     io.func7 := io.id_instruction(31,25)
   }.otherwise{
     io.func7 := 0.U

@@ -56,7 +56,7 @@ if __name__ == '__main__':
         '-Wno-style',
         '--no-timing' if args.timing is None \
             else args.timing,
-        '-j', '0',
+        #'-j', '0',
         '--top', args.mod,
         '--Mdir', join(target_dir, 'obj_dir'),
         'nrv_tb.cpp'
