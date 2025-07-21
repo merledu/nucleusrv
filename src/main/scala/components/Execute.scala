@@ -99,7 +99,7 @@ class Execute(
   alu.io.aluCtl := aluCtl.io.out
 
   //io.ALUresult := alu.io.result
-  dontTouch(io.stall) := false.B
+  //dontTouch(io.stall) := false.B
 
   val mdu = if (M) Some(Module (new MDU)) else None
   val src_a_reg = if (M) Some(RegInit(0.U(32.W))) else None
@@ -113,7 +113,6 @@ class Execute(
     mdu.get.io.src_b := aluIn2
     mdu.get.io.op    := io.func3
     // mdu.io.valid := true.B
-    // io.stall := false.B
     
 
     when(io.func7 === 1.U && (io.func3 === 0.U || io.func3 === 1.U || io.func3 === 2.U || io.func3 === 3.U)){
@@ -129,14 +128,13 @@ class Execute(
       src_b_reg.get := aluIn2
       op_reg.get := io.func3
       f7_reg.get := io.func7
-      io.stall := true.B
+      //io.stall := true.B
       dontTouch(f7_reg.get)
     }
 
     when(div_en.get){
-      // io.stall := true.B
       when (counter.get < 32.U){
-        io.stall := true.B
+        //io.stall := true.B
         mdu.get.io.src_a := src_a_reg.get
         mdu.get.io.src_b := src_b_reg.get
         mdu.get.io.op    := op_reg.get
@@ -150,7 +148,7 @@ class Execute(
         mdu.get.io.op    := op_reg.get
         counter.get := 0.U
       }
-    }//.otherwise{io.stall := false.B}
+    }
 
     //when(div_en && f7_reg === 1.U && mdu.io.ready){
     //  io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
@@ -192,7 +190,9 @@ class Execute(
   ).reduce(
     (x, y) => x || y
   ))) else None
-  val f_multi_cycle_inst = if (F) Some(Vector()) else None
+  val f_multi_cycle_inst = if (F) Some(Vector(fdiv_s, fsqrt_s).map(
+    f => f === io.id_ex_ins
+  ).reduce(_ || _)) else None
   if (F) {
     fpu.get.rm := io.func3
     Vector(inputMux1, inputMux2, inputMux3.get).zipWithIndex foreach (
@@ -226,7 +226,7 @@ class Execute(
     ).zipWithIndex.map(
       f => (f._1 === io.id_ex_ins) -> (f._2 + 1).U
     ))
-    fpu.get.div_sqrt_valid := 0.B
+    fpu.get.div_sqrt_valid := f_multi_cycle_inst.get
     io.exceptions.get <> fpu.get.exceptions
   }
 
@@ -237,9 +237,19 @@ class Execute(
     ) else Vector()
   ) ++ (
     if (F) Vector(
-      f_mono_cycle_inst.get -> fpu.get.out
+      f_mono_cycle_inst.get -> fpu.get.out,
+      fpu.get.div_sqrt_valid_out -> fpu.get.out
     ) else Vector()
   ))
+
+  io.stall := (
+    if (M) (
+      io.func7 === 1.U && ~div_en.get && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
+    ) || (div_en.get && counter.get < 32.U)
+    else false.B
+  ) || (
+    if (F) !fpu.get.div_sqrt_ready else false.B
+  )
 
   io.writeData := inputMux2
 

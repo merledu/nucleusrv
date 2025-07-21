@@ -44,4 +44,8 @@ object FBitPats {
 
 object FCONSTS {
   val canon_nan = "h7FC00000".U
+  val neg_zero = "h80000000".U
+  val pos_zero = "h00000000".U
+  val pos_inf = "h7F800000".U
+  val neg_inf = "hFF800000".U
 }

@@ -29,6 +29,7 @@ class FPUIO extends Bundle {
   val out = Output(UInt(32.W))
   val exceptions = Output(Vec(5, Bool()))
   val div_sqrt_ready = Output(Bool())
+  val div_sqrt_valid_out = Output(Bool())
 }
 
 class FPU(
@@ -69,6 +70,7 @@ class FPU(
   f_to_i.signedOut := io.aluOp === 15.U
   i_to_f.signedIn := io.aluOp === 22.U
   i_to_f.in := io.in(0)
+  io.div_sqrt_valid_out := div.outValid_div || div.outValid_sqrt
 
   Vector(
     Vector(madd.a, madd.b),
@@ -114,7 +116,11 @@ class FPU(
       Mux(cmp.eq || f._1, io.in(0), io.in(1)), Vector(
         (raw_in(0).isNaN && raw_in(1).isNaN) -> canon_nan,
         raw_in(0).isNaN -> io.in(1),
-        raw_in(1).isNaN -> io.in(0)
+        raw_in(1).isNaN -> io.in(0),
+        Vector(
+          (0 to 1).map(io.in(_) === neg_zero).reduce(_ || _),
+          (0 to 1).map(io.in(_) === pos_zero).reduce(_ || _),
+        ).reduce(_ && _) -> (if (f._2 == 0) neg_zero else pos_zero)
       )
     )
   ) ++ (15 to 16).map(
