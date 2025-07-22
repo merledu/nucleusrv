@@ -65,9 +65,24 @@ class CSRRegFile extends Module{
     val MCAUSE_INTERRUPT_WIRE   = WireInit(MCAUSE_REG(31))
     val MTVEC_MODE_WIRE         = WireInit(MTVEC_REG(1,0))
     val MTVEC_BASE_WIRE         = WireInit(MTVEC_REG(31,2))
-    val FFLAGS_WIRE             = WireInit(Cat("b0".U(27.W),FCSR_NV_REG,FCSR_DZ_REG,FCSR_OF_REG,FCSR_UF_REG,FCSR_NX_REG))
+    val FFLAGS_WIRE             = WireInit(Cat(
+                                    "b0".U(27.W),
+                                    FCSR_NV_REG,
+                                    FCSR_DZ_REG,
+                                    FCSR_OF_REG,
+                                    FCSR_UF_REG,
+                                    FCSR_NX_REG
+                                  ))
     val FRM_WIRE                = WireInit(Cat("b0".U(29.W),FCSR_FRM_REG))
-    val FCSR_WIRE               = WireInit(Cat("b0".U(24.W),FCSR_FRM_REG,FCSR_NV_REG,FCSR_DZ_REG,FCSR_OF_REG,FCSR_UF_REG,FCSR_NX_REG))
+    val FCSR_WIRE               = WireInit(Cat(
+                                    "b0".U(24.W),
+                                    FCSR_FRM_REG,
+                                    FCSR_NV_REG,
+                                    FCSR_DZ_REG,
+                                    FCSR_OF_REG,
+                                    FCSR_UF_REG,
+                                    FCSR_NX_REG
+                                  ))
 
     val csr_opr = CSROperations()
     /*************************************************/

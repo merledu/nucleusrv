@@ -185,10 +185,10 @@ class nucleusrv(pluginTemplate):
                 f'./obj_dir/VTop &> {sig_file}'
             ))
           else:
-            simcmd = 'echo "NO RUN"'
+            simcmd = ''
 
           # concatenate all commands that need to be executed within a make-target.
-          execute = '@cd {0}; {1}; {2};'.format(testentry['work_dir'], cmd, simcmd)
+          execute = '@cd {0}; {1};{2}'.format(testentry['work_dir'], cmd, f'{simcmd};' if self.target_run else simcmd)
 
           # create a target. The makeutil will create a target with the name "TARGET<num>" where num
           # starts from 0 and increments automatically for each new target that is added
