@@ -73,6 +73,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_csr_data = RegInit(0.U)
 
   val ex_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
+  val ex_reg_f_except = if (F) Some(RegInit(VecInit(Vector.fill(5)(0.B)))) else None
 
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -87,6 +88,7 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_csr_data = RegInit(0.U)
 
   val mem_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
+  val mem_reg_f_except = if (F) Some(RegInit(VecInit(Vector.fill(5)(0.B)))) else None
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
@@ -273,6 +275,7 @@ class Core(implicit val config:Configs) extends Module{
     EX.f_read.get <> id_reg_f_read.get
     EX.readData3.get := id_reg_rd3.get
     EX.fcsr_o_data.get := id_reg_fcsr_o_data.get
+    ex_reg_f_except.get <> EX.exceptions.get
   }
 
   /****************
@@ -322,6 +325,7 @@ class Core(implicit val config:Configs) extends Module{
 
   if (F) {
     mem_reg_f_read.get <> ex_reg_f_read.get
+    mem_reg_f_except.get <> ex_reg_f_except.get
   }
 
   /********************
@@ -355,6 +359,7 @@ class Core(implicit val config:Configs) extends Module{
   io.pin := wb_data
 
   if (F) {
+    ID.f_except.get <> mem_reg_f_except.get
   }
 
   /**************

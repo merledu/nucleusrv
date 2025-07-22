@@ -38,7 +38,7 @@ class Execute(
 
     val f_read = if (F) Some(Input(Vec(3, Bool()))) else None
     val readData3 = if (F) Some(Input(UInt(32.W))) else None
-    val fcsr_o_data = if (F) Some(Output(UInt(32.W))) else None
+    val fcsr_o_data = if (F) Some(Input(UInt(32.W))) else None
     val exceptions = if (F) Some(Output(Vec(5, Bool()))) else None
   })
 
@@ -194,7 +194,11 @@ class Execute(
     f => f === io.id_ex_ins
   ).reduce(_ || _)) else None
   if (F) {
-    fpu.get.rm := Mux(io.func3 === 7.U, io.fcsr_o_data.get(7, 5), io.func3)
+    fpu.get.rm := Mux(
+      io.func3 === 7.U,
+      io.fcsr_o_data.get(7, 5),
+      io.func3
+    )
     Vector(inputMux1, inputMux2, inputMux3.get).zipWithIndex foreach (
       f => fpu.get.in(f._2) := f._1
     )

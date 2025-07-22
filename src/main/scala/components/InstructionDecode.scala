@@ -68,12 +68,13 @@ class InstructionDecode(
     val csr_i_mhartid     = if (Zicsr) Some(Input(UInt(32.W))) else None
     val csr_o_data        = if (Zicsr) Some(Output(UInt(32.W))) else None
     val is_csr            = if (Zicsr) Some(Output(Bool())) else None
-    val fscr_o_data       = if (Zicsr) Some(Output(UInt(32.W))) else None
+    val fcsr_o_data       = if (Zicsr) Some(Output(UInt(32.W))) else None
 
     // F pins
     val f_read_reg = if (F) Some(Input(Vec(3, Vec(2, Bool())))) else None
     val f_read = if (F) Some(Output(Vec(3, Bool()))) else None
     val readData3 = if (F) Some(Output(UInt(32.W))) else None
+    val f_except = if (F) Some(Input(Vec(5, Bool()))) else None
 
     // RVFI pins
     val raddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
@@ -89,10 +90,11 @@ class InstructionDecode(
     csr.get.io.i_opr                := io.id_instruction(14,12)
     csr.get.io.i_addr               := io.id_instruction(31,20)
     csr.get.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
+    csr.get.io.f_except             <> io.f_except.get
 
     io.is_csr.get                   := io.id_instruction(6, 0) === "b1110011".U
     io.csr_o_data.get               := csr.get.io.o_data
-    io.fscr_o_data.get              := csr.get.io.fcsr_o_data
+    io.fcsr_o_data.get              := csr.get.io.fcsr_o_data
   }
 
   val csrController = if (Zicsr) Some(Module(new CSRController())) else None

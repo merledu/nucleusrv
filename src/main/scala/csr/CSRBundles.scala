@@ -12,11 +12,13 @@ class MHARTID extends Bundle{
 }
 
 class FCSR extends Bundle{
-    val nx  = Output(UInt(1.W))
-    val uf  = Output(UInt(1.W))
-    val of  = Output(UInt(1.W))
-    val dz  = Output(UInt(1.W))
-    val nv  = Output(UInt(1.W))
+    val except = Input(Vec(5, Bool()))
+
+    val nx  = Output(Bool())
+    val uf  = Output(Bool())
+    val of  = Output(Bool())
+    val dz  = Output(Bool())
+    val nv  = Output(Bool())
     val frm = Output(UInt(3.W))
 }
 

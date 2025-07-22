@@ -30,18 +30,26 @@ class CSRRegFile extends Module{
     val MSTATUS_MIE_REG     = RegInit(0.U(1.W))
 
     //FCSR 
-    val FCSR_NX_REG         = RegInit(1.U(1.W))
-    val FCSR_UF_REG         = RegInit(0.U(1.W))
-    val FCSR_OF_REG         = RegInit(0.U(1.W))
-    val FCSR_DZ_REG         = RegInit(1.U(1.W))
-    val FCSR_NV_REG         = RegInit(1.U(1.W))
-    val FCSR_FRM_REG        = RegInit(6.U(3.W))
+    val FCSR_NX_REG         = RegInit(0.B)
+    val FCSR_UF_REG         = RegInit(0.B)
+    val FCSR_OF_REG         = RegInit(0.B)
+    val FCSR_DZ_REG         = RegInit(0.B)
+    val FCSR_NV_REG         = RegInit(0.B)
+    val FCSR_FRM_REG        = RegInit(0.U(3.W))
 
     // Hardwired
     MISA_REG                := io.MISA.i_value
     MHARTID_REG             := io.MHARTID.i_value
 
-
+    Vector(
+      FCSR_NX_REG,
+      FCSR_UF_REG,
+      FCSR_OF_REG,
+      FCSR_DZ_REG,
+      FCSR_NV_REG
+    ).zipWithIndex.foreach(
+      f => f._1 := f._1 | io.FCSR.except(f._2)
+    )
     io.FCSR.nx              := FCSR_NX_REG
     io.FCSR.uf              := FCSR_UF_REG
     io.FCSR.of              := FCSR_OF_REG
