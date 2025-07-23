@@ -130,18 +130,12 @@ class CSR extends Module {
     mcause := io.exception_cause
     mtval := io.exception_tval
     
-    // Update MSTATUS
+    // Update MSTATUS - do all updates in one assignment to avoid combinational loops
     val new_mstatus = Wire(UInt(32.W))
-    new_mstatus := mstatus
-    
-    // Save current MIE to MPIE and clear MIE
-    new_mstatus := (new_mstatus & "hFFFFFF77".U) | 
-                   ((mstatus & "h00000008".U) << 4) |  // MPIE = MIE
-                   "h00000000".U                        // MIE = 0
-    
-    // Save current privilege mode to MPP and set to Machine mode
-    new_mstatus := (new_mstatus & "hFFFFE7FF".U) | 
-                   (current_privilege << 11)           // MPP = current_privilege
+    new_mstatus := (mstatus & "hFFFFE777".U) |         // Clear MIE, MPIE, and MPP fields
+                   ((mstatus & "h00000008".U) << 4) |   // MPIE = MIE
+                   (current_privilege << 11)            // MPP = current_privilege
+                   // MIE = 0 (already cleared by mask)
     
     mstatus := new_mstatus
     current_privilege := MACHINE_MODE
@@ -152,14 +146,12 @@ class CSR extends Module {
     // Restore privilege mode from MPP
     current_privilege := (mstatus >> 11) & "h3".U
     
-    // Restore MIE from MPIE and set MPIE to 1
+    // Restore MIE from MPIE and set MPIE to 1 - do all updates in one assignment
     val new_mstatus = Wire(UInt(32.W))
-    new_mstatus := (mstatus & "hFFFFFF77".U) | 
-                   ((mstatus & "h00000080".U) >> 4) |  // MIE = MPIE
-                   "h00000080".U                        // MPIE = 1
-    
-    // Clear MPP to User mode
-    new_mstatus := new_mstatus & "hFFFFE7FF".U
+    new_mstatus := (mstatus & "hFFFFE777".U) |         // Clear MIE, MPIE, and MPP fields
+                   ((mstatus & "h00000080".U) >> 4) |   // MIE = MPIE
+                   "h00000080".U                         // MPIE = 1
+                   // MPP = 0 (User mode, already cleared by mask)
     
     mstatus := new_mstatus
   }

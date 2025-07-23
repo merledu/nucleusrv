@@ -171,7 +171,7 @@ class Control extends Module {
   
   io.aluSrc := signals(0)
   io.memToReg := signals(1)
-  io.regWrite := signals(2) && (!is_ecall_inst && !is_ebreak_inst && !is_mret_inst)  // Don't write for system calls
+  io.regWrite := signals(2) & (!is_ecall_inst & !is_ebreak_inst & !is_mret_inst)  // Don't write for system calls
   io.memRead := signals(3)
   io.memWrite := signals(4)
   io.branch := signals(5)
