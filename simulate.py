@@ -56,10 +56,11 @@ if __name__ == '__main__':
         '-Wno-style',
         '--no-timing' if args.timing is None \
             else args.timing,
-        #'-j', '0',
+        '-j', '0',
         '--top', args.mod,
         '--Mdir', join(target_dir, 'obj_dir'),
-        'nrv_tb.cpp'
+        #'nrv_tb.cpp'
+        'tb_Top.cpp'
     ) + sv_files, text = True)
     execute_sp([join(
         target_dir,

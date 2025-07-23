@@ -2,7 +2,7 @@
 #include "verilated_vcd_c.h"
 #include "VTop.h"
 
-#define MAX_SIM_TIME 100000  // In cycles
+#define MAX_SIM_TIME 10000  // In cycles
 
 int main(int argc, char **argv, char **env) {
 	if (false && argc && argv && env) {}
@@ -34,9 +34,9 @@ int main(int argc, char **argv, char **env) {
 		top->eval();  // Evaluate model
 		tfp->dump(sim_time);
 		if (top->io_rvfi_valid_0 == 1 && top->io_rvfi_mem_wmask_0 == 15) {
-			if (top->io_rvfi_mem_addr_0 == 0x08000004) {
+			if (top->io_rvfi_mem_addr_0 == 0x20000004) {
 				printf("%.8x\n", top->io_rvfi_mem_wdata_0);  // Dump signature
-			} else if (top->io_rvfi_mem_addr_0 == 0x08000008 && top->io_rvfi_mem_wdata_0 == 0xCAFECAFE) {
+			} else if (top->io_rvfi_mem_addr_0 == 0x20000008 && top->io_rvfi_mem_wdata_0 == 0xCAFECAFE) {
 				break;  // Terminate simulation
 			}
 		}
