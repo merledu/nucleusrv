@@ -17,7 +17,8 @@ if __name__ == '__main__':
             'run',
             '--suite', RISCV_TEST_SUITE,
             '--env', RISCV_TEST_SUITE_ENV,
-            '--no-browser'
+            '--no-browser',
+            '--config', CONFIG
         ],
             text = True
         )
