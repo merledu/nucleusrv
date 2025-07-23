@@ -179,7 +179,7 @@ class nucleusrv(pluginTemplate):
                     os.path.join(testentry['work_dir'], 'dmem.hex'),
                     test_name
                 ),
-                f'cd {os.path.join('out', test_name)}',
+                f"cd {os.path.join('out', test_name)}",
                 "(echo '/* verilator lint_off WIDTH */' && cat Top.v) > temp && mv temp Top.v",
                 'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
                 f'./obj_dir/VTop &> {sig_file}'
