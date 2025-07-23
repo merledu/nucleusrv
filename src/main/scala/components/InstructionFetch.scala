@@ -32,7 +32,7 @@ class InstructionFetch extends Module {
 
   io.coreInstrReq.bits.addrRequest := Mux(
     io.coreInstrReq.ready,
-    io.address & "h1ffffff6".U,
+    Cat("b00".U, io.address(31, 2)),
     DontCare
   )
   io.coreInstrReq.valid := (state_reg === 1.U) & !io.stall

@@ -26,7 +26,7 @@
 module sram #(
   parameter NUM_WMASKS = 4,
   parameter DATA_WIDTH = 32,
-  parameter ADDR_WIDTH = 27,
+  parameter ADDR_WIDTH = 28,
   parameter RAM_DEPTH = 1 << ADDR_WIDTH,
   // FIXME: This delay is arbitrary.
   parameter DELAY = 3,

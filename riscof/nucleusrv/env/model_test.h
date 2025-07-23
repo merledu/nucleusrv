@@ -14,7 +14,7 @@
 #define RVMODEL_HALT                                              \
   la a0, begin_signature; \
   la a1, end_signature; \
-  li a2, 0x20000004; \
+  li a2, 0x40000004; \
   sig_dump_loop: \
   	lw t0, 0(a0); \
   	sw t0, 0(a2); \
@@ -22,7 +22,7 @@
   	bge a0, a1, end_sim; \
   	j sig_dump_loop; \
   end_sim: \
-  	li a0, 0x20000008; \
+  	li a0, 0x40000008; \
   	li a1, 0xCAFECAFE; \
   	sw a1, 0(a0); \
   	j end_sim;
