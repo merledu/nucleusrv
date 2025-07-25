@@ -75,7 +75,7 @@ class SRAMIO extends Bundle {
     val csb_i = Input(Bool())
     val we_i = Input(Bool())
     val wmask_i = Input(UInt(4.W))
-    val addr_i = Input(UInt(13.W))
+    val addr_i = Input(UInt(28.W))
     val wdata_i = Input(UInt(32.W))
     val rdata_o = Output(UInt(32.W))
 }
