@@ -32,6 +32,10 @@ class spike(pluginTemplate):
         self.isa_spec = os.path.abspath(config['ispec']) if 'ispec' in config else ''
         self.platform_spec = os.path.abspath(config['pspec']) if 'ispec' in config else ''
         self.make = config['make'] if 'make' in config else 'make'
+        if 'target_run' in config and config['target_run']=='0':
+            self.target_run = False
+        else:
+            self.target_run = True
         logger.debug("spike plugin initialised using the following configuration.")
         for entry in config:
             logger.debug(entry+' : '+config[entry])
@@ -127,3 +131,5 @@ class spike(pluginTemplate):
 
             make.add_target(execute)
         make.execute_all(self.work_dir, 1000000)
+        if not self.target_run:
+            raise SystemExit(0)

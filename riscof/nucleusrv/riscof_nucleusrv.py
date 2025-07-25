@@ -185,10 +185,15 @@ class nucleusrv(pluginTemplate):
                 f'./obj_dir/VTop &> {sig_file}'
             ))
           else:
-            simcmd = ''
+            simcmd = '; '.join((
+                self.objcopy.format(self.xlen, elf, 'imem.bin', '.text.init'),
+                self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
+                self.hexdump.format('imem.bin', 'imem.hex'),
+                self.hexdump.format('dmem.bin', 'dmem.hex')
+            ))
 
           # concatenate all commands that need to be executed within a make-target.
-          execute = '@cd {0}; {1};{2}'.format(testentry['work_dir'], cmd, f'{simcmd};' if self.target_run else simcmd)
+          execute = '@cd {0}; {1};{2}'.format(testentry['work_dir'], cmd, f'{simcmd};')
 
           # create a target. The makeutil will create a target with the name "TARGET<num>" where num
           # starts from 0 and increments automatically for each new target that is added
@@ -204,8 +209,8 @@ class nucleusrv(pluginTemplate):
 
       # if target runs are not required then we simply exit as this point after running all
       # the makefile targets.
-      if not self.target_run:
-          raise SystemExit(0)
+      #if not self.target_run:
+      #    raise SystemExit(0)
 
 #The following is an alternate template that can be used instead of the above.
 #The following template only uses shell commands to compile and run the tests.
