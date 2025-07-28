@@ -157,7 +157,7 @@ class InstructionDecode(
   //Register File
   val registers = Module(new Registers(F))
   val registerRd = io.writeReg
-  val registerRs1 = io.id_instruction(19, 15)
+  val registerRs1 = dontTouch(io.id_instruction(19, 15))
   val registerRs2 = io.id_instruction(24, 20)
   val registerRs3 = if (F) Some(io.id_instruction(31, 27)) else None
   val readData1 = WireInit(0.U(32.W))

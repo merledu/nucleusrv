@@ -161,8 +161,6 @@ class Execute(
 
   val fpu = if (F) Some(dontTouch(Module(new FPU(8, 24)).io)) else None
   val f_mono_cycle_inst = if (F) Some(WireInit(Vector(
-    flw,
-    fsw,
     fmadd_s,
     fmsub_s,
     fnmsub_s,
