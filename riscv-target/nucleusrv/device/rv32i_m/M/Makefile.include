@@ -6,7 +6,7 @@ ifeq ($(shell command -v $(TARGET_SIM) 2> /dev/null),)
 endif
 
 RUN_TARGET=\
-	cd $(NUCLEUSRV) && sbt "testOnly nucleusrv.components.TopTest -- -DprogramFile=$(<).program.hex -DwriteVcd=1 -DdataFile=$(<).data.hex" \
+	cd $(NUCLEUSRV) && sbt "testOnly nucleusrv.components.TopTest -- -DprogramFile=$(<).program.hex -DwriteVcd=1 -DdataFile=$(<).data.hex" -J-Xmx4G \
     2> $(*).stdout; \
     `grep '^[a-f0-9]\+$$' $(*).stdout > $(*).signature.output`; \
     python3 tools/trace/scripts/signature.py --signature=$(*).signature.output --reference=imperas-riscv-tests/riscv-test-suite/rv32i_m/M/references/$(notdir $(*)).reference_output;

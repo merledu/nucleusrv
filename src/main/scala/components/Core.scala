@@ -28,8 +28,8 @@ class Core(implicit val config:Configs,implicit val vec_config:VaquitaConfig) ex
 
     val imemReq = Decoupled(new MemRequestIO)
     val imemRsp = Flipped(Decoupled(new MemResponseIO))
-    val vec_top_data_out = Output(Vec(32, Vec(vec_config.count_lanes, SInt(32.W))))
-    val vec_data_out_fpga_core = Output(Vec(8, Vec(vec_config.count_lanes, SInt(32.W))))  //to resolve fpga removing signals
+    // val vec_top_data_out = Output(Vec(32, Vec(vec_config.count_lanes, SInt(32.W))))
+    // val vec_data_out_fpga_core = Output(Vec(8, Vec(vec_config.count_lanes, SInt(32.W))))  //to resolve fpga removing signals
 
     // RVFI Pins
     val rvfiUInt    = if (TRACE) Some(Output(Vec(4, UInt(32.W)))) else None

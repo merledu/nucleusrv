@@ -20,8 +20,8 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
   implicit val config = Configs(XLEN=32, M=true, C=true, TRACE=true)
   implicit val vec_config = VaquitaConfig (256,32,32,8)
-  implicit val config = new Configs {}
-  implicit val vec_config = new VaquitaConfig {}
+  // implicit val config = new Configs {}
+  // implicit val vec_config = new VaquitaConfig {}
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -30,36 +30,37 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   val imem = Module(new SRamTop(programFile))
 
   // io.led := RegInit(0.U(1.W))
-  val detect_fpga_vec32 = VecInit(Seq.fill(32)(VecInit(Seq.fill(vec_config.count_lanes)(0.S(32.W)))))
-  detect_fpga_vec32 <> core.io.vec_top_data_out
-  val check = core.io.vec_top_data_out(0)(0).asUInt === ("b1".U) && core.io.vec_top_data_out(0)(1).asUInt === ("b10".U)
-  when(check===1.B){
-    io.led1 := 1.U
-  }.otherwise{
+  // val detect_fpga_vec32 = VecInit(Seq.fill(32)(VecInit(Seq.fill(vec_config.count_lanes)(0.S(32.W)))))
+  // detect_fpga_vec32 <> core.io.vec_top_data_out
+  // val check = core.io.vec_top_data_out(0)(0).asUInt === ("b1".U) && core.io.vec_top_data_out(0)(1).asUInt === ("b10".U)
+  // when(check===1.B){
+  //   io.led1 := 1.U
+  // }.otherwise{
     io.led1 := 0.U
-  }
-    val check2 = core.io.vec_top_data_out(2)(0).asUInt === ("h0".U) && core.io.vec_top_data_out(2)(1).asUInt === ("h0".U)
-  when(check2===1.B){
-    io.led2 := 1.U
-  }.otherwise{
+  // }
+  //   val check2 = core.io.vec_top_data_out(2)(0).asUInt === ("h0".U) && core.io.vec_top_data_out(2)(1).asUInt === ("h0".U)
+  // when(check2===1.B){
+  //   io.led2 := 1.U
+  // }.otherwise{
     io.led2 := 0.U
-  }
-  val check3 = core.io.vec_top_data_out(3)(0).asUInt === ("hb".U) && core.io.vec_top_data_out(3)(1).asUInt === ("hc".U)
-  when(check3===1.B){
-    io.led3 := 1.U
-  }.otherwise{
+  // }
+  // val check3 = core.io.vec_top_data_out(3)(0).asUInt === ("hb".U) && core.io.vec_top_data_out(3)(1).asUInt === ("hc".U)
+  // when(check3===1.B){
+  //   io.led3 := 1.U
+  // }.otherwise{
     io.led3 := 0.U
-  }
+  // }
+
+
+
+
   // when(core.io.vec_top_data_out(29)(0) === ("b00101".U).asSInt){
   //   io.led3 := 1.U
   // }.otherwise{
   //   io.led3 := 0.U
   // }
-  dontTouch(check)
-  dontTouch(check2)
-  dontTouch(check3)
 
-  dontTouch(detect_fpga_vec32)
+  // dontTouch(detect_fpga_vec32)
   // val vec_dmem = Module(new SRamTop(dataFile))
   /*  Imem Interceonnections  */
     core.io.imemRsp <> imem.io.rsp
@@ -70,12 +71,12 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 // val vec_h3 = RegNext(vec_h2)
 // val vec_read_h4 = RegNext(vec_h3)
 
+// use this signals for fpga connection
+  // val detect_fpga_core = WireInit(0.U(32.W))
 
-  val detect_fpga_core = WireInit(0.U(32.W))
-
-  val detect_fpga_vec = VecInit(Seq.fill(8)(VecInit(Seq.fill(vec_config.count_lanes)(0.S(32.W)))))
-  detect_fpga_vec <> core.io.vec_data_out_fpga_core
-  dontTouch(detect_fpga_vec)
+  // val detect_fpga_vec = VecInit(Seq.fill(8)(VecInit(Seq.fill(vec_config.count_lanes)(0.S(32.W)))))
+  // detect_fpga_vec <> core.io.vec_data_out_fpga_core
+  // dontTouch(detect_fpga_vec)
 
 
    core.io.dmemRsp.bits.dataResponse := dmem.io.rsp.bits.dataResponse//Mux(reg1,core.io.vec_dmemRsp.bits.dataResponse,core.io.dmemRsp.bits.dataResponse)
@@ -90,9 +91,9 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   
 
 
-  core.io.vec_dmemRsp.bits.dataResponse := Mux(core.io.vec_load_store_valid,dmem.io.rsp.bits.dataResponse,0.U)
+  core.io.vec_dmemRsp.bits.dataResponse := dmem.io.rsp.bits.dataResponse //Mux(core.io.vec_load_store_valid,dmem.io.rsp.bits.dataResponse,0.U)
   core.io.vec_dmemRsp.valid := 1.B
-  // io.vec_dmemRsp.ready := 1.B
+  // io.vec_dmemRsp.ready := 1.B  
   core.io.vec_dmemReq.ready := 1.B
   // io.vec_dmemReq.valid := 1.B
   // io.vec_dmemReq.bits.dataRequest := 0.U

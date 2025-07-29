@@ -37,7 +37,7 @@ create_hexes:
 
 # Run testOnly command in /home/mlatif/nucleusrv directory
 run_test:
-	cd $(NUCLEUSRV_DIR) && sbt "testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile=$(PROGRAM_HEX) -DdataFile=$(DATA_HEX)" 2> trace.log
+	cd $(NUCLEUSRV_DIR) && sbt "testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile=$(PROGRAM_HEX) -DdataFile=$(DATA_HEX) -J-Xmx4G" 2> trace.log
 
 # Run Spike simulator with signature output
 run_spike:

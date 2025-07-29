@@ -8,7 +8,7 @@ if [ -f $FILE ]; then
 else 
         echo "$FILE does not exist."
         echo "Running sbt testOnly TopTest"
-        sbt "testOnly nucleusrv.components.TopTest"
+        sbt "testOnly nucleusrv.components.TopTest" -J-Xmx4G
 fi
 
 ISA=$1
