@@ -55,6 +55,7 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
   val id_reg_rd3 = if (F) Some(RegInit(0.U(32.W))) else None
   val id_reg_fcsr_o_data = if (F) Some(RegInit(0.U(32.W))) else None
+  val id_reg_is_f = if (F) Some(RegInit(0.B)) else None
 
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
@@ -74,6 +75,7 @@ class Core(implicit val config:Configs) extends Module{
 
   val ex_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
   val ex_reg_f_except = if (F) Some(RegInit(VecInit(Vector.fill(5)(0.B)))) else None
+  val ex_reg_is_f = if (F) Some(RegInit(0.B)) else None
 
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -89,6 +91,7 @@ class Core(implicit val config:Configs) extends Module{
 
   val mem_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
   val mem_reg_f_except = if (F) Some(RegInit(VecInit(Vector.fill(5)(0.B)))) else None
+  val mem_reg_is_f = if (F) Some(RegInit(0.B)) else None
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
@@ -211,7 +214,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  ID.csr_i_misa.get    := 0x752.U
+  ID.csr_i_misa.get    := DontCare
   ID.csr_i_mhartid.get := DontCare
   ID.id_ex_regWr := id_reg_ctl_regWrite(0)
   ID.ex_mem_regWr := ex_reg_ctl_regWrite(0)
@@ -220,6 +223,7 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_f_read.get <> ID.f_read.get
     id_reg_rd3.get := ID.readData3.get
     id_reg_fcsr_o_data.get := ID.fcsr_o_data.get
+    id_reg_is_f.get := ID.is_f.get
     for (i <- 0 until 2) {
       ID.f_read_reg.get(0)(i) := id_reg_f_read.get(i)
       ID.f_read_reg.get(1)(i) := ex_reg_f_read.get(i)
@@ -276,6 +280,8 @@ class Core(implicit val config:Configs) extends Module{
     EX.readData3.get := id_reg_rd3.get
     EX.fcsr_o_data.get := id_reg_fcsr_o_data.get
     ex_reg_f_except.get <> EX.exceptions.get
+    ex_reg_is_f.get := id_reg_is_f.get
+    ID.f_except.get(0) <> EX.exceptions.get
   }
 
   /****************
@@ -326,6 +332,8 @@ class Core(implicit val config:Configs) extends Module{
   if (F) {
     mem_reg_f_read.get <> ex_reg_f_read.get
     mem_reg_f_except.get <> ex_reg_f_except.get
+    mem_reg_is_f.get := ex_reg_is_f.get
+    ID.f_except.get(1) <> ex_reg_f_except.get
   }
 
   /********************
@@ -359,7 +367,14 @@ class Core(implicit val config:Configs) extends Module{
   io.pin := wb_data
 
   if (F) {
-    ID.f_except.get <> mem_reg_f_except.get
+    ID.f_except.get(2) <> mem_reg_f_except.get
+    Vector(
+      id_reg_is_f.get,
+      ex_reg_is_f.get,
+      mem_reg_is_f.get
+    ).zipWithIndex.foreach(
+      f => ID.is_f_in.get(f._2) := f._1
+    )
   }
 
   /**************

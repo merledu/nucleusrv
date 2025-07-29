@@ -72,14 +72,30 @@ class InstructionDecode(
 
     // F pins
     val f_read_reg = if (F) Some(Input(Vec(3, Vec(2, Bool())))) else None
+    val f_except = if (F) Some(Input(Vec(3, Vec(5, Bool())))) else None
+    val is_f_in = if (F) Some(Input(Vec(3, Bool()))) else None
     val f_read = if (F) Some(Output(Vec(3, Bool()))) else None
     val readData3 = if (F) Some(Output(UInt(32.W))) else None
-    val f_except = if (F) Some(Input(Vec(5, Bool()))) else None
+    val is_f = if (F) Some(Output(Bool())) else None
 
     // RVFI pins
     val raddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
     val rd_wdata = if (TRACE) Some(Output(UInt(32.W))) else None
   })
+
+  val is_f = if (F) Some(WireInit(0.B)) else None
+  if (F) {
+    is_f.get := Vector(
+      "b0000111",
+      "b0100111",
+      "b1000011",
+      "b1000111",
+      "b1001011",
+      "b1001111",
+      "b1010011"
+    ).map(io.id_instruction(6, 0) === _.U).reduce(_ || _)
+    io.is_f.get := is_f.get
+  }
 
   // CSR
   val csr = if (Zicsr) Some(Module(new CSR())) else None
@@ -90,10 +106,14 @@ class InstructionDecode(
     csr.get.io.i_opr                := io.id_instruction(14,12)
     csr.get.io.i_addr               := io.id_instruction(31,20)
     csr.get.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
-    csr.get.io.f_except             <> io.f_except.get
+    csr.get.io.f_except             <> io.f_except.get(2)
 
     io.is_csr.get                   := io.id_instruction(6, 0) === "b1110011".U
-    io.csr_o_data.get               := csr.get.io.o_data
+    io.csr_o_data.get               := MuxCase(csr.get.io.o_data, Vector(
+                                         ((io.id_instruction(31, 20) === 1.U) || (io.id_instruction(31, 20) === 3.U)) -> (csr.get.io.o_data | (0 until 3).map(
+                                           f => Mux(io.is_f_in.get(f), io.f_except.get(f).asUInt, 0.U)
+                                         ).reduce(_ | _))
+                                       ))
     io.fcsr_o_data.get              := csr.get.io.fcsr_o_data
   }
 
