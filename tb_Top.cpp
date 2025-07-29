@@ -2,7 +2,7 @@
 #include "verilated_vcd_c.h"
 #include "VTop.h"
 
-#define MAX_SIM_TIME 100000  // In cycles
+#define MAX_SIM_TIME 10000000  // In cycles
 
 int main(int argc, char **argv, char **env) {
 	if (false && argc && argv && env) {}
