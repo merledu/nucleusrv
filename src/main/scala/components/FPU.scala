@@ -147,7 +147,7 @@ class FPU(
     f => f._1.map(io.aluOp === _.U).reduce(_ || _) -> f._2
   ) ++ (15 to 16).map(
     f => (io.aluOp === f.U) -> (
-      f_to_i.intExceptionFlags(2) ## 0.U ## f_to_i.intExceptionFlags(1) ## 0.U ## f_to_i.intExceptionFlags(0)
+      (f_to_i.intExceptionFlags(2) | f_to_i.intExceptionFlags(1)) ## 0.U ## 0.U ## 0.U ## f_to_i.intExceptionFlags(0)
     )
   ) ++ Vector((div.outValid_div || div.outValid_sqrt) -> div.exceptionFlags)).asBools
 }
