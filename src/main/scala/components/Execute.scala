@@ -39,6 +39,8 @@ class Execute(
     val f_read = if (F) Some(Input(Vec(3, Bool()))) else None
     val readData3 = if (F) Some(Input(UInt(32.W))) else None
     val fcsr_o_data = if (F) Some(Input(UInt(32.W))) else None
+    val is_f_i = if (F) Some(Input(Bool())) else None
+    val is_f_o = if (F) Some(Output(Bool())) else None
     val exceptions = if (F) Some(Output(Vec(5, Bool()))) else None
   })
 
@@ -188,9 +190,10 @@ class Execute(
   ).reduce(
     (x, y) => x || y
   ))) else None
-  val f_multi_cycle_inst = if (F) Some(Vector(fdiv_s, fsqrt_s).map(
+  val f_multi_cycle_inst = if (F) Some(dontTouch(Vector(fdiv_s, fsqrt_s).map(
     f => f === io.id_ex_ins
-  ).reduce(_ || _)) else None
+  ).reduce(_ || _))) else None
+  val f_stall = if (F) Some((io.func7 === "b0001100".U) || (io.func7 === "b0101100".U) || (!fpu.get.div_sqrt_ready)) else None
   if (F) {
     fpu.get.rm := Mux(
       io.func3 === 7.U,
@@ -230,6 +233,7 @@ class Execute(
     ))
     fpu.get.div_sqrt_valid := f_multi_cycle_inst.get
     io.exceptions.get <> fpu.get.exceptions
+    io.is_f_o.get := io.is_f_i.get | RegNext(f_stall.get)
   }
 
   io.ALUresult := MuxCase(alu.io.result, (
@@ -250,7 +254,7 @@ class Execute(
     ) || (div_en.get && counter.get < 32.U)
     else false.B
   ) || (
-    if (F) (io.func7 === "b0001100".U) || (io.func7 === "b0101100".U) || (!fpu.get.div_sqrt_ready) else false.B
+    if (F) f_stall.get else false.B
   )
 
   io.writeData := inputMux2

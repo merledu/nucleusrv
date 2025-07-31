@@ -279,8 +279,9 @@ class Core(implicit val config:Configs) extends Module{
     EX.f_read.get <> id_reg_f_read.get
     EX.readData3.get := id_reg_rd3.get
     EX.fcsr_o_data.get := id_reg_fcsr_o_data.get
+    EX.is_f_i.get := id_reg_is_f.get
     ex_reg_f_except.get <> EX.exceptions.get
-    ex_reg_is_f.get := id_reg_is_f.get
+    ex_reg_is_f.get := EX.is_f_o.get
     ID.f_except.get(0) <> EX.exceptions.get
   }
 
@@ -369,7 +370,7 @@ class Core(implicit val config:Configs) extends Module{
   if (F) {
     ID.f_except.get(2) <> mem_reg_f_except.get
     Vector(
-      id_reg_is_f.get,
+      EX.is_f_o.get,
       ex_reg_is_f.get,
       mem_reg_is_f.get
     ).zipWithIndex.foreach(
