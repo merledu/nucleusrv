@@ -87,7 +87,7 @@ if __name__ == '__main__':
             'w'
         ) as f:
             f.write(
-                f'| {"Test Name":30} | {"Status"} |\n'
+                f'\n| {"Test Name":30} | {"Status"} |\n'
                 f'| {"-" * 30} | {"-" * 6} |\n'
             )
             f.flush()
