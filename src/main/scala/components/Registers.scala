@@ -17,7 +17,7 @@ class Registers(F: Boolean) extends Module {
   val i_reg = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
   val f_reg = if (F) Some(Reg(Vec(32, UInt(32.W)))) else None
 
-  when (io.writeEnable(0)) {
+  when (io.writeEnable(0) && (io.writeAddress =/= 0.U)) {
     i_reg(io.writeAddress) := io.writeData
   }
 

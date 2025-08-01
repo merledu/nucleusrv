@@ -268,6 +268,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.ex_result := EX.ALUresult
   ID.csr_Ex := id_reg_is_csr
   ID.csr_Ex_data := id_reg_csr_data
+  ID.ex_stall := EX.stall
 
   when(EX.stall){
     id_reg_wra := id_reg_wra

@@ -39,6 +39,8 @@ class InstructionDecode(
     val csr_Wb_data = Input(UInt(32.W))
     val dmem_data = Input(UInt(32.W))
 
+    val ex_stall = Input(Bool())
+
     //Outputs
     val immediate = Output(UInt(32.W))
     val writeRegAddress = Output(UInt(5.W))
@@ -185,7 +187,7 @@ class InstructionDecode(
   val writeData = dontTouch(Mux(io.csr_Wb, io.csr_Wb_data, io.writeData))
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable(0) := io.ctl_writeEnable(0) || io.csr_Wb
+  registers.io.writeEnable(0) := io.ctl_writeEnable(0) || (!io.ex_stall && io.csr_Wb)
   registers.io.writeAddress := registerRd
   registers.io.writeData := writeData
   if (F) {
