@@ -255,10 +255,8 @@ class Core(implicit val config:Configs) extends Module{
   ex_reg_ctl_regWrite <> id_reg_ctl_regWrite
   ex_reg_is_csr := id_reg_is_csr
   ex_reg_csr_data := id_reg_csr_data
-//  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
   ID.id_ex_mem_read := id_reg_ctl_memRead
   ID.ex_mem_mem_read := ex_reg_ctl_memRead
-//  ID.ex_mem_mem_write := ex_reg_ctl_memWrite
   EX.id_ex_ins := id_reg_ins
   EX.ex_mem_ins := ex_reg_ins
   EX.mem_wb_ins := mem_reg_ins
@@ -293,7 +291,6 @@ class Core(implicit val config:Configs) extends Module{
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
 //  val stall = Wire(Bool())
-//  stall := (ex_reg_ctl_memWrite || ex_reg_ctl_memRead) && !io.dmemRsp.valid
 //  when(MEM.io.stall){
 //    mem_reg_rd := mem_reg_rd
 //    mem_reg_result := mem_reg_result
@@ -302,8 +299,6 @@ class Core(implicit val config:Configs) extends Module{
 //    mem_reg_pc := mem_reg_pc
 //
 //    ex_reg_ctl_memRead := ex_reg_ctl_memRead
-//    ex_reg_ctl_memWrite := ex_reg_ctl_memWrite
-////    ex_reg_wd := ex_reg_wd
 //
 //  } otherwise{
     mem_reg_rd := MEM.io.readData

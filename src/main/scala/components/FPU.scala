@@ -128,7 +128,7 @@ class FPU(
   ) ++ Vector(17, 24).map(
     f => (io.aluOp === f.U) -> io.in(0)
   ) ++ Vector(cmp.eq, cmp.lt, !cmp.gt).zipWithIndex.map(
-    f => (io.aluOp === (f._2 + 18).U) -> f._1
+    f => (io.aluOp === (f._2 + 18).U) -> Mux(raw_in(0).isNaN || raw_in(1).isNaN, 0.U, f._1)
   ) ++ Vector((io.aluOp === 21.U) -> classifyRecFN(
     exp_width,
     sig_width,

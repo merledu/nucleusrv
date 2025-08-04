@@ -363,7 +363,6 @@ project/project/
 firrtl_black_box_resource_files.f
 trace.log
 ver_output.log
-riscv-arch-test/
 riscof_work/
 .metals/
 .bloop/
