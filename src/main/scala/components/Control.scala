@@ -59,7 +59,7 @@ class Control(F: Boolean) extends Module {
         false.B, // memWrite
         false.B, // branch
         0.U, // jump
-        2.U, // aluOp
+        1.U, // aluOp
         0.U
       ),
       // Load
