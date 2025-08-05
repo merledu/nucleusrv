@@ -22,7 +22,7 @@ module sram_top #(
 );
 
 logic        csb;
-logic [11:0] addr_o;
+logic [12:0] addr_o;
 logic [31:0] wdata_o;
 logic [3:0]  wmask_o;
 logic        we_o;
