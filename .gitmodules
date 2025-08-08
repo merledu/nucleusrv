@@ -3,4 +3,4 @@
 	url = https://github.com/ucb-bar/berkeley-hardfloat.git
 [submodule "riscof/riscv-arch-test"]
 	path = riscof/riscv-arch-test
-	url = git@github.com:riscv-non-isa/riscv-arch-test.git
+	url = https://github.com/riscv-non-isa/riscv-arch-test.git
