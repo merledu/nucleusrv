@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export NUCLEUSRV=$PWD
-FILE=$NUCLEUSRV/test_run_dir/Top_Test/VTop
+FILE=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop
 
 if [ -f $FILE ]; then
         echo "$FILE exists."
@@ -13,10 +13,11 @@ fi
 
 ISA=$1
 TEST=$2
+DEVICE=$3
 
-cd $NUCLEUSRV/riscv-arch-test
+cd $NUCLEUSRV/imperas-riscv-tests 
 
-make clean TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf-  RISCV_TARGET=nucleusrv RISCV_DEVICE=rv32i RISCV_ISA=$ISA RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/VTop
-make TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf- RISCV_TARGET=nucleusrv RISCV_DEVICE=rv32i RISCV_ISA=$ISA RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/VTop | tee Test_result.txt
+make clean TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=$DEVICE RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop
+make TARGETDIR=$NUCLEUSRV/riscv-target RISCV_PREFIX=riscv64-unknown-elf- RISCV_BASE=i RISCV_TARGET=nucleusrv RISCV_DEVICE=$DEVICE RISCV_ISA=$ISA RISCV_MODE=m RISCV_TEST=$TEST TARGET_SIM=$NUCLEUSRV/test_run_dir/Top_Test/verilated/VTop | tee Test_result.txt
 
 cd ../

@@ -1,3 +1,9 @@
+obj_dir
+*.v
+*.fir
+*.anno.json
+*.f
+# *.log
 ### Project Specific stuff
 test_run_dir/*
 .metals/*
@@ -17,7 +23,7 @@ riscv-arch-test/
 *.bgn
 *.bit
 *.bld
-*.cmd_log
+# *.cmd_log
 *.drc
 *.ll
 *.lso
@@ -115,7 +121,7 @@ local.properties
 *.o
 *.ko
 *.obj
-*.elf
+
 
 # Precompiled Headers
 *.gch
@@ -134,12 +140,10 @@ local.properties
 *.dylib
 
 # Executables
-*.exe
 *.out
 *.app
 *.i*86
 *.x86_64
-*.hex
 
 # Debug files
 *.dSYM/
@@ -320,7 +324,7 @@ xcuserdata
 *.xcuserstate
 ### Scala template
 *.class
-*.log
+# *.log
 
 # sbt specific
 .cache
@@ -350,3 +354,17 @@ project/plugins/project/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+# Extras
+__pycache__/
+.venv/
+project/.bloop/
+project/metals.sbt
+project/project/
+firrtl_black_box_resource_files.f
+trace.log
+ver_output.log
+riscof_work/
+.metals/
+.bloop/
+.ammonite/
+metals.sbt

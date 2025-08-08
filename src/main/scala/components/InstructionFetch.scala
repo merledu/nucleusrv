@@ -1,4 +1,3 @@
-
 package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
@@ -14,8 +13,16 @@ class InstructionFetch extends Module {
   })
 
   val rst = Wire(Bool())
-  rst := reset.asBool()
-  io.coreInstrResp.ready := true.B
+  rst := reset.asBool
+
+  dontTouch(io.stall)
+  val state_reg = dontTouch(RegInit(0.U))
+  val next_state = dontTouch(MuxCase(state_reg, Vector(
+    ((state_reg === 0.U) || ((state_reg === 2.U) && io.coreInstrResp.valid)) -> 1.U,  // valid
+    ((state_reg === 1.U) && io.coreInstrReq.ready && !io.stall) -> 2.U  // ready
+  )))
+  state_reg := next_state
+  io.coreInstrResp.ready := state_reg === 2.U
 
 //  io.coreInstrReq.ready := Mux(rst, false.B, true.B)
 
@@ -23,8 +30,16 @@ class InstructionFetch extends Module {
   io.coreInstrReq.bits.isWrite := false.B
   io.coreInstrReq.bits.dataRequest := DontCare
 
-  io.coreInstrReq.bits.addrRequest := io.address >> 2
-  io.coreInstrReq.valid := Mux(rst || io.stall, false.B, true.B)
+  io.coreInstrReq.bits.addrRequest := Mux(
+    io.coreInstrReq.ready,
+    Cat("b00".U, io.address(31, 2)),
+    DontCare
+  )
+  io.coreInstrReq.valid := (state_reg === 1.U) & !io.stall
 
-  io.instruction := Mux(io.coreInstrResp.valid, io.coreInstrResp.bits.dataResponse, DontCare)
+  io.instruction := Mux(
+    io.coreInstrResp.valid,
+    io.coreInstrResp.bits.dataResponse,
+    DontCare
+  )
 }

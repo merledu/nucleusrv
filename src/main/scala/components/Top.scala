@@ -1,5 +1,6 @@
 package nucleusrv.components
 import chisel3._
+import chisel3.stage.ChiselStage
 import nucleusrv.tracer._
 
 
@@ -7,9 +8,17 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
+    val rvfi = new TracerO
   })
 
-  implicit val config:Configs = Configs(XLEN=32, M=true, C=true, TRACE=true)
+  implicit val config:Configs = Configs(
+    XLEN = 32,
+    M = true,
+    F = true,
+    C = false,
+    Zicsr = true,
+    TRACE = true
+  )
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -29,16 +38,23 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   io.pin := core.io.pin
 
   if (config.TRACE) {
-    val tracer = Module(new Tracer())
+    val tracer = Module(new Tracer)
+    tracer.rvfi_i <> core.io.rvfi.get
+    io.rvfi <> tracer.rvfi_o
+  }
+}
 
-    Seq(
-      (tracer.io.rvfiUInt, core.io.rvfiUInt.get),
-      (tracer.io.rvfiSInt, core.io.rvfiSInt.get),
-      (tracer.io.rvfiBool, core.io.rvfiBool.get),
-      (tracer.io.rvfiRegAddr, core.io.rvfiRegAddr.get)
-    ).map(
-      tr => tr._1 <> tr._2
-    )
-    tracer.io.rvfiMode := core.io.rvfiMode.get
+object NRVDriver {
+  // generate verilog
+  def main(args: Array[String]): Unit = {
+      val IMem = if (args.contains("--imem")) Some(args(args.indexOf("--imem") + 1)) else None
+      val DMem = if (args.contains("--dmem")) Some(args(args.indexOf("--dmem") + 1)) else None
+      new ChiselStage().emitVerilog(
+        new Top(IMem, DMem),
+        if (args.contains("--target-dir")) args.slice(
+          args.indexOf("--target-dir"),
+          args.indexOf("--target-dir") + 2
+        ) else Array()
+      )
   }
 }

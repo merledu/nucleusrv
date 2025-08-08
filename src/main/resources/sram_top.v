@@ -1,3 +1,9 @@
+/* verilator lint_off ASSIGNDLY */
+/* verilator lint_off PINCONNECTEMPTY */
+/* verilator lint_off WIDTH */
+/* verilator lint_off UNUSED */
+/* verilator lint_off SYNCASYNCNET */
+
 module sram_top #(
     parameter IFILE_IN = ""
 )
@@ -7,7 +13,7 @@ module sram_top #(
 
 // sram interface in
   input   logic        csb_i,
-  input   logic [12:0] addr_i,
+  input   logic [27:0] addr_i,
   input   logic [31:0] wdata_i,
   input   logic [3:0]  wmask_i,
   input   logic        we_i,
@@ -43,8 +49,8 @@ end
 sram #(
   .NUM_WMASKS (4),
   .DATA_WIDTH (32),
-  .ADDR_WIDTH (13),
-  .RAM_DEPTH (1 << 13),
+  //.ADDR_WIDTH (13),
+  //.RAM_DEPTH (1 << 13),
   // FIXME: This delay is arbitrary.
   .DELAY (3),
   .IZERO (0) , // binary / Initial RAM with zeros (has priority over INITFILE)

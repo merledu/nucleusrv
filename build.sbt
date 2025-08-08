@@ -7,7 +7,7 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
     //  https://github.com/scala/bug/issues/10047
     CrossVersion.partialVersion(scalaVersion) match {
       case Some((2, scalaMajor: Long)) if scalaMajor < 12 => Seq()
-      case _ => Seq("-Xsource:2.11")
+      case _ => Seq("-Xsource:2.13.0")
     }
   }
 }
@@ -26,39 +26,35 @@ def javacOptionsVersion(scalaVersion: String): Seq[String] = {
   }
 }
 
-name := "nucleusrv"
 
-version := "3.2.0"
-
-scalaVersion := "2.12.10"
-
-crossScalaVersions := Seq("2.12.10", "2.11.12")
-
-
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("snapshots"),
-  Resolver.sonatypeRepo("releases")
-)
+ThisBuild / version := "3.2.0"
+ThisBuild / scalaVersion := "2.13.10"
+ThisBuild / crossScalaVersions := Seq("2.12.10", "2.11.12")
+ThisBuild / logBuffered in Test := false
+ThisBuild / parallelExecution in Test := false
+ThisBuild / trapExit := false
 
 // Provide a managed dependency on X if -DXVersion="" is supplied on the command line.
 val defaultVersions = Map(
-  "chisel3" -> "3.4.2",
-  "chisel-iotesters" -> "1.5.0"
+  "chisel3" -> "3.5.5",
+  "chisel-iotesters" -> "2.5.6"
   )
 
-libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
-  dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep)) }
+lazy val hardfloat = project in file("berkeley-hardfloat")
 
-libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.3.2" % "test"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
-
-logBuffered in Test := false
-
-parallelExecution in Test := false
-
-scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
-
-javacOptions ++= javacOptionsVersion(scalaVersion.value)
-
-trapExit := false
+lazy val root = (project in file(".")).settings(
+  name := "nucleusrv",
+  libraryDependencies ++= Seq("chisel3","chisel-iotesters").map {
+    dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep))
+  } ++ Seq(
+    "edu.berkeley.cs" %% "chiseltest" % "0.5.6" % "test",
+    "org.scalatest" %% "scalatest" % "3.2.0" % "test"
+  ),
+  addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % defaultVersions("chisel3") cross CrossVersion.full),
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("snapshots"),
+    Resolver.sonatypeRepo("releases")
+  ),
+  scalacOptions ++= scalacOptionsVersion(scalaVersion.value),
+  javacOptions ++= javacOptionsVersion(scalaVersion.value)
+).dependsOn(hardfloat)

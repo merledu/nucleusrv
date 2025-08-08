@@ -7,23 +7,39 @@ A chisel based riscv 5-stage pipelined cpu design, implementing 32-bit version o
 
 ## Dependencies
 
-* [`verilator`](https://verilator.org/guide/latest/install.html) v4.016 recommended by Chisel. Tested on v4.210.
-* [`riscv-gnu-toolchain`](https://github.com/riscv/riscv-gnu-toolchain) To build the C program
+* [`verilator >= v5.002`](https://verilator.org/guide/latest/install.html): Simulation
+* [`riscv-gnu-toolchain`](https://github.com/riscv/riscv-gnu-toolchain): To build the C program
 
 
-## Build Instructions
+## Getting Started
 
-#### Building with SBT
-Run this command is SBT shell
-```bash
-testOnly nucleusrv.components.TopTest -- -DwriteVcd=1 -DprogramFile=/path/to/instructions/hex
+### Clone
+
+```sh
+git clone --recurse-submodules https://github.com/merledu/nucleusrv.git
 ```
-#### Running Compliance Tests
-* Clone `riscv-arch-test` repo in nucleusrv root `git clone git@github.com:riscv-non-isa/riscv-arch-test.git -b 1.0`
-* Build the simulation executable as defined in "Building with SBT" section
-* Run `./run-compliance.sh` in root directory
 
-#### Building C Programs
+### Generating SystemVerilog
+
+```sh
+python3 gen_verilog.py <imem> <dmem>
+```
+
+### Running RISC-V assembly
+
+```sh
+python3 simulate.py --sbt_args "--imem <imem>" nucleusrv.components.NRVDriver Top
+```
+
+### Running RISC-V Architectural Tests
+* Make sure to have the RISC-V GNU Toolchain and Verilator in your `PATH`.
+* Create a python virtual environment and follow the `README.md` in `riscof/riscv-arch-test/`.
+* Run `run_riscv_arch_tests.py` in root directory.
+```sh
+python3 run_riscv_arch_tests.py
+```
+
+### Building C Programs
 * In `tools/tests` directory, create a folder and write c program in the `main.c` file
 * Run `make PROGRAM=<your_newly_created_test_folder_name`> inside tools directory
 * Build the program with `sbt` command listed above. Make sure you are in root directory
