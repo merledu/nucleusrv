@@ -2,9 +2,15 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
 
+class BabyKyberIO extends Bundle {
+  val addr = Output(UInt(32.W))
+  val data = Output(UInt(32.W))
+}
 
-
-class MemoryFetch(TRACE: Boolean) extends Module {
+class MemoryFetch(
+  BABY_KYBER: Boolean,
+  TRACE: Boolean
+) extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
     val writeData: UInt = Input(UInt(32.W))
@@ -18,6 +24,8 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     val dccmRsp = Flipped(Decoupled(new MemResponseIO))
 
     val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
+
+    val baby_kyber = if (BABY_KYBER) Some(new BabyKyberIO) else None
   })
 
   io.dccmRsp.ready := true.B
@@ -109,6 +117,14 @@ class MemoryFetch(TRACE: Boolean) extends Module {
 
   rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 
+  if (BABY_KYBER) {
+    io.baby_kyber.get.addr := Mux(
+      (io.aluResultIn >= "h40007000".U) && (io.aluResultIn <= "h40007168".U),
+      io.aluResultIn,
+      0.U
+    )
+    io.baby_kyber.get.data := wdata.asUInt
+  }
 
   when(io.readEnable) {
     when(funct3 === "b010".U) {

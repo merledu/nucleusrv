@@ -6,12 +6,13 @@ import nucleusrv.tracer.{TracerI, delays}
 
 class Core(implicit val config:Configs) extends Module{
 
-  val M      = config.M
-  val F      = config.F
-  val C      = config.C
-  val Zicsr  = config.Zicsr
-  val XLEN   = config.XLEN
-  val TRACE  = config.TRACE
+  val M          = config.M
+  val F          = config.F
+  val C          = config.C
+  val Zicsr      = config.Zicsr
+  val XLEN       = config.XLEN
+  val TRACE      = config.TRACE
+  val BABY_KYBER = config.BABY_KYBER
 
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
@@ -25,6 +26,8 @@ class Core(implicit val config:Configs) extends Module{
 
     // RVFI Pins
     val rvfi = if (TRACE) Some(Flipped(new TracerI)) else None
+
+    val baby_kyber = if (BABY_KYBER) Some(new BabyKyberIO) else None
   })
 
   // IF-ID Registers
@@ -97,7 +100,7 @@ class Core(implicit val config:Configs) extends Module{
   val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode(F, Zicsr, TRACE)).io
   val EX = Module(new Execute(F, M = M, TRACE = TRACE)).io
-  val MEM = Module(new MemoryFetch(TRACE))
+  val MEM = Module(new MemoryFetch(BABY_KYBER, TRACE))
 
   
   /*****************
@@ -331,6 +334,10 @@ class Core(implicit val config:Configs) extends Module{
     mem_reg_f_except.get <> ex_reg_f_except.get
     mem_reg_is_f.get := ex_reg_is_f.get
     ID.f_except.get(1) <> ex_reg_f_except.get
+  }
+
+  if (BABY_KYBER) {
+    dontTouch(io.baby_kyber.get) <> MEM.io.baby_kyber.get
   }
 
   /********************
