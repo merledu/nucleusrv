@@ -24,12 +24,19 @@ def execute_sp(cmd, **kwargs):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('prog', help = 'Path to RISC-V assembly or C program')
+    #parser.add_argument('app', help = 'The object whose main method is to be invoked')
+    #parser.add_argument('mod', help = 'Top module name')
     parser.add_argument(
         '--timing',
         action = 'store_const',
         const = '--timing',
         help = 'Enable timing support'
     )
+    #parser.add_argument(
+    #    '--sbt_args',
+    #    default = '',
+    #    help = 'Comma-separated sbt args'
+    #)
     args = parser.parse_args()
     prog_name = split(args.prog)[-1]
     target_dir = join(ROOT, 'out', prog_name)
@@ -99,12 +106,11 @@ if __name__ == '__main__':
         '-Wno-fatal',
         '-Wno-lint',
         '-Wno-style',
-        '--no-timing' if args.timing is None \
-            else args.timing,
+        '--no-timing' if args.timing is None else args.timing,
         '-j', '0',
         '--top', 'Top',
         '--Mdir', join(target_dir, 'obj_dir'),
-        'nrv_tb.cpp'
+        join(ROOT, 'nrv_tb.cpp')
     ) + sv_files, text = True)
     chdir(target_dir)
     execute_sp([join(
@@ -113,3 +119,4 @@ if __name__ == '__main__':
         'VTop'
     )], text = True)
     chdir(ROOT)
+

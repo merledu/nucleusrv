@@ -2,9 +2,12 @@ package nucleusrv.components
 import chisel3._
 import chisel3.stage.ChiselStage
 import nucleusrv.tracer._
+import BabyKyber.BabyKyberTop
 
 
 class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
+  val babyKyber = Module(new BabyKyberTop())
+  
 
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
@@ -20,8 +23,32 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     TRACE = true
   )
 
+
   val core: Core = Module(new Core())
   core.io.stall := false.B
+
+
+  // Enable is always on, triggers are from core
+  babyKyber.io.enable := true.B
+  babyKyber.io.key_enable := core.io.key_enable_trigger
+  babyKyber.io.encryption_enable := core.io.encryption_enable_trigger
+  babyKyber.io.decryption_enable := core.io.decryption_enable_trigger
+
+  // Optionally, connect or monitor done signals
+  // val keyDone = babyKyber.io.key_done
+  // val encryptionDone = babyKyber.io.encryption_done
+  // val decryptionDone = babyKyber.io.decryption_done
+
+  // Connect BabyKyberTop to core.io.baby_kyber if present
+  core.io.baby_kyber match {
+    case Some(bkIO) =>
+      babyKyber.io.req <> bkIO.req
+      babyKyber.io.rsp <> bkIO.rsp
+    case None => // Not enabled
+  }
+
+  
+  
 
   val dmem = Module(new SRamTop(dataFile))
   val imem = Module(new SRamTop(programFile))
