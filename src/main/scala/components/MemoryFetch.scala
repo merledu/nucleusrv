@@ -2,12 +2,19 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
 
+// class BabyKyberIO extends Bundle {
+//   val addr = Output(UInt(32.W))
+//   val data = Output(UInt(32.W))
+// }
 class BabyKyberIO extends Bundle {
-  val addr = Output(UInt(32.W))
-  val data = Output(UInt(32.W))
+  val req = Decoupled(new MemRequestIO)   // Request interface
+  val rsp = Flipped(Decoupled(new MemResponseIO)) // Response interface
 }
 
+
 class MemoryFetch(
+  // ...existing code...
+
   BABY_KYBER: Boolean,
   TRACE: Boolean
 ) extends Module {
@@ -26,7 +33,21 @@ class MemoryFetch(
     val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
 
     val baby_kyber = if (BABY_KYBER) Some(new BabyKyberIO) else None
+
+    // BabyKyber trigger outputs
+    val key_enable_trigger = Output(Bool())
+    val encryption_enable_trigger = Output(Bool())
+    val decryption_enable_trigger = Output(Bool())
   })
+  // Trigger address constants
+  val KEYGEN_TRIGGER_ADDR = "h40007356".U(32.W)
+  val ENCRYPT_TRIGGER_ADDR = "h40007360".U(32.W)
+  val DECRYPT_TRIGGER_ADDR = "h40007364".U(32.W)
+
+  // Trigger logic: high for one cycle on write to trigger address
+  io.key_enable_trigger := io.writeEnable && (io.aluResultIn === KEYGEN_TRIGGER_ADDR)
+  io.encryption_enable_trigger := io.writeEnable && (io.aluResultIn === ENCRYPT_TRIGGER_ADDR)
+  io.decryption_enable_trigger := io.writeEnable && (io.aluResultIn === DECRYPT_TRIGGER_ADDR)
 
   io.dccmRsp.ready := true.B
 
@@ -118,12 +139,23 @@ class MemoryFetch(
   rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 
   if (BABY_KYBER) {
-    io.baby_kyber.get.addr := Mux(
-      (io.aluResultIn >= "h40007000".U) && (io.aluResultIn <= "h40007168".U),
-      io.aluResultIn,
-      0.U
-    )
-    io.baby_kyber.get.data := wdata.asUInt
+    val babyKyberAddrRange = (io.aluResultIn >= "h40007000".U) && (io.aluResultIn <= "h40007FFF".U)
+    // Set default values for all Decoupled signals
+    io.baby_kyber.get.req.bits.addrRequest := 0.U
+    io.baby_kyber.get.req.bits.dataRequest := 0.U
+    io.baby_kyber.get.req.bits.activeByteLane := 0.U
+    io.baby_kyber.get.req.bits.isWrite := false.B
+    io.baby_kyber.get.req.valid := false.B
+    io.baby_kyber.get.rsp.ready := false.B
+    // Only drive when in range
+    when(babyKyberAddrRange) {
+      io.baby_kyber.get.req.bits.addrRequest := io.aluResultIn
+      io.baby_kyber.get.req.bits.dataRequest := io.writeData
+      io.baby_kyber.get.req.bits.activeByteLane := "b1111".U
+      io.baby_kyber.get.req.bits.isWrite := io.writeEnable
+      io.baby_kyber.get.req.valid := true.B
+      io.baby_kyber.get.rsp.ready := true.B
+    }
   }
 
   when(io.readEnable) {
@@ -214,4 +246,6 @@ class MemoryFetch(
   //  printf("%x\n", io.writeData)
   //}
 
+  // Debug print for writeEnable, aluResultIn, and writeData
+  printf(p"[MEMFETCH] writeEnable: ${io.writeEnable}, aluResultIn: 0x${Hexadecimal(io.aluResultIn)}, writeData: 0x${Hexadecimal(io.writeData)}\n")
 }

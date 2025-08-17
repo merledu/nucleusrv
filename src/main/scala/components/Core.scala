@@ -28,6 +28,11 @@ class Core(implicit val config:Configs) extends Module{
     val rvfi = if (TRACE) Some(Flipped(new TracerI)) else None
 
     val baby_kyber = if (BABY_KYBER) Some(new BabyKyberIO) else None
+
+    // BabyKyber triggers
+    val key_enable_trigger = Output(Bool())
+    val encryption_enable_trigger = Output(Bool())
+    val decryption_enable_trigger = Output(Bool())
   })
 
   // IF-ID Registers
@@ -338,6 +343,11 @@ class Core(implicit val config:Configs) extends Module{
 
   if (BABY_KYBER) {
     dontTouch(io.baby_kyber.get) <> MEM.io.baby_kyber.get
+
+    // Pass trigger signals to top
+    io.key_enable_trigger := MEM.io.key_enable_trigger
+    io.encryption_enable_trigger := MEM.io.encryption_enable_trigger
+    io.decryption_enable_trigger := MEM.io.decryption_enable_trigger
   }
 
   /********************
