@@ -57,6 +57,13 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_fcsr_o_data = if (F) Some(RegInit(0.U(32.W))) else None
   val id_reg_is_f = if (F) Some(RegInit(0.B)) else None
 
+  // Atomic signals ID-EX
+  val id_reg_isAMO = RegInit(false.B)
+  val id_reg_isLR  = RegInit(false.B)
+  val id_reg_isSC  = RegInit(false.B)
+  val id_reg_amoOp = RegInit(0.U(4.W))
+
+
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
   val ex_reg_zero = RegInit(0.U(32.W))
