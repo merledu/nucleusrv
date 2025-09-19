@@ -108,10 +108,11 @@ class InstructionDecode(
   val atomicDecoder = Module(new AtomicDecoder)
   atomicDecoder.io.instr := io.id_instruction 
 
-  io.out.isAMO := atomicDecoder.io.out.isAMO
-  io.out.isLR  := atomicDecoder.io.out.isLR
-  io.out.isSC  := atomicDecoder.io.out.isSC
-  io.out.amoOp := atomicDecoder.io.out.amoOp
+  io.isAMO := atomicDecoder.io.out.isAMO
+  io.isLR  := atomicDecoder.io.out.isLR
+  io.isSC  := atomicDecoder.io.out.isSC
+  io.amoOp := atomicDecoder.io.out.amoOp
+  
   
 
   // CSR
