@@ -187,7 +187,7 @@ class Core(implicit val config:Configs) extends Module{
   when(ID.ifid_flush) {
     if_reg_ins := 0.U
   }
-
+   
 
   /****************
    * Decode Stage *
@@ -237,6 +237,11 @@ class Core(implicit val config:Configs) extends Module{
       ID.f_read_reg.get(2)(i) := mem_reg_f_read.get(i)
     }
   }
+   // ID-EX A
+    id_reg_isAMO := ID.isAMO
+    id_reg_isLR  := ID.isLR
+    id_reg_isSC  := ID.isSC
+    id_reg_amoOp := ID.amoOp
 
   /*****************
    * Execute Stage *
