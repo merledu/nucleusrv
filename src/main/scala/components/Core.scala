@@ -57,6 +57,13 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_fcsr_o_data = if (F) Some(RegInit(0.U(32.W))) else None
   val id_reg_is_f = if (F) Some(RegInit(0.B)) else None
 
+  // Atomic signals ID-EX
+  val id_reg_isAMO = RegInit(false.B)
+  val id_reg_isLR  = RegInit(false.B)
+  val id_reg_isSC  = RegInit(false.B)
+  val id_reg_amoOp = RegInit(0.U(4.W))
+
+
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
   val ex_reg_zero = RegInit(0.U(32.W))
@@ -76,7 +83,10 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
   val ex_reg_f_except = if (F) Some(RegInit(VecInit(Vector.fill(5)(0.B)))) else None
   val ex_reg_is_f = if (F) Some(RegInit(0.B)) else None
-
+  // Atomic signals EX-MEM
+  val ex_reg_isAMO  = RegInit(false.B)
+  val ex_reg_amoOp  = RegInit(0.U(4.W))
+  
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
   val mem_reg_ins = RegInit(0.U(32.W))
@@ -180,7 +190,7 @@ class Core(implicit val config:Configs) extends Module{
   when(ID.ifid_flush) {
     if_reg_ins := 0.U
   }
-
+   
 
   /****************
    * Decode Stage *
@@ -230,6 +240,11 @@ class Core(implicit val config:Configs) extends Module{
       ID.f_read_reg.get(2)(i) := mem_reg_f_read.get(i)
     }
   }
+   // ID-EX A
+  id_reg_isAMO := ID.isAMO
+  id_reg_isLR  := ID.isLR
+  id_reg_isSC  := ID.isSC
+  id_reg_amoOp := ID.amoOp
 
   /*****************
    * Execute Stage *
@@ -283,6 +298,18 @@ class Core(implicit val config:Configs) extends Module{
     ex_reg_is_f.get := EX.is_f_o.get
     ID.f_except.get(0) <> EX.exceptions.get
   }
+  // forward atomic control from ID->EX to EX->MEM
+  ex_reg_isAMO := id_reg_isAMO
+  ex_reg_amoOp := id_reg_amoOp
+
+  // AMO ALU instance (use in MEM stage)
+  val amoALU = Module(new AMOALU)
+
+    // ----- AMO wiring in Memory stage -----
+  // Connect AMOALU inputs to data read from memory.. rs2 (ex_reg_wd)
+  amoALU.io.memData := MEM.io.readData
+  amoALU.io.src2    := ex_reg_wd
+  amoALU.io.amoOp   := ex_reg_amoOp
 
   /****************
    * Memory Stage *
@@ -302,7 +329,12 @@ class Core(implicit val config:Configs) extends Module{
 //
 //  } otherwise{
     mem_reg_rd := MEM.io.readData
-    mem_reg_result := ex_reg_result
+    // mem_reg_result := ex_reg_result
+
+    // If this is an AMO, WB should receive the original memory value (MEM.io.readData).
+  // For other cases keep previous behavior.
+  mem_reg_result := Mux(ex_reg_isAMO, MEM.io.readData, ex_reg_result)
+
 //    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
     mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
     mem_reg_ins := ex_reg_ins
@@ -313,14 +345,28 @@ class Core(implicit val config:Configs) extends Module{
     ex_reg_result := EX.ALUresult
 //  }
   mem_reg_wra := ex_reg_wra
-  mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+  // mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+
+  // Force the memToReg selector to choose memory result for AMO
+  // (assuming memToReg==1 means load -> uses MEM.io.readData in WB)
+  mem_reg_ctl_memToReg := Mux(ex_reg_isAMO, 1.U, ex_reg_ctl_memToReg)
+
   mem_reg_is_csr := ex_reg_is_csr
   mem_reg_csr_data := ex_reg_csr_data
   EX.ex_mem_regWrite <> ex_reg_ctl_regWrite
   MEM.io.aluResultIn := ex_reg_result
-  MEM.io.writeData := ex_reg_wd
-  MEM.io.readEnable := ex_reg_ctl_memRead
-  MEM.io.writeEnable := ex_reg_ctl_memWrite
+  // MEM.io.writeData := ex_reg_wd
+// If ex_reg_isAMO: writeData should be amoALU result; otherwise normal ex_reg_wd
+  MEM.io.writeData   := Mux(ex_reg_isAMO, amoALU.io.result, ex_reg_wd)
+
+  // MEM.io.readEnable := ex_reg_ctl_memRead
+  // For readEnable we keep original control (AMO still needs a read)
+  MEM.io.readEnable  := ex_reg_ctl_memRead || ex_reg_isAMO
+
+  //MEM.io.writeEnable := ex_reg_ctl_memWrite
+  // Ensure we assert writeEnable for AMO (RMW needs write back)
+  MEM.io.writeEnable := ex_reg_ctl_memWrite || ex_reg_isAMO
+  
   MEM.io.f3 := ex_reg_ins(14,12)
   EX.mem_result := ex_reg_result
   ID.csr_Mem := ex_reg_is_csr
