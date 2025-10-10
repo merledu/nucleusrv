@@ -43,30 +43,26 @@ class Top(programFile: Option[String], dataFile: Option[String]) extends Module 
   val imem = Module(new SRamTop(programFile))
   val dmem = Module(new SRamTop(dataFile))
 
-  //  Connect Core0 to dcaches, icache
-  core0.io.imemReq.addr  := icache0.io.addr
-  core0.io.imemRsp.data  := icache0.io.rdata
-  core0.io.imemRsp.valid := icache0.io.valid
-
-  core0.io.dmemReq.addr  := dcache0.io.addr
-  core0.io.dmemReq.wdata := dcache0.io.wdata
-  core0.io.dmemReq.wen   := dcache0.io.wen
-  core0.io.dmemRsp.data  := dcache0.io.rdata
-  core0.io.dmemRsp.valid := dcache0.io.valid
-
-  //  Connect Core1 to dcaches, icache
-
-  core1.io.imemReq.addr  := icache1.io.addr
-  core1.io.imemRsp.data  := icache1.io.rdata
-  core1.io.imemRsp.valid := icache1.io.valid
-
-  core1.io.dmemReq.addr  := dcache1.io.addr
-  core1.io.dmemReq.wdata := dcache1.io.wdata
-  core1.io.dmemReq.wen   := dcache1.io.wen
-  core1.io.dmemRsp.data  := dcache1.io.rdata
-  core1.io.dmemRsp.valid := dcache1.io.valid
-
+  // Core 0 instruction
+  core0.io.imemReq.bits.addrRequest  := icache0.io.addr
+  core0.io.imemRsp.bits.dataResponse := icache0.io.rdata
   
+  // Core 0 data
+  core0.io.dmemReq.bits.addrRequest  := dcache0.io.addr
+  core0.io.dmemReq.bits.dataRequest  := dcache0.io.wdata
+  core0.io.dmemReq.bits.isWrite      := dcache0.io.wen
+  core0.io.dmemRsp.bits.dataResponse := dcache0.io.rdata
+  
+  // Core 1 instruction
+  core1.io.imemReq.bits.addrRequest  := icache1.io.addr
+  core1.io.imemRsp.bits.dataResponse := icache1.io.rdata
+  
+  // Core 1 data
+  core1.io.dmemReq.bits.addrRequest  := dcache1.io.addr
+  core1.io.dmemReq.bits.dataRequest  := dcache1.io.wdata
+  core1.io.dmemReq.bits.isWrite      := dcache1.io.wen
+  core1.io.dmemRsp.bits.dataResponse := dcache1.io.rdata
+
   //  Connect caches to bus
   
   // Core0 cache to Bus0

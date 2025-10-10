@@ -3,27 +3,37 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
+class BusPortIO(addrWidth: Int, dataWidth: Int) extends Bundle {
+  val addr  = Output(UInt(addrWidth.W))
+  val wdata = Output(UInt(dataWidth.W))
+  val rdata = Input(UInt(dataWidth.W))
+  val wen   = Output(Bool())
+  val ren   = Output(Bool())
+}
+
 class BusIO(addrWidth: Int, dataWidth: Int) extends Bundle {
-  val addr  = Input(UInt(addrWidth.W))
-  val wdata = Input(UInt(dataWidth.W))
-  val rdata = Output(UInt(dataWidth.W))
-  val wen   = Input(Bool())
-  val ren   = Input(Bool())
+  val cpu  = Flipped(new BusPortIO(addrWidth, dataWidth)) // from CPU
+  val imem = new BusPortIO(addrWidth, dataWidth)          // to IMEM
+  val dmem = new BusPortIO(addrWidth, dataWidth)          // to DMEM
 }
 
 class Bus(addrWidth: Int = 32, dataWidth: Int = 32) extends Module {
-  val io = IO(new Bundle {
-    val cpu   = Flipped(new BusIO(addrWidth, dataWidth))
-    val imem  = new BusIO(addrWidth, dataWidth)
-    val dmem  = new BusIO(addrWidth, dataWidth)
-  })
+  val io = IO(new BusIO(addrWidth, dataWidth))
 
   // Default signals
-  io.imem := 0.U.asTypeOf(io.imem)
-  io.dmem := 0.U.asTypeOf(io.dmem)
-  io.cpu.rdata := 0.U
+  io.imem.addr  := 0.U
+  io.imem.wdata := 0.U
+  io.imem.wen   := false.B
+  io.imem.ren   := false.B
 
-  // Address decode: <0x1000_0000 -> imem, else -> dmem
+  io.dmem.addr  := 0.U
+  io.dmem.wdata := 0.U
+  io.dmem.wen   := false.B
+  io.dmem.ren   := false.B
+
+  io.cpu.rdata  := 0.U
+
+  // Address decode: < 0x10000000 → imem, else → dmem
   when(io.cpu.addr < "h10000000".U) {
     io.imem.addr  := io.cpu.addr
     io.imem.wdata := io.cpu.wdata
