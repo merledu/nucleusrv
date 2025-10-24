@@ -58,13 +58,22 @@ class Top(programFile: Option[String], dataFile: Option[String]) extends Module 
 
   // Connect caches to Shared Bus (2 CPU ports)
   //  Core 0 side
-  bus.io.cpu(0).addr  := Mux(icache0.io.valid, icache0.io.addr, dcache0.io.addr)
+  bus.io.cpu(0).addr  := Mux(icache0.io.valid, icache0.io.addr, dcache0.io.addr) // note: match the actual dcache field name
   bus.io.cpu(0).wdata := dcache0.io.wdata
   bus.io.cpu(0).wen   := dcache0.io.wen
   bus.io.cpu(0).ren   := !dcache0.io.wen
   bus.io.cpu(0).valid := icache0.io.valid || dcache0.io.valid
-  dcache0.io.rdata    := bus.io.cpu(0).rdata
-  icache0.io.rdata    := bus.io.cpu(0).rdata
+
+  // The bus drives mem responses into cache memory-side inputs (mem_rdata/mem_valid).
+  icache0.io.mem_rdata := bus.io.cpu(0).rdata
+  icache0.io.mem_valid := bus.io.cpu(0).valid // or another signal that indicates response (simple mapping)
+
+  dcache0.io.mem_rdata := bus.io.cpu(0).rdata
+  dcache0.io.mem_valid := bus.io.cpu(0).valid
+
+  // Core still reads from cache output as before:
+  core0.io.imemRsp.bits.dataResponse := icache0.io.rdata
+  core0.io.dmemRsp.bits.dataResponse := dcache0.io.rdata
 
   //  Core 1 side
   bus.io.cpu(1).addr  := Mux(icache1.io.valid, icache1.io.addr, dcache1.io.addr)
@@ -72,8 +81,17 @@ class Top(programFile: Option[String], dataFile: Option[String]) extends Module 
   bus.io.cpu(1).wen   := dcache1.io.wen
   bus.io.cpu(1).ren   := !dcache1.io.wen
   bus.io.cpu(1).valid := icache1.io.valid || dcache1.io.valid
-  dcache1.io.rdata    := bus.io.cpu(1).rdata
-  icache1.io.rdata    := bus.io.cpu(1).rdata
+
+  icache1.io.mem_rdata := bus.io.cpu(1).rdata
+  icache1.io.mem_valid := bus.io.cpu(1).valid
+
+  dcache1.io.mem_rdata := bus.io.cpu(1).rdata
+  dcache1.io.mem_valid := bus.io.cpu(1).valid
+
+  // Core reads cache outputs
+  core1.io.imemRsp.bits.dataResponse := icache1.io.rdata
+  core1.io.dmemRsp.bits.dataResponse := dcache1.io.rdata
+
 
   // Connect bus to memories
   bus.io.imem <> imem.io
