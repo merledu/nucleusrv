@@ -3,7 +3,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-// Interface for CPU, IMEM, DMEM ports
+// CPU, IMEM, DMEM ports
 class BusPortIO(addrWidth: Int, dataWidth: Int) extends Bundle {
   val addr  = Output(UInt(addrWidth.W))
   val wdata = Output(UInt(dataWidth.W))
@@ -11,10 +11,10 @@ class BusPortIO(addrWidth: Int, dataWidth: Int) extends Bundle {
   val wen   = Output(Bool())
   val ren   = Output(Bool())
   val valid = Output(Bool()) // request valid
-  val ready = Input(Bool())  // bus ready / response valid
+  val ready = Input(Bool())  // bus ready, response valid
 }
 
-// Top-level bus interface (2 CPU ports)
+// newtoplevel bus interface 2CPU ports
 class SharedBusIO(addrWidth: Int, dataWidth: Int) extends Bundle {
   val cpu  = Vec(2, Flipped(new BusPortIO(addrWidth, dataWidth))) // 2 cores
   val imem = new BusPortIO(addrWidth, dataWidth)
@@ -46,7 +46,7 @@ class RoundRobinArbiter2 extends Module {
   }
 }
 
-// SharedBus 2-core shared bus with IMEM + DMEM routing
+// SharedBus 2core shared bus with IMEM + DMEM
 class SharedBus(addrWidth: Int = 32, dataWidth: Int = 32) extends Module {
   val io = IO(new SharedBusIO(addrWidth, dataWidth))
   for (i <- 0 until 2) {
