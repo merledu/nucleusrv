@@ -85,6 +85,8 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_is_f = if (F) Some(RegInit(0.B)) else None
   // Atomic signals EX-MEM
   val ex_reg_isAMO  = RegInit(false.B)
+  val ex_reg_isLR   = RegInit(false.B)
+  val ex_reg_isSC   = RegInit(false.B)
   val ex_reg_amoOp  = RegInit(0.U(4.W))
   
   // MEM-WB Registers
@@ -103,12 +105,27 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_f_except = if (F) Some(RegInit(VecInit(Vector.fill(5)(0.B)))) else None
   val mem_reg_is_f = if (F) Some(RegInit(0.B)) else None
 
+  // Atomic signals MEM-WB
+  val mem_reg_isAMO = RegInit(false.B)
+  val mem_reg_isLR  = RegInit(false.B)
+  val mem_reg_isSC  = RegInit(false.B)
+
+  // AMO State Machine Registers
+  val amo_state = RegInit(0.U(2.W))  // 0=idle, 1=reading, 2=writing
+  val amo_read_data = RegInit(0.U(32.W))  // Store the value read from memory
+  val amo_modified_data = RegInit(0.U(32.W))  // Store the modified value to write back
+
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode(F, Zicsr, TRACE)).io
   val EX = Module(new Execute(F, M = M, TRACE = TRACE)).io
   val MEM = Module(new MemoryFetch(TRACE))
 
+  // Reservation File for LR/SC
+  val reservationFile = Module(new ReservationFile).io
+  
+  // AMO ALU instance
+  val amoALU = Module(new AMOALU)
   
   /*****************
    * Fetch Stage *
@@ -168,9 +185,12 @@ class Core(implicit val config:Configs) extends Module{
     func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
   ) || ((func7 === "b0001100".U) || (func7 === "b0101100".U))
 
-  IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc //stall signal from outside
+  // AMO stall logic
+  val amo_stall = ex_reg_isAMO && (amo_state =/= 0.U)
+
+  IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc || amo_stall
   
-  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
+  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o | amo_stall), 1.B, 0.B)
   pc.io.halt := halt
   val npc = Mux(
     ID.hdu_pcWrite,
@@ -218,7 +238,6 @@ class Core(implicit val config:Configs) extends Module{
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
   ID.dmem_resp_valid := io.dmemRsp.valid
-//  IF.PCPlusOffset := ID.pcPlusOffset
   ID.ex_ins := id_reg_ins
   ID.ex_mem_ins := ex_reg_ins
   ID.mem_wb_ins := mem_reg_ins
@@ -240,7 +259,8 @@ class Core(implicit val config:Configs) extends Module{
       ID.f_read_reg.get(2)(i) := mem_reg_f_read.get(i)
     }
   }
-   // ID-EX A
+  
+  // ID-EX Atomic signals
   id_reg_isAMO := ID.isAMO
   id_reg_isLR  := ID.isLR
   id_reg_isSC  := ID.isSC
@@ -250,8 +270,6 @@ class Core(implicit val config:Configs) extends Module{
    * Execute Stage *
   ******************/
 
-  //ex_reg_branch := EX.branchAddress
-  //ex_reg_ctl_branch_taken := EX.branch_taken
   EX.immediate := id_reg_imm
   EX.readData1 := id_reg_rd1
   EX.readData2 := id_reg_rd2
@@ -261,8 +279,6 @@ class Core(implicit val config:Configs) extends Module{
   EX.ctl_aluSrc := id_reg_ctl_aluSrc
   EX.ctl_aluOp := id_reg_ctl_aluOp
   EX.ctl_aluSrc1 := id_reg_ctl_aluSrc1
-  //EX.ctl_branch := id_reg_ctl_branch
-  //EX.ctl_jump := id_reg_ctl_jump
   ex_reg_pc := id_reg_pc
   ex_reg_wra := id_reg_wra
   ex_reg_ins := id_reg_ins
@@ -281,9 +297,9 @@ class Core(implicit val config:Configs) extends Module{
   ID.ex_result := EX.ALUresult
   ID.csr_Ex := id_reg_is_csr
   ID.csr_Ex_data := id_reg_csr_data
-  ID.ex_stall := EX.stall
+  ID.ex_stall := EX.stall || amo_stall
 
-  when(EX.stall){
+  when(EX.stall || amo_stall){
     id_reg_wra := id_reg_wra
     id_reg_ctl_regWrite <> id_reg_ctl_regWrite
   }
@@ -298,80 +314,164 @@ class Core(implicit val config:Configs) extends Module{
     ex_reg_is_f.get := EX.is_f_o.get
     ID.f_except.get(0) <> EX.exceptions.get
   }
-  // forward atomic control from ID->EX to EX->MEM
+  
+  // Forward atomic control from ID->EX to EX->MEM
   ex_reg_isAMO := id_reg_isAMO
+  ex_reg_isLR  := id_reg_isLR
+  ex_reg_isSC  := id_reg_isSC
   ex_reg_amoOp := id_reg_amoOp
 
-  // AMO ALU instance (use in MEM stage)
-  val amoALU = Module(new AMOALU)
-
-    // ----- AMO wiring in Memory stage -----
-  // Connect AMOALU inputs to data read from memory.. rs2 (ex_reg_wd)
-  amoALU.io.memData := MEM.io.readData
-  amoALU.io.src2    := ex_reg_wd
-  amoALU.io.amoOp   := ex_reg_amoOp
+  // Propagate control signals
+  ex_reg_ctl_memRead := id_reg_ctl_memRead
+  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+  ex_reg_wd := EX.writeData
+  ex_reg_result := EX.ALUresult
 
   /****************
    * Memory Stage *
    ****************/
-  val rf = Module(new ReservationFile)
 
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
-//  val stall = Wire(Bool())
-//  when(MEM.io.stall){
-//    mem_reg_rd := mem_reg_rd
-//    mem_reg_result := mem_reg_result
-//    ex_reg_ctl_memToReg := ex_reg_ctl_memToReg
-////    mem_reg_ctl_memToReg := mem_reg_ctl_memToReg
-//    mem_reg_pc := mem_reg_pc
-//
-//    ex_reg_ctl_memRead := ex_reg_ctl_memRead
-//
-//  } otherwise{
-    mem_reg_rd := MEM.io.readData
-    // mem_reg_result := ex_reg_result
 
-    // If this is an AMO, WB should receive the original memory value (MEM.io.readData).
-  // For other cases keep previous behavior.
-  mem_reg_result := Mux(ex_reg_isAMO, MEM.io.readData, ex_reg_result)
-
-//    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
-    mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
-    mem_reg_ins := ex_reg_ins
-    mem_reg_pc := ex_reg_pc
-    ex_reg_ctl_memRead := id_reg_ctl_memRead
-    ex_reg_ctl_memWrite := id_reg_ctl_memWrite
-    ex_reg_wd := EX.writeData
-    ex_reg_result := EX.ALUresult
-//  }
-  mem_reg_wra := ex_reg_wra
-  // mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
-
-  // Force the memToReg selector to choose memory result for AMO
-  // (assuming memToReg==1 means load -> uses MEM.io.readData in WB)
-  mem_reg_ctl_memToReg := Mux(ex_reg_isAMO, 1.U, ex_reg_ctl_memToReg)
-
-  mem_reg_is_csr := ex_reg_is_csr
-  mem_reg_csr_data := ex_reg_csr_data
-  EX.ex_mem_regWrite <> ex_reg_ctl_regWrite
-  MEM.io.aluResultIn := ex_reg_result
-  // MEM.io.writeData := ex_reg_wd
-// If ex_reg_isAMO: writeData should be amoALU result; otherwise normal ex_reg_wd
-  MEM.io.writeData   := Mux(ex_reg_isAMO, amoALU.io.result, ex_reg_wd)
-
-  // MEM.io.readEnable := ex_reg_ctl_memRead
-  // For readEnable we keep original control (AMO still needs a read)
-  MEM.io.readEnable  := ex_reg_ctl_memRead || ex_reg_isAMO
-
-  //MEM.io.writeEnable := ex_reg_ctl_memWrite
-  // Ensure we assert writeEnable for AMO (RMW needs write back)
-  MEM.io.writeEnable := ex_reg_ctl_memWrite || ex_reg_isAMO
+  // ============================================
+  // AMO STATE MACHINE
+  // ============================================
   
+  val amo_is_active = ex_reg_isAMO && !EX.stall
+
+  switch(amo_state) {
+    is(0.U) {  // IDLE
+      when(amo_is_active) {
+        amo_state := 1.U  // Start read phase
+      }
+    }
+    is(1.U) {  // READING
+      when(MEM.io.dccmRsp.valid) {
+        // Memory read completed, store the value
+        amo_read_data := MEM.io.readData
+        
+        // Compute the modified value using AMO ALU
+        amo_modified_data := amoALU.io.result
+        
+        amo_state := 2.U  // Move to write phase
+      }
+    }
+    is(2.U) {  // WRITING
+      when(MEM.io.dccmReq.fire) {
+        // Write completed, return to idle
+        amo_state := 0.U
+      }
+    }
+  }
+
+  // ============================================
+  // AMO ALU CONNECTIONS
+  // ============================================
+  
+  // Connect AMO ALU inputs
+  amoALU.io.memData := Mux(amo_state === 1.U && MEM.io.dccmRsp.valid, 
+                            MEM.io.readData, 
+                            amo_read_data)
+  amoALU.io.src2 := ex_reg_wd
+  amoALU.io.amoOp := ex_reg_amoOp
+
+  // ============================================
+  // RESERVATION FILE (LR/SC)
+  // ============================================
+  
+  reservationFile.set := ex_reg_isLR
+  val sc_success = ex_reg_isSC && reservationFile.matchAddr
+  reservationFile.clear := ex_reg_isSC && reservationFile.matchAddr
+  reservationFile.addrIn := ex_reg_result
+
+  // ============================================
+  // MEMORY INTERFACE CONTROL
+  // ============================================
+
+  // Read Enable:
+  // - Normal loads: memRead signal
+  // - AMO: read during state 0 and 1 (idle -> reading)
+  // - LR: always read
+  // - SC: no read needed
+  MEM.io.readEnable := ex_reg_ctl_memRead || 
+                       (ex_reg_isAMO && (amo_state === 0.U || amo_state === 1.U)) || 
+                       ex_reg_isLR
+
+  // Write Enable:
+  // - Normal stores: memWrite signal  
+  // - AMO: write during state 2 (writing phase, after read completes)
+  // - LR: no write
+  // - SC: conditional write (only if reservation valid)
+  MEM.io.writeEnable := ex_reg_ctl_memWrite || 
+                        (ex_reg_isAMO && amo_state === 2.U) || 
+                        (ex_reg_isSC && sc_success)
+
+  // Write Data Selection:
+  // - AMO: write the modified value (stored in amo_modified_data)
+  // - SC: write rs2 value if reservation is valid
+  // - Others: normal write data
+  MEM.io.writeData := Mux(ex_reg_isAMO && amo_state === 2.U, 
+                         amo_modified_data,
+                         ex_reg_wd)
+
+  // ALU Result (address calculation)
+  MEM.io.aluResultIn := ex_reg_result
+
+  // Function code for memory access width
   MEM.io.f3 := ex_reg_ins(14,12)
+
+  // Forward EX result to ID for hazard detection
   EX.mem_result := ex_reg_result
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
+
+  // ============================================
+  // MEM-WB REGISTER UPDATE
+  // ============================================
+  
+  // Update MEM-WB registers (only when not stalled by AMO)
+  when(!amo_stall) {
+    mem_reg_rd := MEM.io.readData
+    
+    // Result selection for writeback:
+    // - AMO: return original memory value (the value that was read)
+    // - LR: return loaded value from memory
+    // - SC: return success (0) or failure (1)
+    // - Others: normal ALU result
+    val sc_result = Mux(sc_success, 0.U, 1.U)
+    
+    mem_reg_result := Mux(ex_reg_isAMO, 
+                         amo_read_data,  // Return the ORIGINAL value read from memory
+                         Mux(ex_reg_isLR, 
+                             MEM.io.readData,
+                             Mux(ex_reg_isSC,
+                                 sc_result,
+                                 ex_reg_result)))
+
+    mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
+    mem_reg_ins := ex_reg_ins
+    mem_reg_pc := ex_reg_pc
+    mem_reg_wra := ex_reg_wra
+    
+    // MemToReg control:
+    // - AMO/LR: use memory data (1)
+    // - SC: use computed result (0)
+    // - Others: normal control
+    mem_reg_ctl_memToReg := Mux(ex_reg_isAMO || ex_reg_isLR, 
+                               1.U,
+                               Mux(ex_reg_isSC,
+                                   0.U,
+                                   ex_reg_ctl_memToReg))
+
+    mem_reg_is_csr := ex_reg_is_csr
+    mem_reg_csr_data := ex_reg_csr_data
+    
+    // Propagate atomic signals to MEM-WB
+    mem_reg_isAMO := ex_reg_isAMO
+    mem_reg_isLR  := ex_reg_isLR
+    mem_reg_isSC  := ex_reg_isSC
+  }
 
   if (F) {
     mem_reg_f_read.get <> ex_reg_f_read.get
@@ -379,6 +479,8 @@ class Core(implicit val config:Configs) extends Module{
     mem_reg_is_f.get := ex_reg_is_f.get
     ID.f_except.get(1) <> ex_reg_f_except.get
   }
+
+  EX.ex_mem_regWrite <> ex_reg_ctl_regWrite
 
   /********************
    * Write Back Stage *
@@ -391,13 +493,12 @@ class Core(implicit val config:Configs) extends Module{
     wb_data := MEM.io.readData
     wb_addr := mem_reg_wra
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
-      wb_data := mem_reg_pc+4.U
-      wb_addr := mem_reg_wra
-    }
-    .otherwise {
-      wb_data := mem_reg_result
-      wb_addr := mem_reg_wra
-    }
+    wb_data := mem_reg_pc + 4.U
+    wb_addr := mem_reg_wra
+  }.otherwise {
+    wb_data := mem_reg_result
+    wb_addr := mem_reg_wra
+  }
 
   ID.mem_wb_result := wb_data
   ID.writeData := wb_data

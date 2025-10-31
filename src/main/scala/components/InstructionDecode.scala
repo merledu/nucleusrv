@@ -83,7 +83,27 @@ class InstructionDecode(
     // RVFI pins
     val raddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
     val rd_wdata = if (TRACE) Some(Output(UInt(32.W))) else None
+
+    // Atomic Outputpins
+    val isAMO  = Output(Bool())
+    val isLR   = Output(Bool())
+    val isSC   = Output(Bool())
+    val amoOp  = Output(UInt(4.W))
+    val aq   = Output(Bool())
+    val rl   = Output(Bool())
   })
+
+  //atomic instruction detection
+  
+  val atomicDecoder = Module(new AtomicDecoder)
+  atomicDecoder.io.instr := io.id_instruction 
+
+  io.isAMO := atomicDecoder.io.out.isAMO
+  io.isLR  := atomicDecoder.io.out.isLR
+  io.isSC  := atomicDecoder.io.out.isSC
+  io.amoOp := atomicDecoder.io.out.amoOp
+  io.aq    := atomicDecoder.io.out.aq
+  io.rl    := atomicDecoder.io.out.rl
 
   val is_f = if (F) Some(WireInit(0.B)) else None
   if (F) {
