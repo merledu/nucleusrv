@@ -85,10 +85,10 @@ class InstructionDecode(
     val rd_wdata = if (TRACE) Some(Output(UInt(32.W))) else None
 
     // Atomic Outputpins
-    val isAMO  = Bool()
-    val isLR   = Bool()
-    val isSC   = Bool()
-    val amoOp  = UInt(4.W)
+    val isAMO  = Output(Bool())
+    val isLR   = Output(Bool())
+    val isSC   = Output(Bool())
+    val amoOp  = Output(UInt(4.W))
   })
 
   val is_f = if (F) Some(WireInit(0.B)) else None
