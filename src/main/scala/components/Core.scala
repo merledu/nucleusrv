@@ -314,6 +314,7 @@ class Core(implicit val config:Configs) extends Module{
   /****************
    * Memory Stage *
    ****************/
+  val rf = Module(new ReservationFile)
 
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
