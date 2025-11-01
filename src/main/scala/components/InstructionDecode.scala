@@ -88,7 +88,7 @@ class InstructionDecode(
     val isAMO  = Output(Bool())
     val isLR   = Output(Bool())
     val isSC   = Output(Bool())
-    val amoOp  = Output(UInt(4.W))
+    val amoOp  = Output(UInt(5.W))
     val aq   = Output(Bool())
     val rl   = Output(Bool())
   })

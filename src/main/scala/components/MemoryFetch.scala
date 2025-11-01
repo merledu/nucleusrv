@@ -18,6 +18,10 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     val dccmRsp = Flipped(Decoupled(new MemResponseIO))
 
     val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
+
+    val isAMO = Input(Bool())
+    val isLR  = Input(Bool())
+    val isSC  = Input(Bool())
   })
 
   io.dccmRsp.ready := true.B
@@ -27,8 +31,12 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   val offset = RegInit(0.U(2.W))
   val funct3 = RegInit(0.U(3.W))
   val offsetSW = io.aluResultIn(1,0)
-
-  when(!io.dccmRsp.valid){
+  
+  when(io.isAMO || io.isLR || io.isSC) {
+    io.dccmReq.bits.activeByteLane := "b1111".U
+    if (TRACE) io.wmask.get := Mux(io.writeEnable, "b1111".U, 0.U)
+  }
+  .elsewhen(!io.dccmRsp.valid){
     funct3 := io.f3
     offset := io.aluResultIn(1,0)
   }.otherwise{
@@ -111,7 +119,11 @@ class MemoryFetch(TRACE: Boolean) extends Module {
 
 
   when(io.readEnable) {
-    when(funct3 === "b010".U) {
+    // Atomic operations always return full 32-bit word
+    when(io.isAMO || io.isLR || funct3 === "b010".U) {
+      io.readData := rdata
+    }
+    .elsewhen(funct3 === "b010".U) {
       // load word
       io.readData := rdata
     }

@@ -6,7 +6,7 @@ class AtomicDecodeOut extends Bundle {
   val isLR   = Bool()
   val isSC   = Bool()
   val isAMO  = Bool()
-  val amoOp  = UInt(4.W) // Encoded value for AMO operation type
+  val amoOp  = UInt(5.W)    // AMO operation type (funct5 from instruction)
 
   val rs1 = UInt(5.W)
   val rs2 = UInt(5.W)
@@ -53,31 +53,20 @@ class AtomicDecoder extends Module {
   // Opcode for atomic instructions
   val OPCODE_ATOMIC = "b0101111".U(7.W)
 
-  // AMO operation codes
-  val AMOADD  = 1.U(4.W)
-  val AMOSWAP = 2.U(4.W)
-  val AMOXOR  = 3.U(4.W)
-  val AMOAND  = 4.U(4.W)
-  val AMOOR   = 5.U(4.W)
-  val AMOMIN  = 6.U(4.W)
-  val AMOMAX  = 7.U(4.W)
-  val AMOMINU = 8.U(4.W)
-  val AMOMAXU = 9.U(4.W)
-
-  // Decode atomic instructions
-  when(opcode === OPCODE_ATOMIC && funct3 === "b010".U(3.W)) {
+  when(opcode === OPCODE_ATOMIC && funct3 === "b010".U) {
     switch(funct5) {
-      is("b00010".U(5.W)) { io.out.isLR := true.B }       // LR.W
-      is("b00011".U(5.W)) { io.out.isSC := true.B }       // SC.W
-      is("b00000".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOADD }
-      is("b00001".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOSWAP }
-      is("b00100".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOXOR }
-      is("b01100".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOAND }
-      is("b01000".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOOR }
-      is("b10000".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOMIN }
-      is("b10100".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOMAX }
-      is("b11000".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOMINU }
-      is("b11100".U(5.W)) { io.out.isAMO := true.B; io.out.amoOp := AMOMAXU }
+      is("b00010".U) { io.out.isLR  := true.B }             // LR.W
+      is("b00011".U) { io.out.isSC  := true.B }             // SC.W
+
+      is("b00000".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOADD
+      is("b00001".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOSWAP
+      is("b00100".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOXOR
+      is("b01100".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOAND
+      is("b01000".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOOR
+      is("b10000".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOMIN
+      is("b10100".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOMAX
+      is("b11000".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOMINU
+      is("b11100".U) { io.out.isAMO := true.B; io.out.amoOp := funct5 } // AMOMAXU
     }
   }
 }

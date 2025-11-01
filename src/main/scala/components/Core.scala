@@ -57,11 +57,11 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_fcsr_o_data = if (F) Some(RegInit(0.U(32.W))) else None
   val id_reg_is_f = if (F) Some(RegInit(0.B)) else None
 
-  // Atomic signals ID-EX
+  // Atomic signals ID-EX 
   val id_reg_isAMO = RegInit(false.B)
   val id_reg_isLR  = RegInit(false.B)
   val id_reg_isSC  = RegInit(false.B)
-  val id_reg_amoOp = RegInit(0.U(4.W))
+  val id_reg_amoOp = RegInit(0.U(5.W))
 
 
   // EX-MEM Registers
@@ -83,11 +83,12 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_f_read = if (F) Some(Reg(Vec(3, Bool()))) else None
   val ex_reg_f_except = if (F) Some(RegInit(VecInit(Vector.fill(5)(0.B)))) else None
   val ex_reg_is_f = if (F) Some(RegInit(0.B)) else None
+  
   // Atomic signals EX-MEM
   val ex_reg_isAMO  = RegInit(false.B)
   val ex_reg_isLR   = RegInit(false.B)
   val ex_reg_isSC   = RegInit(false.B)
-  val ex_reg_amoOp  = RegInit(0.U(4.W))
+  val ex_reg_amoOp  = RegInit(0.U(5.W)) 
   
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -315,7 +316,7 @@ class Core(implicit val config:Configs) extends Module{
     ID.f_except.get(0) <> EX.exceptions.get
   }
   
-  // Forward atomic control from ID->EX to EX->MEM
+  // atomic control from ID->EX to EX->MEM
   ex_reg_isAMO := id_reg_isAMO
   ex_reg_isLR  := id_reg_isLR
   ex_reg_isSC  := id_reg_isSC
@@ -334,9 +335,7 @@ class Core(implicit val config:Configs) extends Module{
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
 
-  // ============================================
   // AMO STATE MACHINE
-  // ============================================
   
   val amo_is_active = ex_reg_isAMO && !EX.stall
 
@@ -365,30 +364,26 @@ class Core(implicit val config:Configs) extends Module{
     }
   }
 
-  // ============================================
   // AMO ALU CONNECTIONS
-  // ============================================
   
-  // Connect AMO ALU inputs
+  // Use muxed data - during read phase use MEM.io.readData, otherwise use stored value
   amoALU.io.memData := Mux(amo_state === 1.U && MEM.io.dccmRsp.valid, 
                             MEM.io.readData, 
                             amo_read_data)
   amoALU.io.src2 := ex_reg_wd
   amoALU.io.amoOp := ex_reg_amoOp
 
-  // ============================================
   // RESERVATION FILE (LR/SC)
-  // ============================================
   
-  reservationFile.set := ex_reg_isLR
+  // reservation when LR completes (memory read valid)
+  reservationFile.set := ex_reg_isLR && MEM.io.dccmRsp.valid
   val sc_success = ex_reg_isSC && reservationFile.matchAddr
-  reservationFile.clear := ex_reg_isSC && reservationFile.matchAddr
+  // Clear on SC fire or conflicting writes
+  reservationFile.clear := (ex_reg_isSC && MEM.io.dccmReq.fire) || 
+                           (ex_reg_ctl_memWrite && !ex_reg_isSC)
   reservationFile.addrIn := ex_reg_result
 
-  // ============================================
   // MEMORY INTERFACE CONTROL
-  // ============================================
-
   // Read Enable:
   // - Normal loads: memRead signal
   // - AMO: read during state 0 and 1 (idle -> reading)
@@ -397,6 +392,7 @@ class Core(implicit val config:Configs) extends Module{
   MEM.io.readEnable := ex_reg_ctl_memRead || 
                        (ex_reg_isAMO && (amo_state === 0.U || amo_state === 1.U)) || 
                        ex_reg_isLR
+
 
   // Write Enable:
   // - Normal stores: memWrite signal  
@@ -415,6 +411,11 @@ class Core(implicit val config:Configs) extends Module{
                          amo_modified_data,
                          ex_reg_wd)
 
+    // Connect atomic signals to MemoryFetch
+  MEM.io.isAMO := ex_reg_isAMO
+  MEM.io.isLR := ex_reg_isLR
+  MEM.io.isSC := ex_reg_isSC
+
   // ALU Result (address calculation)
   MEM.io.aluResultIn := ex_reg_result
 
@@ -426,9 +427,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
 
-  // ============================================
   // MEM-WB REGISTER UPDATE
-  // ============================================
   
   // Update MEM-WB registers (only when not stalled by AMO)
   when(!amo_stall) {

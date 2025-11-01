@@ -16,10 +16,21 @@ class Control(F: Boolean) extends Module {
     val aluOp = Output(UInt(2.W))
     val jump = Output(UInt(2.W))
     val aluSrc1 = Output(UInt(2.W))
+    //atomic  signals
+    val isAMO  = Output(Bool())
+    val isLR   = Output(Bool())
+    val isSC   = Output(Bool())
 
     val f_read = if (F) Some(Output(Vec(3, Bool()))) else None
     val f_wr = if (F) Some(Output(Bool())) else None
   })
+  // Extract opcode and funct5 for atomic detection
+  val opcode = io.in(6, 0)
+  val funct3 = io.in(14, 12)
+  val funct5 = io.in(31, 27)
+  
+  // Atomic opcode
+  val OPCODE_AMO = "b0101111".U
 
   val signals = ListLookup(
     io.in,
@@ -145,6 +156,19 @@ class Control(F: Boolean) extends Module {
         2.U, // jump
         0.U, // aluOp
         0.U
+      ),
+       // Atomic instructions (opcode = 0101111)
+      // Base pattern for all atomics - will be overridden by specific logic below
+      BitPat("b?????????????????????????0101111") -> List(
+        true.B,  // aluSrc (rs1 is base address)
+        1.U,     // memToReg (return memory value for AMO/LR)
+        true.B,  // regWrite (all atomics write to rd)
+        false.B, // memRead (controlled by Core state machine)
+        false.B, // memWrite (controlled by Core state machine)
+        false.B, // branch
+        0.U,     // jump
+        0.U,     // aluOp (address calculation)
+        0.U      // aluSrc1
       )
     ) ++ (
       if (F) Array(
@@ -232,6 +256,34 @@ class Control(F: Boolean) extends Module {
   io.jump := signals(6)
   io.aluOp := signals(7)
   io.aluSrc1 := signals(8)
+
+  //Atomic instruction detection and control override
+  // Default: no atomic operation
+  io.isAMO := false.B
+  io.isLR  := false.B
+  io.isSC  := false.B
+
+  // Detect atomic instructions (opcode = 0101111, funct3 = 010)
+  when(opcode === OPCODE_AMO && funct3 === "b010".U) {
+    when(funct5 === "b00010".U) {
+      // LR.W: Load-Reserved
+      io.isLR := true.B
+      // LR needs: memRead (handled by Core), regWrite=true, memToReg=1 (return memory value)
+      // These are already set by the ListLookup pattern above
+    }
+    .elsewhen(funct5 === "b00011".U) {
+      // SC.W: Store-Conditional
+      io.isSC := true.B
+      // SC needs: regWrite=true (write success/fail), memToReg=0 (use computed result)
+      io.memToReg := 0.U  // Override: SC returns 0 or 1, not memory value
+    }
+    .otherwise {
+      // AMO operations (AMOADD, AMOSWAP, etc.)
+      io.isAMO := true.B
+      // AMO needs: regWrite=true, memToReg=1 (return OLD memory value to rd)
+      // These are already set by the ListLookup pattern above
+    }
+  }
 
   if (F) {
     val f_ctrl = VecInit(Vector(
