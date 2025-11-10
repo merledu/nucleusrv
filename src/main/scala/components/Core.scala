@@ -12,6 +12,7 @@ class Core(implicit val config:Configs) extends Module{
   val Zicsr  = config.Zicsr
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
+  val HARTID = config.HARTID
 
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
@@ -214,8 +215,11 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_ins := mem_reg_ins
   ID.ex_mem_result := ex_reg_result
 
-  ID.csr_i_misa.get    := DontCare
-  ID.csr_i_mhartid.get := DontCare
+  val misa = (1 << 30).U | (1 << 8).U | 
+              Mux(M.B, (1 << 12).U, 0.U) | 
+              Mux(C.B, (1 << 2).U, 0.U)
+  ID.csr_i_misa.get    := misa
+  ID.csr_i_mhartid.get := HARTID.U
   ID.id_ex_regWr := id_reg_ctl_regWrite(0)
   ID.ex_mem_regWr := ex_reg_ctl_regWrite(0)
 
@@ -373,6 +377,13 @@ class Core(implicit val config:Configs) extends Module{
       f => ID.is_f_in.get(f._2) := f._1
     )
   }
+
+    /*****************************
+    ** instruction retire logic **
+    *****************************/
+    val instruction_retired = WireInit(false.B)
+    instruction_retired := mem_reg_ins =/= 0.U && !ID.ifid_flush && !(MEM.io.stall || io.stall) && (!mem_reg_ctl_memToReg === 1.U || io.dmemRsp.valid)
+    ID.csr_i_instr_retired.get := instruction_retired
 
   /**************
   ** RVFI PINS **

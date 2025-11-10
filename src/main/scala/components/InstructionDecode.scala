@@ -66,11 +66,12 @@ class InstructionDecode(
     val stall = Output(Bool())
 
     // CSR pins
-    val csr_i_misa        = if (Zicsr) Some(Input(UInt(32.W))) else None
-    val csr_i_mhartid     = if (Zicsr) Some(Input(UInt(32.W))) else None
-    val csr_o_data        = if (Zicsr) Some(Output(UInt(32.W))) else None
-    val is_csr            = if (Zicsr) Some(Output(Bool())) else None
-    val fcsr_o_data       = if (Zicsr) Some(Output(UInt(32.W))) else None
+    val csr_i_misa          = if (Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_i_mhartid       = if (Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_i_instr_retired = if (Zicsr) Some(Input(Bool())) else None
+    val csr_o_data          = if (Zicsr) Some(Output(UInt(32.W))) else None
+    val is_csr              = if (Zicsr) Some(Output(Bool())) else None
+    val fcsr_o_data         = if (Zicsr) Some(Output(UInt(32.W))) else None
 
     // F pins
     val f_read_reg = if (F) Some(Input(Vec(3, Vec(2, Bool())))) else None
@@ -108,6 +109,7 @@ class InstructionDecode(
     csr.get.io.i_opr                := io.id_instruction(14,12)
     csr.get.io.i_addr               := io.id_instruction(31,20)
     csr.get.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
+    csr.get.io.i_instr_retired      := io.csr_i_instr_retired.get
     csr.get.io.f_except             <> io.f_except.get(2)
 
     io.is_csr.get                   := io.id_instruction(6, 0) === "b1110011".U

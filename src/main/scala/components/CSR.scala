@@ -14,6 +14,7 @@ class CSR extends Module{
         val i_opr               = Input(UInt(3.W))
         val i_addr              = Input(UInt(12.W))
         val i_w_en              = Input(Bool())
+        val i_instr_retired     = Input(Bool())
         val f_except            = Input(Vec(5, Bool()))
         val fcsr_o_data         = Output(UInt(32.W))
     })
@@ -21,13 +22,14 @@ class CSR extends Module{
     val csrRegFile = Module(new CSRRegFile)
     dontTouch(csrRegFile.io)
 
-    csrRegFile.io.CSR.i_data        := Mux(io.i_opr(2), io.i_imm, io.i_data)
-    csrRegFile.io.CSR.i_opr         := io.i_opr
-    csrRegFile.io.MISA.i_value      := io.i_misa_value
-    csrRegFile.io.MHARTID.i_value   := io.i_mhartid_value
-    csrRegFile.io.CSR.i_addr        := io.i_addr
-    csrRegFile.io.CSR.i_w_en        := io.i_w_en
-    csrRegFile.io.FCSR.except       <> io.f_except
+    csrRegFile.io.CSR.i_data               := Mux(io.i_opr(2), io.i_imm, io.i_data)
+    csrRegFile.io.CSR.i_opr                := io.i_opr
+    csrRegFile.io.MISA.i_value             := io.i_misa_value
+    csrRegFile.io.MHARTID.i_value          := io.i_mhartid_value
+    csrRegFile.io.CSR.i_addr               := io.i_addr
+    csrRegFile.io.CSR.i_w_en               := io.i_w_en
+    csrRegFile.io.MINSTRET.i_instr_retired := io.i_instr_retired
+    csrRegFile.io.FCSR.except              <> io.f_except
 
     io.o_data                       := csrRegFile.io.CSR.o_data
     io.fcsr_o_data                  := Cat(

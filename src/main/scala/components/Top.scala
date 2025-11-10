@@ -17,7 +17,8 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     F = true,
     C = false,
     Zicsr = true,
-    TRACE = true
+    TRACE = true,
+    HARTID = 0
   )
 
   val core: Core = Module(new Core())

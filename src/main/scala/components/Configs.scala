@@ -6,5 +6,6 @@ case class Configs(
     F       : Boolean = true,
     C       : Boolean = true,
     Zicsr   : Boolean = true,
-    TRACE   : Boolean = true
+    TRACE   : Boolean = true,
+    HARTID : Int     = 0
 )
