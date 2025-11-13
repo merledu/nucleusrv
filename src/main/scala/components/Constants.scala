@@ -2,16 +2,14 @@ package nucleusrv.components
 import chisel3._
 
 object ALUOps {
-  val ALU_ADD = 2.asUInt(4.W)
-  val ALU_SUB = 6.asUInt(4.W)
-  val ALU_AND = 0.asUInt(4.W)
-  val ALU_OR = 1.asUInt(4.W)
-  val ALU_XOR = 9.asUInt(4.W)
-  // val ALU_SLL = 3.asUInt(4.W)
-  // val ALU_SRL = 4.asUInt(4.W)
-  // val ALU_SRA = 5.asUInt(4.W)
-  // val ALU_SLT = 9.asUInt(4.W)
-  // val ALU_SLTU = 10.asUInt(4.W)
-  // val ALU_COPY1 = 11.asUInt(4.W)
-  // val ALU_X = 0.asUInt(4.W)
+    val AND = 0.U(4.W)
+    val OR  = 1.U(4.W)
+    val ADD = 2.U(4.W)
+    val SUB = 3.U(4.W)
+    val SLT = 4.U(4.W)
+    val SLTU= 5.U(4.W)
+    val SLL = 6.U(4.W)
+    val SRL = 7.U(4.W)
+    val SRA = 8.U(4.W)
+    val XOR = 9.U(4.W)
 }

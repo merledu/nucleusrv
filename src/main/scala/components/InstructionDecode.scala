@@ -68,6 +68,7 @@ class InstructionDecode(
     // CSR pins
     val csr_i_misa          = if (Zicsr) Some(Input(UInt(32.W))) else None
     val csr_i_mhartid       = if (Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_i_marchid       = if (Zicsr) Some(Input(UInt(32.W))) else None
     val csr_i_instr_retired = if (Zicsr) Some(Input(Bool())) else None
     val csr_o_data          = if (Zicsr) Some(Output(UInt(32.W))) else None
     val is_csr              = if (Zicsr) Some(Output(Bool())) else None
@@ -105,6 +106,7 @@ class InstructionDecode(
   if (Zicsr) {
     csr.get.io.i_misa_value         := io.csr_i_misa.get
     csr.get.io.i_mhartid_value      := io.csr_i_mhartid.get
+    csr.get.io.i_marchid_value      := io.csr_i_marchid.get
     csr.get.io.i_imm                := io.id_instruction(19,15)
     csr.get.io.i_opr                := io.id_instruction(14,12)
     csr.get.io.i_addr               := io.id_instruction(31,20)

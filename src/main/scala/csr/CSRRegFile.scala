@@ -1,3 +1,5 @@
+// Created by @Talha-Ahmed-1
+
 package nucleusrv.csr
 
 import chisel3._
@@ -16,16 +18,17 @@ class CSRRegFile extends Module{
     /***************** Initializations *****************/
     // Registers
     val MISA_REG            = RegInit(0.U(32.W))
+    val MARCHID_REG         = RegInit(0.U(32.W))
     val MHARTID_REG         = RegInit(0.U(32.W))
     val MCAUSE_REG          = RegInit(0.U(32.W))
     val MTVEC_REG           = RegInit(0.U(32.W))
     val MEPC_REG            = RegInit(0.U(32.W))
     val MSCRATCH_REG        = RegInit(0.U(32.W))
     val MTVAL_REG           = RegInit(0.U(32.W))
-    val MCYCLE_REG         = RegInit(0.U(32.W))
-    val MCYCLEH_REG        = RegInit(0.U(32.W))
-    val MINSTRET_REG       = RegInit(0.U(32.W))
-    val MINSTRETH_REG      = RegInit(0.U(32.W))
+    val MCYCLE_REG          = RegInit(0.U(32.W))
+    val MCYCLEH_REG         = RegInit(0.U(32.W))
+    val MINSTRET_REG        = RegInit(0.U(32.W))
+    val MINSTRETH_REG       = RegInit(0.U(32.W))
     
     // MSTATUS
     val MSTATUS_TSR_REG     = RegInit(0.U(1.W))
@@ -73,6 +76,7 @@ class CSRRegFile extends Module{
     // Hardwired
     MISA_REG                := io.MISA.i_value
     MHARTID_REG             := io.MHARTID.i_value
+    MARCHID_REG             := io.MARCHID.i_value
 
     Vector(
       FCSR_NX_REG,
@@ -156,6 +160,7 @@ class CSRRegFile extends Module{
     val READ_CASES = Array(
         AddressMap.MISA    -> MISA_REG,
         AddressMap.MHARTID -> MHARTID_REG,
+        AddressMap.MARCHID -> MARCHID_REG,
         AddressMap.MSTATUS -> MSTATUS_WIRE,
         AddressMap.MCAUSE  -> MCAUSE_REG,
         AddressMap.MTVEC   -> MTVEC_REG,

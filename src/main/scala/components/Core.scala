@@ -13,6 +13,7 @@ class Core(implicit val config:Configs) extends Module{
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
   val HARTID = config.HARTID
+  val ARCHID = config.ARCHID
 
   val io = IO(new Bundle {
     val pin: UInt = Output(UInt(32.W))
@@ -219,6 +220,7 @@ class Core(implicit val config:Configs) extends Module{
               Mux(M.B, (1 << 12).U, 0.U) | 
               Mux(C.B, (1 << 2).U, 0.U)
   ID.csr_i_misa.get    := misa
+  ID.csr_i_marchid.get := ARCHID.U
   ID.csr_i_mhartid.get := HARTID.U
   ID.id_ex_regWr := id_reg_ctl_regWrite(0)
   ID.ex_mem_regWr := ex_reg_ctl_regWrite(0)

@@ -193,9 +193,4 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     io.readData := DontCare
   }
 
-
-  //when(io.writeEnable && io.aluResultIn(31, 28) === "h8".asUInt()){
-  //  printf("%x\n", io.writeData)
-  //}
-
 }

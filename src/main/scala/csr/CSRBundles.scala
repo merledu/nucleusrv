@@ -1,9 +1,15 @@
+// Created by @Talha-Ahmed-1
+
 package nucleusrv.csr
 
 import chisel3._
 import chisel3.util._
 
 class MISA extends Bundle{
+    val i_value = Input(UInt(32.W))
+}
+
+class MARCHID extends Bundle{
     val i_value = Input(UInt(32.W))
 }
 
@@ -37,6 +43,7 @@ class CSR_IO extends Bundle{
 class CSRRegFileIO extends Bundle{
     val MISA    = new MISA()
     val MHARTID = new MHARTID()
+    val MARCHID = new MARCHID()
     val CSR     = new CSR_IO()
     val FCSR    = new FCSR()
     val MINSTRET = new MINSTRET()
