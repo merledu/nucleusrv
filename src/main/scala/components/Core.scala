@@ -265,7 +265,17 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_isAMO := ID.isAMO
   id_reg_isLR  := ID.isLR
   id_reg_isSC  := ID.isSC
-  id_reg_amoOp := ID.amoOp
+  // id_reg_amoOp := ID.amoOp
+    // ✅ FIX: Extract amoOp from instruction (funct5 field bits [31:27])
+  val atomic_opcode = if_reg_ins(6,0)
+  val atomic_funct3 = if_reg_ins(14,12)
+  val atomic_funct5 = if_reg_ins(31,27)
+  
+  when(atomic_opcode === "b0101111".U && atomic_funct3 === "b010".U) {
+    id_reg_amoOp := atomic_funct5
+  }.otherwise {
+    id_reg_amoOp := 0.U
+  }
 
   /*****************
    * Execute Stage *
@@ -346,9 +356,9 @@ class Core(implicit val config:Configs) extends Module{
       }
     }
     is(1.U) {  // READING
-      when(MEM.io.dccmRsp.valid) {
+      when(io.dmemRsp.valid) {
         // Memory read completed, store the value
-        amo_read_data := MEM.io.readData
+        amo_read_data := io.dmemRsp.bits.dataResponse
         
         // Compute the modified value using AMO ALU
         amo_modified_data := amoALU.io.result
@@ -357,7 +367,7 @@ class Core(implicit val config:Configs) extends Module{
       }
     }
     is(2.U) {  // WRITING
-      when(MEM.io.dccmReq.fire) {
+      when(io.dmemReq.fire) {
         // Write completed, return to idle
         amo_state := 0.U
       }
@@ -367,19 +377,20 @@ class Core(implicit val config:Configs) extends Module{
   // AMO ALU CONNECTIONS
   
   // Use muxed data - during read phase use MEM.io.readData, otherwise use stored value
-  amoALU.io.memData := Mux(amo_state === 1.U && MEM.io.dccmRsp.valid, 
-                            MEM.io.readData, 
-                            amo_read_data)
+  // amoALU.io.memData := Mux(amo_state === 1.U && MEM.io.dccmRsp.valid, 
+  //                           MEM.io.readData, 
+  //                           amo_read_data)
+  amoALU.io.memData := io.dmemRsp.bits.dataResponse
   amoALU.io.src2 := ex_reg_wd
   amoALU.io.amoOp := ex_reg_amoOp
 
   // RESERVATION FILE (LR/SC)
   
   // reservation when LR completes (memory read valid)
-  reservationFile.set := ex_reg_isLR && MEM.io.dccmRsp.valid
+  reservationFile.set := ex_reg_isLR && io.dmemRsp.valid
   val sc_success = ex_reg_isSC && reservationFile.matchAddr
   // Clear on SC fire or conflicting writes
-  reservationFile.clear := (ex_reg_isSC && MEM.io.dccmReq.fire) || 
+  reservationFile.clear := (ex_reg_isSC && io.dmemReq.fire) || 
                            (ex_reg_ctl_memWrite && !ex_reg_isSC)
   reservationFile.addrIn := ex_reg_result
 
