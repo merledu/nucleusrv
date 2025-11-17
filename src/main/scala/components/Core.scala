@@ -266,7 +266,7 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_isLR  := ID.isLR
   id_reg_isSC  := ID.isSC
   // id_reg_amoOp := ID.amoOp
-    // ✅ FIX: Extract amoOp from instruction (funct5 field bits [31:27])
+    // extract amoOp from instruction (funct5 field bits [31:27])
   val atomic_opcode = if_reg_ins(6,0)
   val atomic_funct3 = if_reg_ins(14,12)
   val atomic_funct5 = if_reg_ins(31,27)
