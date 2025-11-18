@@ -11,15 +11,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
     val rvfi = new TracerO
   })
 
-  implicit val config:Configs = Configs(
-    XLEN = 32,
-    M = true,
-    F = true,
-    C = false,
-    Zicsr = true,
-    TRACE = true,
-    HARTID = 0
-  )
+  implicit val config:Configs = Configs()
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
