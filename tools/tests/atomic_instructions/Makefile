@@ -29,7 +29,12 @@ LDFLAGS := -T $(LINKER_LD) -nostdlib -nostartfiles
 # --- Targets ---
 
 # Default target: build both hex files
-all: imem.hex dmem.hex
+all: imem.hex dmem.hex dump_assembly.txt dump_header.txt
+
+dump_assembly.txt: $(ELF_FILE)
+	$(OBJDUMP) -S $(ELF_FILE) > $@
+dump_header.txt: $(ELF_FILE)
+	$(OBJDUMP) -x $(ELF_FILE) > $@
 
 # Target for instruction memory (imem)
 # --only-section=.text: Extracts only the .text section
@@ -62,6 +67,6 @@ dump: $(ELF_FILE)
 # Clean up generated files
 clean:
 	@echo "Cleaning up..."
-	rm -f *.o *.elf *.bin *.hex
+	rm -f *.o *.elf *.bin *.hex *.txt
 
 .PHONY: all clean dump

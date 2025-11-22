@@ -1,0 +1,17 @@
+
+asm_test.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:	00010097          	auipc	ra,0x10
+   4:	00008093          	mv	ra,ra
+   8:	00100113          	li	sp,1
+   c:	0020a1af          	amoadd.w	gp,sp,(ra)
+  10:	00010217          	auipc	tp,0x10
+  14:	ff420213          	addi	tp,tp,-12 # 10004 <lrsc_addr>
+  18:	100222af          	lr.w	t0,(tp)
+  1c:	0aa00313          	li	t1,170
+  20:	186223af          	sc.w	t2,t1,(tp)
+  24:	0000006f          	j	24 <_start+0x24>

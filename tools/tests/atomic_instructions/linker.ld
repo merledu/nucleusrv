@@ -13,17 +13,14 @@ MEMORY
 {
   /*
    * imem: Instruction memory (Read-Only, Executable)
-   * We'll place this at 0x80000000, a common boot address for RISC-V.
    * The CPU will start fetching instructions from here.
    */
-  imem (rx) : ORIGIN = 0x80000000, LENGTH = 4K
+  imem (rx) : ORIGIN = 0x00000000, LENGTH = 4K
 
   /*
    * dmem: Data memory (Read-Write)
-   * We'll place this at a different address. The 'la' instructions in
-   * the assembly will be resolved to this address by the linker.
    */
-  dmem (rw) : ORIGIN = 0x80010000, LENGTH = 4K
+  dmem (rw) : ORIGIN = 0x00010000, LENGTH = 4K
 }
 
 SECTIONS
