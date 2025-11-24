@@ -8,6 +8,8 @@ class Top(
     numCores: Int,
     cacheSize: Int,
     cacheLineSize: Int,
+    imemBaseAddr: UInt,
+    dmemBaseAddr: UInt,
     programFile:Option[String], 
     dataFile:Option[String]
 ) extends Module{
@@ -35,8 +37,8 @@ class Top(
     val dmem = Module(new SRamTop(dataFile))
 
     // --- Instantiate Buses ---
-    val iBus = Module(new Bus(numCores))
-    val dBus = Module(new Bus(numCores))
+    val iBus = Module(new Bus(numCores, imemBaseAddr))
+    val dBus = Module(new Bus(numCores, dmemBaseAddr))
 
     // Connect I-Caches from all coreTilesIO to the I-Bus
     for (i <- 0 until numCores) {
@@ -72,10 +74,13 @@ object NRVDriver {
         val numCores = 2
         val cacheSize = 1024
         val cacheLineSize = 16
+        // --- Define Memory Map region for each IMEM and DMEM ---
+        val I_MEM_BASE = "h00000000".U(32.W)
+        val D_MEM_BASE = "h00010000".U(32.W)
         val IMem = if (args.contains("--imem")) Some(args(args.indexOf("--imem") + 1)) else None
         val DMem = if (args.contains("--dmem")) Some(args(args.indexOf("--dmem") + 1)) else None
         new ChiselStage().emitVerilog(
-            new Top(numCores, cacheSize, cacheLineSize, IMem, DMem),
+            new Top(numCores, cacheSize, cacheLineSize, I_MEM_BASE, D_MEM_BASE, IMem, DMem),
             if (args.contains("--target-dir")) args.slice(
             args.indexOf("--target-dir"),
             args.indexOf("--target-dir") + 2

@@ -13,8 +13,10 @@ import chisel3.util._
  * where a new request could overwrite the ID of the core awaiting a response.
  *
  * @param numCores The number of cores sharing this bus
+ * @param baseAddress The base address of the memory this bus is connected to.
+ * All incoming addresses will have this value subtracted.
  */
-class Bus(numCores: Int) extends Module {
+class Bus(numCores: Int, baseAddress: UInt) extends Module {
   val io = IO(new Bundle {
     // --- Connections to the Cores ---
     // Receives requests from all cores
@@ -56,6 +58,9 @@ class Bus(numCores: Int) extends Module {
   // The bus is valid to send a request *if* the arbiter has one AND we are in sIdle.
   io.memReq.valid := busArbiter.io.out.valid && (state === sIdle)
   io.memReq.bits  := busArbiter.io.out.bits
+  // *Overwrite* the address field by subtracting the base address
+  // This translates, e.g., 0x80010000 -> 0x00000000 for dmem
+  io.memReq.bits.addrRequest := busArbiter.io.out.bits.addrRequest - baseAddress
 
   // ** THIS IS THE STALL LOGIC **
   // When state === sBusy, this becomes false, stalling the arbiter.
