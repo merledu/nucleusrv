@@ -160,7 +160,7 @@ class Control(F: Boolean) extends Module {
        // Atomic instructions (opcode = 0101111)
       // Base pattern for all atomics - will be overridden by specific logic below
       BitPat("b?????????????????????????0101111") -> List(
-        true.B,  // aluSrc (rs1 is base address)
+        false.B,  // aluSrc (rs1 is base address),, FALSE means use Immediate, ImmediateGen MUST return 0 for Atomics Instrs
         1.U,     // memToReg (return memory value for AMO/LR)
         true.B,  // regWrite (all atomics write to rd)
         false.B, // memRead (controlled by Core state machine)
