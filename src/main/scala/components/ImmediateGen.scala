@@ -10,8 +10,14 @@ class ImmediateGen(F: Boolean) extends Module {
   })
   val opcode = io.instruction(6, 0)
 
+  // ATOMIC INSTRUCTIONS (AMO) - Opcode 0101111
+  // AMOs use R-Type format but behave like loads/stores.
+  // They do NOT have an immediate field.  We must force immediate to 0 so Address = rs1 + 0.
+  when(opcode === "b0101111".U) {
+    io.out := 0.U
+  }
   //I-type
-  when(
+  .elsewhen(
     opcode === 3.U || opcode === 15.U || opcode === 19.U || opcode === 27.U || opcode === 103.U || opcode === 115.U
     || (if (F) (opcode === s"b$flw".U) else 0.B)
   ) {
