@@ -5,6 +5,7 @@ case class Configs(
     M       : Boolean = true,
     F       : Boolean = true,
     C       : Boolean = true,
+    A       : Boolean = true,
     Zicsr   : Boolean = true,
     TRACE   : Boolean = true
 )
