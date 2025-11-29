@@ -15,6 +15,14 @@ class HazardUnit extends Module {
     val jump = Input(UInt(2.W))
     val branch = Input(Bool())
 
+    val id_is_amo = Input(Bool())      // instruction in ID is AMO
+    val ex_is_amo = Input(Bool())      // instruction in EX is AMO
+    val mem_is_amo = Input(Bool())     // instruction in MEM is AMO
+    
+    val addr_id  = Input(UInt(32.W))
+    val addr_ex  = Input(UInt(32.W))
+    val addr_mem = Input(UInt(32.W))
+
     val if_reg_write = Output(Bool())
     val pc_write = Output(Bool())
     val ctl_mux = Output(Bool())
@@ -58,6 +66,34 @@ class HazardUnit extends Module {
     io.ifid_flush := true.B
   }.otherwise {
     io.ifid_flush := false.B
+  }
+
+  // AMO hazard detection
+
+  val addrMatchEX  = io.addr_id === io.addr_ex
+  val addrMatchMEM = io.addr_id === io.addr_mem
+
+  // ID AMO depends on EX AMO
+  val amoExHazard =
+    io.id_is_amo && io.ex_is_amo && !addrMatchEX
+
+  // ID AMO depends on MEM AMO
+  val amoMemHazard =
+    io.id_is_amo && io.mem_is_amo && !addrMatchMEM
+
+  // both EX and MEM different → 2-cycle stall
+  val amoDoubleStall =
+    io.id_is_amo && io.ex_is_amo && io.mem_is_amo &&
+    !addrMatchEX && !addrMatchMEM
+
+  when(amoDoubleStall) {
+    io.ctl_mux := false.B
+    io.pc_write := false.B
+    io.if_reg_write := false.B
+  }.elsewhen(amoExHazard || amoMemHazard) {
+    io.ctl_mux := false.B
+    io.pc_write := false.B
+    io.if_reg_write := false.B
   }
 
 }
