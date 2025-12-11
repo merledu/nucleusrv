@@ -157,18 +157,43 @@ class Control(F: Boolean) extends Module {
         0.U, // aluOp
         0.U
       ),
-       // Atomic instructions (opcode = 0101111)
-      // Base pattern for all atomics - will be overridden by specific logic below
-      BitPat("b?????????????????????????0101111") -> List(
-        false.B,  // aluSrc (rs1 is base address),, FALSE means use Immediate, ImmediateGen MUST return 0 for Atomics Instrs
-        1.U,     // memToReg (return memory value for AMO/LR)
+      // LR.W
+      BitPat("b00010?????????????????0100101111") -> List(
+        false.B, 
+        1.U,   // memToReg (return memory value for AMO/LR)
         true.B,  // regWrite (all atomics write to rd)
-        false.B, // memRead (controlled by Core state machine)
-        false.B, // memWrite (controlled by Core state machine)
+        true.B,   // memRead
+        false.B,  // memWrite
+        false.B,   // branch
+        0.U, 
+        0.U, 
+        0.U
+      ),
+
+      // SC.W
+      BitPat("b00011?????????????????0100101111") -> List(
+        false.B, 
+        0.U, 
+        true.B,  // regWrite (all atomics write to rd)
+        false.B,   // memRead
+        true.B,   // memWrite
+        false.B,  // branch
+        0.U, 
+        0.U, 
+        0.U
+      ),
+
+      // all AMOs same control
+      BitPat("b00000?????????????????0100101111") -> List(
+        false.B, 
+        1.U,   // memToReg (return memory value for AMO/LR)
+        true.B,  // regWrite (all atomics write to rd)
+        true.B,   // memRead
+        true.B,  //memWrite
         false.B, // branch
-        0.U,     // jump
-        0.U,     // aluOp (address calculation)
-        0.U      // aluSrc1
+        0.U,  
+        0.U, 
+        0.U
       )
     ) ++ (
       if (F) Array(
@@ -257,7 +282,6 @@ class Control(F: Boolean) extends Module {
   io.aluOp := signals(7)
   io.aluSrc1 := signals(8)
 
-  //Atomic instruction detection and control override
   // Default: no atomic operation
   io.isAMO := false.B
   io.isLR  := false.B
@@ -268,20 +292,13 @@ class Control(F: Boolean) extends Module {
     when(funct5 === "b00010".U) {
       // LR.W: Load-Reserved
       io.isLR := true.B
-      // LR needs: memRead (handled by Core), regWrite=true, memToReg=1 (return memory value)
-      // These are already set by the ListLookup pattern above
     }
     .elsewhen(funct5 === "b00011".U) {
       // SC.W: Store-Conditional
       io.isSC := true.B
-      // SC needs: regWrite=true (write success/fail), memToReg=0 (use computed result)
-      io.memToReg := 0.U  // Override: SC returns 0 or 1, not memory value
     }
     .otherwise {
-      // AMO operations (AMOADD, AMOSWAP, etc.)
       io.isAMO := true.B
-      // AMO needs: regWrite=true, memToReg=1 (return OLD memory value to rd)
-      // These are already set by the ListLookup pattern above
     }
   }
 

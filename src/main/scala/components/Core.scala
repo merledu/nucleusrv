@@ -62,7 +62,7 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_isLR  = RegInit(false.B)
   val id_reg_isSC  = RegInit(false.B)
   val id_reg_amoOp = RegInit(0.U(5.W))
-
+  val id_reg_memdata = RegInit(0.U(32.W)) // Store AMO ALU result
 
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
@@ -88,7 +88,8 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_isAMO  = RegInit(false.B)
   val ex_reg_isLR   = RegInit(false.B)
   val ex_reg_isSC   = RegInit(false.B)
-  val ex_reg_amoOp  = RegInit(0.U(5.W)) 
+  val ex_reg_amoOp  = RegInit(0.U(5.W))
+  val ex_reg_amo_result = RegInit(0.U(32.W)) // Store AMO ALU result
   
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -110,11 +111,6 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_isAMO = RegInit(false.B)
   val mem_reg_isLR  = RegInit(false.B)
   val mem_reg_isSC  = RegInit(false.B)
-
-  // AMO State Machine Registers
-  val amo_state = RegInit(0.U(2.W))  // 0=idle, 1=reading, 2=writing
-  val amo_read_data = RegInit(0.U(32.W))  // Store the value read from memory
-  val amo_modified_data = RegInit(0.U(32.W))  // Store the modified value to write back
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
@@ -186,12 +182,9 @@ class Core(implicit val config:Configs) extends Module{
     func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
   ) || ((func7 === "b0001100".U) || (func7 === "b0101100".U))
 
-  // AMO stall logic
-  val amo_stall = ex_reg_isAMO && (amo_state =/= 0.U)
-
-  IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc || amo_stall
+  IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc
   
-  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o | amo_stall), 1.B, 0.B)
+  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
   pc.io.halt := halt
   val npc = Mux(
     ID.hdu_pcWrite,
@@ -265,8 +258,9 @@ class Core(implicit val config:Configs) extends Module{
   id_reg_isAMO := ID.isAMO
   id_reg_isLR  := ID.isLR
   id_reg_isSC  := ID.isSC
-  // id_reg_amoOp := ID.amoOp
-    // extract amoOp from instruction (funct5 field bits [31:27])
+  id_reg_memdata := MEM.io.readData
+  
+  // Extract amoOp from instruction (funct5 field bits [31:27])
   val atomic_opcode = if_reg_ins(6,0)
   val atomic_funct3 = if_reg_ins(14,12)
   val atomic_funct5 = if_reg_ins(31,27)
@@ -280,6 +274,9 @@ class Core(implicit val config:Configs) extends Module{
   /*****************
    * Execute Stage *
   ******************/
+  EX.isAMO := id_reg_isAMO
+  EX.isLR := id_reg_isLR
+  EX.isSC := id_reg_isSC
 
   EX.immediate := id_reg_imm
   EX.readData1 := id_reg_rd1
@@ -308,9 +305,9 @@ class Core(implicit val config:Configs) extends Module{
   ID.ex_result := EX.ALUresult
   ID.csr_Ex := id_reg_is_csr
   ID.csr_Ex_data := id_reg_csr_data
-  ID.ex_stall := EX.stall || amo_stall
+  ID.ex_stall := EX.stall
 
-  when(EX.stall || amo_stall){
+  when(EX.stall){
     id_reg_wra := id_reg_wra
     id_reg_ctl_regWrite <> id_reg_ctl_regWrite
   }
@@ -326,17 +323,33 @@ class Core(implicit val config:Configs) extends Module{
     ID.f_except.get(0) <> EX.exceptions.get
   }
   
-  // atomic control from ID->EX to EX->MEM
+  // Propagate atomic control from ID->EX to EX->MEM
   ex_reg_isAMO := id_reg_isAMO
   ex_reg_isLR  := id_reg_isLR
   ex_reg_isSC  := id_reg_isSC
   ex_reg_amoOp := id_reg_amoOp
 
+  // AMO ALU in Execute
+ // Store memory response when it arrives (for AMO)
+
+
+  // AMO ALU Computation
+  amoALU.io.memData := id_reg_memdata
+  amoALU.io.src2 := EX.writeData
+  amoALU.io.amoOp := id_reg_amoOp
+
+  // Store result on next cycle
+  when(ex_reg_isAMO && io.dmemRsp.valid) {
+    ex_reg_amo_result := amoALU.io.result
+  }.otherwise {
+    ex_reg_amo_result := ex_reg_amo_result  // Hold previous value
+  }
+
   // Propagate control signals
   ex_reg_ctl_memRead := id_reg_ctl_memRead
   ex_reg_ctl_memWrite := id_reg_ctl_memWrite
   ex_reg_wd := EX.writeData
-  ex_reg_result := EX.ALUresult
+  ex_reg_result := EX.ALUresult  // This is the address for AMO
 
   /****************
    * Memory Stage *
@@ -345,49 +358,10 @@ class Core(implicit val config:Configs) extends Module{
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
 
-  // AMO STATE MACHINE
-  
-  val amo_is_active = ex_reg_isAMO && !EX.stall
-
-  switch(amo_state) {
-    is(0.U) {  // IDLE
-      when(amo_is_active) {
-        amo_state := 1.U  // Start read phase
-      }
-    }
-    is(1.U) {  // READING
-      when(io.dmemRsp.valid) {
-        // Memory read completed, store the value
-        amo_read_data := io.dmemRsp.bits.dataResponse
-        
-        // Compute the modified value using AMO ALU
-        amo_modified_data := amoALU.io.result
-        
-        amo_state := 2.U  // Move to write phase
-      }
-    }
-    is(2.U) {  // WRITING
-      when(io.dmemReq.fire) {
-        // Write completed, return to idle
-        amo_state := 0.U
-      }
-    }
-  }
-
-  // AMO ALU CONNECTIONS
-  
-  // Use muxed data - during read phase use MEM.io.readData, otherwise use stored value
-  // amoALU.io.memData := Mux(amo_state === 1.U && MEM.io.dccmRsp.valid, 
-  //                           MEM.io.readData, 
-  //                           amo_read_data)
-  amoALU.io.memData := io.dmemRsp.bits.dataResponse
-  amoALU.io.src2 := ex_reg_wd
-  amoALU.io.amoOp := ex_reg_amoOp
-
   // RESERVATION FILE (LR/SC)
-  
-  // reservation when LR completes (memory read valid)
-  reservationFile.set := ex_reg_isLR && io.dmemRsp.valid
+
+  // Set reservation when LR completes (memory read valid)
+  reservationFile.set := ex_reg_isLR
   val sc_success = ex_reg_isSC && reservationFile.matchAddr
   // Clear on SC fire or conflicting writes
   reservationFile.clear := (ex_reg_isSC && io.dmemReq.fire) || 
@@ -395,34 +369,30 @@ class Core(implicit val config:Configs) extends Module{
   reservationFile.addrIn := ex_reg_result
 
   // MEMORY INTERFACE CONTROL
+  
   // Read Enable:
   // - Normal loads: memRead signal
-  // - AMO: read during state 0 and 1 (idle -> reading)
+  // - AMO: always read first (to get old value)
   // - LR: always read
   // - SC: no read needed
-  MEM.io.readEnable := ex_reg_ctl_memRead || 
-                       (ex_reg_isAMO && (amo_state === 0.U || amo_state === 1.U)) || 
-                       ex_reg_isLR
-
+  MEM.io.readEnable := ex_reg_ctl_memRead 
 
   // Write Enable:
   // - Normal stores: memWrite signal  
-  // - AMO: write during state 2 (writing phase, after read completes)
+  // - AMO: write after read completes (single cycle, write happens same cycle as read completes)
   // - LR: no write
   // - SC: conditional write (only if reservation valid)
-  MEM.io.writeEnable := ex_reg_ctl_memWrite || 
-                        (ex_reg_isAMO && amo_state === 2.U) || 
-                        (ex_reg_isSC && sc_success)
+  MEM.io.writeEnable := ex_reg_ctl_memWrite
 
   // Write Data Selection:
-  // - AMO: write the modified value (stored in amo_modified_data)
+  // - AMO: write the modified value computed in EX stage
   // - SC: write rs2 value if reservation is valid
   // - Others: normal write data
-  MEM.io.writeData := Mux(ex_reg_isAMO && amo_state === 2.U, 
-                         amo_modified_data,
+  MEM.io.writeData := Mux(ex_reg_isAMO, 
+                         ex_reg_amo_result,  // Modified value from AMO ALU
                          ex_reg_wd)
 
-    // Connect atomic signals to MemoryFetch
+  // Connect atomic signals to MemoryFetch
   MEM.io.isAMO := ex_reg_isAMO
   MEM.io.isLR := ex_reg_isLR
   MEM.io.isSC := ex_reg_isSC
@@ -440,48 +410,33 @@ class Core(implicit val config:Configs) extends Module{
 
   // MEM-WB REGISTER UPDATE
   
-  // Update MEM-WB registers (only when not stalled by AMO)
-  when(!amo_stall) {
-    mem_reg_rd := MEM.io.readData
-    
-    // Result selection for writeback:
-    // - AMO: return original memory value (the value that was read)
-    // - LR: return loaded value from memory
-    // - SC: return success (0) or failure (1)
-    // - Others: normal ALU result
-    val sc_result = Mux(sc_success, 0.U, 1.U)
-    
-    mem_reg_result := Mux(ex_reg_isAMO, 
-                         amo_read_data,  // Return the ORIGINAL value read from memory
-                         Mux(ex_reg_isLR, 
-                             MEM.io.readData,
-                             Mux(ex_reg_isSC,
-                                 sc_result,
-                                 ex_reg_result)))
+  // Update MEM-WB registers
+  mem_reg_rd := MEM.io.readData
+  
+  // Result selection for writeback:
+  // - AMO: return original memory value (the value that was read before modification)
+  // - LR: return loaded value from memory
+  // - SC: return success (0) or failure (1)
+  // - Others: normal ALU result
+  val sc_result = Mux(sc_success, 0.U, 1.U)
+  
+ mem_reg_result := ex_reg_result
 
-    mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
-    mem_reg_ins := ex_reg_ins
-    mem_reg_pc := ex_reg_pc
-    mem_reg_wra := ex_reg_wra
-    
-    // MemToReg control:
-    // - AMO/LR: use memory data (1)
-    // - SC: use computed result (0)
-    // - Others: normal control
-    mem_reg_ctl_memToReg := Mux(ex_reg_isAMO || ex_reg_isLR, 
-                               1.U,
-                               Mux(ex_reg_isSC,
-                                   0.U,
-                                   ex_reg_ctl_memToReg))
+  mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
+  mem_reg_ins := ex_reg_ins
+  mem_reg_pc := ex_reg_pc
+  mem_reg_wra := ex_reg_wra
+  
 
-    mem_reg_is_csr := ex_reg_is_csr
-    mem_reg_csr_data := ex_reg_csr_data
-    
-    // Propagate atomic signals to MEM-WB
-    mem_reg_isAMO := ex_reg_isAMO
-    mem_reg_isLR  := ex_reg_isLR
-    mem_reg_isSC  := ex_reg_isSC
-  }
+  mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+
+  mem_reg_is_csr := ex_reg_is_csr
+  mem_reg_csr_data := ex_reg_csr_data
+  
+  // Propagate atomic signals to MEM-WB
+  mem_reg_isAMO := ex_reg_isAMO
+  mem_reg_isLR  := ex_reg_isLR
+  mem_reg_isSC  := ex_reg_isSC
 
   if (F) {
     mem_reg_f_read.get <> ex_reg_f_read.get

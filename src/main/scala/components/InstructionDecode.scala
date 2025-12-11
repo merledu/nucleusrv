@@ -375,6 +375,15 @@ class InstructionDecode(
     csr.get.io.i_data := MuxLookup(csrController.get.io.forwardRS1, registers.io.readData(0), csr_iData_cases)
   }
 
+  hdu.io.id_is_amo  := false.B
+  hdu.io.ex_is_amo  := false.B
+  hdu.io.mem_is_amo := false.B
+  
+  hdu.io.addr_id  := 0.U
+  hdu.io.addr_ex  := 0.U
+  hdu.io.addr_mem := 0.U
+  
+
   // RVFI
   if (TRACE) {
     Vector(

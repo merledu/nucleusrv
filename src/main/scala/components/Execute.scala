@@ -29,6 +29,11 @@ class Execute(
     val ctl_aluOp = Input(UInt(2.W))
     val ctl_aluSrc1 = Input(UInt(2.W))
 
+    // AMO control signals
+    val isAMO = Input(Bool())
+    val isLR = Input(Bool())
+    val isSC = Input(Bool())
+
     val writeData = Output(UInt(32.W))
     val ALUresult = Output(UInt(32.W))
 
@@ -48,7 +53,7 @@ class Execute(
   val aluCtl = Module(new AluControl)
   val fu = Module(new ForwardingUnit(F)).io
 
-  // Forwarding Unt
+  // Forwarding Unit
 
   fu.ex_regWrite <> io.ex_mem_regWrite
   fu.mem_regWrite <> io.mem_wb_regWrite
@@ -83,14 +88,25 @@ class Execute(
     io.wb_result
   ).zipWithIndex.map(f => f._2.U -> f._1))) else None
 
+  // ALU Input 1 Selection
+  // For AMO/LR/SC: use rs1 (the address)
+
   val aluIn1 = MuxCase(
     inputMux1,
     Array(
+      (io.isAMO || io.isLR || io.isSC) -> inputMux1,  // AMO.. rs1 is the address
       (io.ctl_aluSrc1 === 1.U) -> io.pcAddress,
       (io.ctl_aluSrc1 === 2.U) -> 0.U
     )
   )
-  val aluIn2 = Mux(io.ctl_aluSrc, inputMux2, io.immediate)
+  
+  // ALU Input 2 Selection
+  // For AMO/LR/SC: use 0 (no offset, just pass rs1 through)
+  val aluIn2 = Mux(
+    io.isAMO || io.isLR || io.isSC,
+    0.U,  // AMO no offset, ALU computes rs1 + 0 = rs1
+    Mux(io.ctl_aluSrc, inputMux2, io.immediate)
+  )
 
   aluCtl.io.f3 := io.func3
   aluCtl.io.f7 := io.func7(5)
@@ -100,9 +116,6 @@ class Execute(
   alu.io.input1 := aluIn1
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
-
-  //io.ALUresult := alu.io.result
-  //dontTouch(io.stall) := false.B
 
   val mdu = if (M) Some(Module (new MDU)) else None
   val src_a_reg = if (M) Some(RegInit(0.U(32.W))) else None
@@ -115,12 +128,10 @@ class Execute(
     mdu.get.io.src_a := aluIn1
     mdu.get.io.src_b := aluIn2
     mdu.get.io.op    := io.func3
-    // mdu.io.valid := true.B
     
-
     when(io.func7 === 1.U && (io.func3 === 0.U || io.func3 === 1.U || io.func3 === 2.U || io.func3 === 3.U)){
       mdu.get.io.valid := true.B
-    }otherwise{
+    }.otherwise{
       mdu.get.io.valid := false.B
     }
     dontTouch(io.stall)
@@ -131,17 +142,14 @@ class Execute(
       src_b_reg.get := aluIn2
       op_reg.get := io.func3
       f7_reg.get := io.func7
-      //io.stall := true.B
       dontTouch(f7_reg.get)
     }
 
     when(div_en.get){
       when (counter.get < 32.U){
-        //io.stall := true.B
         mdu.get.io.src_a := src_a_reg.get
         mdu.get.io.src_b := src_b_reg.get
         mdu.get.io.op    := op_reg.get
-        // mdu.io.valid := true.B
         counter.get := counter.get + 1.U
       }.otherwise{
         mdu.get.io.valid := false.B
@@ -152,13 +160,6 @@ class Execute(
         counter.get := 0.U
       }
     }
-
-    //when(div_en && f7_reg === 1.U && mdu.io.ready){
-    //  io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
-    //}
-    //  io.ALUresult := Mux(mdu.io.output.valid, mdu.io.output.bits, 0.U)
-    //}
-    //.otherwise{io.ALUresult := alu.io.result}
   }
 
   val fpu = if (F) Some(dontTouch(Module(new FPU(8, 24)).io)) else None
@@ -257,6 +258,7 @@ class Execute(
     if (F) f_stall.get else false.B
   )
 
+  // Write Data: for AMO/LR/SC, this is rs2: sourceB operand
   io.writeData := inputMux2
 
   if (TRACE) {
