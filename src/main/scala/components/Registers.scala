@@ -15,10 +15,12 @@ class Registers(F: Boolean) extends Module {
     val readData = Output(Vec(if (F) 3 else 2, UInt(32.W)))
   })
   val i_reg = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
+  dontTouch(i_reg) // Ensure VCD visibility
   val f_reg = if (F) Some(Reg(Vec(32, UInt(32.W)))) else None
 
   when (io.writeEnable(0) && (io.writeAddress =/= 0.U)) {
     i_reg(io.writeAddress) := io.writeData
+    printf("[REG] Writing x%d = %x\n", io.writeAddress, io.writeData)
   }
 
   if (F) {

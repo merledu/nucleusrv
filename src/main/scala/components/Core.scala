@@ -10,6 +10,7 @@ class Core(implicit val config:Configs) extends Module{
   val F      = config.F
   val C      = config.C
   val Zicsr  = config.Zicsr
+  val A      = config.A
   val XLEN   = config.XLEN
   val TRACE  = config.TRACE
 
@@ -62,7 +63,6 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_isLR  = RegInit(false.B)
   val id_reg_isSC  = RegInit(false.B)
   val id_reg_amoOp = RegInit(0.U(5.W))
-  val id_reg_memdata = RegInit(0.U(32.W)) // Store AMO ALU result
 
   // EX-MEM Registers
   val ex_reg_branch = RegInit(0.U(32.W))
@@ -89,7 +89,6 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_isLR   = RegInit(false.B)
   val ex_reg_isSC   = RegInit(false.B)
   val ex_reg_amoOp  = RegInit(0.U(5.W))
-  val ex_reg_amo_result = RegInit(0.U(32.W)) // Store AMO ALU result
   
   // MEM-WB Registers
   val mem_reg_rd = RegInit(0.U(32.W))
@@ -118,11 +117,8 @@ class Core(implicit val config:Configs) extends Module{
   val EX = Module(new Execute(F, M = M, TRACE = TRACE)).io
   val MEM = Module(new MemoryFetch(TRACE))
 
-  // Reservation File for LR/SC
+  // Reservationfile for LR/SC
   val reservationFile = Module(new ReservationFile).io
-  
-  // AMO ALU instance
-  val amoALU = Module(new AMOALU)
   
   /*****************
    * Fetch Stage *
@@ -138,36 +134,22 @@ class Core(implicit val config:Configs) extends Module{
   val is_comp     = dontTouch(WireInit(false.B))
 
   if (C) {
-
-    /*****************
-    * Realingner *
-    ******************/
     val RA = Module(new Realigner).io
-
     RA.ral_address_i     := pc.io.out.asUInt
     RA.ral_instruction_i := IF.instruction
     RA.ral_jmp           := ID.pcSrc
-
     IF.address           := RA.ral_address_o
     val instruction_cd    = RA.ral_instruction_o
-
     ral_halt_o           := RA.ral_halt_o
 
-    /*************************************************
-    * Compressed Decoder (Fully Combinational) *
-    *************************************************/
     val CD = Module(new CompressedDecoder).io
-
     CD.instruction_i := instruction_cd
     instruction  := CD.instruction_o
-
     is_comp := CD.is_comp
   }
   else {
-
     IF.address := pc.io.out.asUInt
     instruction := IF.instruction
-
   }
 
   val func3 = instruction(14, 12)
@@ -182,9 +164,9 @@ class Core(implicit val config:Configs) extends Module{
     func7 === 1.U && (func3 === 4.U || func3 === 5.U || func3 === 6.U || func3 === 7.U)
   ) || ((func7 === "b0001100".U) || (func7 === "b0101100".U))
 
-  IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc
+  IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc || MEM.io.stall
   
-  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o), 1.B, 0.B)
+  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o || MEM.io.stall), 1.B, 0.B)
   pc.io.halt := halt
   val npc = Mux(
     ID.hdu_pcWrite,
@@ -197,7 +179,7 @@ class Core(implicit val config:Configs) extends Module{
   )
   pc.io.in := dontTouch(npc)
 
-  when(ID.hdu_if_reg_write) {
+  when(ID.hdu_if_reg_write && !MEM.io.stall) {
     if_reg_pc := pc.io.out.asUInt
     if_reg_ins := instruction 
   }
@@ -205,30 +187,37 @@ class Core(implicit val config:Configs) extends Module{
     if_reg_ins := 0.U
   }
    
-
   /****************
    * Decode Stage *
    ****************/
 
-  id_reg_rd1 := ID.readData1
-  id_reg_rd2 := ID.readData2
-  id_reg_imm := ID.immediate
-  id_reg_wra := ID.writeRegAddress
-  id_reg_f3 := ID.func3
-  id_reg_f7 := ID.func7
-  id_reg_ins := if_reg_ins
-  id_reg_pc := if_reg_pc
-  id_reg_ctl_aluSrc := ID.ctl_aluSrc
-  id_reg_ctl_memToReg := ID.ctl_memToReg
-  id_reg_ctl_regWrite <> ID.ctl_regWrite
-  id_reg_ctl_memRead := ID.ctl_memRead
-  id_reg_ctl_memWrite := ID.ctl_memWrite
-  id_reg_ctl_branch := ID.ctl_branch
-  id_reg_ctl_aluOp := ID.ctl_aluOp
-  id_reg_ctl_jump := ID.ctl_jump
-  id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
-  id_reg_is_csr := ID.is_csr.get
-  id_reg_csr_data := ID.csr_o_data.get
+  when(!MEM.io.stall) {
+    id_reg_rd1 := ID.readData1
+    id_reg_rd2 := ID.readData2
+    id_reg_imm := ID.immediate
+    id_reg_wra := ID.writeRegAddress
+    id_reg_f3 := ID.func3
+    id_reg_f7 := ID.func7
+    id_reg_ins := if_reg_ins
+    id_reg_pc := if_reg_pc
+    id_reg_ctl_aluSrc := ID.ctl_aluSrc
+    id_reg_ctl_memToReg := ID.ctl_memToReg
+    id_reg_ctl_regWrite <> ID.ctl_regWrite
+    id_reg_ctl_memRead := ID.ctl_memRead
+    id_reg_ctl_memWrite := ID.ctl_memWrite
+    id_reg_ctl_branch := ID.ctl_branch
+    id_reg_ctl_aluOp := ID.ctl_aluOp
+    id_reg_ctl_jump := ID.ctl_jump
+    id_reg_ctl_aluSrc1 := ID.ctl_aluSrc1
+    id_reg_is_csr := ID.is_csr.get
+    id_reg_csr_data := ID.csr_o_data.get
+    
+    id_reg_isAMO := ID.isAMO
+    id_reg_isLR  := ID.isLR
+    id_reg_isSC  := ID.isSC
+    id_reg_amoOp := ID.amoOp
+  }
+
   ID.id_instruction := if_reg_ins
   ID.pcAddress := if_reg_pc
   ID.dmem_resp_valid := io.dmemRsp.valid
@@ -253,27 +242,11 @@ class Core(implicit val config:Configs) extends Module{
       ID.f_read_reg.get(2)(i) := mem_reg_f_read.get(i)
     }
   }
-  
-  // ID-EX Atomic signals
-  id_reg_isAMO := ID.isAMO
-  id_reg_isLR  := ID.isLR
-  id_reg_isSC  := ID.isSC
-  id_reg_memdata := MEM.io.readData
-  
-  // Extract amoOp from instruction (funct5 field bits [31:27])
-  val atomic_opcode = if_reg_ins(6,0)
-  val atomic_funct3 = if_reg_ins(14,12)
-  val atomic_funct5 = if_reg_ins(31,27)
-  
-  when(atomic_opcode === "b0101111".U && atomic_funct3 === "b010".U) {
-    id_reg_amoOp := atomic_funct5
-  }.otherwise {
-    id_reg_amoOp := 0.U
-  }
 
   /*****************
    * Execute Stage *
   ******************/
+  
   EX.isAMO := id_reg_isAMO
   EX.isLR := id_reg_isLR
   EX.isSC := id_reg_isSC
@@ -287,13 +260,25 @@ class Core(implicit val config:Configs) extends Module{
   EX.ctl_aluSrc := id_reg_ctl_aluSrc
   EX.ctl_aluOp := id_reg_ctl_aluOp
   EX.ctl_aluSrc1 := id_reg_ctl_aluSrc1
-  ex_reg_pc := id_reg_pc
-  ex_reg_wra := id_reg_wra
-  ex_reg_ins := id_reg_ins
-  ex_reg_ctl_memToReg := id_reg_ctl_memToReg
-  ex_reg_ctl_regWrite <> id_reg_ctl_regWrite
-  ex_reg_is_csr := id_reg_is_csr
-  ex_reg_csr_data := id_reg_csr_data
+  
+  when(!MEM.io.stall) {
+    ex_reg_pc := id_reg_pc
+    ex_reg_wra := id_reg_wra
+    ex_reg_ins := id_reg_ins
+    ex_reg_ctl_memToReg := id_reg_ctl_memToReg
+    ex_reg_ctl_regWrite <> id_reg_ctl_regWrite
+    ex_reg_is_csr := id_reg_is_csr
+    ex_reg_csr_data := id_reg_csr_data
+    ex_reg_ctl_memRead := id_reg_ctl_memRead
+    ex_reg_ctl_memWrite := id_reg_ctl_memWrite
+    ex_reg_wd := EX.writeData
+    ex_reg_result := EX.ALUresult
+    ex_reg_isAMO := id_reg_isAMO
+    ex_reg_isLR  := id_reg_isLR
+    ex_reg_isSC  := id_reg_isSC
+    ex_reg_amoOp := id_reg_amoOp
+  }
+  
   ID.id_ex_mem_read := id_reg_ctl_memRead
   ID.ex_mem_mem_read := ex_reg_ctl_memRead
   EX.id_ex_ins := id_reg_ins
@@ -307,7 +292,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Ex_data := id_reg_csr_data
   ID.ex_stall := EX.stall
 
-  when(EX.stall){
+  when(EX.stall || MEM.io.stall){
     id_reg_wra := id_reg_wra
     id_reg_ctl_regWrite <> id_reg_ctl_regWrite
   }
@@ -322,34 +307,6 @@ class Core(implicit val config:Configs) extends Module{
     ex_reg_is_f.get := EX.is_f_o.get
     ID.f_except.get(0) <> EX.exceptions.get
   }
-  
-  // Propagate atomic control from ID->EX to EX->MEM
-  ex_reg_isAMO := id_reg_isAMO
-  ex_reg_isLR  := id_reg_isLR
-  ex_reg_isSC  := id_reg_isSC
-  ex_reg_amoOp := id_reg_amoOp
-
-  // AMO ALU in Execute
- // Store memory response when it arrives (for AMO)
-
-
-  // AMO ALU Computation
-  amoALU.io.memData := id_reg_memdata
-  amoALU.io.src2 := EX.writeData
-  amoALU.io.amoOp := id_reg_amoOp
-
-  // Store result on next cycle
-  when(ex_reg_isAMO && io.dmemRsp.valid) {
-    ex_reg_amo_result := amoALU.io.result
-  }.otherwise {
-    ex_reg_amo_result := ex_reg_amo_result  // Hold previous value
-  }
-
-  // Propagate control signals
-  ex_reg_ctl_memRead := id_reg_ctl_memRead
-  ex_reg_ctl_memWrite := id_reg_ctl_memWrite
-  ex_reg_wd := EX.writeData
-  ex_reg_result := EX.ALUresult  // This is the address for AMO
 
   /****************
    * Memory Stage *
@@ -358,85 +315,62 @@ class Core(implicit val config:Configs) extends Module{
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
 
-  // RESERVATION FILE (LR/SC)
-
-  // Set reservation when LR completes (memory read valid)
-  reservationFile.set := ex_reg_isLR
+  // RESERVATIONFILE (LR/SC)
+  reservationFile.set := ex_reg_isLR && io.dmemRsp.valid
   val sc_success = ex_reg_isSC && reservationFile.matchAddr
-  // Clear on SC fire or conflicting writes
   reservationFile.clear := (ex_reg_isSC && io.dmemReq.fire) || 
-                           (ex_reg_ctl_memWrite && !ex_reg_isSC)
+                           (ex_reg_ctl_memWrite && !ex_reg_isSC && !ex_reg_isAMO)
   reservationFile.addrIn := ex_reg_result
 
-  // MEMORY INTERFACE CONTROL
+  // MEMORY CONTROL for AMO needs TWO cycles. 1) READ old value, 2) WRITE new value
+  val amo_read_done = RegInit(false.B)
   
-  // Read Enable:
-  // - Normal loads: memRead signal
-  // - AMO: always read first (to get old value)
-  // - LR: always read
-  // - SC: no read needed
-  MEM.io.readEnable := ex_reg_ctl_memRead 
+  when(ex_reg_isAMO) {
+    when(!amo_read_done && io.dmemRsp.valid) {
+      amo_read_done := true.B  // Read complete, now write
+    }
+    when(amo_read_done && io.dmemReq.fire) {
+      amo_read_done := false.B  // Write complete, reset
+    }
+  }.otherwise {
+    amo_read_done := false.B
+  }
+  
+  MEM.io.readEnable := ex_reg_ctl_memRead || (ex_reg_isAMO && !amo_read_done) || ex_reg_isLR
+  MEM.io.writeEnable := ex_reg_ctl_memWrite || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success)
 
-  // Write Enable:
-  // - Normal stores: memWrite signal  
-  // - AMO: write after read completes (single cycle, write happens same cycle as read completes)
-  // - LR: no write
-  // - SC: conditional write (only if reservation valid)
-  MEM.io.writeEnable := ex_reg_ctl_memWrite
+  MEM.io.writeData := ex_reg_wd
 
-  // Write Data Selection:
-  // - AMO: write the modified value computed in EX stage
-  // - SC: write rs2 value if reservation is valid
-  // - Others: normal write data
-  MEM.io.writeData := Mux(ex_reg_isAMO, 
-                         ex_reg_amo_result,  // Modified value from AMO ALU
-                         ex_reg_wd)
-
-  // Connect atomic signals to MemoryFetch
+  // atomic signals to Mem
   MEM.io.isAMO := ex_reg_isAMO
   MEM.io.isLR := ex_reg_isLR
   MEM.io.isSC := ex_reg_isSC
+  MEM.io.amoOp := ex_reg_amoOp
 
-  // ALU Result (address calculation)
   MEM.io.aluResultIn := ex_reg_result
-
-  // Function code for memory access width
   MEM.io.f3 := ex_reg_ins(14,12)
 
-  // Forward EX result to ID for hazard detection
   EX.mem_result := ex_reg_result
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
 
-  // MEM-WB REGISTER UPDATE
-  
-  // Update MEM-WB registers
-  mem_reg_rd := MEM.io.readData
-  
-  // Result selection for writeback:
-  // - AMO: return original memory value (the value that was read before modification)
-  // - LR: return loaded value from memory
-  // - SC: return success (0) or failure (1)
-  // - Others: normal ALU result
+  // MEM-WB REGISTE
   val sc_result = Mux(sc_success, 0.U, 1.U)
   
- mem_reg_result := ex_reg_result
-
-  mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
-  mem_reg_ins := ex_reg_ins
-  mem_reg_pc := ex_reg_pc
-  mem_reg_wra := ex_reg_wra
-  
-
-  mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
-
-  mem_reg_is_csr := ex_reg_is_csr
-  mem_reg_csr_data := ex_reg_csr_data
-  
-  // Propagate atomic signals to MEM-WB
-  mem_reg_isAMO := ex_reg_isAMO
-  mem_reg_isLR  := ex_reg_isLR
-  mem_reg_isSC  := ex_reg_isSC
+  when(!MEM.io.stall) {
+    mem_reg_rd := MEM.io.readData
+    mem_reg_result := Mux(ex_reg_isSC, sc_result, ex_reg_result)
+    mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
+    mem_reg_ins := ex_reg_ins
+    mem_reg_pc := ex_reg_pc
+    mem_reg_wra := ex_reg_wra
+    mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
+    mem_reg_is_csr := ex_reg_is_csr
+    mem_reg_csr_data := ex_reg_csr_data
+    mem_reg_isAMO := ex_reg_isAMO
+    mem_reg_isLR  := ex_reg_isLR
+    mem_reg_isSC  := ex_reg_isSC
+  }
 
   if (F) {
     mem_reg_f_read.get <> ex_reg_f_read.get
@@ -455,7 +389,7 @@ class Core(implicit val config:Configs) extends Module{
   val wb_addr = Wire(UInt(5.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {
-    wb_data := MEM.io.readData
+    wb_data := mem_reg_rd  // For loads and AMO (old value)
     wb_addr := mem_reg_wra
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
     wb_data := mem_reg_pc + 4.U
@@ -485,6 +419,18 @@ class Core(implicit val config:Configs) extends Module{
     ).zipWithIndex.foreach(
       f => ID.is_f_in.get(f._2) := f._1
     )
+  }
+
+  // Debug prints
+  if (TRACE) {
+    when(id_reg_isAMO || id_reg_isLR || id_reg_isSC) {
+      printf("[ID-EX] AMO=%d LR=%d SC=%d amoOp=%x rs1=%x rs2=%x\n",
+        id_reg_isAMO, id_reg_isLR, id_reg_isSC, id_reg_amoOp, id_reg_rd1, id_reg_rd2)
+    }
+    when(ex_reg_isAMO) {
+      printf("[EX-MEM] AMO: addr=%x rs2=%x read_done=%d\n",
+        ex_reg_result, ex_reg_wd, amo_read_done)
+    }
   }
 
   /**************

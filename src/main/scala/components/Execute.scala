@@ -89,7 +89,7 @@ class Execute(
   ).zipWithIndex.map(f => f._2.U -> f._1))) else None
 
   // ALU Input 1 Selection
-  // For AMO/LR/SC: use rs1 (the address)
+  // For AMO/LR/SC, use rs1 address
 
   val aluIn1 = MuxCase(
     inputMux1,
@@ -101,7 +101,7 @@ class Execute(
   )
   
   // ALU Input 2 Selection
-  // For AMO/LR/SC: use 0 (no offset, just pass rs1 through)
+  // For AMO/LR/SC: use 0..no offset, just pass rs1 through
   val aluIn2 = Mux(
     io.isAMO || io.isLR || io.isSC,
     0.U,  // AMO no offset, ALU computes rs1 + 0 = rs1
@@ -263,5 +263,8 @@ class Execute(
 
   if (TRACE) {
     io.rs1_rdata.get := inputMux1
+    when(io.isAMO) {
+      printf("[EX] AMO Exec: addr=%x, data=%x, aluIn1=%x, aluIn2=%x, op=%d\n", io.ALUresult, io.writeData, aluIn1, aluIn2, io.ctl_aluOp)
+    }
   }
 }
