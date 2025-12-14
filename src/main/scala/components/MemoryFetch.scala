@@ -12,31 +12,31 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     val stall: Bool = Output(Bool())
     val f3 = Input(UInt(3.W))
 
-    val dccmReq = Decoupled(new MemRequestIO)
-    val dccmRsp = Flipped(Decoupled(new MemResponseIO))
-
-    val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
-
+    // AMO / LR / SC
     val isAMO = Input(Bool())
     val isLR  = Input(Bool())
     val isSC  = Input(Bool())
     val amoOp = Input(UInt(5.W))
+    val amoRdVal = Output(UInt(32.W)) // old memory value for rd
+
+    val dccmReq = Decoupled(new MemRequestIO)
+    val dccmRsp = Flipped(Decoupled(new MemResponseIO))
+
+    val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
   })
 
   io.dccmRsp.ready := true.B
+  
+  val amoALU = Module(new AMOALU)
+  val amo_old_value = RegInit(0.U(32.W)) // Register to capture old memory value
 
   val wdata = Wire(Vec(4, UInt(8.W)))
   val rdata = Wire(UInt(32.W))
   val offset = RegInit(0.U(2.W))
   val funct3 = RegInit(0.U(3.W))
   val offsetSW = io.aluResultIn(1,0)
-  
-  // AMO/LR/SC use full word access
-  when(io.isAMO || io.isLR || io.isSC) {
-    io.dccmReq.bits.activeByteLane := "b1111".U
-    if (TRACE) io.wmask.get := Mux(io.writeEnable, "b1111".U, 0.U)
-  }
-  .elsewhen(!io.dccmRsp.valid){
+
+  when(!io.dccmRsp.valid){
     funct3 := io.f3
     offset := io.aluResultIn(1,0)
   }.otherwise{
@@ -98,39 +98,38 @@ class MemoryFetch(TRACE: Boolean) extends Module {
       wdata(1) := io.writeData(31,24)
     }
   }
-  // Store Word or AMO/SC 
+  /* Store Word or AMO/LR/SC */
   .otherwise{
     io.dccmReq.bits.activeByteLane := "b1111".U
     if (TRACE) io.wmask.get := Mux(io.writeEnable, "b1111".U, 0.U)
   }
 
-  // AMO ALU - Instantiate inside MemoryFetch
-  val amoALU = Module(new AMOALU)
-  amoALU.io.memData := io.dccmRsp.bits.dataResponse
-  amoALU.io.src2 := io.writeData
+  // Capture old memory value ONLY when AMO read completes
+  when(io.dccmRsp.valid && io.readEnable && io.isAMO) {
+    amo_old_value := rdata
+  }
+
+  amoALU.io.memData := rdata  // value at rs1() address
+  amoALU.io.src2 := io.writeData      // rs2 value
   amoALU.io.amoOp := io.amoOp
 
-  // Memory Request Control
-  io.dccmReq.bits.addrRequest := Cat("b00".U, (io.aluResultIn & "h3FFFFFFF".U)(31, 2))
-  
-  // For AMO: use AMO ALU result, for normal: use wdata
-  io.dccmReq.bits.dataRequest := Mux(io.isAMO && io.writeEnable, 
-                                     amoALU.io.result, 
-                                     wdata.asUInt)
-  
-  io.dccmReq.bits.isWrite := io.writeEnable
-  io.dccmReq.valid := io.writeEnable | io.readEnable
+  io.amoRdVal := amo_old_value // Output old value to rd
 
-  // Stall: wait for memory response
+  // For AMO writes: use AMOALU result, for normal stores: use wdata
+  val writeDataFinal = Mux(io.isAMO && io.writeEnable, amoALU.io.result, wdata.asUInt)
+
+  io.dccmReq.bits.dataRequest := writeDataFinal
+  io.dccmReq.bits.addrRequest := Cat("b00".U, (io.aluResultIn & "h3FFFFFFF".U)(31, 2))
+  io.dccmReq.bits.isWrite := io.writeEnable
+  io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
+
   io.stall := (io.writeEnable || io.readEnable) && !io.dccmRsp.valid
 
-  // Read data
   rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 
-  // Output read data based on operation type
   when(io.readEnable) {
-    when(io.isAMO || io.isLR || funct3 === "b010".U) {
-      // AMO/LR/LW: full word
+    when(funct3 === "b010".U || io.isAMO || io.isLR) {
+      // load word or AMO/LR
       io.readData := rdata
     }
     .elsewhen(funct3 === "b000".U) {
@@ -195,12 +194,13 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   // Debug prints
   if (TRACE) {
     when(io.isAMO) {
-      when(io.readEnable) {
-        printf("[MEM] AMO Read: addr=%x\n", io.aluResultIn)
+      when(io.readEnable && io.dccmRsp.valid) {
+        printf("[MEM] AMO Read: addr=%x rdata=%x captured_old=%x\n", 
+          io.aluResultIn, rdata, amo_old_value)
       }
-      when(io.writeEnable && io.dccmRsp.valid) {
-        printf("[MEM] AMO Write: addr=%x old=%x new=%x amoOp=%x\n", 
-          io.aluResultIn, io.dccmRsp.bits.dataResponse, amoALU.io.result, io.amoOp)
+      when(io.writeEnable) {
+        printf("[MEM] AMO Write: addr=%x old=%x rs2=%x new=%x op=%x\n", 
+          io.aluResultIn, amo_old_value, io.writeData, amoALU.io.result, io.amoOp)
       }
     }
   }
