@@ -264,7 +264,8 @@ class Execute(
   if (TRACE) {
     io.rs1_rdata.get := inputMux1
     when(io.isAMO) {
-      printf("[EX] AMO Exec: addr=%x, data=%x, aluIn1=%x, aluIn2=%x, op=%d\n", io.ALUresult, io.writeData, aluIn1, aluIn2, io.ctl_aluOp)
+      printf("[EX] AMO Exec: addr=%x, rs2=%x, aluIn1=%x, aluIn2=%x, forwardA=%d, forwardB=%d\n", 
+        io.ALUresult, io.writeData, aluIn1, aluIn2, fu.forwardA, fu.forwardB)
     }
   }
 }

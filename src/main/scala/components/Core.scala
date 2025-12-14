@@ -111,6 +111,10 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_isLR  = RegInit(false.B)
   val mem_reg_isSC  = RegInit(false.B)
 
+  // AMO state tracking
+  val amo_read_done = RegInit(false.B)
+  val amo_old_value = RegInit(0.U(32.W))
+
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
   val ID = Module(new InstructionDecode(F, Zicsr, TRACE)).io
@@ -322,20 +326,7 @@ class Core(implicit val config:Configs) extends Module{
                            (ex_reg_ctl_memWrite && !ex_reg_isSC && !ex_reg_isAMO)
   reservationFile.addrIn := ex_reg_result
 
-  // MEMORY CONTROL for AMO needs TWO cycles. 1) READ old value, 2) WRITE new value
-  val amo_read_done = RegInit(false.B)
-  
-  when(ex_reg_isAMO) {
-    when(!amo_read_done && io.dmemRsp.valid) {
-      amo_read_done := true.B  // Read complete, now write
-    }
-    when(amo_read_done && io.dmemReq.fire) {
-      amo_read_done := false.B  // Write complete, reset
-    }
-  }.otherwise {
-    amo_read_done := false.B
-  }
-  
+ 
   MEM.io.readEnable := ex_reg_ctl_memRead || (ex_reg_isAMO && !amo_read_done) || ex_reg_isLR
   MEM.io.writeEnable := ex_reg_ctl_memWrite || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success)
 
@@ -354,11 +345,24 @@ class Core(implicit val config:Configs) extends Module{
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
 
+  // AMO state machine: track read completion and capture old value
+  when(ex_reg_isAMO && !amo_read_done && io.dmemRsp.valid) {
+    // First cycle: read completes, capture old value
+    amo_read_done := true.B
+    amo_old_value := MEM.io.amoRdVal
+  }.elsewhen(ex_reg_isAMO && amo_read_done && io.dmemRsp.valid) {
+    // Second cycle: write completes, reset state
+    amo_read_done := false.B
+  }.elsewhen(!ex_reg_isAMO) {
+    // Reset when not doing AMO
+    amo_read_done := false.B
+  }
+
   // MEM-WB REGISTE
   val sc_result = Mux(sc_success, 0.U, 1.U)
   
   when(!MEM.io.stall) {
-    mem_reg_rd := MEM.io.readData
+    mem_reg_rd := Mux(ex_reg_isAMO, amo_old_value, MEM.io.readData)
     mem_reg_result := Mux(ex_reg_isSC, sc_result, ex_reg_result)
     mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
     mem_reg_ins := ex_reg_ins
@@ -428,8 +432,8 @@ class Core(implicit val config:Configs) extends Module{
         id_reg_isAMO, id_reg_isLR, id_reg_isSC, id_reg_amoOp, id_reg_rd1, id_reg_rd2)
     }
     when(ex_reg_isAMO) {
-      printf("[EX-MEM] AMO: addr=%x rs2=%x read_done=%d\n",
-        ex_reg_result, ex_reg_wd, amo_read_done)
+      printf("[EX-MEM] AMO: addr=%x rs2=%x read_done=%d old_val=%x\n",
+        ex_reg_result, ex_reg_wd, amo_read_done, amo_old_value)
     }
   }
 
