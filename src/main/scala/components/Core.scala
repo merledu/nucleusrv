@@ -112,8 +112,10 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_isSC  = RegInit(false.B)
 
   // AMO state tracking
+  // AMO state tracking
   val amo_read_done = RegInit(false.B)
   val amo_old_value = RegInit(0.U(32.W))
+  val sc_issued = RegInit(false.B)
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
@@ -322,13 +324,26 @@ class Core(implicit val config:Configs) extends Module{
   // RESERVATIONFILE (LR/SC)
   reservationFile.set := ex_reg_isLR && io.dmemRsp.valid
   val sc_success = ex_reg_isSC && reservationFile.matchAddr
-  reservationFile.clear := (ex_reg_isSC && io.dmemReq.fire) || 
+  reservationFile.clear := (ex_reg_isSC && (io.dmemReq.fire || (!sc_success && !sc_issued))) || 
                            (ex_reg_ctl_memWrite && !ex_reg_isSC && !ex_reg_isAMO)
   reservationFile.addrIn := ex_reg_result
 
+  if (TRACE) {
+    when(reservationFile.set) {
+      printf("[Core] Reservation SET: addr=%x\n", reservationFile.addrIn)
+    }
+    when(reservationFile.clear) {
+      printf("[Core] Reservation CLEAR\n")
+    }
+    when(ex_reg_isSC) {
+      printf("[Core] SC Exec: addr=%x success=%d match=%d\n", 
+        ex_reg_result, sc_success, reservationFile.matchAddr)
+    }
+  }
+
  
   MEM.io.readEnable := ex_reg_ctl_memRead || (ex_reg_isAMO && !amo_read_done) || ex_reg_isLR
-  MEM.io.writeEnable := ex_reg_ctl_memWrite || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success)
+  MEM.io.writeEnable := ex_reg_ctl_memWrite || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success && !sc_issued)
 
   MEM.io.writeData := ex_reg_wd
 
@@ -358,8 +373,18 @@ class Core(implicit val config:Configs) extends Module{
     amo_read_done := false.B
   }
 
+ 
+  when(ex_reg_isSC && io.dmemReq.fire) {  // SC state tracking to handle stalls
+    sc_issued := true.B
+  }
+  when(!MEM.io.stall) {
+    sc_issued := false.B
+  }
+
   // MEM-WB REGISTE
-  val sc_result = Mux(sc_success, 0.U, 1.U)
+  // sc_success is true if we have a match currently OR if we already issued successfully
+  val sc_success_latched = (ex_reg_isSC && reservationFile.matchAddr) || sc_issued
+  val sc_result = Mux(sc_success_latched, 0.U, 1.U)
   
   when(!MEM.io.stall) {
     mem_reg_rd := Mux(ex_reg_isAMO, amo_old_value, MEM.io.readData)
@@ -404,6 +429,12 @@ class Core(implicit val config:Configs) extends Module{
   }
 
   ID.mem_wb_result := wb_data
+  
+  if (TRACE) {
+    when(mem_reg_ctl_regWrite(0) && wb_addr =/= 0.U) {
+      printf("[Core] Writeback: rd=%d data=%x\n", wb_addr, wb_data)
+    }
+  }
   ID.writeData := wb_data
   EX.wb_result := wb_data
   EX.mem_wb_regWrite <> mem_reg_ctl_regWrite
