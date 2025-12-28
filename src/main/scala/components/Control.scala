@@ -174,9 +174,9 @@ class Control(F: Boolean) extends Module {
       BitPat("b00011????????????????????0101111") -> List(
         false.B, 
         0.U, 
-        true.B,  // regWrite (all atomics write to rd)
+        true.B,  // regWrite (Writes 0/1 to rd)
         false.B,   // memRead
-        true.B,   // memWrite
+        true.B,   // memWrite (SC is a conditional write, we enable write initially, Core checks reservation)
         false.B,  // branch
         0.U, 
         0.U, 
@@ -188,8 +188,8 @@ class Control(F: Boolean) extends Module {
         false.B, 
         1.U,   // memToReg (return memory value for AMO/LR)
         true.B,  // regWrite (all atomics write to rd)
-        true.B,   // memRead
-        true.B,  //memWrite
+        false.B,   // memRead (Set to FALSE. Read is enabled by Core state machine !amo_read_done)
+        false.B,  // memWrite (Set to FALSE. Write is enabled by Core state machine amo_read_done)
         false.B, // branch
         0.U,  
         0.U, 

@@ -23,11 +23,13 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     val dccmRsp = Flipped(Decoupled(new MemResponseIO))
 
     val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
+    
+    val amo_alu_result_in = Input(UInt(32.W)) // Result from Execute stage
   })
 
   io.dccmRsp.ready := true.B
   
-  val amoALU = Module(new AMOALU)
+  // val amoALU = Module(new AMOALU) -- Moved to Execute
   val amo_old_value = RegInit(0.U(32.W)) // Register to capture old memory value
 
   val wdata = Wire(Vec(4, UInt(8.W)))
@@ -109,21 +111,25 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     amo_old_value := rdata
   }
 
-  amoALU.io.memData := rdata  // value at rs1() address
-  amoALU.io.src2 := io.writeData      // rs2 value
-  amoALU.io.amoOp := io.amoOp
+  // io.amoRdVal is unused by Core, keeping 0
+  io.amoRdVal := 0.U
 
-  io.amoRdVal := amo_old_value // Output old value to rd
-
-  // For AMO writes: use AMOALU result, for normal stores: use wdata
-  val writeDataFinal = Mux(io.isAMO && io.writeEnable, amoALU.io.result, wdata.asUInt)
+  // For AMO writes: use AMOALU result (from input), for normal stores: use wdata
+  val writeDataFinal = Mux(io.isAMO && io.writeEnable, io.amo_alu_result_in, wdata.asUInt)
 
   io.dccmReq.bits.dataRequest := writeDataFinal
   io.dccmReq.bits.addrRequest := Cat("b00".U, (io.aluResultIn & "h3FFFFFFF".U)(31, 2))
   io.dccmReq.bits.isWrite := io.writeEnable
   io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
 
-  io.stall := (io.writeEnable || io.readEnable) && !io.dccmRsp.valid
+  // Stall logic:
+  // 1. Standard: Write or Read pending and no response
+  // 2. AMO Transition: We just got the Read Response (valid) but we are still in AMO sequence (need to do write next).
+  //    Wait, if we stall here, the pipeline holds 'ex_reg' as AMO.
+  //    Core state machine will advance 'amo_read_done' to true.
+  //    So next cycle, this stall condition will clear because 'readEnable' will be false (amo_read_done is true).
+  val amo_transition_stall = io.isAMO && io.readEnable && io.dccmRsp.valid
+  io.stall := ((io.writeEnable || io.readEnable) && !io.dccmRsp.valid) || amo_transition_stall
 
   rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 
@@ -200,7 +206,7 @@ class MemoryFetch(TRACE: Boolean) extends Module {
       }
       when(io.writeEnable) {
         printf("[MEM] AMO Write: addr=%x old=%x rs2=%x new=%x op=%x\n", 
-          io.aluResultIn, amo_old_value, io.writeData, amoALU.io.result, io.amoOp)
+          io.aluResultIn, amo_old_value, io.writeData, io.amo_alu_result_in, io.amoOp)
       }
     }
   }

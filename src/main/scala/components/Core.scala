@@ -266,6 +266,11 @@ class Core(implicit val config:Configs) extends Module{
   EX.ctl_aluSrc := id_reg_ctl_aluSrc
   EX.ctl_aluOp := id_reg_ctl_aluOp
   EX.ctl_aluSrc1 := id_reg_ctl_aluSrc1
+
+  // AMO new connections
+  EX.amo_memData := amo_old_value
+  EX.amo_src2    := ex_reg_wd
+  EX.amo_op_code := ex_reg_amoOp
   
   when(!MEM.io.stall) {
     ex_reg_pc := id_reg_pc
@@ -343,6 +348,8 @@ class Core(implicit val config:Configs) extends Module{
 
  
   MEM.io.readEnable := ex_reg_ctl_memRead || (ex_reg_isAMO && !amo_read_done) || ex_reg_isLR
+  // Note: ex_reg_ctl_memWrite is now FALSE for SC/AMO in Control.scala.
+  // We must explicitly enable it here for SC and for AMO-phase-2.
   MEM.io.writeEnable := ex_reg_ctl_memWrite || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success && !sc_issued)
 
   MEM.io.writeData := ex_reg_wd
@@ -352,6 +359,8 @@ class Core(implicit val config:Configs) extends Module{
   MEM.io.isLR := ex_reg_isLR
   MEM.io.isSC := ex_reg_isSC
   MEM.io.amoOp := ex_reg_amoOp
+  MEM.io.amo_alu_result_in := EX.amo_result
+
 
   MEM.io.aluResultIn := ex_reg_result
   MEM.io.f3 := ex_reg_ins(14,12)
@@ -364,10 +373,11 @@ class Core(implicit val config:Configs) extends Module{
   when(ex_reg_isAMO && !amo_read_done && io.dmemRsp.valid) {
     // First cycle: read completes, capture old value
     amo_read_done := true.B
-    amo_old_value := MEM.io.amoRdVal
+    amo_old_value := io.dmemRsp.bits.dataResponse
   }.elsewhen(ex_reg_isAMO && amo_read_done && io.dmemRsp.valid) {
     // Second cycle: write completes, reset state
     amo_read_done := false.B
+    amo_old_value := amo_old_value // Keep value stable
   }.elsewhen(!ex_reg_isAMO) {
     // Reset when not doing AMO
     amo_read_done := false.B

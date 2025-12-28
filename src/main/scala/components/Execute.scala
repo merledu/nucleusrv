@@ -47,10 +47,22 @@ class Execute(
     val is_f_i = if (F) Some(Input(Bool())) else None
     val is_f_o = if (F) Some(Output(Bool())) else None
     val exceptions = if (F) Some(Output(Vec(5, Bool()))) else None
+    // AMO signals from Core (for looping back ex_reg values)
+    val amo_memData = Input(UInt(32.W))
+    val amo_src2    = Input(UInt(32.W))
+    val amo_op_code = Input(UInt(5.W))
+    val amo_result  = Output(UInt(32.W))
   })
 
   val alu = Module(new ALU)
   val aluCtl = Module(new AluControl)
+  
+  val amoAlu = Module(new AMOALU)
+  amoAlu.io.memData := io.amo_memData
+  amoAlu.io.src2 := io.amo_src2
+  amoAlu.io.amoOp := io.amo_op_code
+  io.amo_result := amoAlu.io.result
+
   val fu = Module(new ForwardingUnit(F)).io
 
   // Forwarding Unit
