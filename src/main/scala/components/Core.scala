@@ -298,6 +298,15 @@ class Core(implicit val config:Configs) extends Module{
   ID.id_ex_rd := id_reg_ins(11, 7)
   ID.id_ex_branch := Mux(id_reg_ins(6,0) === "b1100011".U, true.B, false.B )
   ID.ex_mem_rd := ex_reg_ins(11, 7)
+  
+  ID.ex_stall := EX.stall
+  ID.dmem_data := MEM.io.readData
+  // ID.ex_result := EX.ALUresult // assigned below
+  ID.ex_mem_result := ex_reg_result
+  ID.mem_wb_result := mem_reg_result
+  
+  EX.wb_result := mem_reg_result
+  EX.mem_result := ex_reg_result
   ID.ex_result := EX.ALUresult
   ID.csr_Ex := id_reg_is_csr
   ID.csr_Ex_data := id_reg_csr_data
@@ -326,7 +335,7 @@ class Core(implicit val config:Configs) extends Module{
   io.dmemReq <> MEM.io.dccmReq
   MEM.io.dccmRsp <> io.dmemRsp
 
-  // RESERVATIONFILE (LR/SC)
+  // RESERVATIONFILE
   reservationFile.set := ex_reg_isLR && io.dmemRsp.valid
   val sc_success = ex_reg_isSC && reservationFile.matchAddr
   reservationFile.clear := (ex_reg_isSC && (io.dmemReq.fire || (!sc_success && !sc_issued))) || 
@@ -348,8 +357,7 @@ class Core(implicit val config:Configs) extends Module{
 
  
   MEM.io.readEnable := ex_reg_ctl_memRead || (ex_reg_isAMO && !amo_read_done) || ex_reg_isLR
-  // Note: ex_reg_ctl_memWrite is now FALSE for SC/AMO in Control.scala.
-  // We must explicitly enable it here for SC and for AMO-phase-2.
+  // ex_reg_ctl_memWrite enable it here for SC and for AMO 
   MEM.io.writeEnable := ex_reg_ctl_memWrite || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success && !sc_issued)
 
   MEM.io.writeData := ex_reg_wd
@@ -368,6 +376,11 @@ class Core(implicit val config:Configs) extends Module{
   EX.mem_result := ex_reg_result
   ID.csr_Mem := ex_reg_is_csr
   ID.csr_Mem_data := ex_reg_csr_data
+  ID.ex_is_amo  := id_reg_isAMO
+  ID.mem_is_amo := ex_reg_isAMO
+  // ID.addr_id is internal (readData1).
+  ID.addr_ex  := EX.ALUresult
+  ID.addr_mem := ex_reg_result
 
   // AMO state machine: track read completion and capture old value
   when(ex_reg_isAMO && !amo_read_done && io.dmemRsp.valid) {
@@ -379,7 +392,6 @@ class Core(implicit val config:Configs) extends Module{
     amo_read_done := false.B
     amo_old_value := amo_old_value // Keep value stable
   }.elsewhen(!ex_reg_isAMO) {
-    // Reset when not doing AMO
     amo_read_done := false.B
   }
 

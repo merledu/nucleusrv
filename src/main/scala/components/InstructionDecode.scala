@@ -91,6 +91,12 @@ class InstructionDecode(
     val amoOp  = Output(UInt(5.W))
     val aq   = Output(Bool())
     val rl   = Output(Bool())
+
+    // HDU new inputs
+    val ex_is_amo  = Input(Bool())
+    val mem_is_amo = Input(Bool())
+    val addr_ex    = Input(UInt(32.W))
+    val addr_mem   = Input(UInt(32.W))
   })
 
   //atomic instruction detection
@@ -263,6 +269,15 @@ class InstructionDecode(
     )
   }
   
+  // AMO Forwarding (Memory Dependency) overrides Register Forwarding
+  when(hdu.io.operandForwardEX) {
+    io.readData1 := io.ex_result
+    io.readData2 := io.ex_result
+  }.elsewhen(hdu.io.operandForwardMEM) {
+    io.readData1 := io.ex_mem_result
+    io.readData2 := io.ex_mem_result
+  }
+  
 
   val immediate = Module(new ImmediateGen(F))
   immediate.io.instruction := io.id_instruction
@@ -375,13 +390,13 @@ class InstructionDecode(
     csr.get.io.i_data := MuxLookup(csrController.get.io.forwardRS1, registers.io.readData(0), csr_iData_cases)
   }
 
-  hdu.io.id_is_amo  := false.B
-  hdu.io.ex_is_amo  := false.B
-  hdu.io.mem_is_amo := false.B
+  hdu.io.id_is_amo  := io.isAMO
+  hdu.io.ex_is_amo  := io.ex_is_amo
+  hdu.io.mem_is_amo := io.mem_is_amo
   
-  hdu.io.addr_id  := 0.U
-  hdu.io.addr_ex  := 0.U
-  hdu.io.addr_mem := 0.U
+  hdu.io.addr_id  := readData1 // RS1 is address for AMO
+  hdu.io.addr_ex  := io.addr_ex
+  hdu.io.addr_mem := io.addr_mem
   
 
   // RVFI
