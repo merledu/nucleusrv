@@ -453,8 +453,16 @@ class Core(implicit val config:Configs) extends Module{
   ID.mem_wb_result := wb_data
   
   if (TRACE) {
+    // Print every cycle what the writeback signals are
+    printf("[Core] WB Stage: RegWrite=%d Addr=%d Data=%x SC=%d RegWriteIO=%d\n", 
+           mem_reg_ctl_regWrite(0), wb_addr, wb_data, mem_reg_isSC, ID.ctl_writeEnable(0))
+    
     when(mem_reg_ctl_regWrite(0) && wb_addr =/= 0.U) {
-      printf("[Core] Writeback: rd=%d data=%x\n", wb_addr, wb_data)
+      // Confirmed write
+      printf("[Core] Writeback ACTUAL: rd=%d data=%x\n", wb_addr, wb_data)
+      when(mem_reg_isSC) {
+          printf("[Core] SC WB: rd=%d result=%x (mem_reg_wra=%d)\n", wb_addr, wb_data, mem_reg_wra)
+      }
     }
   }
   ID.writeData := wb_data
