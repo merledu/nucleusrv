@@ -356,7 +356,8 @@ class Core(implicit val config:Configs) extends Module{
  
   MEM.io.readEnable := ex_reg_ctl_memRead || (ex_reg_isAMO && !amo_read_done) || ex_reg_isLR
   // ex_reg_ctl_memWrite enable it here for SC and for AMO 
-  MEM.io.writeEnable := ex_reg_ctl_memWrite || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success && !sc_issued)
+  // Disable default memWrite for SC/AMO to ensure we only write when allowed
+  MEM.io.writeEnable := (ex_reg_ctl_memWrite && !ex_reg_isSC && !ex_reg_isAMO) || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success && !sc_issued)
 
   MEM.io.writeData := ex_reg_wd
 
