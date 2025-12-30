@@ -112,7 +112,6 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_isSC  = RegInit(false.B)
 
   // AMO state tracking
-  // AMO state tracking
   val amo_read_done = RegInit(false.B)
   val amo_old_value = RegInit(0.U(32.W))
   val sc_issued = RegInit(false.B)
@@ -123,7 +122,6 @@ class Core(implicit val config:Configs) extends Module{
   val EX = Module(new Execute(F, M = M, TRACE = TRACE)).io
   val MEM = Module(new MemoryFetch(TRACE))
 
-  // Reservationfile for LR/SC
   val reservationFile = Module(new ReservationFile).io
   
   /*****************
@@ -267,7 +265,7 @@ class Core(implicit val config:Configs) extends Module{
   EX.ctl_aluOp := id_reg_ctl_aluOp
   EX.ctl_aluSrc1 := id_reg_ctl_aluSrc1
 
-  // AMO new connections
+  // AMO alu connections
   EX.amo_memData := amo_old_value
   EX.amo_src2    := ex_reg_wd
   EX.amo_op_code := ex_reg_amoOp
@@ -382,7 +380,7 @@ class Core(implicit val config:Configs) extends Module{
   ID.addr_ex  := EX.ALUresult
   ID.addr_mem := ex_reg_result
 
-  // AMO state machine: track read completion and capture old value
+  // AMO state machine track read completion and capture old value
   when(ex_reg_isAMO && !amo_read_done && io.dmemRsp.valid) {
     // First cycle: read completes, capture old value
     amo_read_done := true.B
@@ -396,8 +394,8 @@ class Core(implicit val config:Configs) extends Module{
   }
 
  
-  // SC Execution Logic (Must execute exactly ONCE)
-  // We use sc_issued to track if we've already tried to execute this specific SC instruction
+  // SC Execution 
+  // We use sc_issued to track if wehve already tried to execute this specific SC instruction
   when(ex_reg_isSC && !MEM.io.stall) {  
      sc_issued := true.B
   }
@@ -408,9 +406,19 @@ class Core(implicit val config:Configs) extends Module{
       sc_issued := false.B
   }
 
+  // SC Match Latch: failure to latch success means we might return 1 (fail) 
+  // after the reservation is cleared but before stall ends.
+  val sc_matched = RegInit(false.B)
+  when(ex_reg_isSC && reservationFile.matchAddr) {
+    sc_matched := true.B
+  }
+  when(!MEM.io.stall) {
+    sc_matched := false.B
+  }
+
   // MEM-WB REGISTE
-  // sc_success is true if we have a match currently OR if we already issued successfully
-  val sc_success_latched = (ex_reg_isSC && reservationFile.matchAddr) || sc_issued
+  // sc_success is true if we have a match currently OR if we already matched
+  val sc_success_latched = (ex_reg_isSC && reservationFile.matchAddr) || sc_matched
   val sc_result = Mux(sc_success_latched, 0.U, 1.U)
   
   when(!MEM.io.stall) {
