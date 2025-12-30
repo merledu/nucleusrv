@@ -396,11 +396,16 @@ class Core(implicit val config:Configs) extends Module{
   }
 
  
-  when(ex_reg_isSC && io.dmemReq.fire) {  // SC state tracking to handle stalls
-    sc_issued := true.B
+  // SC Execution Logic (Must execute exactly ONCE)
+  // We use sc_issued to track if we've already tried to execute this specific SC instruction
+  when(ex_reg_isSC && !MEM.io.stall) {  
+     sc_issued := true.B
   }
-  when(!MEM.io.stall) {
-    sc_issued := false.B
+  
+  // Reset sc_issued only when we advance to a NEW instruction (ex_reg changes)
+  // We detect a "new" instruction when we are no longer stalled
+  when(!MEM.io.stall && !EX.stall) {
+      sc_issued := false.B
   }
 
   // MEM-WB REGISTE
