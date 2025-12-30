@@ -176,7 +176,7 @@ class Control(F: Boolean) extends Module {
         0.U, 
         true.B,  // regWrite (Writes 0/1 to rd)
         false.B,   // memRead
-        true.B,   // memWrite (SC is a conditional write, we enable write initially, Core checks reservation)
+        false.B,   // memWrite (Set to FALSE. Write is enabled by Core state machine only if Reservation Matches)
         false.B,  // branch
         0.U, 
         0.U, 
