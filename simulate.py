@@ -59,7 +59,7 @@ if __name__ == '__main__':
         '-j', '0',
         '--top', args.mod,
         '--Mdir', join(target_dir, 'obj_dir'),
-        'nrv_tb.cpp'
+        join(ROOT, 'tb_top.cpp')
         #'tb_Top.cpp'
     ) + sv_files, text = True)
     execute_sp([join(

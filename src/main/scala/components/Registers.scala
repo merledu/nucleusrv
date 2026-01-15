@@ -20,7 +20,6 @@ class Registers(F: Boolean) extends Module {
 
   when (io.writeEnable(0) && (io.writeAddress =/= 0.U)) {
     i_reg(io.writeAddress) := io.writeData
-    printf("[REG] Writing x%d = %x\n", io.writeAddress, io.writeData)
   }
 
   if (F) {

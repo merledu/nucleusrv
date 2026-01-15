@@ -50,14 +50,14 @@ class HazardUnit extends Module {
       || ((io.id_ex_rd =/= 0.U) && (io.id_rs2 =/= 0.U))
     ) && !io.id_ex_branch
   ) {
-    standard_stall := true.B
+   // standard_stall := true.B
   }
 
   when (
     (io.ex_mem_memRead || io.branch)
     && ((io.ex_mem_rd === io.id_rs1) || (io.ex_mem_rd === io.id_rs2))
   ) {
-    standard_stall := true.B
+   // standard_stall := true.B
   }
 
   // Branch flush hazard
@@ -143,21 +143,4 @@ class HazardUnit extends Module {
     io.take_branch := false.B
   }
 
-  // Debug Print Statements
-  // printf("[HazardUnit] Cycle=%d | ID_AMO=%d EX_AMO=%d MEM_AMO=%d | Stall(Std=%d AMO=%d) | Fwd(EX=%d MEM=%d)\n", 
-  //   io.addr_id, // Using addr temporarily as cycle counter proxy or just identifier? chisel printf auto adds time.
-  //   io.id_is_amo, io.ex_is_amo, io.mem_is_amo,
-  //   standard_stall, amo_stall,
-  //   forward_EX, forward_MEM
-  // )
-  // when(io.id_is_amo) {
-  //    printf(" -> Depend: AddrID=%x AddrEX=%x AddrMEM=%x | EX_Load/AMO=%d MEM_Load/AMO=%d\n",
-  //       addr_ID, addr_EX, addr_MEM, isAMO_EX, isAMO_MEM || isLoad_MEM
-  //    )
-  // }
-  // when(standard_stall) {
-  //    printf(" -> STANDARD STALL: MemRead(EX=%d MEM=%d) Branch=%d\n", 
-  //       io.id_ex_memRead, io.ex_mem_memRead, io.branch
-  //    )
-  // }
 }

@@ -411,8 +411,4 @@ class InstructionDecode(
     io.rd_wdata.get := writeData
   }
 
-  // Debug Printf
-  when(io.ctl_writeEnable(0) && io.writeReg =/= 0.U) {
-      if(TRACE) printf("[ID] RegFile Write: rd=%d, data=%x\n", io.writeReg, writeData)
-  }
 }

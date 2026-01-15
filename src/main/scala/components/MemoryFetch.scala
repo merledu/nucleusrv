@@ -196,18 +196,4 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   } .otherwise {
     io.readData := DontCare
   }
-
-  // Debug prints
-  if (TRACE) {
-    when(io.isAMO) {
-      when(io.readEnable && io.dccmRsp.valid) {
-        printf("[MEM] AMO Read: addr=%x rdata=%x captured_old=%x\n", 
-          io.aluResultIn, rdata, amo_old_value)
-      }
-      when(io.writeEnable) {
-        printf("[MEM] AMO Write: addr=%x old=%x rs2=%x new=%x op=%x\n", 
-          io.aluResultIn, amo_old_value, io.writeData, io.amo_alu_result_in, io.amoOp)
-      }
-    }
-  }
 }

@@ -340,18 +340,6 @@ class Core(implicit val config:Configs) extends Module{
                            (ex_reg_ctl_memWrite && !ex_reg_isSC && !ex_reg_isAMO)
   reservationFile.addrIn := ex_reg_result
 
-  if (TRACE) {
-    when(reservationFile.set) {
-      printf("[Core] Reservation SET: addr=%x\n", reservationFile.addrIn)
-    }
-    when(reservationFile.clear) {
-      printf("[Core] Reservation CLEAR\n")
-    }
-    when(ex_reg_isSC) {
-      printf("[Core] SC Exec: addr=%x success=%d match=%d\n", 
-        ex_reg_result, sc_success, reservationFile.matchAddr)
-    }
-  }
 
  
   MEM.io.readEnable := ex_reg_ctl_memRead || (ex_reg_isAMO && !amo_read_done) || ex_reg_isLR
@@ -466,19 +454,6 @@ class Core(implicit val config:Configs) extends Module{
 
   ID.mem_wb_result := wb_data
   
-  if (TRACE) {
-    // Print every cycle what the writeback signals are
-    printf("[Core] WB Stage: RegWrite=%d Addr=%d Data=%x SC=%d RegWriteIO=%d\n", 
-           mem_reg_ctl_regWrite(0), wb_addr, wb_data, mem_reg_isSC, ID.ctl_writeEnable(0))
-    
-    when(mem_reg_ctl_regWrite(0) && wb_addr =/= 0.U) {
-      // Confirmed write
-      printf("[Core] Writeback ACTUAL: rd=%d data=%x\n", wb_addr, wb_data)
-      when(mem_reg_isSC) {
-          printf("[Core] SC WB: rd=%d result=%x (mem_reg_wra=%d)\n", wb_addr, wb_data, mem_reg_wra)
-      }
-    }
-  }
   ID.writeData := wb_data
   EX.wb_result := wb_data
   EX.mem_wb_regWrite <> mem_reg_ctl_regWrite
@@ -498,18 +473,6 @@ class Core(implicit val config:Configs) extends Module{
     ).zipWithIndex.foreach(
       f => ID.is_f_in.get(f._2) := f._1
     )
-  }
-
-  // Debug prints
-  if (TRACE) {
-    when(id_reg_isAMO || id_reg_isLR || id_reg_isSC) {
-      printf("[ID-EX] AMO=%d LR=%d SC=%d amoOp=%x rs1=%x rs2=%x\n",
-        id_reg_isAMO, id_reg_isLR, id_reg_isSC, id_reg_amoOp, id_reg_rd1, id_reg_rd2)
-    }
-    when(ex_reg_isAMO) {
-      printf("[EX-MEM] AMO: addr=%x rs2=%x read_done=%d old_val=%x\n",
-        ex_reg_result, ex_reg_wd, amo_read_done, amo_old_value)
-    }
   }
 
   /**************

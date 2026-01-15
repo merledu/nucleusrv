@@ -6,4 +6,4 @@
 	url = https://github.com/riscv-non-isa/riscv-arch-test.git
 [submodule "CacheMatic"]
 	path = CacheMatic
-	url = git@github.com:maximyudayev/CacheMatic.git
+	url = https://github.com/maximyudayev/CacheMatic.git
