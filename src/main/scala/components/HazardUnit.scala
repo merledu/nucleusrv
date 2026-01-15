@@ -50,14 +50,12 @@ class HazardUnit extends Module {
       || ((io.id_ex_rd =/= 0.U) && (io.id_rs2 =/= 0.U))
     ) && !io.id_ex_branch
   ) {
-   // standard_stall := true.B
   }
 
   when (
     (io.ex_mem_memRead || io.branch)
     && ((io.ex_mem_rd === io.id_rs1) || (io.ex_mem_rd === io.id_rs2))
   ) {
-   // standard_stall := true.B
   }
 
   // Branch flush hazard
