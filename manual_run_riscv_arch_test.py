@@ -42,7 +42,7 @@ def simulate_and_compare(testlist, test, f):
         text = True
     )
     run(
-        f'./obj_dir/VTop &> {nrv_sig_file}',
+        f'./obj_dir/VTop > {nrv_sig_file}',
         shell = True,
         text = True
     )
