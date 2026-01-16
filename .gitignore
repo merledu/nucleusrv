@@ -368,3 +368,4 @@ riscof_work/
 .bloop/
 .ammonite/
 metals.sbt
+mem_data/

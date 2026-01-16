@@ -19,21 +19,27 @@ A chisel based riscv 5-stage pipelined cpu design, implementing 32-bit version o
 git clone --recurse-submodules https://github.com/merledu/nucleusrv.git
 ```
 
-### Generating SystemVerilog
-
-```sh
-python3 gen_verilog.py <imem> <dmem>
-```
-
 ### Running RISC-V assembly
 
 ```sh
-python3 simulate.py --sbt_args "--imem <imem>" nucleusrv.components.NRVDriver Top
+sbt "nucleusrv.components.NRVDriver --imem /path/to/imem/hex/file --dmem /path/to/dmem/hex/file --target-dir /path/to/output/dir"
+export NRV_ROOT=$PWD
+cd /path/to/output/dir
+verilator --cc --exe --build --trace --no-timing $NRV_ROOT/tb_Top.cpp Top.v
+./obj_dir/VTop
 ```
+
+Waveform will can be found at `/path/to/output/dir/logs`.
 
 ### Running RISC-V Architectural Tests
 * Make sure to have the RISC-V GNU Toolchain and Verilator in your `PATH`.
-* Create a python virtual environment and follow the `README.md` in `riscof/riscv-arch-test/`.
+* Create a python virtual environment and setup `riscv-arch-test`.
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install -e riscof/riscv-arch-test/riscv-ctg riscof/riscv-arch-test/riscv-isac
+pip3 install git+https://github.com/riscv/riscof.git
+```
 * Run `run_riscv_arch_tests.py` in root directory.
 ```sh
 python3 run_riscv_arch_tests.py
