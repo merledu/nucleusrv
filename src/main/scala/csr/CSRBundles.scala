@@ -1,3 +1,5 @@
+// Created by @Talha-Ahmed-1
+
 package nucleusrv.csr
 
 import chisel3._
@@ -7,8 +9,16 @@ class MISA extends Bundle{
     val i_value = Input(UInt(32.W))
 }
 
+class MARCHID extends Bundle{
+    val i_value = Input(UInt(32.W))
+}
+
 class MHARTID extends Bundle{
     val i_value = Input(UInt(32.W))
+}
+
+class MINSTRET extends Bundle{
+    val i_instr_retired = Input(Bool())
 }
 
 class FCSR extends Bundle{
@@ -22,8 +32,6 @@ class FCSR extends Bundle{
     val frm = Output(UInt(3.W))
 }
 
-
-
 class CSR_IO extends Bundle{
     val i_opr  = Input(UInt(2.W))
     val o_data = Output(UInt(32.W))
@@ -35,6 +43,8 @@ class CSR_IO extends Bundle{
 class CSRRegFileIO extends Bundle{
     val MISA    = new MISA()
     val MHARTID = new MHARTID()
+    val MARCHID = new MARCHID()
     val CSR     = new CSR_IO()
     val FCSR    = new FCSR()
+    val MINSTRET = new MINSTRET()
 }
