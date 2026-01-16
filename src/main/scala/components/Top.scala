@@ -14,6 +14,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   implicit val config:Configs = Configs(
     XLEN = 32,
     M = true,
+    A = true,
     F = true,
     C = false,
     Zicsr = true,
