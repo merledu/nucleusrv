@@ -1,4 +1,8 @@
-# NucleusRV
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="nrv_B.png">
+  <source media="(prefers-color-scheme: light)" srcset="NucleusRV_w.png">
+  <img alt="NucleusRV Logo" src="NucleusRV_w.png" width="600">
+</picture>
 
 [![Join the chat at https://gitter.im/merledu/nucleusrv](https://badges.gitter.im/merledu/nucleusrv.svg)](https://gitter.im/merledu/nucleusrv?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
