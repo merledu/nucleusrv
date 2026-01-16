@@ -32,16 +32,43 @@ python3 gen_verilog.py <imem> <dmem>
 ### Running RISC-V assembly
 
 ```sh
-python3 simulate.py --sbt_args "--imem <imem>" nucleusrv.components.NRVDriver Top
+python3 simulate.py --sbt_args "--imem <PATH_TO_YOUR_IMEM_FILE>" nucleusrv.components.NRVDriver Top
+
 ```
 
 ### Running RISC-V Architectural Tests
 * Make sure to have the RISC-V GNU Toolchain and Verilator in your `PATH`.
-* Create a python virtual environment and follow the `README.md` in `riscof/riscv-arch-test/`.
+* Create a python virtual environment.
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+```
+* Install Python Dependencies for RISCoF
+```sh
+pip install --upgrade pip
+pip install git+https://github.com/riscv/riscof.git
+```
 * Run `run_riscv_arch_tests.py` in root directory.
 ```sh
 python3 run_riscv_arch_tests.py
 ```
+* RISCoF Architecture Tests:
+```sh
+cd riscof/riscv-arch-test/riscv-ctg
+pip install -e .
+```
+```sh
+cd ../riscv-isac
+pip install -e .
+cd ../../..
+```
+* Verify Installation
+```sh
+riscof --help
+spike --help
+```
+You should see RISCoF and Spike help options displayed.
+
 
 ### Building C Programs
 * In `tools/tests` directory, create a folder and write c program in the `main.c` file
