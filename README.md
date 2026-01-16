@@ -8,6 +8,17 @@
 
 A chisel based riscv 5-stage pipelined cpu design, implementing 32-bit version of the ISA (incomplete).
 
+## Supported Extensions
+
+| Extension | Description |
+|-----------|-------------|
+| I         | Base Integer Instructions |
+| M         | Integer Multiplication & Division |
+| F         | Single-Precision Floating Point |
+| C         | Compressed Instructions |
+| A         | Atomic Instructions |
+
+
 
 ## Dependencies
 
