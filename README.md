@@ -22,8 +22,14 @@ git clone --recurse-submodules https://github.com/merledu/nucleusrv.git
 ### Running RISC-V assembly
 
 ```sh
-sbt "nucleusrv.components.NRVDriver --imem <imem> --dmem <dmem> --target-dir <out_dir>"
+sbt "nucleusrv.components.NRVDriver --imem /path/to/imem/hex/file --dmem /path/to/dmem/hex/file --target-dir /path/to/output/dir"
+export NRV_ROOT=$PWD
+cd /path/to/output/dir
+verilator --cc --exe --build --trace --no-timing $NRV_ROOT/tb_Top.cpp Top.v
+./obj_dir/VTop
 ```
+
+Waveform will can be found at `/path/to/output/dir/logs`.
 
 ### Running RISC-V Architectural Tests
 * Make sure to have the RISC-V GNU Toolchain and Verilator in your `PATH`.

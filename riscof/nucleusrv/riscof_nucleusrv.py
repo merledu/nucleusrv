@@ -184,7 +184,7 @@ class nucleusrv(pluginTemplate):
                 f"cd {os.path.join('out', test_name)}",
                 "(echo '/* verilator lint_off WIDTH */' && cat Top.v) > temp && mv temp Top.v",
                 'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
-                f'./obj_dir/VTop > {sig_file}'
+                f'./obj_dir/VTop > {sig_file} 2>&1'
             ))
           else:
             simcmd = '; '.join((

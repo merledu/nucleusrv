@@ -41,7 +41,7 @@ val defaultVersions = Map(
   )
 
 lazy val hardfloat = project in file("berkeley-hardfloat")
-lazy val cachematic = project in file("CacheMatic")
+//lazy val cachematic = project in file("CacheMatic")
 
 lazy val root = (project in file(".")).settings(
   name := "nucleusrv",
@@ -58,4 +58,4 @@ lazy val root = (project in file(".")).settings(
   ),
   scalacOptions ++= scalacOptionsVersion(scalaVersion.value),
   javacOptions ++= javacOptionsVersion(scalaVersion.value)
-).dependsOn(hardfloat, cachematic)
+).dependsOn(hardfloat, /*cachematic*/)
