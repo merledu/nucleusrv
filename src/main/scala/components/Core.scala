@@ -140,18 +140,34 @@ class Core(implicit val config:Configs) extends Module{
   val is_comp     = dontTouch(WireInit(false.B))
 
   if (C) {
-    val RA = Module(new Realigner).io
-    RA.ral_address_i     := pc.io.out.asUInt
-    RA.ral_instruction_i := IF.instruction
-    RA.ral_jmp           := ID.pcSrc
-    IF.address           := RA.ral_address_o
-    val instruction_cd    = RA.ral_instruction_o
-    ral_halt_o           := RA.ral_halt_o
+    // val RA = Module(new Realigner).io
+    // RA.ral_address_i     := pc.io.out.asUInt
+    // RA.ral_instruction_i := IF.instruction
+    // RA.ral_jmp           := ID.pcSrc
+    // IF.address           := RA.ral_address_o
+    // val instruction_cd    = RA.ral_instruction_o
+    // ral_halt_o           := RA.ral_halt_o
+
+    IF.address := pc.io.out.asUInt
 
     val CD = Module(new CompressedDecoder).io
-    CD.instruction_i := instruction_cd
+    CD.instruction_i := IF.instruction
     instruction  := CD.instruction_o
     is_comp := CD.is_comp
+
+    val cPhase = RegInit(true.B) // false :: misaligned & true :: aligned
+    when(io.imemRsp.valid || IF.phase_valid){
+      when(is_comp | ral_halt_o){
+        cPhase := Mux(IF.halt_damn_pc, cPhase, ~cPhase) // increment for c ext instruction
+      }
+      // .elsewhen(ral_halt_o){
+      //   cPhase := ~cPhase
+      // }
+      // .otherwise{
+      //   cPhase := Mux(IF.halt_damn_pc, cPhase, true.B)  // reset when full word non-c instruction
+      // }
+    }
+    IF.c_phase := cPhase
   }
   else {
     IF.address := pc.io.out.asUInt
@@ -171,15 +187,18 @@ class Core(implicit val config:Configs) extends Module{
   ) || ((func7 === "b0001100".U) || (func7 === "b0101100".U))
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc || MEM.io.stall
+  val ral_halt_o_reg = RegInit(0.B)
+  ral_halt_o_reg := ral_halt_o
+  IF.c_stall := ral_halt_o_reg && is_comp
   
-  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o || MEM.io.stall), 1.B, 0.B)
+  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o || MEM.io.stall || IF.halt_damn_pc), 1.B, 0.B)
   pc.io.halt := halt
   val npc = Mux(
     ID.hdu_pcWrite,
     Mux(
       ID.pcSrc,
       ID.pcPlusOffset.asSInt,
-      Mux(is_comp, pc.io.pc2, pc.io.pc4)
+      Mux(is_comp || ral_halt_o_reg, pc.io.pc2, pc.io.pc4)
     ),
     pc.io.out
   )
