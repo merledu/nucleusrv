@@ -120,7 +120,21 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   io.dccmReq.bits.dataRequest := writeDataFinal
   io.dccmReq.bits.addrRequest := Cat("b00".U, (io.aluResultIn & "h3FFFFFFF".U)(31, 2))
   io.dccmReq.bits.isWrite := io.writeEnable
-  io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
+
+  // This enables to make valid availble only for a single cycle
+  // In case of a mem operation, constant valid gets ignore due to consumer's ready off
+  // But In case of Tracer, signatures were being captured twice due to valid being high for more than 1 cycle
+  // This logic leashes valid to be high just once
+  // All hail dumb Shayan, for implementing this abomination of a logic
+  // which has crippled NRV to its core!!
+  val valid_reg = RegInit(0.B)
+  valid_reg := io.writeEnable | io.readEnable
+
+  io.dccmReq.valid := Mux((io.writeEnable | io.readEnable) && ~valid_reg, true.B, false.B)
+
+  when(valid_reg){
+    valid_reg := 0.B
+  }
 
   // Stall logic:
   // 1. Standard: Write or Read pending and no response
