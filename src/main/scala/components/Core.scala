@@ -144,13 +144,7 @@ class Core(implicit val config:Configs) extends Module{
   val is_comp     = dontTouch(WireInit(false.B))
 
   if (C) {
-    // val RA = Module(new Realigner).io
-    // RA.ral_address_i     := pc.io.out.asUInt
-    // RA.ral_instruction_i := IF.instruction
-    // RA.ral_jmp           := ID.pcSrc
-    // IF.address           := RA.ral_address_o
-    // val instruction_cd    = RA.ral_instruction_o
-    // ral_halt_o           := RA.ral_halt_o
+    // RIP: Here once lived a Realigner, who is no more with us
 
     IF.address := pc.io.out.asUInt
 
@@ -159,17 +153,12 @@ class Core(implicit val config:Configs) extends Module{
     instruction  := CD.instruction_o
     is_comp := CD.is_comp
 
+    // this is a double check mechanism for surely a c ext created misaligned instruction
     val cPhase = RegInit(true.B) // false :: misaligned & true :: aligned
     when(io.imemRsp.valid || IF.phase_valid){
       when(is_comp | ral_halt_o){
         cPhase := Mux(IF.halt_damn_pc, cPhase, ~cPhase) // increment for c ext instruction
       }
-      // .elsewhen(ral_halt_o){
-      //   cPhase := ~cPhase
-      // }
-      // .otherwise{
-      //   cPhase := Mux(IF.halt_damn_pc, cPhase, true.B)  // reset when full word non-c instruction
-      // }
     }
     IF.c_phase := cPhase
   }
