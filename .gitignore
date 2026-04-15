@@ -368,3 +368,7 @@ riscof_work/
 .bloop/
 .ammonite/
 metals.sbt
+
+# Documentation
+docs_venv/
+documentation/_build/
