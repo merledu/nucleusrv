@@ -1,27 +1,39 @@
-NucleusRV: A 32 bit RISC-V core
-===================================
+NucleusRV Documentation
+======================
 
-.. note::
-
-   This project is under active development.
-
-**NucleusRV** is a 32-bit 5 stage pipelined RISC-V core written in Chisel. It implements I base ISA, M multiply and divide, and C compressed instructions (RV32IMC). NucleusRV has been taped out in Google's sponsered OpenMPW-6 shuttle on SKY130nm process node.
-
-The documentation is split into 3 sections.
-
-The :doc:`Overview <01_overview/index>` section explores the features of NucleusRV from bird's eye view. 
-
-The :doc:`User Guide <02_user/index>` section provides information necessary to setup and run
-NucleusRV. It is aimed at software developers writing software for NucleusRV.
-
-The :doc:`Developer Guide <03_dev/index>` section gives detailed explanation of source code and different
-design decisions. It highlights contribution guidelines and will be helpful for people making
-changes to NucleusRV
+NucleusRV is an open-source 32-bit 5-stage pipelined RISC-V core (RV32IMAFC) written in Chisel. It is designed for high configurability and ease of integration into FPGA and ASIC designs.
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
+   :caption: Get Started
 
-   01_overview/index.rst
-   02_user/index.rst
-   03_dev/index.rst
+   introduction
+   quickstart
+   installation
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Core Concepts
+
+   concepts/isa-support
+   concepts/pipeline
+   concepts/memory-interface
+   concepts/configuration
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Guides
+
+   guides/running-assembly
+   guides/building-c-programs
+   guides/arch-tests
+   guides/waveform-simulation
+   guides/fpga-integration
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Reference
+
+   reference/csr-map
+   reference/config-options
+   reference/pipeline-stages
