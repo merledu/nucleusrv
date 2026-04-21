@@ -1,5 +1,5 @@
 NucleusRV Documentation
-======================
+=======================
 
 NucleusRV is an open-source 32-bit 5-stage pipelined RISC-V core (RV32IMAFC) written in Chisel. It is designed for high configurability and ease of integration into FPGA and ASIC designs.
 
