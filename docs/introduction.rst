@@ -29,7 +29,7 @@ Where to Go Next
 - :doc:`concepts/isa-support` for technical details on ISA extensions.
 
 What you can do with NucleusRV
-----------------------------
+------------------------------
 
 * **Install dependencies**: Set up Verilator, RISC-V GNU toolchain, sbt, and Scala.
 * **Generate Verilog**: Use ``NRVDriver`` to emit synthesis-ready Verilog.

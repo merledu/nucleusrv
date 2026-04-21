@@ -1,5 +1,5 @@
 NucleusRV Configuration Options Reference
-========================================
+=========================================
 
 Complete reference for the ``Configs`` class parameters.
 
