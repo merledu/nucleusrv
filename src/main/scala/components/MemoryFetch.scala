@@ -2,7 +2,10 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
 
-class MemoryFetch(TRACE: Boolean) extends Module {
+class MemoryFetch(
+  A: Boolean,
+  TRACE: Boolean
+) extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
     val writeData: UInt = Input(UInt(32.W))
@@ -13,38 +16,39 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     val f3 = Input(UInt(3.W))
 
     // AMO / LR / SC
-    val isAMO = Input(Bool())
-    val isLR  = Input(Bool())
-    val isSC  = Input(Bool())
-    val amoOp = Input(UInt(5.W))
-    val amoRdVal = Output(UInt(32.W)) // old memory value for rd
+    val isAMO = if (A) Some(Input(Bool())) else None
+    val isLR  = if (A) Some(Input(Bool())) else None
+    val isSC  = if (A) Some(Input(Bool())) else None
+    val amoOp = if (A) Some(Input(UInt(5.W))) else None
+    val amoRdVal = if (A) Some(Output(UInt(32.W))) else None // old memory value for rd
+    val amo_stall = if (A) Some(Output(Bool())) else None
 
     val dccmReq = Decoupled(new MemRequestIO)
     val dccmRsp = Flipped(Decoupled(new MemResponseIO))
 
     val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
     
-    val amo_alu_result_in = Input(UInt(32.W)) // Result from Execute stage
+    val amo_alu_result_in = if (A) Some(Input(UInt(32.W))) else None // Result from Execute stage
   })
 
   io.dccmRsp.ready := true.B
   
   // val amoALU = Module(new AMOALU) -- Moved to Execute
-  val amo_old_value = RegInit(0.U(32.W)) // Register to capture old memory value
+  val amo_old_value = if (A) Some(RegInit(0.U(32.W))) else None // Register to capture old memory value
 
   val wdata = Wire(Vec(4, UInt(8.W)))
   val rdata = Wire(UInt(32.W))
-  val offset = RegInit(0.U(2.W))
-  val funct3 = RegInit(0.U(3.W))
+  val offset = WireInit(0.U(2.W))
+  val funct3 = WireInit(0.U(3.W))
   val offsetSW = io.aluResultIn(1,0)
 
-  when(!io.dccmRsp.valid){
+  //when(!io.dccmRsp.valid){
     funct3 := io.f3
     offset := io.aluResultIn(1,0)
-  }.otherwise{
-    funct3 := funct3
-    offset := offset
-  }
+  //}.otherwise{
+    //funct3 := funct3
+    //offset := offset
+  //}
 
   wdata(0) := io.writeData(7,0)
   wdata(1) := io.writeData(15,8)
@@ -52,7 +56,9 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   wdata(3) := io.writeData(31,24)
 
   /* Store Byte */
-  when(io.writeEnable && io.f3 === "b000".U && !io.isAMO && !io.isSC){
+  when(io.writeEnable && io.f3 === "b000".U && (
+    if (A) !io.isAMO.get && !io.isSC.get else 1.B
+  )){
     when(offsetSW === 0.U){
       io.dccmReq.bits.activeByteLane := "b0001".U
       if (TRACE) io.wmask.get := "b0001".U
@@ -80,7 +86,10 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     }
   }
   /* Store Half Word */
-  .elsewhen(io.writeEnable && io.f3 === "b001".U && !io.isAMO && !io.isSC){
+  .elsewhen(io.writeEnable && io.f3 === "b001".U && (
+    if (A) !io.isAMO.get && !io.isSC.get else 1.B
+  )){
+    // offset will either be 0 or 2 since address will be 0x0000 or 0x0002
     when(offsetSW === 0.U){
       io.dccmReq.bits.activeByteLane := "b0011".U
       if (TRACE) io.wmask.get := "b0011".U
@@ -107,18 +116,24 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   }
 
   // Capture old memory value ONLY when AMO read completes
-  when(io.dccmRsp.valid && io.readEnable && io.isAMO) {
-    amo_old_value := rdata
+  if (A) {
+    when(io.dccmRsp.valid && io.readEnable && io.isAMO.get) {
+      amo_old_value.get := rdata
+    }
   }
 
   // io.amoRdVal is unused by Core, keeping 0
-  io.amoRdVal := 0.U
+  if (A) {
+    io.amoRdVal.get := 0.U
+  }
 
   // For AMO writes: use AMOALU result (from input), for normal stores: use wdata
-  val writeDataFinal = Mux(io.isAMO && io.writeEnable, io.amo_alu_result_in, wdata.asUInt)
+  val writeDataFinal = if (A) Mux(io.isAMO.get && io.writeEnable, io.amo_alu_result_in.get, wdata.asUInt) else wdata.asUInt
 
+  val addr = Cat("b00".U, (io.aluResultIn & "h3FFFFFFF".U)(31, 2))
+  //val addr = io.aluResultIn
   io.dccmReq.bits.dataRequest := writeDataFinal
-  io.dccmReq.bits.addrRequest := Cat("b00".U, (io.aluResultIn & "h3FFFFFFF".U)(31, 2))
+  io.dccmReq.bits.addrRequest := dontTouch(addr)
   io.dccmReq.bits.isWrite := io.writeEnable
   io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
 
@@ -128,13 +143,22 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   //    Wait, if we stall here, the pipeline holds 'ex_reg' as AMO.
   //    Core state machine will advance 'amo_read_done' to true.
   //    So next cycle, this stall condition will clear because 'readEnable' will be false (amo_read_done is true).
-  val amo_transition_stall = io.isAMO && io.readEnable && io.dccmRsp.valid
-  io.stall := ((io.writeEnable || io.readEnable) && !io.dccmRsp.valid) || amo_transition_stall
+  val amo_transition_stall = if (A) Some(io.isAMO.get && io.readEnable && io.dccmRsp.valid) else None
+  dontTouch(io.stall) := (false.B
+  //  io.writeEnable && io.dccmReq.ready
+  //) || (
+  //  io.readEnable && !io.dccmRsp.valid
+  )
+  if (A) {
+    io.amo_stall.get := amo_transition_stall.get
+  }
 
   rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 
   when(io.readEnable) {
-    when(funct3 === "b010".U || io.isAMO || io.isLR) {
+    when(funct3 === "b010".U || (
+      if (A) (io.isAMO.get || io.isLR.get) else 0.B
+    )) {
       // load word or AMO/LR
       io.readData := rdata
     }

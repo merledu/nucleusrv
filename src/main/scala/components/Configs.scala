@@ -2,10 +2,10 @@ package nucleusrv.components
 
 case class Configs(
     XLEN    : Int     = 32,
-    M       : Boolean = true,
+    M       : Boolean = false,
     F       : Boolean = true,
     C       : Boolean = false,
-    A       : Boolean = true,
+    A       : Boolean = false,
     Zicsr   : Boolean = true,
     TRACE   : Boolean = true,
     HARTID  : Int     = 1,

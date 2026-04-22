@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 
 class InstructionDecode(
+  A: Boolean,
   F: Boolean,
   Zicsr: Boolean,
   TRACE: Boolean
@@ -40,6 +41,7 @@ class InstructionDecode(
     val dmem_data = Input(UInt(32.W))
 
     val ex_stall = Input(Bool())
+    val mem_stall = Input(Bool())
 
     //Outputs
     val immediate = Output(UInt(32.W))
@@ -72,7 +74,7 @@ class InstructionDecode(
     val csr_i_instr_retired = if (Zicsr) Some(Input(Bool())) else None
     val csr_o_data          = if (Zicsr) Some(Output(UInt(32.W))) else None
     val is_csr              = if (Zicsr) Some(Output(Bool())) else None
-    val fcsr_o_data         = if (Zicsr) Some(Output(UInt(32.W))) else None
+    val fcsr_o_data         = if (Zicsr && F) Some(Output(UInt(32.W))) else None
 
     // F pins
     val f_read_reg = if (F) Some(Input(Vec(3, Vec(2, Bool())))) else None
@@ -87,31 +89,39 @@ class InstructionDecode(
     val rd_wdata = if (TRACE) Some(Output(UInt(32.W))) else None
 
     // Atomic Outputpins
-    val isAMO  = Output(Bool())
-    val isLR   = Output(Bool())
-    val isSC   = Output(Bool())
-    val amoOp  = Output(UInt(5.W))
-    val aq   = Output(Bool())
-    val rl   = Output(Bool())
+    val isAMO  = if (A) Some(Output(Bool())) else None
+    val isLR   = if (A) Some(Output(Bool())) else None
+    val isSC   = if (A) Some(Output(Bool())) else None
+    val amoOp  = if (A) Some(Output(UInt(5.W))) else None
+    val aq   = if (A) Some(Output(Bool())) else None
+    val rl   = if (A) Some(Output(Bool())) else None
 
     // HDU new inputs
-    val ex_is_amo  = Input(Bool())
-    val mem_is_amo = Input(Bool())
-    val addr_ex    = Input(UInt(32.W))
-    val addr_mem   = Input(UInt(32.W))
+    val ex_is_amo  = if (A) Some(Input(Bool())) else None
+    val mem_is_amo = if (A) Some(Input(Bool())) else None
+    val addr_ex    = if (A) Some(Input(UInt(32.W))) else None
+    val addr_mem   = if (A) Some(Input(UInt(32.W))) else None
   })
 
   //atomic instruction detection
   
-  val atomicDecoder = Module(new AtomicDecoder)
-  atomicDecoder.io.instr := io.id_instruction 
+  val atomicDecoder = if (A) Some(Module(new AtomicDecoder)) else None
+  if (A) {
+    atomicDecoder.get.io.instr := io.id_instruction 
+    io.isAMO.get := atomicDecoder.get.io.out.isAMO
+    io.isLR.get  := atomicDecoder.get.io.out.isLR
+    io.isSC.get  := atomicDecoder.get.io.out.isSC
+    io.amoOp.get := atomicDecoder.get.io.out.amoOp
+    io.aq.get    := atomicDecoder.get.io.out.aq
+    io.rl.get    := atomicDecoder.get.io.out.rl
+  }
 
-  io.isAMO := atomicDecoder.io.out.isAMO
-  io.isLR  := atomicDecoder.io.out.isLR
-  io.isSC  := atomicDecoder.io.out.isSC
-  io.amoOp := atomicDecoder.io.out.amoOp
-  io.aq    := atomicDecoder.io.out.aq
-  io.rl    := atomicDecoder.io.out.rl
+  //io.isAMO.get := atomicDecoder.get.io.out.isAMO
+  //io.isLR.get  := atomicDecoder.get.io.out.isLR
+  //io.isSC.get  := atomicDecoder.get.io.out.isSC
+  //io.amoOp.get := atomicDecoder.get.io.out.amoOp
+  //io.aq.get    := atomicDecoder.get.io.out.aq
+  //io.rl.get    := atomicDecoder.get.io.out.rl
 
   val is_f = if (F) Some(WireInit(0.B)) else None
   if (F) {
@@ -128,7 +138,7 @@ class InstructionDecode(
   }
 
   // CSR
-  val csr = if (Zicsr) Some(Module(new CSR())) else None
+  val csr = if (Zicsr) Some(Module(new CSR(F))) else None
   if (Zicsr) {
     csr.get.io.i_misa_value         := io.csr_i_misa.get
     csr.get.io.i_mhartid_value      := io.csr_i_mhartid.get
@@ -138,15 +148,17 @@ class InstructionDecode(
     csr.get.io.i_addr               := io.id_instruction(31,20)
     csr.get.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
     csr.get.io.i_instr_retired      := io.csr_i_instr_retired.get
-    csr.get.io.f_except             <> io.f_except.get(2)
+    if (F) {
+      csr.get.io.f_except.get       <> io.f_except.get(2)
+      io.fcsr_o_data.get            := csr.get.io.fcsr_o_data.get
+    }
 
     io.is_csr.get                   := io.id_instruction(6, 0) === "b1110011".U
     io.csr_o_data.get               := MuxCase(csr.get.io.o_data, Vector(
-                                         ((io.id_instruction(31, 20) === 1.U) || (io.id_instruction(31, 20) === 3.U)) -> (csr.get.io.o_data | (0 until 3).map(
+                                         ((io.id_instruction(31, 20) === 1.U) || (io.id_instruction(31, 20) === 3.U)) -> (csr.get.io.o_data | (if (F) (0 until 3).map(
                                            f => Mux(io.is_f_in.get(f), io.f_except.get(f).asUInt, 0.U)
-                                         ).reduce(_ | _))
+                                         ).reduce(_ | _) else 0.B))
                                        ))
-    io.fcsr_o_data.get              := csr.get.io.fcsr_o_data
   }
 
   val csrController = if (Zicsr) Some(Module(new CSRController())) else None
@@ -166,7 +178,7 @@ class InstructionDecode(
   }
 
   //Hazard Detection Unit
-  val hdu = Module(new HazardUnit)
+  val hdu = Module(new HazardUnit(A))
   hdu.io.dmem_resp_valid := io.dmem_resp_valid
   hdu.io.id_ex_memRead := io.id_ex_mem_read
   hdu.io.ex_mem_memRead := io.ex_mem_mem_read
@@ -177,6 +189,7 @@ class InstructionDecode(
   hdu.io.id_rs2 := io.id_instruction(24, 20)
   hdu.io.jump := io.ctl_jump
   hdu.io.branch := io.ctl_branch
+  hdu.io.stall := io.ex_stall || io.mem_stall
   io.hdu_pcWrite := hdu.io.pc_write
   io.hdu_if_reg_write := hdu.io.if_reg_write
 
@@ -214,12 +227,16 @@ class InstructionDecode(
   val registerRs3 = if (F) Some(io.id_instruction(31, 27)) else None
   val readData1 = WireInit(0.U(32.W))
   val readData2 = WireInit(0.U(32.W))
-  val writeData = dontTouch(Mux(io.csr_Wb, io.csr_Wb_data, io.writeData))
+  val writeData = dontTouch(MuxCase(io.writeData, List(
+    (io.csr_Ex && io.id_ex_regWr && ((registerRs1 === io.id_ex_rd) || (registerRs2 === io.id_ex_rd)) && (io.id_ex_rd =/= 0.U)) -> io.csr_Ex_data,
+    (io.csr_Mem && io.ex_mem_regWr && ((registerRs1 === io.ex_mem_rd) || (registerRs2 === io.ex_mem_rd)) && (io.ex_mem_rd =/= 0.U)) -> io.csr_Mem_data,
+    (io.csr_Wb && io.ctl_writeEnable(0) && ((registerRs1 === io.writeReg) || (registerRs2 === io.writeReg)) && (io.writeReg =/= 0.U)) -> io.csr_Wb_data
+  )))
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
   registers.io.writeEnable(0) := io.ctl_writeEnable(0) || (!io.ex_stall && io.csr_Wb)
   registers.io.writeAddress := registerRd
-  registers.io.writeData := writeData
+  registers.io.writeData := io.writeData
   if (F) {
     registers.io.readAddress(2) := registerRs3.get
     registers.io.f_read.get <> control.io.f_read.get
@@ -240,7 +257,7 @@ class InstructionDecode(
     ) {
       readData1 := 0.U
     }.otherwise{
-      readData1 := io.writeData
+      readData1 := writeData
     }
   }.otherwise {
     readData1 := registers.io.readData(0)
@@ -259,7 +276,7 @@ class InstructionDecode(
     ) {
       readData2 := 0.U
     }.otherwise{
-      readData2 := io.writeData
+      readData2 := writeData
     }
   }.otherwise{
     readData2 := registers.io.readData(1)
@@ -268,18 +285,20 @@ class InstructionDecode(
   if (F) {
     io.readData3.get := Mux(
       (io.writeReg === registerRs3.get) && (io.ctl_writeEnable(1) && control.io.f_read.get(2)),
-      io.writeData,
+      writeData,
       registers.io.readData(2)
     )
   }
   
-  // AMO Forwarding (Memory Dependency) overrides Register Forwarding
-  when(hdu.io.operandForwardEX) {
-    io.readData1 := io.ex_result
-    io.readData2 := io.ex_result
-  }.elsewhen(hdu.io.operandForwardMEM) {
-    io.readData1 := io.ex_mem_result
-    io.readData2 := io.ex_mem_result
+  if (A) {
+    // AMO Forwarding (Memory Dependency) overrides Register Forwarding
+    when(hdu.io.operandForwardEX.get) {
+      io.readData1 := io.ex_result
+      io.readData2 := io.ex_result
+    }.elsewhen(hdu.io.operandForwardMEM.get) {
+      io.readData1 := io.ex_mem_result
+      io.readData2 := io.ex_mem_result
+    }
   }
   
 
@@ -292,6 +311,11 @@ class InstructionDecode(
   val input2 = Wire(UInt(32.W))
 
   when (
+    (registerRs1 === io.ex_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(0)(0) else 1.B)
+  ) {
+    input1 := io.ex_result
+  }.elsewhen (
     (registerRs1 === io.ex_mem_ins(11, 7))
     && (if (F) !io.f_read_reg.get(1)(0) else 1.B)
   ) {
@@ -305,6 +329,11 @@ class InstructionDecode(
     input1 := readData1
   }
   when (
+    (registerRs2 === io.ex_ins(11, 7))
+    && (if (F) !io.f_read_reg.get(0)(1) else 1.B)
+  ) {
+    input2 := io.ex_result
+  }.elsewhen (
     (registerRs2 === io.ex_mem_ins(11, 7))
     && (if (F) !io.f_read_reg.get(1)(1) else 1.B)
   ) {
@@ -384,23 +413,29 @@ class InstructionDecode(
   val csr_iData_cases = Array(
     1.U -> io.ex_result,
     2.U -> Mux(io.ex_mem_mem_read, io.dmem_data, io.ex_mem_result),
-    3.U -> io.writeData,
+    3.U -> writeData,
     4.U -> io.csr_Ex_data,
     5.U -> io.csr_Mem_data,
     6.U -> io.csr_Wb_data
   )
 
   if (Zicsr) {
-    csr.get.io.i_data := MuxLookup(csrController.get.io.forwardRS1, registers.io.readData(0), csr_iData_cases)
+    csr.get.io.i_data := MuxLookup(
+      csrController.get.io.forwardRS1,
+      registers.io.readData(0),
+      csr_iData_cases
+    )
   }
 
-  hdu.io.id_is_amo  := io.isAMO
-  hdu.io.ex_is_amo  := io.ex_is_amo
-  hdu.io.mem_is_amo := io.mem_is_amo
-  
-  hdu.io.addr_id  := readData1 // RS1 is address for AMO
-  hdu.io.addr_ex  := io.addr_ex
-  hdu.io.addr_mem := io.addr_mem
+  if (A) {
+    hdu.io.id_is_amo.get  := io.isAMO.get
+    hdu.io.ex_is_amo.get  := io.ex_is_amo.get
+    hdu.io.mem_is_amo.get := io.mem_is_amo.get
+    
+    hdu.io.addr_id.get  := readData1 // RS1 is address for AMO
+    hdu.io.addr_ex.get  := io.addr_ex.get
+    hdu.io.addr_mem.get := io.addr_mem.get
+  }
   
 
   // RVFI

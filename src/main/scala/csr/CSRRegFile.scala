@@ -12,8 +12,8 @@ case class CSROperations(
     val CLEAR   :UInt   =   3.U(2.W)
 )
 
-class CSRRegFile extends Module{
-    val io = IO(new CSRRegFileIO)
+class CSRRegFile(F: Boolean) extends Module{
+    val io = IO(new CSRRegFileIO(F))
 
     /***************** Initializations *****************/
     // Registers
@@ -64,12 +64,12 @@ class CSRRegFile extends Module{
     val TIMEH_REG           = RegInit(0.U(32.W))
 
     //FCSR 
-    val FCSR_NX_REG         = RegInit(0.B)
-    val FCSR_UF_REG         = RegInit(0.B)
-    val FCSR_OF_REG         = RegInit(0.B)
-    val FCSR_DZ_REG         = RegInit(0.B)
-    val FCSR_NV_REG         = RegInit(0.B)
-    val FCSR_FRM_REG        = RegInit(0.U(3.W))
+    val FCSR_NX_REG         = if (F) Some(RegInit(0.B)) else None
+    val FCSR_UF_REG         = if (F) Some(RegInit(0.B)) else None
+    val FCSR_OF_REG         = if (F) Some(RegInit(0.B)) else None
+    val FCSR_DZ_REG         = if (F) Some(RegInit(0.B)) else None
+    val FCSR_NV_REG         = if (F) Some(RegInit(0.B)) else None
+    val FCSR_FRM_REG        = if (F) Some(RegInit(0.U(3.W))) else None
 
     /***************************************************/
 
@@ -78,21 +78,23 @@ class CSRRegFile extends Module{
     MHARTID_REG             := io.MHARTID.i_value
     MARCHID_REG             := io.MARCHID.i_value
 
-    Vector(
-      FCSR_NX_REG,
-      FCSR_UF_REG,
-      FCSR_OF_REG,
-      FCSR_DZ_REG,
-      FCSR_NV_REG
-    ).zipWithIndex.foreach(
-      f => f._1 := f._1 | io.FCSR.except(f._2)
-    )
-    io.FCSR.nx              := FCSR_NX_REG
-    io.FCSR.uf              := FCSR_UF_REG
-    io.FCSR.of              := FCSR_OF_REG
-    io.FCSR.dz              := FCSR_DZ_REG
-    io.FCSR.nv              := FCSR_NV_REG
-    io.FCSR.frm             := FCSR_FRM_REG
+    if (F) {
+      Vector(
+        FCSR_NX_REG.get,
+        FCSR_UF_REG.get,
+        FCSR_OF_REG.get,
+        FCSR_DZ_REG.get,
+        FCSR_NV_REG.get
+      ).zipWithIndex.foreach(
+        f => f._1 := f._1 | io.FCSR.get.except(f._2)
+      )
+      io.FCSR.get.nx              := FCSR_NX_REG.get
+      io.FCSR.get.uf              := FCSR_UF_REG.get
+      io.FCSR.get.of              := FCSR_OF_REG.get
+      io.FCSR.get.dz              := FCSR_DZ_REG.get
+      io.FCSR.get.nv              := FCSR_NV_REG.get
+      io.FCSR.get.frm             := FCSR_FRM_REG.get
+    }
 
     // Wires
     val w_data                  = Wire(UInt(32.W))
@@ -105,24 +107,24 @@ class CSRRegFile extends Module{
     val MTVEC_MODE_WIRE         = WireInit(MTVEC_REG(1,0))
     val MTVEC_BASE_WIRE         = WireInit(MTVEC_REG(31,2))
     val MCOUNTINHIBIT_WIRE      = WireInit(Cat("b0".U(29.W),MCOUNTINHIBIT_IR_REG, "b0".U(1.W), MCOUNTINHIBIT_CY_REG))
-    val FFLAGS_WIRE             = WireInit(Cat(
+    val FFLAGS_WIRE             = if (F) Some(WireInit(Cat(
                                     "b0".U(27.W),
-                                    FCSR_NV_REG,
-                                    FCSR_DZ_REG,
-                                    FCSR_OF_REG,
-                                    FCSR_UF_REG,
-                                    FCSR_NX_REG
-                                  ))
-    val FRM_WIRE                = WireInit(Cat("b0".U(29.W),FCSR_FRM_REG))
-    val FCSR_WIRE               = WireInit(Cat(
+                                    FCSR_NV_REG.get,
+                                    FCSR_DZ_REG.get,
+                                    FCSR_OF_REG.get,
+                                    FCSR_UF_REG.get,
+                                    FCSR_NX_REG.get
+                                  ))) else None
+    val FRM_WIRE                = if (F) Some(WireInit(Cat("b0".U(29.W),FCSR_FRM_REG.get))) else None
+    val FCSR_WIRE               = if (F) Some(WireInit(Cat(
                                     "b0".U(24.W),
-                                    FCSR_FRM_REG,
-                                    FCSR_NV_REG,
-                                    FCSR_DZ_REG,
-                                    FCSR_OF_REG,
-                                    FCSR_UF_REG,
-                                    FCSR_NX_REG
-                                  ))
+                                    FCSR_FRM_REG.get,
+                                    FCSR_NV_REG.get,
+                                    FCSR_DZ_REG.get,
+                                    FCSR_OF_REG.get,
+                                    FCSR_UF_REG.get,
+                                    FCSR_NX_REG.get
+                                  ))) else None
 
     val csr_opr = CSROperations()
     /***************************************************/
@@ -169,9 +171,9 @@ class CSRRegFile extends Module{
         AddressMap.MTVAL   -> MTVAL_REG,
         AddressMap.MIE     -> MIE_WIRE,
         AddressMap.MIP     -> MIP_WIRE,
-        AddressMap.FFLAGS  -> FFLAGS_WIRE,
-        AddressMap.FRM     -> FRM_WIRE,
-        AddressMap.FCSR    -> FCSR_WIRE,
+        //AddressMap.FFLAGS  -> FFLAGS_WIRE,
+        //AddressMap.FRM     -> FRM_WIRE,
+        //AddressMap.FCSR    -> FCSR_WIRE,
         AddressMap.MCYCLE  -> MCYCLE_REG,
         AddressMap.MCYCLEH -> MCYCLEH_REG,
         AddressMap.MINSTRET-> MINSTRET_REG,
@@ -179,7 +181,11 @@ class CSRRegFile extends Module{
         AddressMap.MCOUNTINHIBIT-> MCOUNTINHIBIT_WIRE,
         AddressMap.TIME    -> TIME_REG,
         AddressMap.TIMEH   -> TIMEH_REG
-    )
+    ) ++ (if (F) Array(
+        AddressMap.FFLAGS  -> FFLAGS_WIRE.get,
+        AddressMap.FRM     -> FRM_WIRE.get,
+        AddressMap.FCSR    -> FCSR_WIRE.get
+    ) else Array())
 
     r_data := MuxLookup(io.CSR.i_addr, DontCare, READ_CASES)
 
@@ -241,22 +247,28 @@ class CSRRegFile extends Module{
                 MIP_MSIP_REG     := w_data(3)
             }
             is(AddressMap.FCSR){
-               FCSR_NX_REG       := w_data(0)
-               FCSR_UF_REG       := w_data(1)
-               FCSR_OF_REG       := w_data(2)
-               FCSR_DZ_REG       := w_data(3)
-               FCSR_NV_REG       := w_data(4)
-               FCSR_FRM_REG      := w_data(7,5)
+              if (F) {
+                FCSR_NX_REG.get       := w_data(0)
+                FCSR_UF_REG.get       := w_data(1)
+                FCSR_OF_REG.get       := w_data(2)
+                FCSR_DZ_REG.get       := w_data(3)
+                FCSR_NV_REG.get       := w_data(4)
+                FCSR_FRM_REG.get      := w_data(7,5)
+              }
             }
             is(AddressMap.FFLAGS){
-               FCSR_NX_REG       := w_data(0)
-               FCSR_UF_REG       := w_data(1)
-               FCSR_OF_REG       := w_data(2)
-               FCSR_DZ_REG       := w_data(3)
-               FCSR_NV_REG       := w_data(4)
+              if (F) {
+                FCSR_NX_REG.get       := w_data(0)
+                FCSR_UF_REG.get       := w_data(1)
+                FCSR_OF_REG.get       := w_data(2)
+                FCSR_DZ_REG.get       := w_data(3)
+                FCSR_NV_REG.get       := w_data(4)
+              }
             }
             is(AddressMap.FRM){
-               FCSR_FRM_REG      := w_data(2,0)
+              if (F) {
+                FCSR_FRM_REG.get      := w_data(2,0)
+              }
             }
             is(AddressMap.MCYCLE){
                 MCYCLE_REG        := w_data

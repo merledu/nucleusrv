@@ -7,6 +7,7 @@ import FBitPats._
 class Execute(
   F: Boolean,
   M: Boolean = false,
+  A: Boolean,
   TRACE: Boolean
 ) extends Module {
   val io = IO(new Bundle {
@@ -30,9 +31,9 @@ class Execute(
     val ctl_aluSrc1 = Input(UInt(2.W))
 
     // AMO control signals
-    val isAMO = Input(Bool())
-    val isLR = Input(Bool())
-    val isSC = Input(Bool())
+    val isAMO = if (A) Some(Input(Bool())) else None
+    val isLR = if (A) Some(Input(Bool())) else None
+    val isSC = if (A) Some(Input(Bool())) else None
 
     val writeData = Output(UInt(32.W))
     val ALUresult = Output(UInt(32.W))
@@ -48,20 +49,22 @@ class Execute(
     val is_f_o = if (F) Some(Output(Bool())) else None
     val exceptions = if (F) Some(Output(Vec(5, Bool()))) else None
     // AMO signals from Core (for looping back ex_reg values)
-    val amo_memData = Input(UInt(32.W))
-    val amo_src2    = Input(UInt(32.W))
-    val amo_op_code = Input(UInt(5.W))
-    val amo_result  = Output(UInt(32.W))
+    val amo_memData = if (A) Some(Input(UInt(32.W))) else None
+    val amo_src2    = if (A) Some(Input(UInt(32.W))) else None
+    val amo_op_code = if (A) Some(Input(UInt(5.W))) else None
+    val amo_result  = if (A) Some(Output(UInt(32.W))) else None
   })
 
   val alu = Module(new ALU)
   val aluCtl = Module(new AluControl)
   
-  val amoAlu = Module(new AMOALU)
-  amoAlu.io.memData := io.amo_memData
-  amoAlu.io.src2 := io.amo_src2
-  amoAlu.io.amoOp := io.amo_op_code
-  io.amo_result := amoAlu.io.result
+  val amoAlu = if (A) Some(Module(new AMOALU)) else None
+  if (A) {
+    amoAlu.get.io.memData := io.amo_memData.get
+    amoAlu.get.io.src2 := io.amo_src2.get
+    amoAlu.get.io.amoOp := io.amo_op_code.get
+    io.amo_result.get := amoAlu.get.io.result
+  }
 
   val fu = Module(new ForwardingUnit(F)).io
 
@@ -105,8 +108,10 @@ class Execute(
 
   val aluIn1 = MuxCase(
     inputMux1,
+    (if (A) Array((io.isAMO.get || io.isLR.get || io.isSC.get) -> inputMux1)  // AMO.. rs1 is the address
+    else Array()) ++
     Array(
-      (io.isAMO || io.isLR || io.isSC) -> inputMux1,  // AMO.. rs1 is the address
+      //(io.isAMO || io.isLR || io.isSC) -> inputMux1,  // AMO.. rs1 is the address
       (io.ctl_aluSrc1 === 1.U) -> io.pcAddress,
       (io.ctl_aluSrc1 === 2.U) -> 0.U
     )
@@ -115,7 +120,7 @@ class Execute(
   // ALU Input 2 Selection
   // For AMO/LR/SC: use 0..no offset, just pass rs1 through
   val aluIn2 = Mux(
-    io.isAMO || io.isLR || io.isSC,
+    if (A) io.isAMO.get || io.isLR.get || io.isSC.get else 0.B,
     0.U,  // AMO no offset, ALU computes rs1 + 0 = rs1
     Mux(io.ctl_aluSrc, inputMux2, io.immediate)
   )

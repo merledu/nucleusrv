@@ -56,27 +56,27 @@ module sram #(
   input [NUM_WMASKS-1:0]   wmask0; // write mask
   input [ADDR_WIDTH-1:0]  addr0;
   input [DATA_WIDTH-1:0]  din0;
-  output [DATA_WIDTH-1:0] dout0;
+  output reg [DATA_WIDTH-1:0] dout0;
   input  clk1; // clock
   input   csb1; // active low chip select
   input [ADDR_WIDTH-1:0]  addr1;
   output [DATA_WIDTH-1:0] dout1;
 
-  reg  csb0_reg;
-  reg  web0_reg;
-  reg [NUM_WMASKS-1:0]   wmask0_reg;
-  reg [ADDR_WIDTH-1:0]  addr0_reg;
-  reg [DATA_WIDTH-1:0]  din0_reg;
-  reg [DATA_WIDTH-1:0]  dout0;
+  //reg  csb0_reg;
+  //reg  web0_reg;
+  //reg [NUM_WMASKS-1:0]   wmask0_reg;
+  //reg [ADDR_WIDTH-1:0]  addr0_reg;
+  //reg [DATA_WIDTH-1:0]  din0_reg;
+  //reg [DATA_WIDTH-1:0]  dout0;
 
   // All inputs are registers
-  always @(posedge clk0)
-  begin
-    csb0_reg = csb0;
-    web0_reg = web0;
-    wmask0_reg = wmask0;
-    addr0_reg = addr0;
-    din0_reg = din0;
+  //always @(posedge clk0)
+  //begin
+  //  csb0_reg = csb0;
+  //  web0_reg = web0;
+  //  wmask0_reg = wmask0;
+  //  addr0_reg = addr0;
+  //  din0_reg = din0;
     //dout0 = 32'bx0;
 /*`ifdef DBG
     if ( !csb0_reg && web0_reg )
@@ -84,7 +84,7 @@ module sram #(
     if ( !csb0_reg && !web0_reg )
       $display($time," Writing %m addr0=%b din0=%b wmask0=%b",addr0_reg,din0_reg,wmask0_reg);
 `endif
-*/   end
+*/   //end
 
   reg  csb1_reg;
   reg [ADDR_WIDTH-1:0]  addr1_reg;
@@ -115,15 +115,15 @@ initial
   // Write Operation : When web0 = 0, csb0 = 0
   always @ (negedge clk0)
   begin : MEM_WRITE0
-    if ( !csb0_reg && !web0_reg ) begin
-        if (wmask0_reg[0])
-                mem[addr0_reg][7:0] = din0_reg[7:0];
-        if (wmask0_reg[1])
-                mem[addr0_reg][15:8] = din0_reg[15:8];
-        if (wmask0_reg[2])
-                mem[addr0_reg][23:16] = din0_reg[23:16];
-        if (wmask0_reg[3])
-                mem[addr0_reg][31:24] = din0_reg[31:24];
+    if ( !csb0 && !web0 ) begin
+        if (wmask0[0])
+                mem[addr0][7:0] = din0[7:0];
+        if (wmask0[1])
+                mem[addr0][15:8] = din0[15:8];
+        if (wmask0[2])
+                mem[addr0][23:16] = din0[23:16];
+        if (wmask0[3])
+                mem[addr0][31:24] = din0[31:24];
     end
   end
 
@@ -131,8 +131,8 @@ initial
   // Read Operation : When web0 = 1, csb0 = 0
   always @ (negedge clk0)
   begin : MEM_READ0
-    if (!csb0_reg && web0_reg)
-       dout0 <= #(DELAY) mem[addr0_reg];
+    if (!csb0 && web0)
+       dout0 <= mem[addr0];
   end
 
   // Memory Read Block Port 1
