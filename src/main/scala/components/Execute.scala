@@ -211,7 +211,9 @@ class Execute(
   val f_multi_cycle_inst = if (F) Some(dontTouch(Vector(fdiv_s, fsqrt_s).map(
     f => f === io.id_ex_ins
   ).reduce(_ || _))) else None
-  val f_stall = if (F) Some((io.func7 === "b0001100".U) || (io.func7 === "b0101100".U) || (!fpu.get.div_sqrt_ready)) else None
+  //val f_stall = if (F) Some((io.func7 === "b0001100".U) || (io.func7 === "b0101100".U) || (!fpu.get.div_sqrt_ready)) else None
+  val f_stall = if (F) Some(f_multi_cycle_inst.get && (!fpu.get.div_sqrt_valid_out)) else None
+  val f_in_valid = if (F) Some(RegInit(0.B)) else None
   if (F) {
     fpu.get.rm := Mux(
       io.func3 === 7.U,
@@ -249,9 +251,14 @@ class Execute(
     ).zipWithIndex.map(
       f => (f._1 === io.id_ex_ins) -> (f._2 + 1).U
     ))
-    fpu.get.div_sqrt_valid := f_multi_cycle_inst.get
+    fpu.get.div_sqrt_valid := f_multi_cycle_inst.get && !f_in_valid.get
     io.exceptions.get <> fpu.get.exceptions
     io.is_f_o.get := io.is_f_i.get | RegNext(f_stall.get)
+    when (fpu.get.div_sqrt_valid_out) {
+      f_in_valid.get := 0.B
+    }.elsewhen (f_multi_cycle_inst.get && !f_in_valid.get) {
+      f_in_valid.get := 1.B
+    }
   }
 
   io.ALUresult := MuxCase(alu.io.result, (
@@ -272,7 +279,7 @@ class Execute(
     ) || (div_en.get && counter.get < 32.U)
     else false.B
   ) || (
-    if (F) f_stall.get else false.B
+    if (F) dontTouch(f_stall.get) else false.B
   )
 
   // Write Data: for AMO/LR/SC, this is rs2: sourceB operand
