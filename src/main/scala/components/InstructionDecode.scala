@@ -408,7 +408,7 @@ class InstructionDecode(
     io.func7 := 0.U
   }
 
-  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
+  dontTouch(io.stall) := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
 
   val csr_iData_cases = Array(
     1.U -> io.ex_result,

@@ -273,7 +273,7 @@ class Execute(
     ) else Vector()
   ))
 
-  io.stall := (
+  dontTouch(io.stall) := (
     if (M) (
       io.func7 === 1.U && ~div_en.get && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
     ) || (div_en.get && counter.get < 32.U)

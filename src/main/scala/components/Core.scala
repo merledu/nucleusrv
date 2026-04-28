@@ -173,10 +173,10 @@ class Core(implicit val config:Configs) extends Module{
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc || MEM.io.stall
   
-  val halt = dontTouch(Mux(((EX.stall || ID.stall || !io.imemReq.valid) | ral_halt_o || MEM.io.stall), 1.B, 0.B))
+  val halt = dontTouch(Mux(((EX.stall || ID.stall /*|| !io.imemReq.valid*/) || ral_halt_o || MEM.io.stall || (if (A) MEM.io.amo_stall.get else 0.B)), 1.B, 0.B))
   pc.io.halt := halt
   val npc = Mux(
-    ID.hdu_pcWrite || !halt,
+    ID.hdu_pcWrite && !halt,
     Mux(
       ID.pcSrc,
       ID.pcPlusOffset.asSInt,
@@ -403,7 +403,14 @@ class Core(implicit val config:Configs) extends Module{
   )
   //MEM.io.writeEnable := (ex_reg_ctl_memWrite && !ex_reg_isSC && !ex_reg_isAMO) || (ex_reg_isAMO && amo_read_done) || (ex_reg_isSC && sc_success && !sc_issued)
 
-  MEM.io.writeData := ex_reg_wd
+  //MEM.io.writeData := ex_reg_wd
+  MEM.io.writeData := (if (A) Mux(
+    (mem_reg_isAMO.get && (mem_reg_wra =/= 0.U) && (
+      (mem_reg_wra === ex_reg_ins(19, 15)) || (mem_reg_wra === ex_reg_ins(24, 20))
+    )),
+    mem_reg_rd,
+    ex_reg_wd
+  ) else ex_reg_wd)
 
   // atomic signals to Mem
   if (A) {

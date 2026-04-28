@@ -85,6 +85,7 @@ class nucleusrv(pluginTemplate):
        # add more utility snippets here
        self.objcopy = 'riscv{0}-unknown-elf-objcopy -O binary -j {3} {1} {2}'
        self.hexdump = 'hexdump -v -e \'1/4 "%08x\\n"\' {0} > {1}'
+       self.objdump = 'riscv{0}-unknown-elf-objdump -D -Mno-aliases {1} > {1}.objdump'
 
     def build(self, isa_yaml, platform_yaml):
 
@@ -175,6 +176,7 @@ class nucleusrv(pluginTemplate):
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
                 self.hexdump.format('dmem.bin', 'dmem.hex'),
+                self.objdump.format(self.xlen, elf),
                 f'cd {self.dut}',
                 self.sbt.format(
                     os.path.join(testentry['work_dir'], 'imem.hex'),
@@ -191,7 +193,8 @@ class nucleusrv(pluginTemplate):
                 self.objcopy.format(self.xlen, elf, 'imem.bin', '.text.init'),
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
-                self.hexdump.format('dmem.bin', 'dmem.hex')
+                self.hexdump.format('dmem.bin', 'dmem.hex'),
+                self.objdump.format(self.xlen, elf)
             ))
 
           # concatenate all commands that need to be executed within a make-target.
