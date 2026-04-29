@@ -53,14 +53,14 @@ def simulate_and_compare(testlist, test, f):
     if len(nrv_sig) != len(ref_sig):
         f.write(f'| {test_name:30} | {"Failed"} |\n')
         f.flush()
-    for i in range(min((len(nrv_sig), len(ref_sig)))):
+        return
+    for i in range(len(nrv_sig)):
         if nrv_sig[i] != ref_sig[i]:
             f.write(f'| {test_name:30} | {"Failed"} |\n')
             f.flush()
-            break
-    else:
-        f.write(f'| {test_name:30} | {"Passed"} |\n')
-        f.flush()
+            return
+    f.write(f'| {test_name:30} | {"Passed"} |\n')
+    f.flush()
 
 if __name__ == '__main__':
     parser = ArgumentParser()
