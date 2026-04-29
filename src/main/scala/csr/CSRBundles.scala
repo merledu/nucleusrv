@@ -40,11 +40,11 @@ class CSR_IO extends Bundle{
     val i_w_en = Input(Bool())
 }
 
-class CSRRegFileIO extends Bundle{
+class CSRRegFileIO(F: Boolean) extends Bundle{
     val MISA    = new MISA()
     val MHARTID = new MHARTID()
     val MARCHID = new MARCHID()
     val CSR     = new CSR_IO()
-    val FCSR    = new FCSR()
+    val FCSR    = if (F) Some(new FCSR()) else None
     val MINSTRET = new MINSTRET()
 }
