@@ -50,7 +50,7 @@ class InstructionFetch extends Module {
       // b/w 2 individual word instruction
       
       // 3 states :: 0 - send first req :: 1 - send second req :: 2 - finished instruction
-      val requester_state_phase = dontTouch(RegInit(0.U(2.W))) 
+      val requester_state_phase = RegInit(0.U(2.W))
       val instruction_storage_reg_1 = dontTouch(RegInit(0.U(32.W)))
       val instruction_storage_reg_2 = dontTouch(RegInit(0.U(32.W)))
 
@@ -76,9 +76,9 @@ class InstructionFetch extends Module {
 
       io.coreInstrReq.bits.addrRequest := Mux(
         io.coreInstrReq.ready,
-        MuxLookup(requester_state_phase, DontCare)(Seq(
-          0.U -> Cat("b00".U, io.address(31, 2)),
-          1.U -> Cat("b00".U, io.address(31, 2)) + 1.U
+        MuxLookup(requester_state_phase, DontCare, Seq(
+          (0.U -> Cat("b00".U, io.address(31, 2))),
+          (1.U -> (Cat("b00".U, io.address(31, 2)) + 1.U))
         )),
         DontCare
       )
