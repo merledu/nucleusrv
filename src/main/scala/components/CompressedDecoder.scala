@@ -287,4 +287,10 @@ class CompressedDecoder extends Module {
       io.is_comp := false.B
       io.instruction_o := io.instruction_i
   }
+
+  when(io.instruction_i === "h00000013".asUInt(32.W)){
+    // nop -- pass down -- not is_comp
+    io.is_comp := false.B
+    io.instruction_o := io.instruction_i
+  }
 }

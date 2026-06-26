@@ -4,7 +4,7 @@ case class Configs(
     XLEN    : Int     = 32,
     M       : Boolean = true,
     F       : Boolean = true,
-    C       : Boolean = false,
+    C       : Boolean = true,
     A       : Boolean = true,
     Zicsr   : Boolean = true,
     TRACE   : Boolean = true,

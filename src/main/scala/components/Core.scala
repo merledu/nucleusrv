@@ -32,10 +32,12 @@ class Core(implicit val config:Configs) extends Module{
 
   // IF-ID Registers
   val if_reg_pc = RegInit(0.U(32.W))
+  val if_reg_next_pc = RegInit(0.U(32.W))
   val if_reg_ins = RegInit(0.U(32.W))
 
   // ID-EX Registers
   val id_reg_pc = RegInit(0.U(32.W))
+  val id_reg_next_pc = RegInit(0.U(32.W))
   val id_reg_rd1 = RegInit(0.U(32.W))
   val id_reg_rd2 = RegInit(0.U(32.W))
   val id_reg_imm = RegInit(0.U(32.W))
@@ -79,6 +81,7 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_ctl_memWrite = RegInit(false.B)
   val ex_reg_ctl_branch_taken = RegInit(false.B)
   val ex_reg_pc = RegInit(0.U(32.W))
+  val ex_reg_next_pc = RegInit(0.U(32.W))
   val ex_reg_is_csr = RegInit(false.B)
   val ex_reg_csr_data = RegInit(0.U)
 
@@ -101,6 +104,7 @@ class Core(implicit val config:Configs) extends Module{
   val mem_reg_ctl_memToReg = RegInit(0.U(2.W))
   val mem_reg_ctl_regWrite = RegInit(VecInit(Vector.fill(if (F) 2 else 1)(0.B)))
   val mem_reg_pc = RegInit(0.U(32.W))
+  val mem_reg_next_pc = RegInit(0.U(32.W))
   val mem_reg_is_csr = RegInit(false.B)
   val mem_reg_csr_data = RegInit(0.U)
 
@@ -140,18 +144,23 @@ class Core(implicit val config:Configs) extends Module{
   val is_comp     = dontTouch(WireInit(false.B))
 
   if (C) {
-    val RA = Module(new Realigner).io
-    RA.ral_address_i     := pc.io.out.asUInt
-    RA.ral_instruction_i := IF.instruction
-    RA.ral_jmp           := ID.pcSrc
-    IF.address           := RA.ral_address_o
-    val instruction_cd    = RA.ral_instruction_o
-    ral_halt_o           := RA.ral_halt_o
+    // RIP: Here once lived a Realigner, who is no more with us
+
+    IF.address := pc.io.out.asUInt
 
     val CD = Module(new CompressedDecoder).io
-    CD.instruction_i := instruction_cd
+    CD.instruction_i := IF.instruction
     instruction  := CD.instruction_o
     is_comp := CD.is_comp
+
+    // this is a double check mechanism for surely a c ext created misaligned instruction
+    val cPhase = RegInit(true.B) // false :: misaligned & true :: aligned
+    when(io.imemRsp.valid || IF.phase_valid){
+      when(is_comp | ral_halt_o){
+        cPhase := Mux(IF.halt_damn_pc, cPhase, ~cPhase) // increment for c ext instruction
+      }
+    }
+    IF.c_phase := cPhase
   }
   else {
     IF.address := pc.io.out.asUInt
@@ -171,15 +180,18 @@ class Core(implicit val config:Configs) extends Module{
   ) || ((func7 === "b0001100".U) || (func7 === "b0101100".U))
 
   IF.stall := io.stall || EX.stall || ID.stall || IF_stall || ID.pcSrc || MEM.io.stall
+  val ral_halt_o_reg = RegInit(0.B)
+  ral_halt_o_reg := ral_halt_o
+  IF.c_stall := ral_halt_o_reg && is_comp
   
-  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o || MEM.io.stall), 1.B, 0.B)
+  val halt = Mux(((EX.stall || ID.stall || io.imemReq.valid) | ral_halt_o || MEM.io.stall || IF.halt_damn_pc), 1.B, 0.B)
   pc.io.halt := halt
   val npc = Mux(
     ID.hdu_pcWrite,
     Mux(
       ID.pcSrc,
       ID.pcPlusOffset.asSInt,
-      Mux(is_comp, pc.io.pc2, pc.io.pc4)
+      Mux(is_comp || ral_halt_o_reg, pc.io.pc2, pc.io.pc4)
     ),
     pc.io.out
   )
@@ -187,6 +199,7 @@ class Core(implicit val config:Configs) extends Module{
 
   when(ID.hdu_if_reg_write && !MEM.io.stall) {
     if_reg_pc := pc.io.out.asUInt
+    if_reg_next_pc := Mux(is_comp, pc.io.pc2.asUInt, pc.io.pc4.asUInt)
     if_reg_ins := instruction 
   }
   when(ID.ifid_flush) {
@@ -206,6 +219,7 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_f7 := ID.func7
     id_reg_ins := if_reg_ins
     id_reg_pc := if_reg_pc
+    id_reg_next_pc := if_reg_next_pc
     id_reg_ctl_aluSrc := ID.ctl_aluSrc
     id_reg_ctl_memToReg := ID.ctl_memToReg
     id_reg_ctl_regWrite <> ID.ctl_regWrite
@@ -278,6 +292,7 @@ class Core(implicit val config:Configs) extends Module{
   
   when(!MEM.io.stall) {
     ex_reg_pc := id_reg_pc
+    ex_reg_next_pc := id_reg_next_pc
     ex_reg_wra := id_reg_wra
     ex_reg_ins := id_reg_ins
     ex_reg_ctl_memToReg := id_reg_ctl_memToReg
@@ -422,6 +437,7 @@ class Core(implicit val config:Configs) extends Module{
     mem_reg_ctl_regWrite <> ex_reg_ctl_regWrite
     mem_reg_ins := ex_reg_ins
     mem_reg_pc := ex_reg_pc
+    mem_reg_next_pc := ex_reg_next_pc
     mem_reg_wra := ex_reg_wra
     mem_reg_ctl_memToReg := ex_reg_ctl_memToReg
     mem_reg_is_csr := ex_reg_is_csr
@@ -451,7 +467,7 @@ class Core(implicit val config:Configs) extends Module{
     wb_data := mem_reg_rd  // For loads and AMO (old value)
     wb_addr := mem_reg_wra
   }.elsewhen(mem_reg_ctl_memToReg === 2.U) {
-    wb_data := mem_reg_pc + 4.U
+    wb_data := mem_reg_next_pc //Mux(is_comp, mem_reg_pc + 2.U, mem_reg_pc + 4.U)
     wb_addr := mem_reg_wra
   }.otherwise {
     wb_data := mem_reg_result
