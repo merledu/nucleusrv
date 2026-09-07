@@ -23,46 +23,59 @@ import chisel3.util._
 class Realigner extends Module {
   val io = IO(new Bundle {
     //Input
-    val ral_address_i     = Input(UInt(32.W))
-    val ral_instruction_i = Input(UInt(32.W))
-    val ral_jmp           = Input(Bool())
+    val ral_address_i      = Input(UInt(32.W))
+    val ral_instruction_i  = Input(UInt(32.W))
+    val ral_jmp            = Input(Bool())
+    val stall              = Input(Bool())
+    val is_comp            = Input(Bool())
     // Outputs
-    val ral_address_o     = Output(UInt(32.W))
-    val ral_instruction_o = Output(UInt(32.W))
-    val ral_halt_o        = Output(Bool())
+    val ral_instruction_o  = Output(UInt(32.W))
+    val addri              = Output(Bool())
+    val misaligned_word    = Output(Bool())
+    val misaligned_word_uh = Output(Bool())
+    val nop_sel            = Output(Bool())
   })
 
   // 1st bit of address, which represents misalignment
-  val addri = io.ral_address_i(1)       
-  io.ral_halt_o := false.B
+  val addri = io.ral_address_i(1)
+  io.addri := addri
 
   /* control signals */
-  val pc4_sel  = Wire(Bool())    
   val conc_sel = Wire(Bool())   
   val nop_sel  = Wire(Bool()) 
+  val uh_is_comp = WireInit(false.B)
+  val uh_is_comp_reg  = RegInit(false.B)
   
-  pc4_sel := false.B    
   conc_sel := false.B
   nop_sel := false.B
+  uh_is_comp := Vector("b00", "b01", "b10").map(
+    _.U === io.ral_instruction_i(17, 16)
+  ) reduce (_ || _)
+  uh_is_comp_reg := Mux(
+    io.ral_instruction_i =/= 0.U,
+    /*!addri && */uh_is_comp,
+    uh_is_comp_reg
+  )
 
   // Register to store Lower half word
   val lhw_reg = RegInit(0.U(16.W))     
   val conc_instr = Wire(UInt(32.W)) 
-  lhw_reg := io.ral_instruction_i(31,16)
+  lhw_reg := Mux(nop_sel, io.ral_instruction_i(31,16), lhw_reg)
   /* Concatenated Instruction: {real_instruction_i(15,0),lhw_reg} */
   conc_instr := Cat(io.ral_instruction_i(15,0),lhw_reg)
   
-  /* Address for InstructionFetch module */
-  io.ral_address_o := Mux(pc4_sel, io.ral_address_i + 4.U, io.ral_address_i)
-  
   /* Instruction for the NRV core */  
-  io.ral_instruction_o := Mux(nop_sel, "h00000013".asUInt(32.W), Mux(conc_sel, conc_instr, io.ral_instruction_i))
+  io.ral_instruction_o := MuxCase(io.ral_instruction_i, Vector(
+    (addri && !uh_is_comp) -> "h00000013".asUInt(32.W),
+    conc_sel -> conc_instr
+  ))
+  io.misaligned_word := conc_sel
 
   /*****************
    * Controller *
    ******************/
-  // The three states
-  val state0 :: state1 :: state2 :: Nil = Enum (3)
+  // The two states
+  val state0 :: state1 :: Nil = Enum (2)
 
   // The state register
   val stateReg = RegInit(state0)
@@ -70,36 +83,28 @@ class Realigner extends Module {
   // Next state logic
   switch(stateReg){
     is (state0) {
-      when (addri) {
+      when (io.stall) {
+        stateReg := state0
+      }.elsewhen (io.ral_jmp) {
+        stateReg := state0
+      }.elsewhen (addri && !uh_is_comp/*io.is_comp*/) {
         stateReg := state1
       }.otherwise{
         stateReg := state0
       }
     }
     is (state1) {
-      when(addri){
-        when (io.ral_jmp) {
-          stateReg := state1
-        }.otherwise{
-          stateReg := state2
-        }
-      }.otherwise {
-        stateReg := state0
-      }
-    }
-    is (state2) {
-      when (addri) {
+      when (io.stall) {
         stateReg := state1
-      }.otherwise{
+      }.otherwise {
         stateReg := state0
       }
     }
   }
 
   // Output logic
-  io.ral_halt_o := (stateReg === state1)
-  pc4_sel       := (stateReg === state1) & addri & ~ (io.ral_jmp)
-  nop_sel       := (stateReg === state1)
-  conc_sel      := (stateReg === state2)
-
+  nop_sel               := (stateReg === state0) && addri && !uh_is_comp/*io.is_comp*/ && (io.ral_instruction_i =/= 0.U)
+  conc_sel              := (stateReg === state1) && (io.ral_instruction_i =/= 0.U)
+  io.misaligned_word_uh := (stateReg === state1)
+  io.nop_sel            := nop_sel
 }

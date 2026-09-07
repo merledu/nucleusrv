@@ -129,7 +129,8 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   //    Core state machine will advance 'amo_read_done' to true.
   //    So next cycle, this stall condition will clear because 'readEnable' will be false (amo_read_done is true).
   val amo_transition_stall = io.isAMO && io.readEnable && io.dccmRsp.valid
-  io.stall := ((io.writeEnable || io.readEnable) && !io.dccmRsp.valid) || amo_transition_stall
+  //io.stall := ((io.writeEnable || io.readEnable) && !io.dccmRsp.valid) || amo_transition_stall
+  io.stall := ((io.writeEnable && !io.dccmReq.ready) || (io.readEnable && !io.dccmRsp.valid)) || amo_transition_stall
 
   rdata := Mux(io.dccmRsp.valid, io.dccmRsp.bits.dataResponse, DontCare)
 

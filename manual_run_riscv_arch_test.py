@@ -2,6 +2,7 @@ from os import chdir, sep
 from subprocess import run
 from os.path import dirname, abspath, join
 from argparse import ArgumentParser
+from shutil import rmtree
 
 from ruamel.yaml import YAML
 
@@ -18,29 +19,14 @@ yaml = YAML(
 )
 
 def simulate_and_compare(testlist, test, f):
-    chdir(ROOT)
     imem = join(testlist[test]["work_dir"], "dut", "imem.hex")
     dmem = join(testlist[test]["work_dir"], "dut", "dmem.hex")
     test_name = testlist[test]['work_dir'].split('/')[-1]
     out = join(ROOT, "out", test_name)
     nrv_sig_file = join(testlist[test]["work_dir"], "dut", "DUT-nucleusrv.signature")
     ref_sig_file = join(testlist[test]["work_dir"], "ref", "Reference-spike.signature")
-    run(
-        f'sbt "runMain nucleusrv.components.NRVDriver --imem {imem} --dmem {dmem} --target-dir {out}"',
-        shell = True,
-        text = True
-    )
+    print(f'Simulating and comparing test: {test_name}')
     chdir(out)
-    run(
-        "(echo '/* verilator lint_off WIDTH */' && cat Top.v) > temp && mv temp Top.v",
-        shell = True,
-        text = True
-    )
-    run(
-        'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
-        shell = True,
-        text = True
-    )
     run(
         f'./obj_dir/VTop > {nrv_sig_file}',
         shell = True,
@@ -51,16 +37,25 @@ def simulate_and_compare(testlist, test, f):
     with open(ref_sig_file) as r:
         ref_sig = r.readlines()
     if len(nrv_sig) != len(ref_sig):
-        f.write(f'| {test_name:30} | {"Failed"} |\n')
+        f.write(f'| {test_name:50} | {" " * 4} | \u2718    |\n')
         f.flush()
+        #rmtree(out)
+        print('\u2718 Failed')
+        return False
     for i in range(min((len(nrv_sig), len(ref_sig)))):
         if nrv_sig[i] != ref_sig[i]:
-            f.write(f'| {test_name:30} | {"Failed"} |\n')
+            f.write(f'| {test_name:50} | {" " * 4} | \u2718    |\n')
             f.flush()
-            break
+            #rmtree(out)
+            print('\u2718 Failed')
+            return False
     else:
-        f.write(f'| {test_name:30} | {"Passed"} |\n')
+        f.write(f'| {test_name:50} | \u2714    | {" " * 4} |\n')
         f.flush()
+        #print(f'{out = }')
+        rmtree(out)
+        print('\u2714 Passed')
+    return True
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -87,8 +82,8 @@ if __name__ == '__main__':
             'w'
         ) as f:
             f.write(
-                f'\n| {"Test Name":30} | {"Status"} |\n'
-                f'| {"-" * 30} | {"-" * 6} |\n'
+                f'\n| {"Test Name":50} | Pass | Fail |\n'
+                f'| {"-" * 50} | {"-" * 4} | {"-" * 4} |\n'
             )
             f.flush()
             if args.test is not None:
@@ -104,7 +99,10 @@ if __name__ == '__main__':
                     simulate_and_compare(testlist, test, f)
             else:
                 for test in testlist:
-                    simulate_and_compare(testlist, test, f)
+                    passed = simulate_and_compare(testlist, test, f)
+                    #if not passed:
+                    #    break
+            f.write('\n\n')
     except Exception as e:
         print(e)
         exit(1)

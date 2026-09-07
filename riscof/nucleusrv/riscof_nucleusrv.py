@@ -23,7 +23,7 @@ class nucleusrv(pluginTemplate):
     __model__ = "nucleusrv"
 
     #TODO: please update the below to indicate family, version, etc of your DUT.
-    __version__ = "dev_fpu"
+    __version__ = "c_fix"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -115,16 +115,28 @@ class nucleusrv(pluginTemplate):
       #      not please change appropriately
       self.compile_cmd = self.compile_cmd+' -mabi='+('lp64 ' if 64 in ispec['supported_xlen'] else 'ilp32 ')
 
-      self.sbt = "sbt 'runMain nucleusrv.components.NRVDriver --imem {0} --dmem {1} --target-dir out/{2}'"
+      #self.sbt = "sbt 'runMain nucleusrv.components.NRVDriver --imem {0} --dmem {1} --target-dir out/{2}'"
+      if os.path.isdir(os.path.join(self.dut, 'out')):
+            shutil.rmtree(os.path.join(self.dut, 'out'))
+      os.chdir(self.dut)
+      subprocess.run(
+        f'sbt "runMain nucleusrv.components.NRVDriver --imem inst.txt --dmem data.txt --target-dir {os.path.join(self.dut, "out", "nrv")}"',
+        shell = True
+      )
+      os.chdir(
+        os.path.join('out', 'nrv')
+      )
+      subprocess.run(
+        "(echo '/* verilator lint_off WIDTH */' && cat Top.v) > temp && mv temp Top.v",
+        shell = True
+      )
+      os.chdir(self.dut)
 
     def runTests(self, testList):
 
       # Delete Makefile if it already exists.
       if os.path.exists(self.work_dir+ "/Makefile." + self.name[:-1]):
             os.remove(self.work_dir+ "/Makefile." + self.name[:-1])
-
-      if os.path.isdir(os.path.join(self.dut, 'out')):
-            shutil.rmtree(os.path.join(self.dut, 'out'))
 
       # create an instance the makeUtil class that we will use to create targets.
       make = utils.makeUtil(makefilePath=os.path.join(self.work_dir, "Makefile." + self.name[:-1]))
@@ -167,22 +179,21 @@ class nucleusrv(pluginTemplate):
 	  # if the user wants to disable running the tests and only compile the tests, then
 	  # the "else" clause is executed below assigning the sim command to simple no action
 	  # echo statement.
+          test_name = testentry['work_dir'].split('/')[-2]
           if self.target_run:
-            test_name = testentry['work_dir'].split('/')[-2]
             # set up the simulation command.
             simcmd = '; '.join((
                 self.objcopy.format(self.xlen, elf, 'imem.bin', '.text.init'),
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
                 self.hexdump.format('dmem.bin', 'dmem.hex'),
-                f'cd {self.dut}',
-                self.sbt.format(
-                    os.path.join(testentry['work_dir'], 'imem.hex'),
-                    os.path.join(testentry['work_dir'], 'dmem.hex'),
-                    test_name
-                ),
-                f"cd {os.path.join('out', test_name)}",
-                "(echo '/* verilator lint_off WIDTH */' && cat Top.v) > temp && mv temp Top.v",
+                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry['work_dir'], elf)}.objdump',
+                f'cd {os.path.join(self.dut, "out")}',
+                f'mkdir {test_name}',
+                f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
+                f'cd {os.path.join(self.dut, "out", test_name)}',
+                f'sed -i.bak "s|inst.txt|{os.path.join(testentry['work_dir'], 'imem.hex')}|" Top.v',
+                f'sed -i.bak "s|data.txt|{os.path.join(testentry['work_dir'], 'dmem.hex')}|" Top.v',
                 'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
                 f'./obj_dir/VTop > {sig_file} 2>&1'
             ))
@@ -191,7 +202,15 @@ class nucleusrv(pluginTemplate):
                 self.objcopy.format(self.xlen, elf, 'imem.bin', '.text.init'),
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
-                self.hexdump.format('dmem.bin', 'dmem.hex')
+                self.hexdump.format('dmem.bin', 'dmem.hex'),
+                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry['work_dir'], elf)}.objdump',
+                f'cd {os.path.join(self.dut, "out")}',
+                f'mkdir {test_name}',
+                f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
+                f'cd {os.path.join(self.dut, "out", test_name)}',
+                f'sed -i.bak "s|inst.txt|{os.path.join(testentry['work_dir'], 'imem.hex')}|" Top.v',
+                f'sed -i.bak "s|data.txt|{os.path.join(testentry['work_dir'], 'dmem.hex')}|" Top.v',
+                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v'
             ))
 
           # concatenate all commands that need to be executed within a make-target.
