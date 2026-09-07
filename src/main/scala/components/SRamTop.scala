@@ -11,15 +11,21 @@ class SRamTop(val programFile:Option[String] ) extends Module {
         val rsp = Decoupled(new MemResponseIO)
     })
 
+    val rst = Wire(Bool())
+    rst := reset.asBool
+
+    val init :: valid :: ready :: Nil = Enum(3)
     val state_reg = dontTouch(RegInit(0.U))
     state_reg := MuxCase(state_reg, Vector(
-      (state_reg === 0.U) || ((state_reg === 2.U) && io.rsp.ready),  // ready
-      (state_reg === 1.U) && io.req.valid  // valid
-    ).zipWithIndex.map(
-      s => s._1 -> (s._2 + 1).U
+      //(state_reg === 0.U) || ((state_reg === 2.U) && io.rsp.ready),  // ready
+      //(state_reg === 1.U) && io.req.valid  // valid
+      ((state_reg === init) && !rst) -> ready,
+      ((state_reg === valid) && io.rsp.fire) -> ready,
+      ((state_reg === ready) && io.req.fire) -> valid,
+      rst -> init
     ))
-    io.rsp.valid := state_reg === 2.U
-    io.req.ready := state_reg === 1.U
+    io.rsp.valid := state_reg === valid
+    io.req.ready := state_reg === ready
 
     val rdata = Wire(UInt(32.W))
 
@@ -27,8 +33,6 @@ class SRamTop(val programFile:Option[String] ) extends Module {
     val sram = Module(new sram_top(programFile))
 
     val clk = WireInit(clock.asUInt)
-    val rst = Wire(Bool())
-    rst := reset.asBool
 
     sram.io.clk_i := clk
     sram.io.rst_i := rst

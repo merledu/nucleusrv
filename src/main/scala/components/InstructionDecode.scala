@@ -6,6 +6,7 @@ import chisel3.util._
 class InstructionDecode(
   F: Boolean,
   Zicsr: Boolean,
+  C: Boolean,
   TRACE: Boolean
 ) extends Module {
   val io = IO(new Bundle {
@@ -31,12 +32,12 @@ class InstructionDecode(
 
     val id_ex_regWr = Input(Bool())
     val ex_mem_regWr = Input(Bool())
-    val csr_Ex = Input(Bool())
-    val csr_Mem = Input(Bool())
-    val csr_Wb = Input(Bool())
-    val csr_Ex_data = Input(UInt(32.W))
-    val csr_Mem_data = Input(UInt(32.W))
-    val csr_Wb_data = Input(UInt(32.W))
+    val csr_Ex = if (Zicsr) Some(Input(Bool())) else None
+    val csr_Mem = if (Zicsr) Some(Input(Bool())) else None
+    val csr_Wb = if (Zicsr) Some(Input(Bool())) else None
+    val csr_Ex_data = if (Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_Mem_data = if (Zicsr) Some(Input(UInt(32.W))) else None
+    val csr_Wb_data = if (Zicsr) Some(Input(UInt(32.W))) else None
     val dmem_data = Input(UInt(32.W))
 
     val ex_stall = Input(Bool())
@@ -99,6 +100,9 @@ class InstructionDecode(
     val mem_is_amo = Input(Bool())
     val addr_ex    = Input(UInt(32.W))
     val addr_mem   = Input(UInt(32.W))
+
+    // C
+    val is_comp = if (C) Some(Input(Bool())) else None
   })
 
   //atomic instruction detection
@@ -153,13 +157,13 @@ class InstructionDecode(
   if (Zicsr) {
     csrController.get.io.regWrExecute    := io.id_ex_regWr
     csrController.get.io.rdSelExecute    := io.id_ex_rd
-    csrController.get.io.csrWrExecute    := io.csr_Ex
+    csrController.get.io.csrWrExecute    := io.csr_Ex.get
     csrController.get.io.regWrMemory     := io.ex_mem_regWr
     csrController.get.io.rdSelMemory     := io.ex_mem_rd
-    csrController.get.io.csrWrMemory     := io.csr_Mem
+    csrController.get.io.csrWrMemory     := io.csr_Mem.get
     csrController.get.io.regWrWriteback  := io.ctl_writeEnable(0)
     csrController.get.io.rdSelWriteback  := io.writeReg
-    csrController.get.io.csrWrWriteback  := io.csr_Wb
+    csrController.get.io.csrWrWriteback  := io.csr_Wb.get
     csrController.get.io.rs1SelDecode    := io.id_instruction(19,15)
     csrController.get.io.csrInstDecode   := io.id_instruction(6, 0) === "b1110011".U
     csrController.get.io.csrInstIsImmd   := 0.B
@@ -188,7 +192,14 @@ class InstructionDecode(
   io.ctl_aluSrc1 := control.io.aluSrc1
   io.ctl_branch := control.io.branch
   io.ctl_memRead := control.io.memRead
-  io.ctl_memToReg := control.io.memToReg
+  io.ctl_memToReg := (
+    if (C) Mux(
+      control.io.memToReg === 2.U && io.is_comp.get,
+      3.U,
+      control.io.memToReg
+    )
+    else control.io.memToReg
+  )
   io.ctl_jump := control.io.jump
   when(hdu.io.ctl_mux && io.id_instruction =/= "h13".U) {
     io.ctl_memWrite := control.io.memWrite
@@ -214,10 +225,14 @@ class InstructionDecode(
   val registerRs3 = if (F) Some(io.id_instruction(31, 27)) else None
   val readData1 = WireInit(0.U(32.W))
   val readData2 = WireInit(0.U(32.W))
-  val writeData = dontTouch(Mux(io.csr_Wb, io.csr_Wb_data, io.writeData))
+  val writeData = if (Zicsr) dontTouch(Mux(io.csr_Wb.get, io.csr_Wb_data.get, io.writeData))
+    else io.writeData
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable(0) := io.ctl_writeEnable(0) || (!io.ex_stall && io.csr_Wb)
+  registers.io.writeEnable(0) := (io.ctl_writeEnable(0) || (if (Zicsr) io.csr_Wb.get else 0.B)) && !dontTouch(io.ex_stall)// && (
+    //  if (Zicsr) io.csr_Wb.get else 1.B
+    //)
+  //)
   registers.io.writeAddress := registerRd
   registers.io.writeData := writeData
   if (F) {
@@ -379,15 +394,20 @@ class InstructionDecode(
     io.func7 := 0.U
   }
 
-  io.stall := io.func7 === 1.U && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
+  io.stall := io.func7 === 1.U && (
+    io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U
+  )
 
   val csr_iData_cases = Array(
     1.U -> io.ex_result,
     2.U -> Mux(io.ex_mem_mem_read, io.dmem_data, io.ex_mem_result),
-    3.U -> io.writeData,
-    4.U -> io.csr_Ex_data,
-    5.U -> io.csr_Mem_data,
-    6.U -> io.csr_Wb_data
+    3.U -> io.writeData
+  ) ++ (
+    if (Zicsr) Array(
+      4.U -> io.csr_Ex_data.get,
+      5.U -> io.csr_Mem_data.get,
+      6.U -> io.csr_Wb_data.get
+    ) else Array()
   )
 
   if (Zicsr) {

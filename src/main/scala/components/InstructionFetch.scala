@@ -16,13 +16,18 @@ class InstructionFetch extends Module {
   rst := reset.asBool
 
   dontTouch(io.stall)
+  val init :: valid :: ready :: Nil = Enum(3)
   val state_reg = dontTouch(RegInit(0.U))
   val next_state = dontTouch(MuxCase(state_reg, Vector(
-    ((state_reg === 0.U) || ((state_reg === 2.U) && io.coreInstrResp.valid)) -> 1.U,  // valid
-    ((state_reg === 1.U) && io.coreInstrReq.ready && !io.stall) -> 2.U  // ready
+    //((state_reg === 0.U) || ((state_reg === 2.U) && io.coreInstrResp.valid && !io.stall)) -> valid,
+    //((state_reg === 1.U) && io.coreInstrReq.ready && !io.stall) -> ready
+    ((state_reg === init) && (!io.stall || !rst)) -> valid,
+    ((state_reg === valid) && !io.stall && io.coreInstrReq.fire) -> ready,
+    ((state_reg === ready) && !io.stall && io.coreInstrResp.fire) -> valid,
+    rst -> init
   )))
   state_reg := next_state
-  io.coreInstrResp.ready := state_reg === 2.U
+  io.coreInstrResp.ready := (state_reg === ready) && !io.stall
 
 //  io.coreInstrReq.ready := Mux(rst, false.B, true.B)
 
@@ -35,10 +40,10 @@ class InstructionFetch extends Module {
     Cat("b00".U, io.address(31, 2)),
     DontCare
   )
-  io.coreInstrReq.valid := (state_reg === 1.U) & !io.stall
+  io.coreInstrReq.valid := (state_reg === valid) & !io.stall
 
   io.instruction := Mux(
-    io.coreInstrResp.valid,
+    io.coreInstrResp.valid && !io.stall,
     io.coreInstrResp.bits.dataResponse,
     DontCare
   )

@@ -74,12 +74,12 @@ class spike(pluginTemplate):
             self.isa += 'm'
         if "A" in ispec["ISA"]:
             self.isa += 'a'
-        if "C" in ispec["ISA"]:
-            self.isa += 'c'
         if "F" in ispec["ISA"]:
             self.isa += 'f'
         if "D" in ispec["ISA"]:
             self.isa += 'd'
+        if "C" in ispec["ISA"]:
+            self.isa += 'c'
 
         # based on the validated isa and platform configure your simulator or
         # build your RTL here
