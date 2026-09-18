@@ -157,7 +157,7 @@ class nucleusrv(pluginTemplate):
 
           # capture the directory where the artifacts of this test will be dumped/created. RISCOF is
           # going to look into this directory for the signature files
-          test_dir = testentry['work_dir']
+          test_dir = testentry["work_dir"]
 
           # name of the elf file after compilation of the test
           elf = 'my.elf'
@@ -179,7 +179,7 @@ class nucleusrv(pluginTemplate):
 	  # if the user wants to disable running the tests and only compile the tests, then
 	  # the "else" clause is executed below assigning the sim command to simple no action
 	  # echo statement.
-          test_name = testentry['work_dir'].split('/')[-2]
+          test_name = testentry["work_dir"].split('/')[-2]
           if self.target_run:
             # set up the simulation command.
             simcmd = '; '.join((
@@ -187,13 +187,13 @@ class nucleusrv(pluginTemplate):
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
                 self.hexdump.format('dmem.bin', 'dmem.hex'),
-                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry['work_dir'], elf)}.objdump',
+                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
                 f'cd {os.path.join(self.dut, "out")}',
                 f'mkdir {test_name}',
                 f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
                 f'cd {os.path.join(self.dut, "out", test_name)}',
-                f'sed -i.bak "s|inst.txt|{os.path.join(testentry['work_dir'], 'imem.hex')}|" Top.v',
-                f'sed -i.bak "s|data.txt|{os.path.join(testentry['work_dir'], 'dmem.hex')}|" Top.v',
+                f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
+                f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
                 'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
                 f'./obj_dir/VTop > {sig_file} 2>&1'
             ))
@@ -203,18 +203,18 @@ class nucleusrv(pluginTemplate):
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
                 self.hexdump.format('dmem.bin', 'dmem.hex'),
-                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry['work_dir'], elf)}.objdump',
+                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
                 f'cd {os.path.join(self.dut, "out")}',
                 f'mkdir {test_name}',
                 f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
                 f'cd {os.path.join(self.dut, "out", test_name)}',
-                f'sed -i.bak "s|inst.txt|{os.path.join(testentry['work_dir'], 'imem.hex')}|" Top.v',
-                f'sed -i.bak "s|data.txt|{os.path.join(testentry['work_dir'], 'dmem.hex')}|" Top.v',
+                f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
+                f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
                 'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v'
             ))
 
           # concatenate all commands that need to be executed within a make-target.
-          execute = '@cd {0}; {1};{2}'.format(testentry['work_dir'], cmd, f'{simcmd};')
+          execute = '@cd {0}; {1};{2}'.format(testentry["work_dir"], cmd, f'{simcmd};')
 
           # create a target. The makeutil will create a target with the name "TARGET<num>" where num
           # starts from 0 and increments automatically for each new target that is added
@@ -250,7 +250,7 @@ class nucleusrv(pluginTemplate):
 #          test = testentry['test_path']
 #
 #          # capture the directory where the artifacts of this test will be dumped/created.
-#          test_dir = testentry['work_dir']
+#          test_dir = testentry["work_dir"]
 #
 #          # name of the elf file after compilation of the test
 #          elf = 'my.elf'
