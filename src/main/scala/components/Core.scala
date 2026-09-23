@@ -39,9 +39,9 @@ class Core(implicit val config:Configs) extends Module{
 
   // ID-EX Registers
   val id_reg_pc = RegInit(0.U(32.W))
-  val id_reg_rd1 = RegInit(0.U(32.W))
-  val id_reg_rd2 = RegInit(0.U(32.W))
-  val id_reg_imm = RegInit(0.U(32.W))
+  val id_reg_rd1 = RegInit(0.U(XLEN.W))
+  val id_reg_rd2 = RegInit(0.U(XLEN.W))
+  val id_reg_imm = RegInit(0.U(XLEN.W))
   val id_reg_wra = RegInit(0.U(5.W))
   val id_reg_f7 = RegInit(0.U(7.W))
   val id_reg_f3 = RegInit(0.U(3.W))
@@ -70,10 +70,10 @@ class Core(implicit val config:Configs) extends Module{
   val id_reg_amoOp = RegInit(0.U(5.W))
 
   // EX-MEM Registers
-  val ex_reg_branch = RegInit(0.U(32.W))
-  val ex_reg_zero = RegInit(0.U(32.W))
-  val ex_reg_result = RegInit(0.U(32.W))
-  val ex_reg_wd = RegInit(0.U(32.W))
+  val ex_reg_branch = RegInit(0.U(XLEN.W))
+  val ex_reg_zero = RegInit(0.U(XLEN.W))
+  val ex_reg_result = RegInit(0.U(XLEN.W))
+  val ex_reg_wd = RegInit(0.U(XLEN.W))
   val ex_reg_wra = RegInit(0.U(5.W))
   val ex_reg_ins = RegInit(0.U(32.W))
   val ex_reg_ctl_memToReg = RegInit(0.U(2.W))
@@ -96,10 +96,10 @@ class Core(implicit val config:Configs) extends Module{
   val ex_reg_amoOp  = RegInit(0.U(5.W))
   
   // MEM-WB Registers
-  val mem_reg_rd = RegInit(0.U(32.W))
+  val mem_reg_rd = RegInit(0.U(XLEN.W))
   val mem_reg_ins = RegInit(0.U(32.W))
-  val mem_reg_result = RegInit(0.U(32.W))
-  val mem_reg_branch = RegInit(0.U(32.W))
+  val mem_reg_result = RegInit(0.U(XLEN.W))
+  val mem_reg_branch = RegInit(0.U(XLEN.W))
   val mem_reg_wra = RegInit(0.U(5.W))
   val mem_reg_ctl_memToReg = RegInit(0.U(2.W))
   val mem_reg_ctl_regWrite = RegInit(VecInit(Vector.fill(if (F) 2 else 1)(0.B)))
@@ -118,7 +118,7 @@ class Core(implicit val config:Configs) extends Module{
 
   // AMO state tracking
   val amo_read_done = RegInit(false.B)
-  val amo_old_value = RegInit(0.U(32.W))
+  val amo_old_value = RegInit(0.U(XLEN.W))
   val sc_issued = RegInit(false.B)
 
   //Pipeline Units
@@ -480,7 +480,7 @@ class Core(implicit val config:Configs) extends Module{
    * Write Back Stage *
    ********************/
 
-  val wb_data = dontTouch(Wire(UInt(32.W)))
+  val wb_data = dontTouch(Wire(UInt(XLEN.W)))
   val wb_addr = Wire(UInt(5.W))
 
   when(mem_reg_ctl_memToReg === 1.U) {

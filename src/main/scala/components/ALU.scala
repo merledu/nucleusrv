@@ -22,9 +22,9 @@ class ALU(XLEN: Int) extends Module {
       (io.aluCtl === SUB) -> (io.input1 - io.input2),
       (io.aluCtl === SLT) -> (io.input1.asSInt < io.input2.asSInt).asUInt,
       (io.aluCtl === SLTU) -> (io.input1 < io.input2),
-      (io.aluCtl === SLL) -> (io.input1 << io.input2(4, 0)),
-      (io.aluCtl === SRL) -> (io.input1 >> io.input2(4, 0)),
-      (io.aluCtl === SRA) -> (io.input1.asSInt >> io.input2(4, 0)).asUInt,
+      (io.aluCtl === SLL) -> (io.input1 << io.input2(log2Ceil(XLEN)-1, 0)),
+      (io.aluCtl === SRL) -> (io.input1 >> io.input2(log2Ceil(XLEN)-1, 0)),
+      (io.aluCtl === SRA) -> (io.input1.asSInt >> io.input2(log2Ceil(XLEN)-1, 0)).asUInt,
       (io.aluCtl === XOR) -> (io.input1 ^ io.input2)
     )
   )

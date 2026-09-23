@@ -299,7 +299,7 @@ class InstructionDecode(
   }
   
 
-  val immediate = Module(new ImmediateGen(F))
+  val immediate = Module(new ImmediateGen(XLEN = XLEN, F = F))
   immediate.io.instruction := io.id_instruction
   io.immediate := immediate.io.out
 
