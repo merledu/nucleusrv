@@ -11,8 +11,15 @@ object AddressMap {
     val MHARTID          = "hf14".U
     val MSTATUS          = "h300".U
     val MISA             = "h301".U
+    val MEDELEG          = "h302".U
+    val MIDELEG          = "h303".U
     val MIE              = "h304".U
     val MTVEC            = "h305".U
+    val MCOUNTEREN       = "h306".U
+    val MENVCFG          = "h30A".U
+    val MSTATUSH         = "h310".U
+    val MEDELEGH         = "h312".U
+    val MENVCFGH         = "h31A".U
     val MSCRATCH         = "h340".U
     val MEPC             = "h341".U
     val MCAUSE           = "h342".U

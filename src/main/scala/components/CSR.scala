@@ -20,9 +20,14 @@ class CSR extends Module{
         val i_instr_retired     = Input(Bool())
         val f_except            = Input(Vec(5, Bool()))
         val fcsr_o_data         = Output(UInt(32.W))
+        val o_misa_val          = Output(UInt(32.W))
+        val o_mtvec_val         = Output(UInt(32.W))
+        val o_mepc_val          = Output(UInt(32.W))
+        val o_medeleg_val       = Output(UInt(32.W))
+        val o_mideleg_val       = Output(UInt(32.W))
     })
 
-    val csrRegFile = Module(new CSRRegFile)
+    val csrRegFile = Module(new CSRRegFile(32))
     dontTouch(csrRegFile.io)
 
     csrRegFile.io.CSR.i_data               := Mux(io.i_opr(2), io.i_imm, io.i_data)
@@ -36,6 +41,12 @@ class CSR extends Module{
     csrRegFile.io.FCSR.except              <> io.f_except
 
     io.o_data                       := csrRegFile.io.CSR.o_data
+    io.o_misa_val                   := csrRegFile.io.misa_val
+    io.o_mtvec_val                  := csrRegFile.io.mtvec_val
+    io.o_mepc_val                   := csrRegFile.io.mepc_val
+    io.o_medeleg_val                := csrRegFile.io.medeleg_val
+    io.o_mideleg_val                := csrRegFile.io.mideleg_val
+    
     io.fcsr_o_data                  := Cat(
                                           "b0".U(24.W),
                                           csrRegFile.io.FCSR.frm,
