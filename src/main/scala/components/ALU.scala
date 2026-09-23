@@ -5,13 +5,13 @@ import chisel3.util._
 
 import nucleusrv.components.ALUOps._
 
-class ALU extends Module {
+class ALU(XLEN: Int) extends Module {
   val io = IO(new Bundle {
-    val input1: UInt = Input(UInt(32.W))
-    val input2: UInt = Input(UInt(32.W))
+    val input1: UInt = Input(UInt(XLEN.W))
+    val input2: UInt = Input(UInt(XLEN.W))
     val aluCtl: UInt = Input(UInt(4.W))
 
-    val result: UInt = Output(UInt(32.W))
+    val result: UInt = Output(UInt(XLEN.W))
   })
   io.result := MuxCase(
     0.U,

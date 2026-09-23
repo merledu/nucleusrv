@@ -16,8 +16,8 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   val core: Core = Module(new Core())
   core.io.stall := false.B
 
-  val dmem = Module(new SRamTop(dataFile))
-  val imem = Module(new SRamTop(programFile))
+  val dmem = Module(new SRamTop(programFile = dataFile, XLEN = config.XLEN))
+  val imem = Module(new SRamTop(programFile = programFile, XLEN = 32))
 
   /*  Imem Interceonnections  */
   core.io.imemRsp <> imem.io.rsp

@@ -8,8 +8,8 @@ class InstructionFetch extends Module {
     val address: UInt = Input(UInt(32.W))
     val instruction: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
-    val coreInstrReq = Decoupled(new MemRequestIO)
-    val coreInstrResp = Flipped(Decoupled(new MemResponseIO))
+    val coreInstrReq = Decoupled(new MemRequestIO(XLEN = 32))
+    val coreInstrResp = Flipped(Decoupled(new MemResponseIO(XLEN = 32)))
   })
 
   val rst = Wire(Bool())

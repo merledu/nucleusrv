@@ -2,12 +2,12 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class AMOALU extends Module {
+class AMOALU(XLEN: Int) extends Module {
   val io = IO(new Bundle {
-    val memData = Input(UInt(32.W))   // Data loaded from memory (old value at rs1 address)
-    val src2    = Input(UInt(32.W))   // Value from rs2 register
+    val memData = Input(UInt(XLEN.W))   // Data loaded from memory (old value at rs1 address)
+    val src2    = Input(UInt(XLEN.W))   // Value from rs2 register
     val amoOp   = Input(UInt(5.W))    // Operation code from decoder(fun5)
-    val result  = Output(UInt(32.W))  // Computed result to write back
+    val result  = Output(UInt(XLEN.W))  // Computed result to write back
   })
   io.result := 0.U
 

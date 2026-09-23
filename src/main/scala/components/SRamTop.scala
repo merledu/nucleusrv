@@ -5,10 +5,10 @@ import chisel3.util._
 import chisel3.experimental._
 import chisel3.util.experimental._
 
-class SRamTop(val programFile:Option[String] ) extends Module {
+class SRamTop(val programFile:Option[String], XLEN:Int) extends Module {
     val io = IO(new Bundle {
-        val req = Flipped(Decoupled(new MemRequestIO))
-        val rsp = Decoupled(new MemResponseIO)
+        val req = Flipped(Decoupled(new MemRequestIO(XLEN = XLEN)))
+        val rsp = Decoupled(new MemResponseIO(XLEN = XLEN))
     })
 
     val rst = Wire(Bool())

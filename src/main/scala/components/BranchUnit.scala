@@ -3,12 +3,12 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._
 
-class BranchUnit extends Module {
+class BranchUnit(XLEN: Int) extends Module {
   val io = IO(new Bundle {
     val branch: Bool = Input(Bool())
     val funct3: UInt = Input(UInt(3.W))
-    val rd1: UInt = Input(UInt(32.W))
-    val rd2: UInt = Input(UInt(32.W))
+    val rd1: UInt = Input(UInt(XLEN.W))
+    val rd2: UInt = Input(UInt(XLEN.W))
     val take_branch: Bool = Input(Bool())
 
     val taken: Bool = Output(Bool())

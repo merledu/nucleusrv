@@ -1,23 +1,23 @@
 package nucleusrv.components
 import chisel3._
-import chisel3.util.MuxCase
-import chisel3.util.MuxLookup
+import chisel3.util._
 import FBitPats._
 
 class Execute(
+  XLEN: Int,
+  M: Boolean,
   F: Boolean,
-  M: Boolean = false,
   TRACE: Boolean
 ) extends Module {
   val io = IO(new Bundle {
-    val immediate = Input(UInt(32.W))
-    val readData1 = Input(UInt(32.W))
-    val readData2 = Input(UInt(32.W))
+    val immediate = Input(UInt(XLEN.W))
+    val readData1 = Input(UInt(XLEN.W))
+    val readData2 = Input(UInt(XLEN.W))
     val pcAddress = Input(UInt(32.W))
     val func7 = Input(UInt(7.W))
     val func3 = Input(UInt(3.W))
-    val mem_result = Input(UInt(32.W))
-    val wb_result = Input(UInt(32.W))
+    val mem_result = Input(UInt(XLEN.W))
+    val wb_result = Input(UInt(XLEN.W))
 
     val ex_mem_regWrite = Input(Vec(if (F) 2 else 1, Bool()))
     val mem_wb_regWrite = Input(Vec(if (F) 2 else 1, Bool()))
@@ -34,30 +34,30 @@ class Execute(
     val isLR = Input(Bool())
     val isSC = Input(Bool())
 
-    val writeData = Output(UInt(32.W))
-    val ALUresult = Output(UInt(32.W))
+    val writeData = Output(UInt(XLEN.W))
+    val ALUresult = Output(UInt(XLEN.W))
 
     val stall = Output(Bool())
 
-    val rs1_rdata = if (TRACE) Some(Output(UInt(32.W))) else None
+    val rs1_rdata = if (TRACE) Some(Output(UInt(XLEN.W))) else None
 
     val f_read = if (F) Some(Input(Vec(3, Bool()))) else None
-    val readData3 = if (F) Some(Input(UInt(32.W))) else None
+    val readData3 = if (F) Some(Input(UInt(XLEN.W))) else None
     val fcsr_o_data = if (F) Some(Input(UInt(32.W))) else None
     val is_f_i = if (F) Some(Input(Bool())) else None
     val is_f_o = if (F) Some(Output(Bool())) else None
     val exceptions = if (F) Some(Output(Vec(5, Bool()))) else None
     // AMO signals from Core (for looping back ex_reg values)
-    val amo_memData = Input(UInt(32.W))
-    val amo_src2    = Input(UInt(32.W))
+    val amo_memData = Input(UInt(XLEN.W))
+    val amo_src2    = Input(UInt(XLEN.W))
     val amo_op_code = Input(UInt(5.W))
-    val amo_result  = Output(UInt(32.W))
+    val amo_result  = Output(UInt(XLEN.W))
   })
 
-  val alu = Module(new ALU)
+  val alu = Module(new ALU(XLEN = XLEN))
   val aluCtl = Module(new AluControl)
   
-  val amoAlu = Module(new AMOALU)
+  val amoAlu = Module(new AMOALU(XLEN = XLEN))
   amoAlu.io.memData := io.amo_memData
   amoAlu.io.src2 := io.amo_src2
   amoAlu.io.amoOp := io.amo_op_code
@@ -129,9 +129,9 @@ class Execute(
   alu.io.input2 := aluIn2
   alu.io.aluCtl := aluCtl.io.out
 
-  val mdu = if (M) Some(Module (new MDU)) else None
-  val src_a_reg = if (M) Some(RegInit(0.U(32.W))) else None
-  val src_b_reg = if (M) Some(RegInit(0.U(32.W))) else None
+  val mdu = if (M) Some(Module (new MDU(XLEN=XLEN))) else None
+  val src_a_reg = if (M) Some(RegInit(0.U(XLEN.W))) else None
+  val src_b_reg = if (M) Some(RegInit(0.U(XLEN.W))) else None
   val op_reg    = if (M) Some(RegInit(0.U(3.W))) else None
   val div_en    = if (M) Some(RegInit(false.B)) else None
   val f7_reg    = if (M) Some(RegInit(0.U(6.W))) else None
@@ -214,7 +214,7 @@ class Execute(
       io.func3
     )
     Vector(inputMux1, inputMux2, inputMux3.get).zipWithIndex foreach (
-      f => fpu.get.in(f._2) := f._1
+      f => fpu.get.in(f._2) := f._1(31,0)
     )
     fpu.get.aluOp := MuxCase(0.U, Vector(
       fmadd_s,
@@ -256,8 +256,8 @@ class Execute(
     ) else Vector()
   ) ++ (
     if (F) Vector(
-      f_mono_cycle_inst.get -> fpu.get.out,
-      fpu.get.div_sqrt_valid_out -> fpu.get.out
+      f_mono_cycle_inst.get -> Cat(0.U(31.W), fpu.get.out),
+      fpu.get.div_sqrt_valid_out -> Cat(0.U(31.W), fpu.get.out)
     ) else Vector()
   ))
 

@@ -1,20 +1,20 @@
 package nucleusrv.components
 
 import chisel3._
-import chisel3.util.MuxCase
+import chisel3.util._
 
-class Registers(F: Boolean) extends Module {
+class Registers(XLEN: Int, F: Boolean) extends Module {
   val io = IO(new Bundle {
     val readAddress = Input(Vec(if (F) 3 else 2, UInt(5.W)))
     val writeEnable = Input(Vec(if (F) 2 else 1, Bool()))
     val writeAddress = Input(UInt(5.W))
-    val writeData = Input(UInt(32.W))
+    val writeData = Input(UInt(XLEN.W))
 
     val f_read = if (F) Some(Input(Vec(3, Bool()))) else None
 
-    val readData = Output(Vec(if (F) 3 else 2, UInt(32.W)))
+    val readData = Output(Vec(if (F) 3 else 2, UInt(XLEN.W)))
   })
-  val i_reg = RegInit(VecInit(Seq.fill(32)(0.U(32.W)))) // Integer Registers (x0-x31)
+  val i_reg = RegInit(VecInit(Seq.fill(32)(0.U(XLEN.W)))) // Integer Registers (x0-x31)
   val f_reg = if (F) Some(Reg(Vec(32, UInt(32.W)))) else None // Floating Point Registers (f0-f31)
 
   when (dontTouch(io.writeEnable(0)) && (io.writeAddress =/= 0.U)) {
@@ -23,13 +23,13 @@ class Registers(F: Boolean) extends Module {
 
   if (F) {
     when (io.writeEnable(1)) {
-      f_reg.get(io.writeAddress) := io.writeData
+      f_reg.get(io.writeAddress) := io.writeData(31,0)
     }
   }
 
   for (i <- 0 until 2) {
     io.readData(i) := MuxCase(0.U, (
-      if (F) Vector(io.f_read.get(i) -> f_reg.get(io.readAddress(i)))
+      if (F) Vector(io.f_read.get(i) -> Cat(0.U(32.W), f_reg.get(io.readAddress(i))))
       else Vector()
     ) ++ Vector(
       (io.readAddress(i) =/= 0.U) -> i_reg(io.readAddress(i))

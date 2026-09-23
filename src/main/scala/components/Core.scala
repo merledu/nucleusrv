@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import nucleusrv.tracer.{TracerI, delays}
 
+
 class Core(implicit val config:Configs) extends Module{
 
   val M      = config.M
@@ -21,11 +22,11 @@ class Core(implicit val config:Configs) extends Module{
     val pin: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
 
-    val dmemReq = Decoupled(new MemRequestIO)
-    val dmemRsp = Flipped(Decoupled(new MemResponseIO))
+    val dmemReq = Decoupled(new MemRequestIO(XLEN = config.XLEN))
+    val dmemRsp = Flipped(Decoupled(new MemResponseIO(XLEN = config.XLEN)))
 
-    val imemReq = Decoupled(new MemRequestIO)
-    val imemRsp = Flipped(Decoupled(new MemResponseIO))
+    val imemReq = Decoupled(new MemRequestIO(XLEN = 32))
+    val imemRsp = Flipped(Decoupled(new MemResponseIO(XLEN = 32)))
 
     // RVFI Pins
     val rvfi = if (TRACE) Some(Flipped(new TracerI)) else None
@@ -122,9 +123,9 @@ class Core(implicit val config:Configs) extends Module{
 
   //Pipeline Units
   val IF = Module(new InstructionFetch).io
-  val ID = Module(new InstructionDecode(F, Zicsr, C, TRACE)).io
-  val EX = Module(new Execute(F, M = M, TRACE = TRACE)).io
-  val MEM = Module(new MemoryFetch(TRACE))
+  val ID = Module(new InstructionDecode(XLEN = XLEN, F = F, C = C, Zicsr, TRACE)).io
+  val EX = Module(new Execute(XLEN = XLEN, F = F, M = M, TRACE = TRACE)).io
+  val MEM = Module(new MemoryFetch(XLEN = XLEN, TRACE = TRACE))
 
   val reservationFile = Module(new ReservationFile).io
   

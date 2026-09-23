@@ -4,14 +4,15 @@ import chisel3._
 import chisel3.util._
 
 class InstructionDecode(
+  XLEN: Int,
   F: Boolean,
-  Zicsr: Boolean,
   C: Boolean,
+  Zicsr: Boolean,
   TRACE: Boolean
 ) extends Module {
   val io = IO(new Bundle {
     val id_instruction = Input(UInt(32.W))
-    val writeData = Input(UInt(32.W))
+    val writeData = Input(UInt(XLEN.W))
     val writeReg = Input(UInt(5.W))
     val pcAddress = Input(UInt(32.W))
     val ctl_writeEnable = Input(Vec(if (F) 2 else 1, Bool()))
@@ -26,9 +27,9 @@ class InstructionDecode(
     val ex_mem_ins = Input(UInt(32.W))
     val mem_wb_ins = Input(UInt(32.W))
     val ex_ins = Input(UInt(32.W))
-    val ex_result = Input(UInt(32.W))
-    val ex_mem_result = Input(UInt(32.W))
-    val mem_wb_result = Input(UInt(32.W))
+    val ex_result = Input(UInt(XLEN.W))
+    val ex_mem_result = Input(UInt(XLEN.W))
+    val mem_wb_result = Input(UInt(XLEN.W))
 
     val id_ex_regWr = Input(Bool())
     val ex_mem_regWr = Input(Bool())
@@ -43,10 +44,10 @@ class InstructionDecode(
     val ex_stall = Input(Bool())
 
     //Outputs
-    val immediate = Output(UInt(32.W))
+    val immediate = Output(UInt(XLEN.W))
     val writeRegAddress = Output(UInt(5.W))
-    val readData1 = Output(UInt(32.W))
-    val readData2 = Output(UInt(32.W))
+    val readData1 = Output(UInt(XLEN.W))
+    val readData2 = Output(UInt(XLEN.W))
     val func7 = Output(UInt(7.W))
     val func3 = Output(UInt(3.W))
     val ctl_aluSrc = Output(Bool())
@@ -80,12 +81,12 @@ class InstructionDecode(
     val f_except = if (F) Some(Input(Vec(3, Vec(5, Bool())))) else None
     val is_f_in = if (F) Some(Input(Vec(3, Bool()))) else None
     val f_read = if (F) Some(Output(Vec(3, Bool()))) else None
-    val readData3 = if (F) Some(Output(UInt(32.W))) else None
+    val readData3 = if (F) Some(Output(UInt(XLEN.W))) else None
     val is_f = if (F) Some(Output(Bool())) else None
 
     // RVFI pins
     val raddr = if (TRACE) Some(Output(Vec(3, UInt(5.W)))) else None
-    val rd_wdata = if (TRACE) Some(Output(UInt(32.W))) else None
+    val rd_wdata = if (TRACE) Some(Output(UInt(XLEN.W))) else None
 
     // Atomic Outputpins
     val isAMO  = Output(Bool())
@@ -218,7 +219,7 @@ class InstructionDecode(
   }
 
   //Register File
-  val registers = Module(new Registers(F))
+  val registers = Module(new Registers(XLEN,F))
   val registerRd = io.writeReg
   val registerRs1 = dontTouch(io.id_instruction(19, 15))
   val registerRs2 = io.id_instruction(24, 20)
@@ -334,7 +335,7 @@ class InstructionDecode(
   }
 
   //Branch Unit
-  val bu = Module(new BranchUnit)
+  val bu = Module(new BranchUnit(XLEN = XLEN))
   bu.io.branch := io.ctl_branch
   bu.io.funct3 := io.id_instruction(14, 12)
   bu.io.rd1 := input1

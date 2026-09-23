@@ -29,7 +29,7 @@ class TopTest extends AnyFreeSpec with ChiselScalatestTester {
     
     test(new Top(programFile, dataFile)).withAnnotations(Seq(
       VerilatorBackendAnnotation,
-      VerilatorFlags(Seq("--timing")),
+      // VerilatorFlags(Seq("--timing")),
       WriteVcdAnnotation 
     )) { c =>
       c.clock.setTimeout(0)

@@ -2,7 +2,7 @@ package nucleusrv.components
 import chisel3._
 import chisel3.util._ 
 
-class MemoryFetch(TRACE: Boolean) extends Module {
+class MemoryFetch(XLEN:Int, TRACE: Boolean) extends Module {
   val io = IO(new Bundle {
     val aluResultIn: UInt = Input(UInt(32.W))
     val writeData: UInt = Input(UInt(32.W))
@@ -19,8 +19,8 @@ class MemoryFetch(TRACE: Boolean) extends Module {
     val amoOp = Input(UInt(5.W))
     val amoRdVal = Output(UInt(32.W)) // old memory value for rd
 
-    val dccmReq = Decoupled(new MemRequestIO)
-    val dccmRsp = Flipped(Decoupled(new MemResponseIO))
+    val dccmReq = Decoupled(new MemRequestIO(XLEN = XLEN))
+    val dccmRsp = Flipped(Decoupled(new MemResponseIO(XLEN = XLEN)))
 
     val wmask = if (TRACE) Some(Output(UInt(4.W))) else None
     
