@@ -27,50 +27,94 @@ class SRamTop(val programFile:Option[String], XLEN:Int) extends Module {
     io.rsp.valid := state_reg === valid
     io.req.ready := state_reg === ready
 
-    val rdata = Wire(UInt(32.W))
+    val rdata_0 = Wire(UInt(32.W))
 
     // the memory
-    val sram = Module(new sram_top(programFile))
+    val sram_0 = Module(new sram_top(programFile = programFile))
 
     val clk = WireInit(clock.asUInt)
 
-    sram.io.clk_i := clk
-    sram.io.rst_i := rst
-    sram.io.csb_i := !io.req.valid
-    sram.io.we_i := DontCare
-    sram.io.wmask_i := DontCare
-    sram.io.addr_i := DontCare
-    sram.io.wdata_i := DontCare
+    sram_0.io.clk_i := clk
+    sram_0.io.rst_i := rst
+    sram_0.io.csb_i := !io.req.valid
+    sram_0.io.we_i := DontCare
+    sram_0.io.wmask_i := DontCare
+    sram_0.io.addr_i := DontCare
+    sram_0.io.wdata_i := DontCare
 
-    rdata := sram.io.rdata_o
+    rdata_0 := sram_0.io.rdata_o
+
+    dontTouch(io.req.valid)
+
+    when(io.req.valid && !io.req.bits.isWrite) {
+        // READ
+        // rdata := mem.read(io.req.bits.addrRequest/4.U)
+        sram_0.io.we_i := true.B
+        sram_0.io.addr_i := io.req.bits.addrRequest
+
+        rdata_0 := sram_0.io.rdata_o
+
+    } .elsewhen(io.req.valid && io.req.bits.isWrite) {
+        // WRITE
+        // mem.write(io.req.bits.addrRequest/4.U, wdata, mask)
+        // validReg := true.B
+        // rdata map (_ := DontCare)
+        sram_0.io.we_i := false.B
+        sram_0.io.wmask_i := io.req.bits.activeByteLane(3,0)
+        sram_0.io.addr_i := io.req.bits.addrRequest
+        sram_0.io.wdata_i := io.req.bits.dataRequest(31,0)
+        rdata_0 := DontCare
+
+    } .otherwise {
+        // rdata map (_ := DontCare)
+        rdata_0 := DontCare
+    }
 
 
+    if (XLEN == 64){
+        val rdata_1 = Wire(UInt(32.W))
 
-        dontTouch(io.req.valid)
+        // the memory
+        val sram_1 = Module(new sram_top(programFile = programFile))
+
+        sram_1.io.clk_i := clk
+        sram_1.io.rst_i := rst
+        sram_1.io.csb_i := !io.req.valid
+        sram_1.io.we_i := DontCare
+        sram_1.io.wmask_i := DontCare
+        sram_1.io.addr_i := DontCare
+        sram_1.io.wdata_i := DontCare
+
+        rdata_1 := sram_1.io.rdata_o
 
         when(io.req.valid && !io.req.bits.isWrite) {
             // READ
             // rdata := mem.read(io.req.bits.addrRequest/4.U)
-            sram.io.we_i := true.B
-            sram.io.addr_i := io.req.bits.addrRequest
 
-            rdata := sram.io.rdata_o
+            sram_1.io.we_i := true.B
+            sram_1.io.addr_i := io.req.bits.addrRequest
+            rdata_1 := sram_1.io.rdata_o
+
         } .elsewhen(io.req.valid && io.req.bits.isWrite) {
             // WRITE
             // mem.write(io.req.bits.addrRequest/4.U, wdata, mask)
             // validReg := true.B
             // rdata map (_ := DontCare)
-            sram.io.we_i := false.B
-            sram.io.wmask_i := io.req.bits.activeByteLane
-            sram.io.addr_i := io.req.bits.addrRequest
-            sram.io.wdata_i := io.req.bits.dataRequest
-            rdata := DontCare
+            sram_1.io.we_i := false.B
+            sram_1.io.wmask_i := io.req.bits.activeByteLane(7,4)
+            sram_1.io.addr_i := io.req.bits.addrRequest
+            sram_1.io.wdata_i := io.req.bits.dataRequest(63,32)
+            rdata_1 := DontCare
+
         } .otherwise {
             // rdata map (_ := DontCare)
-            rdata := DontCare
+            rdata_1 := DontCare
         }
 
-    io.rsp.bits.dataResponse := sram.io.rdata_o
+        io.rsp.bits.dataResponse := Cat(rdata_1, rdata_0)
+    }else{
+        io.rsp.bits.dataResponse := rdata_0
+    }
 }
 
 class SRAMIO extends Bundle {
