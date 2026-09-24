@@ -29,8 +29,13 @@ class ImmediateGen(XLEN: Int, F: Boolean) extends Module {
   //U-type
   .elsewhen(opcode === 23.U || opcode === 55.U) {
     val imm_u = io.instruction(31, 12)
-    val ext_u = Cat(Fill(XLEN - 32, imm_u(19)), imm_u, Fill(12, 0.U))
-    io.out := ext_u
+    if(XLEN == 64){
+      val ext_u = Cat(Fill(XLEN - 32, imm_u(19)), imm_u, Fill(12, 0.U))
+      io.out := ext_u
+    }else{
+      val ext_u = Cat(imm_u, Fill(12, 0.U))
+      io.out := ext_u
+    }
   }
   //S-type
   .elsewhen(
