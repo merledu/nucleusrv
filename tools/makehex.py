@@ -15,8 +15,8 @@ nwords = int(argv[2])
 with open(binfile, "rb") as f:
     bindata = f.read()
 
+bindata += b"\x00" * ((4 - len(bindata) % 4) % 4)   # pad to a whole word
 assert len(bindata) < 4*nwords
-assert len(bindata) % 4 == 0
 
 for i in range(nwords):
     if i < len(bindata) // 4:

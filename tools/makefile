@@ -2,8 +2,8 @@ RISCV=riscv32-unknown-elf-
 CC=$(RISCV)gcc
 OBJDUMP=$(RISCV)objdump
 OBJCOPY=$(RISCV)objcopy
-CFLAGS=-c -march=rv32gcv -mabi=ilp32 -ffreestanding -fomit-frame-pointer
-OFLAGS=--disassemble-all --section=.text
+CFLAGS=-c -O2 -march=rv32gcv -mabi=ilp32 -ffreestanding -fomit-frame-pointer
+OFLAGS=--disassemble-all
 LFLAGS = -march=rv32gcv -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
 
 PROGRAM ?= fibonacci
@@ -20,10 +20,14 @@ all: setup build
 setup: clean
 	@mkdir -p out
 
+# Flat mem image: VMA layout with gaps zero-filled (not raw ELF bytes).
+HEX_WORDS = 8192
+
 build: $(OBJS)
 	$(CC) $(LFLAGS) $(OBJS) -o out/program.elf -lgcc
 	$(OBJDUMP) $(OFLAGS) out/program.elf > out/program.dump
-	python3 makehex.py out/program.elf 2048 > out/program.hex
+	$(OBJCOPY) -O binary --gap-fill=0x00 out/program.elf out/program.bin
+	python3 makehex.py out/program.bin $(HEX_WORDS) > out/program.hex
 
 clean: 
 	rm -rf out

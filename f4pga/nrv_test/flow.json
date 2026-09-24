@@ -1,0 +1,74 @@
+{
+  "$schema": "https://raw.githubusercontent.com/chipsalliance/f4pga-tools/master/f4pga/schema/flow.json",
+  "default_platform": "XC7A100TCSG324-1",
+  "platforms": {
+    "XC7A100TCSG324-1": {
+      "default_part": "XC7A100TCSG324-1",
+      "part_names": {
+        "XC7A100TCSG324-1": {
+          "default_target": "bitstream",
+          "part_name": "xc7a100tcsg324-1"
+        }
+      }
+    }
+  },
+  "targets": {
+    "bitstream": {
+      "default_platform": "XC7A100TCSG324-1",
+      "steps": [
+        {
+          "name": "synth",
+          "tool": "synth",
+          "arguments": {
+            "top": "Top",
+            "sources": [
+              "Top.v",
+              "nrv_core.v",
+              "sram.v",
+              "sram_top.v"
+            ],
+            "xdc": [
+              "arty.xdc"
+            ],
+            "build_dir": "build/arty_100"
+          }
+        },
+        {
+          "name": "pack",
+          "tool": "pack",
+          "arguments": {
+            "build_dir": "build/arty_100"
+          }
+        },
+        {
+          "name": "place",
+          "tool": "place",
+          "arguments": {
+            "build_dir": "build/arty_100"
+          }
+        },
+        {
+          "name": "route",
+          "tool": "route",
+          "arguments": {
+            "build_dir": "build/arty_100"
+          }
+        },
+        {
+          "name": "fasm",
+          "tool": "fasm",
+          "arguments": {
+            "build_dir": "build/arty_100"
+          }
+        },
+        {
+          "name": "bitstream",
+          "tool": "bitstream",
+          "arguments": {
+            "build_dir": "build/arty_100"
+          }
+        }
+      ]
+    }
+  }
+}
