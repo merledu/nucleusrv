@@ -5,7 +5,7 @@ import chisel3.util._
 import chisel3.experimental._
 import chisel3.util.experimental._
 
-class SRamTop(val programFile:Option[String], XLEN:Int) extends Module {
+class SRamTop(val programFile:Option[String], val programFile1:Option[String], XLEN:Int) extends Module {
     val io = IO(new Bundle {
         val req = Flipped(Decoupled(new MemRequestIO(XLEN = XLEN)))
         val rsp = Decoupled(new MemResponseIO(XLEN = XLEN))
@@ -75,7 +75,7 @@ class SRamTop(val programFile:Option[String], XLEN:Int) extends Module {
         val rdata_1 = Wire(UInt(32.W))
 
         // the memory
-        val sram_1 = Module(new sram_top(programFile = programFile))
+        val sram_1 = Module(new sram_top(programFile = programFile1))
 
         sram_1.io.clk_i := clk
         sram_1.io.rst_i := rst

@@ -34,9 +34,9 @@ int main(int argc, char **argv, char **env) {
 		}
 		top->eval();  // Evaluate model
 		tfp->dump(sim_time);
-		if (top->io_rvfi_valid_0 == 1 && top->io_rvfi_mem_wmask_0 == 255) {
+		if (top->io_rvfi_valid_0 == 1 && (top->io_rvfi_mem_wmask_0 == 0x0F || top->io_rvfi_mem_wmask_0 == 0xF0)) {
 			if (top->io_rvfi_mem_addr_0 == 0x40000004) {
-				printf("%.16lx\n", top->io_rvfi_mem_wdata_0);  // Dump signature
+				printf("%.8x\n", top->io_rvfi_mem_wdata_0 >> 32);  // Dump signature
 			} else if (top->io_rvfi_mem_addr_0 == 0x40000008 && top->io_rvfi_mem_wdata_0 == 0xCAFECAFE) {
 				break;  // Terminate simulation
 			}

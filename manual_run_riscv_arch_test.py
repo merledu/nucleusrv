@@ -20,7 +20,7 @@ yaml = YAML(
 
 def simulate_and_compare(testlist, test, f):
     imem = join(testlist[test]["work_dir"], "dut", "imem.hex")
-    dmem = join(testlist[test]["work_dir"], "dut", "dmem.hex")
+    dmem = join(testlist[test]["work_dir"], "dut", "dmem0.hex")
     test_name = testlist[test]['work_dir'].split('/')[-1]
     out = join(ROOT, "out", test_name)
     nrv_sig_file = join(testlist[test]["work_dir"], "dut", "DUT-nucleusrv.signature")

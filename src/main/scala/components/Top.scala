@@ -4,7 +4,7 @@ import chisel3.stage.ChiselStage
 import nucleusrv.tracer._
 
 
-class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
+class Top(programFile:Option[String], dataFile:Option[String], dataFile1:Option[String]) extends Module{
 
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
@@ -16,8 +16,8 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   val core: Core = Module(new Core())
   core.io.stall := false.B
 
-  val dmem = Module(new SRamTop(programFile = dataFile, XLEN = config.XLEN))
-  val imem = Module(new SRamTop(programFile = programFile, XLEN = 32))
+  val dmem = Module(new SRamTop(programFile = dataFile, programFile1 = dataFile1, XLEN = config.XLEN))
+  val imem = Module(new SRamTop(programFile = programFile, programFile1 = None, XLEN = 32))
 
   /*  Imem Interceonnections  */
   core.io.imemRsp <> imem.io.rsp
@@ -42,8 +42,9 @@ object NRVDriver {
   def main(args: Array[String]): Unit = {
       val IMem = if (args.contains("--imem")) Some(args(args.indexOf("--imem") + 1)) else None
       val DMem = if (args.contains("--dmem")) Some(args(args.indexOf("--dmem") + 1)) else None
+      val DMem1 = if (args.contains("--dmem1")) Some(args(args.indexOf("--dmem1") + 1)) else None
       new ChiselStage().emitVerilog(
-        new Top(IMem, DMem),
+        new Top(IMem, DMem, DMem1),
         if (args.contains("--target-dir")) args.slice(
           args.indexOf("--target-dir"),
           args.indexOf("--target-dir") + 2

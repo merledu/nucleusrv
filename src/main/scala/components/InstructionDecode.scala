@@ -39,7 +39,7 @@ class InstructionDecode(
     val csr_Ex_data = if (Zicsr) Some(Input(UInt(32.W))) else None
     val csr_Mem_data = if (Zicsr) Some(Input(UInt(32.W))) else None
     val csr_Wb_data = if (Zicsr) Some(Input(UInt(32.W))) else None
-    val dmem_data = Input(UInt(32.W))
+    val dmem_data = Input(UInt(XLEN.W))
 
     val ex_stall = Input(Bool())
 
@@ -224,8 +224,8 @@ class InstructionDecode(
   val registerRs1 = dontTouch(io.id_instruction(19, 15))
   val registerRs2 = io.id_instruction(24, 20)
   val registerRs3 = if (F) Some(io.id_instruction(31, 27)) else None
-  val readData1 = WireInit(0.U(32.W))
-  val readData2 = WireInit(0.U(32.W))
+  val readData1 = WireInit(0.U(XLEN.W))
+  val readData2 = WireInit(0.U(XLEN.W))
   val writeData = if (Zicsr) dontTouch(Mux(io.csr_Wb.get, io.csr_Wb_data.get, io.writeData))
     else io.writeData
   registers.io.readAddress(0) := registerRs1
@@ -304,8 +304,8 @@ class InstructionDecode(
   io.immediate := immediate.io.out
 
   // Branch Forwarding
-  val input1 = Wire(UInt(32.W))
-  val input2 = Wire(UInt(32.W))
+  val input1 = Wire(UInt(XLEN.W))
+  val input2 = Wire(UInt(XLEN.W))
 
   when (
     (registerRs1 === io.ex_mem_ins(11, 7))

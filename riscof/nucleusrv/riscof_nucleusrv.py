@@ -85,6 +85,7 @@ class nucleusrv(pluginTemplate):
        # add more utility snippets here
        self.objcopy = 'riscv{0}-unknown-elf-objcopy -O binary -j {3} {1} {2}'
        self.hexdump = 'hexdump -v -e \'1/4 "%08x\\n"\' {0} > {1}'
+       self.split_dmem = f"python3 {os.path.join(RISCOF, 'env', 'split_dmem.py')} {{0}}"
 
     def build(self, isa_yaml, platform_yaml):
 
@@ -120,7 +121,8 @@ class nucleusrv(pluginTemplate):
             shutil.rmtree(os.path.join(self.dut, 'out'))
       os.chdir(self.dut)
       subprocess.run(
-        f'sbt "runMain nucleusrv.components.NRVDriver --imem inst.txt --dmem data.txt --target-dir {os.path.join(self.dut, "out", "nrv")}"',
+        f'sbt "runMain nucleusrv.components.NRVDriver --imem inst.txt --dmem data0.txt --target-dir {os.path.join(self.dut, "out", "nrv")}"' if self.xlen == 32 \
+            else f'sbt "runMain nucleusrv.components.NRVDriver --imem inst.txt --dmem data0.txt --dmem1 data1.txt --target-dir {os.path.join(self.dut, "out", "nrv")}"',
         shell = True
       )
       os.chdir(
@@ -184,33 +186,45 @@ class nucleusrv(pluginTemplate):
             # set up the simulation command.
             simcmd = '; '.join((
                 self.objcopy.format(self.xlen, elf, 'imem.bin', '.text.init'),
-                self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
+                self.objcopy.format(self.xlen, elf, 'dmem0.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
-                self.hexdump.format('dmem.bin', 'dmem.hex'),
-                f'riscv64-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
+                self.hexdump.format('dmem0.bin', 'dmem0.hex')
+            ) + (
+                (self.split_dmem.format(testentry["work_dir"]),) if self.xlen == '64' else ()
+            ) + (
+                f'riscv{self.xlen}-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
                 f'cd {os.path.join(self.dut, "out")}',
                 f'mkdir {test_name}',
                 f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
                 f'cd {os.path.join(self.dut, "out", test_name)}',
                 f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
-                f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
+                f'sed -i.bak "s|data0.txt|{os.path.join(testentry["work_dir"], "dmem0.hex")}|" Top.v'
+            ) + (
+                (f'sed -i.bak "s|data1.txt|{os.path.join(testentry["work_dir"], "dmem1.hex")}|" Top.v',) if self.xlen == '64' else ()
+            ) + (
                 'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
                 f'./obj_dir/VTop > {sig_file} 2>&1'
             ))
           else:
             simcmd = '; '.join((
                 self.objcopy.format(self.xlen, elf, 'imem.bin', '.text.init'),
-                self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
+                self.objcopy.format(self.xlen, elf, 'dmem0.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
-                self.hexdump.format('dmem.bin', 'dmem.hex'),
-                f'riscv64-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
+                self.hexdump.format('dmem0.bin', 'dmem0.hex')
+            ) + (
+                (self.split_dmem.format(testentry["work_dir"]),) if self.xlen == '64' else ()
+            ) + (
+                f'riscv{self.xlen}-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
                 f'cd {os.path.join(self.dut, "out")}',
                 f'mkdir {test_name}',
                 f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
                 f'cd {os.path.join(self.dut, "out", test_name)}',
                 f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
-                f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
-                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v'
+                f'sed -i.bak "s|data0.txt|{os.path.join(testentry["work_dir"], "dmem0.hex")}|" Top.v'
+            ) + (
+                (f'sed -i.bak "s|data1.txt|{os.path.join(testentry["work_dir"], "dmem1.hex")}|" Top.v',) if self.xlen == '64' else ()
+            ) + (
+                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
             ))
 
           # concatenate all commands that need to be executed within a make-target.
