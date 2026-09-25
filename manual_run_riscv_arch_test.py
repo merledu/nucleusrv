@@ -40,21 +40,21 @@ def simulate_and_compare(testlist, test, f):
         f.write(f'| {test_name:50} | {" " * 4} | \u2718    |\n')
         f.flush()
         #rmtree(out)
-        print('\u2718 Failed')
+        print('\033[91m\u2718 Failed\033[0m')
         return False
     for i in range(min((len(nrv_sig), len(ref_sig)))):
         if nrv_sig[i] != ref_sig[i]:
             f.write(f'| {test_name:50} | {" " * 4} | \u2718    |\n')
             f.flush()
             #rmtree(out)
-            print('\u2718 Failed')
+            print('\033[91m\u2718 Failed\033[0m')
             return False
     else:
         f.write(f'| {test_name:50} | \u2714    | {" " * 4} |\n')
         f.flush()
         #print(f'{out = }')
         rmtree(out)
-        print('\u2714 Passed')
+        print('\033[92m\u2714 Passed\033[0m')
     return True
 
 if __name__ == '__main__':
