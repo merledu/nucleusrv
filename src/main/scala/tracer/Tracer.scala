@@ -11,12 +11,14 @@ trait RVFIParams {
 }
 
 // Needs to be modified for adding support of not implemented ports
-class TracerI extends Bundle {
+class TracerI extends Bundle with RVFIParams {
   val bool = Input(Bool())
   val uint2 = Input(UInt(2.W))
-  val uint4 = Input(UInt(4.W))
+  val uint4 = if (XLEN == 32) Some(Input(UInt(4.W))) else None
   val uint5 = Input(Vec(3, UInt(5.W)))
-  val uint32 = Input(Vec(9, UInt(32.W)))
+  val uint8 = if (XLEN == 64) Some(Input(UInt(8.W))) else None
+  val uint32 = if (XLEN == 64) Input(Vec(4, UInt(32.W))) else Input(Vec(9, UInt(32.W)))
+  val uint64 = if (XLEN == 64) Some(Input(Vec(5, UInt(64.W)))) else None
 }
 
 class TracerO extends Bundle with RVFIParams {
@@ -39,8 +41,8 @@ class TracerO extends Bundle with RVFIParams {
   val rd_wdata = Output(Vec(NRET, UInt(XLEN.W)))
 
   // Program Counter
-  val pc_rdata = Output(Vec(NRET, UInt(XLEN.W)))
-  val pc_wdata = Output(Vec(NRET, UInt(XLEN.W)))
+  val pc_rdata = Output(Vec(NRET, UInt(32.W)))
+  val pc_wdata = Output(Vec(NRET, UInt(32.W)))
 
   // Memory Access
   val mem_addr = Output(Vec(NRET, UInt(32.W)))
@@ -50,13 +52,12 @@ class TracerO extends Bundle with RVFIParams {
   val mem_wdata = Output(Vec(NRET, UInt(XLEN.W)))
 }
 
-class Tracer extends RawModule {
+class Tracer extends RawModule with RVFIParams {
   val rvfi_i = IO(new TracerI)
   val rvfi_o = IO(new TracerO)
 
   rvfi_o.valid(0) := rvfi_i.bool
   rvfi_o.mode(0) := rvfi_i.uint2
-  rvfi_o.mem_wmask(0) := rvfi_i.uint4
 
   Vector(
     rvfi_o.rs1_addr,
@@ -66,18 +67,40 @@ class Tracer extends RawModule {
     r => r._1(0) := rvfi_i.uint5(r._2)
   }
 
-  Vector(
-    rvfi_o.insn,
-    rvfi_o.rs1_rdata,
-    rvfi_o.rs2_rdata,
-    rvfi_o.rd_wdata,
-    rvfi_o.pc_rdata,
-    rvfi_o.pc_wdata,
-    rvfi_o.mem_addr,
-    rvfi_o.mem_rdata,
-    rvfi_o.mem_wdata
-  ).zipWithIndex.foreach {
-    r => r._1(0) := rvfi_i.uint32(r._2)
+  if (XLEN == 32) {
+    rvfi_o.mem_wmask(0) := rvfi_i.uint4.get
+    Vector(
+      rvfi_o.insn,
+      rvfi_o.rs1_rdata,
+      rvfi_o.rs2_rdata,
+      rvfi_o.rd_wdata,
+      rvfi_o.pc_rdata,
+      rvfi_o.pc_wdata,
+      rvfi_o.mem_addr,
+      rvfi_o.mem_rdata,
+      rvfi_o.mem_wdata
+    ).zipWithIndex.foreach {
+      r => r._1(0) := rvfi_i.uint32(r._2)
+    }
+  } else {
+    rvfi_o.mem_wmask(0) := rvfi_i.uint8.get
+    Vector(
+      rvfi_o.insn,
+      rvfi_o.pc_rdata,
+      rvfi_o.pc_wdata,
+      rvfi_o.mem_addr,
+    ).zipWithIndex.foreach {
+      r => r._1(0) := rvfi_i.uint32(r._2)
+    }
+    Vector(
+      rvfi_o.rs1_rdata,
+      rvfi_o.rs2_rdata,
+      rvfi_o.rd_wdata,
+      rvfi_o.mem_rdata,
+      rvfi_o.mem_wdata
+    ).zipWithIndex.foreach {
+      r => r._1(0) := rvfi_i.uint64.get(r._2)
+    }
   }
 }
 

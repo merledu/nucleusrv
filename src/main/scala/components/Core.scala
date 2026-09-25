@@ -537,36 +537,69 @@ class Core(implicit val config:Configs) extends Module{
   if (TRACE) {
     io.rvfi.get.bool := (mem_reg_ins =/= 0.U) && !clock.asBool
     io.rvfi.get.uint2 := 3.U
-    io.rvfi.get.uint4 := delays(1, MEM.io.wmask.get)
 
     Vector(3, 3, 0).zipWithIndex.foreach(
       r => io.rvfi.get.uint5(r._2) := delays(r._1, ID.raddr.get(r._2))
     )
 
-    Vector(
-      mem_reg_ins,
-      delays(2, EX.rs1_rdata.get),
-      delays(1, ex_reg_wd),
-      ID.rd_wdata.get,
-      mem_reg_pc,
-      delays(4, npc.asUInt),
-      Mux(
-        delays(1, MEM.io.dccmReq.valid).asBool,
-        delays(1, ex_reg_result),
-        0.U
-      ),
-      Mux(
-        delays(1, ex_reg_ctl_memRead).asBool,
-        mem_reg_rd,
-        0.U
-      ),
-      Mux(
-        delays(1, ex_reg_ctl_memWrite).asBool,
-        delays(1, MEM.io.dccmReq.bits.dataRequest),
-        0.U
+    if (XLEN == 32) {
+      io.rvfi.get.uint4.get := delays(1, MEM.io.wmask.get)
+      Vector(
+        mem_reg_ins,
+        delays(2, EX.rs1_rdata.get),
+        delays(1, ex_reg_wd),
+        ID.rd_wdata.get,
+        mem_reg_pc,
+        delays(4, npc.asUInt),
+        Mux(
+          delays(1, MEM.io.dccmReq.valid).asBool,
+          delays(1, ex_reg_result),
+          0.U
+        ),
+        Mux(
+          delays(1, ex_reg_ctl_memRead).asBool,
+          mem_reg_rd,
+          0.U
+        ),
+        Mux(
+          delays(1, ex_reg_ctl_memWrite).asBool,
+          delays(1, MEM.io.dccmReq.bits.dataRequest),
+          0.U
+        )
+      ).zipWithIndex.foreach(
+        r => io.rvfi.get.uint32(r._2) := r._1
       )
-    ).zipWithIndex.foreach(
-      r => io.rvfi.get.uint32(r._2) := r._1
-    )
+    } else {
+      io.rvfi.get.uint8.get := delays(1, MEM.io.wmask.get)
+      Vector(
+        mem_reg_ins,
+        mem_reg_pc,
+        delays(4, npc.asUInt),
+        Mux(
+          delays(1, MEM.io.dccmReq.valid).asBool,
+          delays(1, ex_reg_result),
+          0.U
+        ),
+      ).zipWithIndex.foreach(
+        r => io.rvfi.get.uint32(r._2) := r._1
+      )
+      Vector(
+        delays(2, EX.rs1_rdata.get),
+        delays(1, ex_reg_wd),
+        ID.rd_wdata.get,
+        Mux(
+          delays(1, ex_reg_ctl_memRead).asBool,
+          mem_reg_rd,
+          0.U
+        ),
+        Mux(
+          delays(1, ex_reg_ctl_memWrite).asBool,
+          delays(1, MEM.io.dccmReq.bits.dataRequest),
+          0.U
+        )
+      ).zipWithIndex.foreach(
+        r => io.rvfi.get.uint64.get(r._2) := r._1
+      )
+    }
   }
 }
