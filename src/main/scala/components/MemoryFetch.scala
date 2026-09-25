@@ -38,7 +38,7 @@ class MemoryFetch(XLEN:Int, TRACE: Boolean) extends Module {
 
   val wdata = Wire(Vec(NUM_BYTES, UInt(BYTE_WIDTH.W)))
   val rdata = Wire(UInt(XLEN.W))
-  val offset = RegInit(0.U((OFFSET_BITS - 1).W))
+  val offset = RegInit(0.U(OFFSET_BITS.W))
   val funct3 = RegInit(0.U(3.W))
   val offsetSW = io.aluResultIn(OFFSET_BITS - 1,0)
 
