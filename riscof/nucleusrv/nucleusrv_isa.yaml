@@ -15,7 +15,7 @@ hart0:
   #ISA: RV32IMAC
   #ISA: RV32IMFCZicsr
   #ISA: RV32IAFCZicsr
-  # ISA: RV32IMAFCZicsr
+  #ISA: RV32IMAFCZicsr
   physical_addr_sz: 32
   User_Spec_Version: '2.3'
   supported_xlen: [64]

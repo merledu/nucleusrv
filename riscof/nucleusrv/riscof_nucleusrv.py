@@ -194,7 +194,7 @@ class nucleusrv(pluginTemplate):
                 f'cd {os.path.join(self.dut, "out", test_name)}',
                 f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
                 f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
-                'verilator --cc --exe --build --trace ../../tb_Top.cpp Top.v',
+                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
                 f'./obj_dir/VTop > {sig_file} 2>&1'
             ))
           else:
@@ -210,7 +210,7 @@ class nucleusrv(pluginTemplate):
                 f'cd {os.path.join(self.dut, "out", test_name)}',
                 f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
                 f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
-                'verilator --cc --exe --build --trace ../../tb_Top.cpp Top.v'
+                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v'
             ))
 
           # concatenate all commands that need to be executed within a make-target.
