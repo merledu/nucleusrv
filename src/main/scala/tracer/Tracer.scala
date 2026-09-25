@@ -1,9 +1,11 @@
 package nucleusrv.tracer
+import nucleusrv.components._
 
 import chisel3._
 
 trait RVFIParams {
-  val XLEN = 32
+  implicit val config:Configs = Configs()
+  val XLEN = config.XLEN
   val NRET = 1
   val ILEN = 32
 }
@@ -41,7 +43,7 @@ class TracerO extends Bundle with RVFIParams {
   val pc_wdata = Output(Vec(NRET, UInt(XLEN.W)))
 
   // Memory Access
-  val mem_addr = Output(Vec(NRET, UInt(XLEN.W)))
+  val mem_addr = Output(Vec(NRET, UInt(32.W)))
   //val mem_rmask = Output(Vec(NRET, UInt((XLEN / 8).W)))  // Not implemented yet
   val mem_wmask = Output(Vec(NRET, UInt((XLEN / 8).W)))
   val mem_rdata = Output(Vec(NRET, UInt(XLEN.W)))

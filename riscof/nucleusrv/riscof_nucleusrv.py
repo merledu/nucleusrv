@@ -187,14 +187,14 @@ class nucleusrv(pluginTemplate):
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
                 self.hexdump.format('dmem.bin', 'dmem.hex'),
-                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
+                f'riscv64-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
                 f'cd {os.path.join(self.dut, "out")}',
                 f'mkdir {test_name}',
                 f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
                 f'cd {os.path.join(self.dut, "out", test_name)}',
                 f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
                 f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
-                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v',
+                'verilator --cc --exe --build --trace ../../tb_Top.cpp Top.v',
                 f'./obj_dir/VTop > {sig_file} 2>&1'
             ))
           else:
@@ -203,14 +203,14 @@ class nucleusrv(pluginTemplate):
                 self.objcopy.format(self.xlen, elf, 'dmem.bin', '.data'),
                 self.hexdump.format('imem.bin', 'imem.hex'),
                 self.hexdump.format('dmem.bin', 'dmem.hex'),
-                f'riscv32-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
+                f'riscv64-unknown-elf-objdump -d -Mno-aliases {os.path.join(testentry["work_dir"], elf)} > {os.path.join(testentry["work_dir"], elf)}.objdump',
                 f'cd {os.path.join(self.dut, "out")}',
                 f'mkdir {test_name}',
                 f'cp {os.path.join(self.dut, "out", "nrv")}/* {os.path.join(self.dut, "out", test_name)}',
                 f'cd {os.path.join(self.dut, "out", test_name)}',
                 f'sed -i.bak "s|inst.txt|{os.path.join(testentry["work_dir"], "imem.hex")}|" Top.v',
                 f'sed -i.bak "s|data.txt|{os.path.join(testentry["work_dir"], "dmem.hex")}|" Top.v',
-                'verilator --cc --exe --build --trace --no-timing ../../tb_Top.cpp Top.v'
+                'verilator --cc --exe --build --trace ../../tb_Top.cpp Top.v'
             ))
 
           # concatenate all commands that need to be executed within a make-target.

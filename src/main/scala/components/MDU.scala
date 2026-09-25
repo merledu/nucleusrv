@@ -31,7 +31,7 @@ class MDU(XLEN:Int) extends Module{
 
     // Multiplier
 
-    val result = Wire(UInt(64.W))
+    val result = Wire(UInt((XLEN*2).W))
     result := MuxCase(0.U, Array(
         (io.op === MUL || io.op === MULHU)  ->  io.src_a * io.src_b,
         (io.op === MULHSU)                  ->  (io.src_a.asSInt * io.src_b).asUInt,
@@ -41,20 +41,20 @@ class MDU(XLEN:Int) extends Module{
 
     // Divider
     val r_ready    = RegInit(1.U(1.W))
-    val r_counter  = RegInit(32.U(6.W))
-    val r_dividend = RegInit(0.U(32.W))
-    val r_quotient = RegInit(0.U(32.W))
+    val r_counter  = RegInit(XLEN.U((log2Ceil(XLEN) + 1).W))
+    val r_dividend = RegInit(0.U(XLEN.W))
+    val r_quotient = RegInit(0.U(XLEN.W))
 
     io.output.valid := 0.U
 
     val is_div_rem_u = WireInit(io.op === DIVU || io.op === REMU) 
     val is_div_rem_s = WireInit(io.op === DIV || io.op === REM) 
     when(is_div_rem_s || is_div_rem_u){
-        val dividend  = Mux(is_div_rem_s && io.src_a(31), -io.src_a, io.src_a)  //WireInit(io.src_a)
-        val divisor   = Mux(is_div_rem_s && io.src_b(31), -io.src_b, io.src_b)  //WireInit(io.src_b)
+        val dividend  = Mux(is_div_rem_s && io.src_a(XLEN-1), -io.src_a, io.src_a)  //WireInit(io.src_a)
+        val divisor   = Mux(is_div_rem_s && io.src_b(XLEN-1), -io.src_b, io.src_b)  //WireInit(io.src_b)
         when(io.valid === 1.U) {
             r_ready    := 0.U
-            r_counter  := 32.U
+            r_counter  := XLEN.U
             r_dividend := dividend
             r_quotient := 0.U
         }.elsewhen(r_counter =/= 0.U){
@@ -73,17 +73,17 @@ class MDU(XLEN:Int) extends Module{
 
     io.ready     := r_ready
     when(io.op === MUL){
-        io.output.bits := result(31,0)
+        io.output.bits := result(XLEN-1,0)
         io.output.valid := 1.U
     }.elsewhen(io.op === MULH || io.op === MULHU || io.op === MULHSU){
-        io.output.bits := result(63,32)
+        io.output.bits := result((2*XLEN)-1,XLEN)
         io.output.valid := 1.U
     }.elsewhen(io.op === DIV){
-        io.output.bits := Mux(io.src_a(31) =/= io.src_b(31) & io.src_b.orR,-r_quotient, r_quotient)
+        io.output.bits := Mux(io.src_a(XLEN-1) =/= io.src_b(XLEN-1) & io.src_b.orR,-r_quotient, r_quotient)
     }.elsewhen(io.op === DIVU){
         io.output.bits := r_quotient
     }.elsewhen(io.op === REM){
-        io.output.bits := Mux(io.src_a(31),-r_dividend, r_dividend)
+        io.output.bits := Mux(io.src_a(XLEN-1),-r_dividend, r_dividend)
     }.elsewhen(io.op === REMU){
         io.output.bits := r_dividend
     }.otherwise{
