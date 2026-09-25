@@ -186,7 +186,7 @@ class InstructionDecode(
   io.hdu_if_reg_write := hdu.io.if_reg_write
 
   //Control Unit
-  val control = Module(new Control(F))
+  val control = Module(new Control(XLEN = XLEN, F = F))
   control.io.in := io.id_instruction
   io.ctl_aluOp := control.io.aluOp
   io.ctl_aluSrc := control.io.aluSrc

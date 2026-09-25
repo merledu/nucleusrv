@@ -4,7 +4,7 @@ import chisel3.util._
 
 import nucleusrv.components.FBitPats._
 
-class Control(F: Boolean) extends Module {
+class Control(XLEN: Int, F: Boolean) extends Module {
   val io = IO(new Bundle {
     val in = Input(UInt(32.W))
     val aluSrc = Output(Bool())
@@ -268,6 +268,31 @@ class Control(F: Boolean) extends Module {
           0.U, // jump
           1.U, // aluOp
           0.U // aluSrc1
+        )
+      ) else Array()
+    ) ++ (
+      if (XLEN == 64) Array(
+        BitPat("b?????????????????????????0011011") -> List(
+          false.B, // aluSrc
+          0.U, // memToReg
+          true.B, // regWrite
+          false.B, // memRead
+          false.B, // memWrite
+          false.B, // branch
+          0.U, // jump
+          3.U, // aluOp
+          0.U
+        ),
+        BitPat("b?????????????????????????0111011") -> List(
+          true.B, // aluSrc
+          0.U, // memToReg
+          true.B, // regWrite
+          false.B, // memRead
+          false.B, // memWrite
+          false.B, // branch
+          0.U, // jump
+          3.U, // aluOp
+          0.U
         )
       ) else Array()
     )
