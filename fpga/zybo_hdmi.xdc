@@ -35,6 +35,8 @@ set_property -dict { PACKAGE_PIN M15   IOSTANDARD LVCMOS33 } [get_ports { led[1]
 set_property -dict { PACKAGE_PIN G14   IOSTANDARD LVCMOS33 } [get_ports { led[2] }];
 set_property -dict { PACKAGE_PIN P15   IOSTANDARD LVCMOS33 } [get_ports { led[3] }];
 
-## USB-UART Pins (Pmod JE: Pin 1 = RX, Pin 2 = TX)
-set_property -dict { PACKAGE_PIN V12   IOSTANDARD LVCMOS33 } [get_ports { uart_rx_pin }];
-set_property -dict { PACKAGE_PIN W16   IOSTANDARD LVCMOS33 } [get_ports { uart_tx_pin }];
+## Paddle Control Buttons - external push buttons on Pmod Header JE
+## Wire each button between the signal pin and Pmod 3.3V (active-high).
+## Internal pulldown holds the pin LOW when the button is not pressed.
+set_property -dict { PACKAGE_PIN V12   IOSTANDARD LVCMOS33   PULLTYPE PULLDOWN } [get_ports { btn_up }]; # je[1]
+set_property -dict { PACKAGE_PIN W16   IOSTANDARD LVCMOS33   PULLTYPE PULLDOWN } [get_ports { btn_dn }]; # je[2]

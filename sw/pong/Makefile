@@ -3,7 +3,7 @@ CC = $(CROSS_COMPILE)gcc
 OBJCOPY = $(CROSS_COMPILE)objcopy
 OBJDUMP = $(CROSS_COMPILE)objdump
 
-CFLAGS = -march=rv32imafc -mabi=ilp32f -O2 -ffreestanding -nostdlib
+CFLAGS = -march=rv32imafc -mabi=ilp32f -O2 -ffreestanding -nostdlib -fno-jump-tables
 LDFLAGS = -T link.ld -nostdlib
 
 SRCS = start.S pong.c
