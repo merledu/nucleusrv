@@ -44,7 +44,7 @@ class AluControl extends Module {
         }
       }
       is(1.U) {
-        io.out := 6.U
+        io.out := 12.U
       } // sllW
       is(5.U) {
         when(io.f7 === 0.U) {
