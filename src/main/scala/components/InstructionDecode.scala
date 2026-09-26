@@ -389,7 +389,7 @@ class InstructionDecode(
     io.func7 := io.id_instruction(31,25)
   }.elsewhen((io.id_instruction(6,0) === "b0010011".U) & (io.func3 === 5.U | io.func3 === 1.U))
     {if (XLEN == 64) {io.func7 := Cat(io.id_instruction(31,26), 0.U(1.W))} else{io.func7 := io.id_instruction(31,25)}
-  }.elsewhen (io.id_instruction(6,0) === "b0011011".U){
+  }.elsewhen (io.id_instruction(6,0) === "b0011011".U && io.id_instruction(14, 12) =/= "b000".U){
     io.func7 := io.id_instruction(31,25)
   }.otherwise{
     io.func7 := 0.U
