@@ -14,9 +14,17 @@ class TopTest extends AnyFreeSpec with ChiselScalatestTester {
     }
   }
 
-  def getDataFile: Option[String] = {
-    if (scalaTestContext.value.get.configMap.contains("dataFile")) {
-      Some(scalaTestContext.value.get.configMap("dataFile").toString)
+  def getDataFile0: Option[String] = {
+    if (scalaTestContext.value.get.configMap.contains("dataFile0")) {
+      Some(scalaTestContext.value.get.configMap("dataFile0").toString)
+    } else {
+      None
+    }
+  }
+
+    def getDataFile1: Option[String] = {
+    if (scalaTestContext.value.get.configMap.contains("dataFile1")) {
+      Some(scalaTestContext.value.get.configMap("dataFile1").toString)
     } else {
       None
     }
@@ -24,10 +32,11 @@ class TopTest extends AnyFreeSpec with ChiselScalatestTester {
 
   "Top Test" in {
     val programFile = getProgramFile
-    val dataFile = getDataFile
+    val dataFile0 = getDataFile0
+    val dataFile1 = getDataFile1
 
     
-    test(new Top(programFile, dataFile)).withAnnotations(Seq(
+    test(new Top(programFile, dataFile0, dataFile1)).withAnnotations(Seq(
       VerilatorBackendAnnotation,
       // VerilatorFlags(Seq("--timing")),
       WriteVcdAnnotation 
