@@ -400,7 +400,7 @@ class MemoryFetch(XLEN:Int, TRACE: Boolean) extends Module {
         } .otherwise {
           io.readData := DontCare
         }
-    }
+      }
     }.elsewhen(funct3 === "b100".U) {
       // load byte unsigned
       if (XLEN == 32) {
@@ -416,7 +416,7 @@ class MemoryFetch(XLEN:Int, TRACE: Boolean) extends Module {
           io.readData := DontCare
         }
       } else {
-        when(offset === "b100".U) {
+        when(offset === "b000".U) {
           io.readData := Cat(Fill(56, 0.U), rdata(7, 0))
         }.elsewhen(offset === "b001".U) {
           io.readData := Cat(Fill(56, 0.U), rdata(15, 8))

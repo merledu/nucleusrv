@@ -4,6 +4,7 @@
 
 //#define MAX_SIM_TIME 10000000  // In cycles
 #define MAX_SIM_TIME 100000  // In cycles
+//#define MAX_SIM_TIME 10000  // In cycles
 
 int main(int argc, char **argv, char **env) {
 	if (false && argc && argv && env) {}
@@ -36,7 +37,7 @@ int main(int argc, char **argv, char **env) {
 		tfp->dump(sim_time);
 		if (top->io_rvfi_valid_0 == 1 && (top->io_rvfi_mem_wmask_0 == 0x0F || top->io_rvfi_mem_wmask_0 == 0xF0)) {
 			if (top->io_rvfi_mem_addr_0 == 0x40000004) {
-				printf("%.8x\n", top->io_rvfi_mem_wdata_0 >> 32);  // Dump signature
+				printf("%.8lx\n", top->io_rvfi_mem_wdata_0 >> 32);  // Dump signature
 			} else if (top->io_rvfi_mem_addr_0 == 0x40000008 && top->io_rvfi_mem_wdata_0 == 0xCAFECAFE) {
 				break;  // Terminate simulation
 			}
