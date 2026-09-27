@@ -25,7 +25,11 @@ def simulate_and_compare(testlist, test, f):
     out = join(ROOT, "out", test_name)
     nrv_sig_file = join(testlist[test]["work_dir"], "dut", "DUT-nucleusrv.signature")
     ref_sig_file = join(testlist[test]["work_dir"], "ref", "Reference-spike.signature")
-    print(f'Simulating and comparing test: {test_name}')
+    print(
+        f'Simulating and comparing test: {test_name} -> ',
+        end = '',
+        flush = True
+    )
     chdir(out)
     run(
         f'./obj_dir/VTop > {nrv_sig_file}',

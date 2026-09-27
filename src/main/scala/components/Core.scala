@@ -194,12 +194,12 @@ class Core(implicit val config:Configs) extends Module{
   )
   pc.io.in := dontTouch(npc)
 
-  when(ID.hdu_if_reg_write && !MEM.io.stall && (
+  when(ID.hdu_if_reg_write && !MEM.io.stall && !EX.stall && (
     if (C) !RA.get.misaligned_word_uh else true.B
   )) {
     if_reg_pc := pc.io.out.asUInt
   }
-  when(ID.hdu_if_reg_write && !MEM.io.stall && (
+  when(ID.hdu_if_reg_write && !MEM.io.stall && !EX.stall && (
     if (C) !RA.get.nop_sel else true.B
   )) {
     if_reg_ins := instruction 
@@ -218,7 +218,7 @@ class Core(implicit val config:Configs) extends Module{
    * Decode Stage *
    ****************/
 
-  when(!MEM.io.stall) {
+  when(!MEM.io.stall && !EX.stall) {
     id_reg_rd1 := ID.readData1
     id_reg_rd2 := ID.readData2
     id_reg_imm := ID.immediate
@@ -305,7 +305,7 @@ class Core(implicit val config:Configs) extends Module{
   EX.amo_src2    := ex_reg_wd
   EX.amo_op_code := ex_reg_amoOp
   
-  when(!MEM.io.stall) {
+  when(!MEM.io.stall && !EX.stall) {
     ex_reg_pc := id_reg_pc
     ex_reg_wra := id_reg_wra
     ex_reg_ins := id_reg_ins
@@ -527,7 +527,7 @@ class Core(implicit val config:Configs) extends Module{
     *****************************/
     if (Zicsr) {
       val instruction_retired = WireInit(false.B)
-      instruction_retired := mem_reg_ins =/= 0.U && !ID.ifid_flush && !(MEM.io.stall || io.stall) && (!mem_reg_ctl_memToReg === 1.U || io.dmemRsp.valid)
+      instruction_retired := mem_reg_ins =/= 0.U && !ID.ifid_flush && !(MEM.io.stall || EX.stall || io.stall) && (!mem_reg_ctl_memToReg === 1.U || io.dmemRsp.valid)
       ID.csr_i_instr_retired.get := instruction_retired
     }
 

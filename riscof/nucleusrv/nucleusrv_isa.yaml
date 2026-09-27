@@ -1,6 +1,6 @@
 hart_ids: [0]
 hart0:
-  ISA: RV64I
+  #ISA: RV32I
   #ISA: RV32IM
   #ISA: RV32IA
   #ISA: RV32IFZicsr
@@ -16,6 +16,8 @@ hart0:
   #ISA: RV32IMFCZicsr
   #ISA: RV32IAFCZicsr
   #ISA: RV32IMAFCZicsr
+  #ISA: RV64I
+  ISA: RV64IM
   physical_addr_sz: 32
   User_Spec_Version: '2.3'
   supported_xlen: [64]
