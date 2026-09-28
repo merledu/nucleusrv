@@ -157,8 +157,9 @@ class Execute(
       dontTouch(f7_reg.get)
     }
 
+    val max_count = Mux(io.id_ex_ins(3), (XLEN/2).U, XLEN.U)
     when(div_en.get){
-      when (counter.get < XLEN.U){
+      when (counter.get < max_count){
         mdu.get.io.src_a := src_a_reg.get
         mdu.get.io.src_b := src_b_reg.get
         mdu.get.io.op    := op_reg.get

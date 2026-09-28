@@ -20,7 +20,7 @@ object  MDUOps {
     val MULW    = 8.U
     val DIVW    = 12.U
     val DIVUW   = 13.U
-    val REMW    = 14.W
+    val REMW    = 14.U
     val REMUW   = 15.U
 }
 
@@ -56,12 +56,21 @@ class MDU(XLEN:Int) extends Module{
 
     val is_div_rem_u = WireInit(io.op === DIVU || io.op === REMU) 
     val is_div_rem_s = WireInit(io.op === DIV || io.op === REM) 
-    when(is_div_rem_s || is_div_rem_u){
-        val dividend  = Mux(is_div_rem_s && io.src_a(XLEN-1), -io.src_a, io.src_a)  //WireInit(io.src_a)
-        val divisor   = Mux(is_div_rem_s && io.src_b(XLEN-1), -io.src_b, io.src_b)  //WireInit(io.src_b)
+    val is_div_rem_u_w = WireInit(io.op === DIVUW || io.op === REMUW)
+    val is_div_rem_s_w = WireInit(io.op === DIVW || io.op === REMW)
+    val max_count = Mux(io.op(3), (XLEN/2).U, XLEN.U)
+    when(is_div_rem_s || is_div_rem_u || is_div_rem_s_w || is_div_rem_u_w){
+        val dividend  = Mux(is_div_rem_s_w || is_div_rem_u_w,
+                            Mux(is_div_rem_s_w && io.src_a(max_count-1.U), -io.src_a(31,0), io.src_a(31,0)),
+                            Mux(is_div_rem_s && io.src_a(max_count-1.U), -io.src_a, io.src_a))
+
+        val divisor   = Mux(is_div_rem_s_w || is_div_rem_u_w,
+                            Mux(is_div_rem_s_w && io.src_b(max_count-1.U), -io.src_b(31,0), io.src_b(31,0)),
+                            Mux(is_div_rem_s && io.src_b(max_count-1.U), -io.src_b, io.src_b))
+        
         when(io.valid === 1.U) {
             r_ready    := 0.U
-            r_counter  := XLEN.U
+            r_counter  := max_count
             r_dividend := dividend
             r_quotient := 0.U
         }.elsewhen(r_counter =/= 0.U){
@@ -77,6 +86,11 @@ class MDU(XLEN:Int) extends Module{
             io.output.valid := 1.U
         }
     }
+
+    val quotient = WireInit(r_quotient)
+    val inv_quotient = WireInit(-r_quotient)
+    val dividend = WireInit(r_dividend)
+    val inv_dividend = WireInit(-r_dividend)
 
     io.ready     := r_ready
     when(io.op === MUL){
@@ -95,7 +109,19 @@ class MDU(XLEN:Int) extends Module{
         io.output.bits := r_dividend
     }.elsewhen(io.op === MULW){
         io.output.bits := Cat(Fill(32, result(31)), result(31,0))
-        io.output.valid := 1.U        
+        io.output.valid := 1.U
+    }.elsewhen(io.op === DIVW){
+        io.output.bits := Mux(io.src_a(max_count-1.U) =/= io.src_b(max_count-1.U) & io.src_b(31,0).orR,
+                             Cat(Fill(32, inv_quotient(31)), inv_quotient(31,0)), 
+                             Cat(Fill(32, quotient(31)), quotient(31,0)))
+    }.elsewhen(io.op === DIVUW){
+        io.output.bits := Cat(Fill(32, quotient(31)), quotient(31,0))
+    }.elsewhen(io.op === REMW){
+        io.output.bits := Mux(io.src_a(max_count-1.U),
+                             Cat(Fill(32, inv_dividend(31)), inv_dividend(31,0)), 
+                             Cat(Fill(32, dividend(31)), dividend(31,0)))
+    }.elsewhen(io.op === REMUW){
+        io.output.bits := Cat(Fill(32, dividend(31)), dividend(31,0))
     }.otherwise{
         io.output.bits := 0.U
     }
