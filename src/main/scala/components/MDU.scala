@@ -16,13 +16,19 @@ object  MDUOps {
     val DIVU    = 5.U
     val REM     = 6.U
     val REMU    = 7.U
+
+    val MULW    = 8.U
+    val DIVW    = 12.U
+    val DIVUW   = 13.U
+    val REMW    = 14.W
+    val REMUW   = 15.U
 }
 
 class MDU(XLEN:Int) extends Module{
     val io = IO(new Bundle{
         val src_a         = Input(UInt(XLEN.W))
         val src_b         = Input(UInt(XLEN.W))
-        val op            = Input(UInt(5.W))
+        val op            = Input(UInt(4.W))
         val valid         = Input(Bool())
         val ready         = Output(Bool())
         
@@ -35,7 +41,8 @@ class MDU(XLEN:Int) extends Module{
     result := MuxCase(0.U, Array(
         (io.op === MUL || io.op === MULHU)  ->  io.src_a * io.src_b,
         (io.op === MULHSU)                  ->  (io.src_a.asSInt * io.src_b).asUInt,
-        (io.op === MULH)                    ->  (io.src_a.asSInt * io.src_b.asSInt).asUInt
+        (io.op === MULH)                    ->  (io.src_a.asSInt * io.src_b.asSInt).asUInt,
+        (io.op === MULW)                    ->  (io.src_a(31,0) * io.src_b(31,0))(31,0)
     ))
 
 
@@ -86,6 +93,9 @@ class MDU(XLEN:Int) extends Module{
         io.output.bits := Mux(io.src_a(XLEN-1),-r_dividend, r_dividend)
     }.elsewhen(io.op === REMU){
         io.output.bits := r_dividend
+    }.elsewhen(io.op === MULW){
+        io.output.bits := Cat(Fill(32, result(31)), result(31,0))
+        io.output.valid := 1.U        
     }.otherwise{
         io.output.bits := 0.U
     }

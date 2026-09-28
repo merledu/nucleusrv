@@ -132,14 +132,14 @@ class Execute(
   val mdu = if (M) Some(Module (new MDU(XLEN=XLEN))) else None
   val src_a_reg = if (M) Some(RegInit(0.U(XLEN.W))) else None
   val src_b_reg = if (M) Some(RegInit(0.U(XLEN.W))) else None
-  val op_reg    = if (M) Some(RegInit(0.U(3.W))) else None
+  val op_reg    = if (M) Some(RegInit(0.U(4.W))) else None
   val div_en    = if (M) Some(RegInit(false.B)) else None
   val f7_reg    = if (M) Some(RegInit(0.U(6.W))) else None
   val counter   = if (M) Some(RegInit(0.U((log2Ceil(XLEN)+1).W))) else None
   if (M) {
     mdu.get.io.src_a := aluIn1
     mdu.get.io.src_b := aluIn2
-    mdu.get.io.op    := io.func3
+    mdu.get.io.op    := Cat(io.id_ex_ins(3), io.func3)
     
     when(io.func7 === 1.U && (io.func3 === 0.U || io.func3 === 1.U || io.func3 === 2.U || io.func3 === 3.U)){
       mdu.get.io.valid := true.B
@@ -152,7 +152,7 @@ class Execute(
       div_en.get := true.B
       src_a_reg.get := aluIn1
       src_b_reg.get := aluIn2
-      op_reg.get := io.func3
+      op_reg.get := Cat(io.id_ex_ins(3), io.func3)
       f7_reg.get := io.func7
       dontTouch(f7_reg.get)
     }
