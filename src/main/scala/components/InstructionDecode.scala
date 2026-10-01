@@ -230,7 +230,7 @@ class InstructionDecode(
     else io.writeData
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable(0) := (io.ctl_writeEnable(0) || (if (Zicsr) io.csr_Wb.get else 0.B)) && !dontTouch(io.ex_stall)// && (
+  registers.io.writeEnable(0) := (io.ctl_writeEnable(0) || (if (Zicsr) io.csr_Wb.get else 0.B))// && (
     //  if (Zicsr) io.csr_Wb.get else 1.B
     //)
   //)
