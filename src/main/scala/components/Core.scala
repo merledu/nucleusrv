@@ -151,7 +151,7 @@ class Core(implicit val config:Configs) extends Module{
     RA.get.is_comp           := is_comp
     val instruction_cd    = RA.get.ral_instruction_o
 
-    val CD = Module(new CompressedDecoder).io
+    val CD = Module(new CompressedDecoder(XLEN = XLEN)).io
     CD.instruction_i := instruction_cd
     CD.addri := RA.get.addri
     instruction  := CD.instruction_o
