@@ -136,6 +136,7 @@ class Execute(
   val div_en    = if (M) Some(RegInit(false.B)) else None
   val f7_reg    = if (M) Some(RegInit(0.U(6.W))) else None
   val counter   = if (M) Some(RegInit(0.U((log2Ceil(XLEN)+1).W))) else None
+  val max_count  = if (M) Some(Mux(io.id_ex_ins(3), (XLEN/2).U, XLEN.U)) else None
   if (M) {
     mdu.get.io.src_a := aluIn1
     mdu.get.io.src_b := aluIn2
@@ -157,9 +158,8 @@ class Execute(
       dontTouch(f7_reg.get)
     }
 
-    val max_count = Mux(io.id_ex_ins(3), (XLEN/2).U, XLEN.U)
     when(div_en.get){
-      when (counter.get < max_count){
+      when (counter.get < max_count.get){
         mdu.get.io.src_a := src_a_reg.get
         mdu.get.io.src_b := src_b_reg.get
         mdu.get.io.op    := op_reg.get
@@ -265,7 +265,7 @@ class Execute(
   dontTouch(io.stall) := (
     if (M) (
       io.func7 === 1.U && ~div_en.get && (io.func3 === 4.U || io.func3 === 5.U || io.func3 === 6.U || io.func3 === 7.U)
-    ) || (div_en.get && counter.get < XLEN.U)
+    ) || (div_en.get && counter.get < max_count.get)
     else false.B
   ) || (
     if (F) f_stall.get else false.B
