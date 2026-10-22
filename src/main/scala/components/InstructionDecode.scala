@@ -143,14 +143,20 @@ class InstructionDecode(
     csr.get.io.i_addr               := io.id_instruction(31,20)
     csr.get.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
     csr.get.io.i_instr_retired      := io.csr_i_instr_retired.get
-    csr.get.io.f_except             <> io.f_except.get(2)
+    if (F) {
+      csr.get.io.f_except             <> io.f_except.get(2)
+    }
 
     io.is_csr.get                   := io.id_instruction(6, 0) === "b1110011".U
-    io.csr_o_data.get               := MuxCase(csr.get.io.o_data, Vector(
-                                         ((io.id_instruction(31, 20) === 1.U) || (io.id_instruction(31, 20) === 3.U)) -> (csr.get.io.o_data | (0 until 3).map(
-                                           f => Mux(io.is_f_in.get(f), io.f_except.get(f).asUInt, 0.U)
-                                         ).reduce(_ | _))
-                                       ))
+    io.csr_o_data.get               := MuxCase(csr.get.io.o_data,
+                                         if (F) {
+                                           Vector(
+                                             ((io.id_instruction(31, 20) === 1.U) || (io.id_instruction(31, 20) === 3.U)) -> (csr.get.io.o_data | (0 until 3).map(
+                                               f => Mux(io.is_f_in.get(f), io.f_except.get(f).asUInt, 0.U)
+                                             ).reduce(_ | _))
+                                           )
+                                         } else Vector()
+                                       )
     io.fcsr_o_data.get              := csr.get.io.fcsr_o_data
   }
 

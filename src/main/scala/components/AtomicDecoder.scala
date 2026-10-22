@@ -62,7 +62,7 @@ class AtomicDecoder extends Module {
   val MINU = "b11000".U
   val MAXU = "b11100".U
 
-  when(opcode === OPCODE_ATOMIC && funct3 === "b010".U) {
+  when(opcode === OPCODE_ATOMIC && funct3(2, 1) === "b01".U) {
     switch(funct5) {
       is("b00010".U) { io.out.isLR  := true.B; io.out.amoOp := "b00010".U }             // LR.W
       is("b00011".U) { io.out.isSC  := true.B; io.out.amoOp := "b00011".U}             // SC.W

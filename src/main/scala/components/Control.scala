@@ -313,7 +313,7 @@ class Control(XLEN: Int, F: Boolean) extends Module {
   io.isSC  := false.B
 
   // Detect atomic instructions (opcode = 0101111, funct3 = 010)
-  when(opcode === OPCODE_AMO && funct3 === "b010".U) {
+  when(opcode === OPCODE_AMO && funct3(2, 1) === "b01".U) {
     when(funct5 === "b00010".U) {
       // LR.W: Load-Reserved
       io.isLR := true.B

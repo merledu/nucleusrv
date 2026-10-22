@@ -3,12 +3,12 @@ package nucleusrv.components
 case class Configs(
     XLEN    : Int     = 64,
 
-    M       : Boolean = true,
+    M       : Boolean = false,
     A       : Boolean = true,
-    F       : Boolean = true,
-    D       : Boolean = true,
-    C       : Boolean = true,
-    Zicsr   : Boolean = true,
+    F       : Boolean = false,
+    D       : Boolean = false,
+    C       : Boolean = false,
+    Zicsr   : Boolean = false,
 
     TRACE   : Boolean = true,
 
