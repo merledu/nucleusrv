@@ -61,6 +61,7 @@ class Execute(
   amoAlu.io.memData := io.amo_memData
   amoAlu.io.src2 := io.amo_src2
   amoAlu.io.amoOp := io.amo_op_code
+  amoAlu.io.isD := io.ex_mem_ins(12)
   io.amo_result := amoAlu.io.result
 
   val fu = Module(new ForwardingUnit(F)).io

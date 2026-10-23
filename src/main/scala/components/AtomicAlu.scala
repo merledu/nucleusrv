@@ -8,6 +8,7 @@ class AMOALU(XLEN: Int) extends Module {
     val src2    = Input(UInt(XLEN.W))   // Value from rs2 register
     val amoOp   = Input(UInt(5.W))    // Operation code from decoder(fun5)
     val result  = Output(UInt(XLEN.W))  // Computed result to write back
+    val isD     = Input(Bool())
   })
   io.result := 0.U
 
@@ -26,11 +27,22 @@ class AMOALU(XLEN: Int) extends Module {
   val s_memData = io.memData.asSInt
   val s_src2    = io.src2.asSInt
 
+  val s_memData_w = io.memData(31,0).asSInt
+  val s_src2_w    = io.src2(31,0).asSInt 
+
+  val u_memData_w = io.memData(31,0)
+  val u_src2_w    = io.src2(31,0)
+
+  val amomax_w  = if (XLEN == 64) Some(Mux(s_memData_w > s_src2_w, io.memData(31,0), io.src2(31,0))) else None
+  val amomaxu_w = if (XLEN == 64) Some(Mux(u_memData_w > u_src2_w, io.memData(31,0), io.src2(31,0))) else None
+  val amomin_w  = if (XLEN == 64) Some(Mux(s_memData_w < s_src2_w, io.memData(31,0), io.src2(31,0))) else None
+  val amominu_w = if (XLEN == 64) Some(Mux(u_memData_w < u_src2_w, io.memData(31,0), io.src2(31,0))) else None
+
   switch(io.amoOp) {
     is(AMO_ADD)  { 
         io.result := io.memData + io.src2 }
     is(AMO_SWAP) { 
-        io.result := io.src2 }                // Swap old with new
+        io.result := io.src2 }
     is(AMO_XOR)  { 
         io.result := io.memData ^ io.src2 }
     is(AMO_AND)  { 
@@ -38,12 +50,12 @@ class AMOALU(XLEN: Int) extends Module {
     is(AMO_OR)   { 
         io.result := io.memData | io.src2 }
     is(AMO_MIN)  { 
-        io.result := Mux(s_memData < s_src2, io.memData, io.src2) }
+        io.result := Mux(io.isD, Mux(s_memData < s_src2, io.memData, io.src2), Cat(Fill(32, amomin_w.get(31)), amomin_w.get)) }
     is(AMO_MAX)  { 
-        io.result := Mux(s_memData > s_src2, io.memData, io.src2) }
+        io.result := Mux(io.isD, Mux(s_memData > s_src2, io.memData, io.src2), Cat(Fill(32, amomax_w.get(31)), amomax_w.get)) }
     is(AMO_MINU) { 
-        io.result := Mux(io.memData < io.src2, io.memData, io.src2) }
+        io.result := Mux(io.isD, Mux(io.memData < io.src2, io.memData, io.src2), Cat(Fill(32, amominu_w.get(31)), amominu_w.get)) }
     is(AMO_MAXU) { 
-        io.result := Mux(io.memData > io.src2, io.memData, io.src2) }
+        io.result := Mux(io.isD, Mux(io.memData > io.src2, io.memData, io.src2), Cat(Fill(32, amomaxu_w.get(31)), amomaxu_w.get)) }
   }
 }
