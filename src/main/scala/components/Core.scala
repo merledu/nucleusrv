@@ -224,8 +224,6 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_imm := ID.immediate
     id_reg_wra := ID.writeRegAddress
     id_reg_f3 := ID.func3
-    id_reg_f7 := ID.func7
-    id_reg_ins := if_reg_ins
     id_reg_pc := if_reg_pc
     id_reg_ctl_aluSrc := ID.ctl_aluSrc
     id_reg_ctl_memToReg := ID.ctl_memToReg
@@ -245,6 +243,10 @@ class Core(implicit val config:Configs) extends Module{
     id_reg_isLR  := ID.isLR
     id_reg_isSC  := ID.isSC
     id_reg_amoOp := ID.amoOp
+  }
+  when (!MEM.io.stall) {
+    id_reg_ins := if_reg_ins
+    id_reg_f7 := ID.func7
   }
 
   ID.id_instruction := if_reg_ins

@@ -216,7 +216,7 @@ class Execute(
       io.func3
     )
     Vector(inputMux1, inputMux2, inputMux3.get).zipWithIndex foreach (
-      f => fpu.get.in(f._2) := f._1(31,0)
+      f => fpu.get.in(f._2) := f._1
     )
     fpu.get.aluOp := MuxCase(0.U, Vector(
       fmadd_s,
@@ -258,8 +258,8 @@ class Execute(
     ) else Vector()
   ) ++ (
     if (F) Vector(
-      f_mono_cycle_inst.get -> Cat(0.U(31.W), fpu.get.out),
-      fpu.get.div_sqrt_valid_out -> Cat(0.U(31.W), fpu.get.out)
+      f_mono_cycle_inst.get -> Cat(Fill(32, fpu.get.out(31)), fpu.get.out),
+      fpu.get.div_sqrt_valid_out -> Cat(Fill(32, fpu.get.out(31)), fpu.get.out)
     ) else Vector()
   ))
 
@@ -269,7 +269,7 @@ class Execute(
     ) || (div_en.get && counter.get < max_count.get)
     else false.B
   ) || (
-    if (F) f_stall.get else false.B
+    if (F) dontTouch(f_stall.get) else false.B
   )
 
   // Write Data: for AMO/LR/SC, this is rs2: sourceB operand
