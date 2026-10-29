@@ -118,7 +118,7 @@ class MemoryFetch(TRACE: Boolean) extends Module {
   val writeDataFinal = Mux(io.isAMO && io.writeEnable, io.amo_alu_result_in, wdata.asUInt)
 
   io.dccmReq.bits.dataRequest := writeDataFinal
-  io.dccmReq.bits.addrRequest := Cat("b00".U, (io.aluResultIn & "h3FFFFFFF".U)(31, 2))
+  io.dccmReq.bits.addrRequest := io.aluResultIn
   io.dccmReq.bits.isWrite := io.writeEnable
   io.dccmReq.valid := Mux(io.writeEnable | io.readEnable, true.B, false.B)
 

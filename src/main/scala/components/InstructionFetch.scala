@@ -1,6 +1,6 @@
 package nucleusrv.components
 import chisel3._
-import chisel3.util._ 
+import chisel3.util._
 
 
 class InstructionFetch extends Module {
@@ -8,6 +8,12 @@ class InstructionFetch extends Module {
     val address: UInt = Input(UInt(32.W))
     val instruction: UInt = Output(UInt(32.W))
     val stall: Bool = Input(Bool())
+    // PC is being redirected this cycle (taken branch / jump resolved in ID)
+    val redirect: Bool = Input(Bool())
+    // A fetch is outstanding and no usable instruction arrived this cycle: PC must hold
+    val waiting: Bool = Output(Bool())
+    // A usable instruction is delivered this cycle
+    val inst_valid: Bool = Output(Bool())
     val coreInstrReq = Decoupled(new MemRequestIO)
     val coreInstrResp = Flipped(Decoupled(new MemResponseIO))
   })
@@ -23,11 +29,27 @@ class InstructionFetch extends Module {
     //((state_reg === 1.U) && io.coreInstrReq.ready && !io.stall) -> ready
     ((state_reg === init) && (!io.stall || !rst)) -> valid,
     ((state_reg === valid) && !io.stall && io.coreInstrReq.fire) -> ready,
-    ((state_reg === ready) && !io.stall && io.coreInstrResp.fire) -> valid,
+    ((state_reg === ready) && io.coreInstrResp.fire) -> valid,
     rst -> init
   )))
   state_reg := next_state
-  io.coreInstrResp.ready := (state_reg === ready) && !io.stall
+
+  // The response to the outstanding request belongs to a PC that a redirect has
+  // since replaced: drop it when it arrives and fetch again from the new PC.
+  val kill = RegInit(false.B)
+  when(io.coreInstrResp.fire) {
+    kill := false.B
+  }
+  when((state_reg === ready) && io.redirect && !io.coreInstrResp.fire) {
+    kill := true.B
+  }
+
+  // A killed response is consumed even while stalled; a live one only when the pipeline can take it
+  io.coreInstrResp.ready := (state_reg === ready) && (kill || io.redirect || !io.stall)
+  val deliver = io.coreInstrResp.fire && !kill && !io.redirect
+
+  io.inst_valid := deliver
+  io.waiting := (state_reg === ready) && !deliver
 
 //  io.coreInstrReq.ready := Mux(rst, false.B, true.B)
 
@@ -35,16 +57,10 @@ class InstructionFetch extends Module {
   io.coreInstrReq.bits.isWrite := false.B
   io.coreInstrReq.bits.dataRequest := DontCare
 
-  io.coreInstrReq.bits.addrRequest := Mux(
-    io.coreInstrReq.ready,
-    Cat("b00".U, io.address(31, 2)),
-    DontCare
-  )
+  // Unconditional: the SoC derives imem ready from the address, so gating on ready is a combinational loop
+  io.coreInstrReq.bits.addrRequest := io.address
   io.coreInstrReq.valid := (state_reg === valid) & !io.stall
 
-  io.instruction := Mux(
-    io.coreInstrResp.valid && !io.stall,
-    io.coreInstrResp.bits.dataResponse,
-    DontCare
-  )
+  // Bubble (0) whenever no usable instruction is delivered
+  io.instruction := Mux(deliver, io.coreInstrResp.bits.dataResponse, 0.U)
 }

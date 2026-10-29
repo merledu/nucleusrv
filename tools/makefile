@@ -2,11 +2,11 @@ RISCV=riscv32-unknown-elf-
 CC=$(RISCV)gcc
 OBJDUMP=$(RISCV)objdump
 OBJCOPY=$(RISCV)objcopy
-CFLAGS=-c -march=rv32gcv -mabi=ilp32 -ffreestanding -fomit-frame-pointer
+CFLAGS=-c -march=rv32im -mabi=ilp32 -ffreestanding -fomit-frame-pointer -O2
 OFLAGS=--disassemble-all --section=.text
-LFLAGS = -march=rv32gcv -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
+LFLAGS = -march=rv32im -mabi=ilp32 -static -nostdlib -nostartfiles -T link.ld
 
-PROGRAM ?= fibonacci
+PROGRAM ?= soc_smoke_test
 TEST_DIR = tests/$(PROGRAM)
 BUILD_DIR = out/$(TEST_DIR)
 
@@ -20,10 +20,14 @@ all: setup build
 setup: clean
 	@mkdir -p out
 
-build: $(OBJS)
-	$(CC) $(LFLAGS) $(OBJS) -o out/program.elf -lgcc
+start.o: start.S
+	$(CC) $(CFLAGS) start.S -o start.o
+
+build: $(OBJS) start.o
+	$(CC) $(LFLAGS) start.o $(OBJS) -o out/program.elf -lgcc
 	$(OBJDUMP) $(OFLAGS) out/program.elf > out/program.dump
-	python3 makehex.py out/program.elf 2048 > out/program.hex
+	$(OBJCOPY) -O binary out/program.elf out/program.bin
+	python3 makehex.py out/program.bin 4096 > out/program.hex
 
 clean: 
 	rm -rf out

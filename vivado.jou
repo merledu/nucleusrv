@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2018.2 (64-bit)
+# SW Build 2258646 on Thu Jun 14 20:02:38 MDT 2018
+# IP Build 2256618 on Thu Jun 14 22:10:49 MDT 2018
+# Start of session at: Tue Sep 29 07:51:18 2026
+# Process ID: 2741824
+# Current directory: /home/ar/nucleusrv
+# Command line: vivado -mode batch -source fpga/build_bitstream.tcl
+# Log file: /home/ar/nucleusrv/vivado.log
+# Journal file: /home/ar/nucleusrv/vivado.jou
+#-----------------------------------------------------------
+source fpga/build_bitstream.tcl

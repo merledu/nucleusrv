@@ -1,0 +1,199 @@
+
+****** Vivado v2018.2 (64-bit)
+  **** SW Build 2258646 on Thu Jun 14 20:02:38 MDT 2018
+  **** IP Build 2256618 on Thu Jun 14 22:10:49 MDT 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source fpga/write_bitstream_only.tcl
+# set ROUTED_DCP "fpga/bd/proj/zynq_bd_proj.runs/impl_1/nucleusrv_soc_top_routed.dcp"
+# set OUT_BIT    "fpga/build/nucleusrv_doom_zybo_z7.bit"
+# file mkdir fpga/build
+# puts "============================================================"
+============================================================
+# puts "  Writing bitstream from existing routed checkpoint ..."
+  Writing bitstream from existing routed checkpoint ...
+# puts "  DCP: $ROUTED_DCP"
+  DCP: fpga/bd/proj/zynq_bd_proj.runs/impl_1/nucleusrv_soc_top_routed.dcp
+# puts "============================================================"
+============================================================
+# open_checkpoint $ROUTED_DCP
+Command: open_checkpoint fpga/bd/proj/zynq_bd_proj.runs/impl_1/nucleusrv_soc_top_routed.dcp
+
+Starting open_checkpoint Task
+
+Time (s): cpu = 00:00:00.05 ; elapsed = 00:00:00.10 . Memory (MB): peak = 1153.109 ; gain = 0.000 ; free physical = 160784 ; free virtual = 240352
+INFO: [Netlist 29-17] Analyzing 1400 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2018.2
+INFO: [Device 21-403] Loading part xc7z010clg400-1
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Timing 38-478] Restoring timing data from binary archive.
+INFO: [Timing 38-479] Binary timing data restore complete.
+INFO: [Project 1-856] Restoring constraints from binary archive.
+INFO: [Project 1-853] Binary constraint restore complete.
+Reading XDEF placement.
+Reading placer database...
+Reading XDEF routing.
+Read XDEF File: Time (s): cpu = 00:00:00.79 ; elapsed = 00:00:00.89 . Memory (MB): peak = 1999.629 ; gain = 8.672 ; free physical = 159972 ; free virtual = 239546
+Restored from archive | CPU: 0.890000 secs | Memory: 16.753761 MB |
+Finished XDEF File Restore: Time (s): cpu = 00:00:00.79 ; elapsed = 00:00:00.89 . Memory (MB): peak = 1999.629 ; gain = 8.672 ; free physical = 159972 ; free virtual = 239546
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 323 instances were transformed.
+  RAM64M => RAM64M (RAMD64E, RAMD64E, RAMD64E, RAMD64E): 259 instances
+  RAM64X1D => RAM64X1D (RAMD64E, RAMD64E): 64 instances
+
+INFO: [Project 1-604] Checkpoint was created with Vivado v2018.2 (64-bit) build 2258646
+open_checkpoint: Time (s): cpu = 00:00:22 ; elapsed = 00:00:57 . Memory (MB): peak = 1999.629 ; gain = 846.520 ; free physical = 159972 ; free virtual = 239545
+# set_property SEVERITY {Warning} [get_drc_checks DPOP-2]
+# set_property SEVERITY {Warning} [get_drc_checks LUTLP-1]
+# write_bitstream -verbose -force $OUT_BIT
+Command: write_bitstream -verbose -force fpga/build/nucleusrv_doom_zybo_z7.bit
+Attempting to get a license for feature 'Implementation' and/or device 'xc7z010'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7z010'
+Running DRC as a precondition to command write_bitstream
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/opt/vivado_2018.2/data/ip'.
+INFO: [DRC 23-27] Running DRC with 8 threads
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15 input u_core/Execute/mdu/_result_T_15/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15 input u_core/Execute/mdu/_result_T_15/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15__0 input u_core/Execute/mdu/_result_T_15__0/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15__0 input u_core/Execute/mdu/_result_T_15__0/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15__1 input u_core/Execute/mdu/_result_T_15__1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15__1 input u_core/Execute/mdu/_result_T_15__1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15__2 input u_core/Execute/mdu/_result_T_15__2/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_15__2 input u_core/Execute/mdu/_result_T_15__2/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3 input u_core/Execute/mdu/_result_T_3/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3 input u_core/Execute/mdu/_result_T_3/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3__0 input u_core/Execute/mdu/_result_T_3__0/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3__0 input u_core/Execute/mdu/_result_T_3__0/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3__1 input u_core/Execute/mdu/_result_T_3__1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3__1 input u_core/Execute/mdu/_result_T_3__1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3__2 input u_core/Execute/mdu/_result_T_3__2/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_3__2 input u_core/Execute/mdu/_result_T_3__2/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7 input u_core/Execute/mdu/_result_T_7/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7 input u_core/Execute/mdu/_result_T_7/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7__0 input u_core/Execute/mdu/_result_T_7__0/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7__0 input u_core/Execute/mdu/_result_T_7__0/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7__1 input u_core/Execute/mdu/_result_T_7__1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7__1 input u_core/Execute/mdu/_result_T_7__1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7__2 input u_core/Execute/mdu/_result_T_7__2/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPIP-1] Input pipelining: DSP u_core/Execute/mdu/_result_T_7__2 input u_core/Execute/mdu/_result_T_7__2/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15 output u_core/Execute/mdu/_result_T_15/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15__0 output u_core/Execute/mdu/_result_T_15__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15__1 output u_core/Execute/mdu/_result_T_15__1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15__2 output u_core/Execute/mdu/_result_T_15__2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3 output u_core/Execute/mdu/_result_T_3/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3__0 output u_core/Execute/mdu/_result_T_3__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3__1 output u_core/Execute/mdu/_result_T_3__1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3__2 output u_core/Execute/mdu/_result_T_3__2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7 output u_core/Execute/mdu/_result_T_7/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7__0 output u_core/Execute/mdu/_result_T_7__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7__1 output u_core/Execute/mdu/_result_T_7__1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-1] PREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7__2 output u_core/Execute/mdu/_result_T_7__2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15 multiplier stage u_core/Execute/mdu/_result_T_15/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15__0 multiplier stage u_core/Execute/mdu/_result_T_15__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15__1 multiplier stage u_core/Execute/mdu/_result_T_15__1/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_15__2 multiplier stage u_core/Execute/mdu/_result_T_15__2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3 multiplier stage u_core/Execute/mdu/_result_T_3/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3__0 multiplier stage u_core/Execute/mdu/_result_T_3__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3__1 multiplier stage u_core/Execute/mdu/_result_T_3__1/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_3__2 multiplier stage u_core/Execute/mdu/_result_T_3__2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7 multiplier stage u_core/Execute/mdu/_result_T_7/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7__0 multiplier stage u_core/Execute/mdu/_result_T_7__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7__1 multiplier stage u_core/Execute/mdu/_result_T_7__1/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC DPOP-2] MREG Output pipelining: DSP u_core/Execute/mdu/_result_T_7__2 multiplier stage u_core/Execute/mdu/_result_T_7__2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+WARNING: [DRC LUTLP-1] Combinatorial Loop Alert: 1 LUT cells form a combinatorial loop. This can create a race condition. Timing analysis may not be accurate. The preferred resolution is to modify the design to remove combinatorial logic loops. If the loop is known and understood, this DRC can be bypassed by acknowledging the condition and setting the following XDC constraint on any one of the nets in the loop: 'set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets <myHier/myNet>]'. One net in the loop is u_core/pc/boot_ram_reg_0. Please evaluate your design. The cells in the loop are: u_core/pc/lhw_reg[15]_i_4.
+WARNING: [DRC LUTLP-1] Combinatorial Loop Alert: 4 LUT cells form a combinatorial loop. This can create a race condition. Timing analysis may not be accurate. The preferred resolution is to modify the design to remove combinatorial logic loops. If the loop is known and understood, this DRC can be bypassed by acknowledging the condition and setting the following XDC constraint on any one of the nets in the loop: 'set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets <myHier/myNet>]'. One net in the loop is u_core/pc/boot_ram_reg_0. Please evaluate your design. The cells in the loop are: u_core/pc/lhw_reg[15]_i_4, u_icache/lhw_reg[15]_i_6, u_core/pc/lhw_reg[15]_i_7, and u_icache/lhw_reg[15]_i_12.
+INFO: [Vivado 12-3199] DRC finished with 0 Errors, 50 Warnings
+INFO: [Vivado 12-3200] Please refer to the DRC report (report_drc) for more information.
+INFO: [Designutils 20-2272] Running write_bitstream with 8 threads.
+Loading data files...
+Loading site data...
+Loading route data...
+Processing options...
+Summary of write_bitstream Options:
++-------------------------+-------------------------+
+| Option Name             | Current Setting         |
++-------------------------+-------------------------+
+| INITSIGNALSERROR        | ENABLE*                 |
++-------------------------+-------------------------+
+| MATCH_CYCLE             | NoWait                  |
++-------------------------+-------------------------+
+| XADCPARTIALRECONFIG     | DISABLE*                |
++-------------------------+-------------------------+
+| USERID                  | 0XFFFFFFFF*             |
++-------------------------+-------------------------+
+| XADCPOWERDOWN           | DISABLE*                |
++-------------------------+-------------------------+
+| TMSPIN                  | PULLUP*                 |
++-------------------------+-------------------------+
+| DONEPIPE                | YES*                    |
++-------------------------+-------------------------+
+| SECURITY                | NONE*                   |
++-------------------------+-------------------------+
+| ACTIVERECONFIG          | NO*                     |
++-------------------------+-------------------------+
+| DISABLE_JTAG            | NO*                     |
++-------------------------+-------------------------+
+| STARTUPCLK              | CCLK*                   |
++-------------------------+-------------------------+
+| XADCENHANCEDLINEARITY   | OFF*                    |
++-------------------------+-------------------------+
+| TDIPIN                  | PULLUP*                 |
++-------------------------+-------------------------+
+| GTS_CYCLE               | 5*                      |
++-------------------------+-------------------------+
+| GWE_CYCLE               | 6*                      |
++-------------------------+-------------------------+
+| DCIUPDATEMODE           | ASREQUIRED*             |
++-------------------------+-------------------------+
+| DONE_CYCLE              | 4*                      |
++-------------------------+-------------------------+
+| USR_ACCESS              | (Not Enabled)*          |
++-------------------------+-------------------------+
+| TDOPIN                  | PULLUP*                 |
++-------------------------+-------------------------+
+| OVERTEMPPOWERDOWN       | DISABLE*                |
++-------------------------+-------------------------+
+| TCKPIN                  | PULLUP*                 |
++-------------------------+-------------------------+
+| PROGPIN                 | PULLUP*                 |
++-------------------------+-------------------------+
+| LCK_CYCLE               | NOWAIT*                 |
++-------------------------+-------------------------+
+| INITPIN                 | PULLUP*                 |
++-------------------------+-------------------------+
+| JTAG_XADC               | ENABLE*                 |
++-------------------------+-------------------------+
+| DONEPIN                 | PULLUP*                 |
++-------------------------+-------------------------+
+| ICAP_SELECT             | AUTO*                   |
++-------------------------+-------------------------+
+| CRC                     | ENABLE*                 |
++-------------------------+-------------------------+
+| PERFRAMECRC             | NO*                     |
++-------------------------+-------------------------+
+| UNUSEDPIN               | PULLDOWN*               |
++-------------------------+-------------------------+
+| COMPRESS                | FALSE*                  |
++-------------------------+-------------------------+
+ *  Default setting.
+ ** The specified setting matches the default setting.
+Creating bitmap...
+Creating bitstream...
+Writing bitstream fpga/build/nucleusrv_doom_zybo_z7.bit...
+INFO: [Vivado 12-1842] Bitgen Completed Successfully.
+INFO: [Project 1-120] WebTalk data collection is mandatory when using a WebPACK part without a full Vivado license. To see the specific WebTalk data collected for your design, open the usage_statistics_webtalk.html or usage_statistics_webtalk.xml file in the implementation directory.
+INFO: [Common 17-83] Releasing license: Implementation
+11 Infos, 50 Warnings, 0 Critical Warnings and 0 Errors encountered.
+write_bitstream completed successfully
+write_bitstream: Time (s): cpu = 00:00:19 ; elapsed = 00:02:29 . Memory (MB): peak = 2503.418 ; gain = 503.789 ; free physical = 159780 ; free virtual = 239348
+# puts "============================================================"
+============================================================
+# puts "  Bitstream written to: $OUT_BIT"
+  Bitstream written to: fpga/build/nucleusrv_doom_zybo_z7.bit
+# puts "============================================================"
+============================================================
+# exit 0
+INFO: [Common 17-206] Exiting Vivado at Fri Sep 25 11:13:14 2026...

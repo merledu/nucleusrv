@@ -52,7 +52,7 @@ class SRamTop(val programFile:Option[String] ) extends Module {
             // READ
             // rdata := mem.read(io.req.bits.addrRequest/4.U)
             sram.io.we_i := true.B
-            sram.io.addr_i := io.req.bits.addrRequest
+            sram.io.addr_i := io.req.bits.addrRequest(29, 2)
 
             rdata := sram.io.rdata_o
         } .elsewhen(io.req.valid && io.req.bits.isWrite) {
@@ -62,7 +62,7 @@ class SRamTop(val programFile:Option[String] ) extends Module {
             // rdata map (_ := DontCare)
             sram.io.we_i := false.B
             sram.io.wmask_i := io.req.bits.activeByteLane
-            sram.io.addr_i := io.req.bits.addrRequest
+            sram.io.addr_i := io.req.bits.addrRequest(29, 2)
             sram.io.wdata_i := io.req.bits.dataRequest
             rdata := DontCare
         } .otherwise {

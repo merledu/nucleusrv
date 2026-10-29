@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2018.2 (64-bit)
+# SW Build 2258646 on Thu Jun 14 20:02:38 MDT 2018
+# IP Build 2256618 on Thu Jun 14 22:10:49 MDT 2018
+# Start of session at: Tue Sep 29 07:55:47 2026
+# Process ID: 2743504
+# Current directory: /home/ar/nucleusrv/fpga/bd/proj/zynq_bd_proj.runs/impl_1
+# Command line: vivado -log nucleusrv_soc_top.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source nucleusrv_soc_top.tcl -notrace
+# Log file: /home/ar/nucleusrv/fpga/bd/proj/zynq_bd_proj.runs/impl_1/nucleusrv_soc_top.vdi
+# Journal file: /home/ar/nucleusrv/fpga/bd/proj/zynq_bd_proj.runs/impl_1/vivado.jou
+#-----------------------------------------------------------
+source nucleusrv_soc_top.tcl -notrace

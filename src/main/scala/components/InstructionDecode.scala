@@ -142,15 +142,21 @@ class InstructionDecode(
     csr.get.io.i_addr               := io.id_instruction(31,20)
     csr.get.io.i_w_en               := io.is_csr.get && (io.id_instruction(19, 15) =/= 0.U)
     csr.get.io.i_instr_retired      := io.csr_i_instr_retired.get
-    csr.get.io.f_except             <> io.f_except.get(2)
 
     io.is_csr.get                   := io.id_instruction(6, 0) === "b1110011".U
-    io.csr_o_data.get               := MuxCase(csr.get.io.o_data, Vector(
-                                         ((io.id_instruction(31, 20) === 1.U) || (io.id_instruction(31, 20) === 3.U)) -> (csr.get.io.o_data | (0 until 3).map(
-                                           f => Mux(io.is_f_in.get(f), io.f_except.get(f).asUInt, 0.U)
-                                         ).reduce(_ | _))
-                                       ))
-    io.fcsr_o_data.get              := csr.get.io.fcsr_o_data
+    if (F) {
+      csr.get.io.f_except             <> io.f_except.get(2)
+      io.csr_o_data.get               := MuxCase(csr.get.io.o_data, Vector(
+                                           ((io.id_instruction(31, 20) === 1.U) || (io.id_instruction(31, 20) === 3.U)) -> (csr.get.io.o_data | (0 until 3).map(
+                                             f => Mux(io.is_f_in.get(f), io.f_except.get(f).asUInt, 0.U)
+                                           ).reduce(_ | _))
+                                         ))
+      io.fcsr_o_data.get              := csr.get.io.fcsr_o_data
+    } else {
+      csr.get.io.f_except             := VecInit(Seq.fill(5)(false.B))
+      io.csr_o_data.get               := csr.get.io.o_data
+      if (io.fcsr_o_data.isDefined) io.fcsr_o_data.get := 0.U
+    }
   }
 
   val csrController = if (Zicsr) Some(Module(new CSRController())) else None
@@ -229,7 +235,10 @@ class InstructionDecode(
     else io.writeData
   registers.io.readAddress(0) := registerRs1
   registers.io.readAddress(1) := registerRs2
-  registers.io.writeEnable(0) := (io.ctl_writeEnable(0) || (if (Zicsr) io.csr_Wb.get else 0.B)) && !dontTouch(io.ex_stall)// && (
+  // Not gated by the EX (divide) stall: WB keeps draining older instructions during it,
+  // and gating here dropped their register writes
+  dontTouch(io.ex_stall)
+  registers.io.writeEnable(0) := (io.ctl_writeEnable(0) || (if (Zicsr) io.csr_Wb.get else 0.B))// && (
     //  if (Zicsr) io.csr_Wb.get else 1.B
     //)
   //)
@@ -303,16 +312,22 @@ class InstructionDecode(
   io.immediate := immediate.io.out
 
   // Branch Forwarding
+  // Only forward from instructions that really write rd: bits 11:7 of stores and
+  // branches are immediate bits and would otherwise alias a register.
+  val fwd_ex     = io.id_ex_regWr && (io.ex_ins(11, 7) =/= 0.U)
+  val fwd_ex_mem = io.ex_mem_regWr && (io.ex_mem_ins(11, 7) =/= 0.U)
+  val fwd_mem_wb = io.ctl_writeEnable(0) && (io.mem_wb_ins(11, 7) =/= 0.U)
+
   val input1 = Wire(UInt(32.W))
   val input2 = Wire(UInt(32.W))
 
   when (
-    (registerRs1 === io.ex_mem_ins(11, 7))
+    fwd_ex_mem && (registerRs1 === io.ex_mem_ins(11, 7))
     && (if (F) !io.f_read_reg.get(1)(0) else 1.B)
   ) {
     input1 := io.ex_mem_result
   }.elsewhen (
-    (registerRs1 === io.mem_wb_ins(11, 7))
+    fwd_mem_wb && (registerRs1 === io.mem_wb_ins(11, 7))
     && (if (F) !io.f_read_reg.get(2)(0) else 1.B)
   ) {
     input1 := io.mem_wb_result
@@ -320,12 +335,12 @@ class InstructionDecode(
     input1 := readData1
   }
   when (
-    (registerRs2 === io.ex_mem_ins(11, 7))
+    fwd_ex_mem && (registerRs2 === io.ex_mem_ins(11, 7))
     && (if (F) !io.f_read_reg.get(1)(1) else 1.B)
   ) {
     input2 := io.ex_mem_result
   }.elsewhen (
-    (registerRs2 === io.mem_wb_ins(11, 7))
+    fwd_mem_wb && (registerRs2 === io.mem_wb_ins(11, 7))
     && (if (F) !io.f_read_reg.get(2)(1) else 1.B)
   ) {
     input2 := io.mem_wb_result
@@ -345,17 +360,17 @@ class InstructionDecode(
   //Forwarding for Jump
   val j_offset = Wire(UInt(32.W))
   when(
-    (registerRs1 === io.ex_ins(11, 7))
+    fwd_ex && (registerRs1 === io.ex_ins(11, 7))
     && (if (F) !io.f_read_reg.get(0)(0) else 1.B)
   ) {
     j_offset := io.ex_result
   }.elsewhen (
-    (registerRs1 === io.ex_mem_ins(11, 7))
+    fwd_ex_mem && (registerRs1 === io.ex_mem_ins(11, 7))
     && (if (F) !io.f_read_reg.get(1)(0) else 1.B)
   ) {
     j_offset := io.ex_mem_result
   }.elsewhen (
-    (registerRs1 === io.mem_wb_ins(11, 7))
+    fwd_mem_wb && (registerRs1 === io.mem_wb_ins(11, 7))
     && (if (F) !io.f_read_reg.get(2)(0) else 1.B)
   ) {
     j_offset := io.mem_wb_result

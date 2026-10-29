@@ -1,0 +1,48 @@
+{
+    "default_part": "XC7Z010CLG400-1",
+
+    "values": {
+        "top": "zybo_hdmi_top"
+    },
+
+    "dependencies": {
+        "sources": [
+            "zybo_hdmi_top.v",
+            "Simple_pattern.v",
+            "tmds_encoder.v",
+            "hdmi_tx.v",
+            "zybo_pll.v"
+        ],
+        "synth_log": "synth.log",
+        "pack_log": "pack.log"
+    },
+
+    "XC7Z010CLG400-1": {
+        "default_target": "bitstream",
+        "dependencies": {
+            "build_dir": "build/zybo",
+            "xdc": [
+                "zybo.xdc"
+            ]
+        }
+    },
+
+    "XC7A100TCSG324-1": {
+        "default_target": "bitstream",
+        "values": {
+            "top": "vga"
+        },
+        "dependencies": {
+            "build_dir": "build/arty_100",
+            "sources": [
+                "vga.v",
+                "Simple_pattern.v",
+                "clk_wiz_0_clk_wiz.v",
+                "PLL_25MHz.v"
+            ],
+            "xdc": [
+                "arty.xdc"
+            ]
+        }
+    }
+}

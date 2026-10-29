@@ -6,12 +6,12 @@ import nucleusrv.tracer._
 
 class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
 
+  implicit val config:Configs = Configs()
+
   val io = IO(new Bundle() {
     val pin = Output(UInt(32.W))
-    val rvfi = new TracerO
+    val rvfi = if (config.TRACE) Some(new TracerO) else None
   })
-
-  implicit val config:Configs = Configs()
 
   val core: Core = Module(new Core())
   core.io.stall := false.B
@@ -33,7 +33,7 @@ class Top(programFile:Option[String], dataFile:Option[String]) extends Module{
   if (config.TRACE) {
     val tracer = Module(new Tracer)
     tracer.rvfi_i <> core.io.rvfi.get
-    io.rvfi <> tracer.rvfi_o
+    io.rvfi.get <> tracer.rvfi_o
   }
 }
 
@@ -44,6 +44,19 @@ object NRVDriver {
       val DMem = if (args.contains("--dmem")) Some(args(args.indexOf("--dmem") + 1)) else None
       new ChiselStage().emitVerilog(
         new Top(IMem, DMem),
+        if (args.contains("--target-dir")) args.slice(
+          args.indexOf("--target-dir"),
+          args.indexOf("--target-dir") + 2
+        ) else Array()
+      )
+  }
+}
+
+object CoreDriver {
+  def main(args: Array[String]): Unit = {
+      implicit val config: Configs = Configs()
+      new ChiselStage().emitVerilog(
+        new Core(),
         if (args.contains("--target-dir")) args.slice(
           args.indexOf("--target-dir"),
           args.indexOf("--target-dir") + 2

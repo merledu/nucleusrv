@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="impl_1" LaunchPart="xc7z010clg400-1" LaunchTime="1790668290">
+  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <File Type="BG-DRC" Name="nucleusrv_soc_top.drc"/>
+  <File Type="BG-BGN" Name="nucleusrv_soc_top.bgn"/>
+  <File Type="BITSTR-SYSDEF" Name="nucleusrv_soc_top.sysdef"/>
+  <File Type="BITSTR-LTX" Name="debug_nets.ltx"/>
+  <File Type="BITSTR-LTX" Name="nucleusrv_soc_top.ltx"/>
+  <File Type="BITSTR-MMI" Name="nucleusrv_soc_top.mmi"/>
+  <File Type="BITSTR-BMM" Name="nucleusrv_soc_top_bd.bmm"/>
+  <File Type="BITSTR-NKY" Name="nucleusrv_soc_top.nky"/>
+  <File Type="BITSTR-RBT" Name="nucleusrv_soc_top.rbt"/>
+  <File Type="BITSTR-MSK" Name="nucleusrv_soc_top.msk"/>
+  <File Type="BG-BIN" Name="nucleusrv_soc_top.bin"/>
+  <File Type="BG-BIT" Name="nucleusrv_soc_top.bit"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="nucleusrv_soc_top_bus_skew_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="nucleusrv_soc_top_bus_skew_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="nucleusrv_soc_top_bus_skew_postroute_physopted.rpt"/>
+  <File Type="RDI-RDI" Name="nucleusrv_soc_top.vdi"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="nucleusrv_soc_top_timing_summary_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="nucleusrv_soc_top_timing_summary_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="nucleusrv_soc_top_timing_summary_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="nucleusrv_soc_top_postroute_physopt_bb.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-DCP" Name="nucleusrv_soc_top_postroute_physopt.dcp"/>
+  <File Type="ROUTE-BUS-SKEW" Name="nucleusrv_soc_top_bus_skew_routed.rpt"/>
+  <File Type="ROUTE-CLK" Name="nucleusrv_soc_top_clock_utilization_routed.rpt"/>
+  <File Type="ROUTE-SIMILARITY" Name="nucleusrv_soc_top_incremental_reuse_routed.rpt"/>
+  <File Type="ROUTE-TIMING-RPX" Name="nucleusrv_soc_top_timing_summary_routed.rpx"/>
+  <File Type="ROUTE-TIMING-PB" Name="nucleusrv_soc_top_timing_summary_routed.pb"/>
+  <File Type="ROUTE-TIMINGSUMMARY" Name="nucleusrv_soc_top_timing_summary_routed.rpt"/>
+  <File Type="ROUTE-STATUS-PB" Name="nucleusrv_soc_top_route_status.pb"/>
+  <File Type="ROUTE-STATUS" Name="nucleusrv_soc_top_route_status.rpt"/>
+  <File Type="ROUTE-PWR-RPX" Name="nucleusrv_soc_top_power_routed.rpx"/>
+  <File Type="ROUTE-PWR-SUM" Name="nucleusrv_soc_top_power_summary_routed.pb"/>
+  <File Type="ROUTE-PWR" Name="nucleusrv_soc_top_power_routed.rpt"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="nucleusrv_soc_top_methodology_drc_routed.pb"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="nucleusrv_soc_top_methodology_drc_routed.rpx"/>
+  <File Type="ROUTE-METHODOLOGY-DRC" Name="nucleusrv_soc_top_methodology_drc_routed.rpt"/>
+  <File Type="ROUTE-DRC-RPX" Name="nucleusrv_soc_top_drc_routed.rpx"/>
+  <File Type="ROUTE-DRC-PB" Name="nucleusrv_soc_top_drc_routed.pb"/>
+  <File Type="ROUTE-DRC" Name="nucleusrv_soc_top_drc_routed.rpt"/>
+  <File Type="ROUTE-BLACKBOX-DCP" Name="nucleusrv_soc_top_routed_bb.dcp"/>
+  <File Type="ROUTE-DCP" Name="nucleusrv_soc_top_routed.dcp"/>
+  <File Type="ROUTE-ERROR-DCP" Name="nucleusrv_soc_top_routed_error.dcp"/>
+  <File Type="PHYSOPT-TIMING" Name="nucleusrv_soc_top_timing_summary_physopted.rpt"/>
+  <File Type="PHYSOPT-DRC" Name="nucleusrv_soc_top_drc_physopted.rpt"/>
+  <File Type="PHYSOPT-DCP" Name="nucleusrv_soc_top_physopt.dcp"/>
+  <File Type="POSTPLACE-PWROPT-TIMING" Name="nucleusrv_soc_top_timing_summary_postplace_pwropted.rpt"/>
+  <File Type="POSTPLACE-PWROPT-DCP" Name="nucleusrv_soc_top_postplace_pwropt.dcp"/>
+  <File Type="PLACE-TIMING" Name="nucleusrv_soc_top_timing_summary_placed.rpt"/>
+  <File Type="PLACE-PRE-SIMILARITY" Name="nucleusrv_soc_top_incremental_reuse_pre_placed.rpt"/>
+  <File Type="PLACE-SIMILARITY" Name="nucleusrv_soc_top_incremental_reuse_placed.rpt"/>
+  <File Type="PLACE-CTRL" Name="nucleusrv_soc_top_control_sets_placed.rpt"/>
+  <File Type="PLACE-UTIL-PB" Name="nucleusrv_soc_top_utilization_placed.pb"/>
+  <File Type="PLACE-UTIL" Name="nucleusrv_soc_top_utilization_placed.rpt"/>
+  <File Type="PLACE-CLK" Name="nucleusrv_soc_top_clock_utilization_placed.rpt"/>
+  <File Type="PLACE-IO" Name="nucleusrv_soc_top_io_placed.rpt"/>
+  <File Type="PLACE-DCP" Name="nucleusrv_soc_top_placed.dcp"/>
+  <File Type="PWROPT-TIMING" Name="nucleusrv_soc_top_timing_summary_pwropted.rpt"/>
+  <File Type="PWROPT-DRC" Name="nucleusrv_soc_top_drc_pwropted.rpt"/>
+  <File Type="PWROPT-DCP" Name="nucleusrv_soc_top_pwropt.dcp"/>
+  <File Type="OPT-TIMING" Name="nucleusrv_soc_top_timing_summary_opted.rpt"/>
+  <File Type="OPT-HWDEF" Name="nucleusrv_soc_top.hwdef"/>
+  <File Type="OPT-METHODOLOGY-DRC" Name="nucleusrv_soc_top_methodology_drc_opted.rpt"/>
+  <File Type="OPT-DRC" Name="nucleusrv_soc_top_drc_opted.rpt"/>
+  <File Type="OPT-DCP" Name="nucleusrv_soc_top_opt.dcp"/>
+  <File Type="INIT-TIMING" Name="nucleusrv_soc_top_timing_summary_init.rpt"/>
+  <File Type="ROUTE-BUS-SKEW-RPX" Name="nucleusrv_soc_top_bus_skew_routed.rpx"/>
+  <File Type="REPORTS-TCL" Name="nucleusrv_soc_top_reports.tcl"/>
+  <File Type="ROUTE-BUS-SKEW-PB" Name="nucleusrv_soc_top_bus_skew_routed.pb"/>
+  <File Type="PA-TCL" Name="nucleusrv_soc_top.tcl"/>
+  <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
+    <Filter Type="Srcs"/>
+    <File Path="$PSRCDIR/sources_1/bd/zynq_soc/zynq_soc.bd">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/Core.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/axi4_line_master.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/bus_interconnect.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/dcache.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/doom_framebuffer_hdmi.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../VGA/HDMI Code Files/hdmi_tx.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/icache.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../VGA/HDMI Code Files/tmds_encoder.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/uart_rx.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/uart_timer_peripheral.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/uart_tx.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../VGA/HDMI Code Files/zybo_pll.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/bd/zynq_soc/hdl/zynq_soc_wrapper.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../../rtl/nucleusrv_soc_top.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="DesignMode" Val="RTL"/>
+      <Option Name="TopModule" Val="nucleusrv_soc_top"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+    <Filter Type="Constrs"/>
+    <File Path="$PPRDIR/../../zybo_z7_soc.xdc">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="ConstrsType" Val="XDC"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
+    <Step Id="init_design"/>
+    <Step Id="opt_design"/>
+    <Step Id="power_opt_design"/>
+    <Step Id="place_design"/>
+    <Step Id="post_place_power_opt_design"/>
+    <Step Id="phys_opt_design"/>
+    <Step Id="route_design"/>
+    <Step Id="post_route_phys_opt_design"/>
+    <Step Id="write_bitstream" PreStepTclHook="/home/ar/nucleusrv/fpga/pre_bitgen.tcl"/>
+  </Strategy>
+</GenRun>

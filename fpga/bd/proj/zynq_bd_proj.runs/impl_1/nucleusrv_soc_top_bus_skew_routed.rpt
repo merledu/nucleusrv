@@ -1,0 +1,15 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.2 (lin64) Build 2258646 Thu Jun 14 20:02:38 MDT 2018
+| Date         : Tue Sep 29 07:58:40 2026
+| Host         : magnum running 64-bit Ubuntu 24.04.5 LTS
+| Command      : report_bus_skew -warn_on_violation -file nucleusrv_soc_top_bus_skew_routed.rpt -pb nucleusrv_soc_top_bus_skew_routed.pb -rpx nucleusrv_soc_top_bus_skew_routed.rpx
+| Design       : nucleusrv_soc_top
+| Device       : 7z010-clg400
+| Speed File   : -1  PRODUCTION 1.11 2014-09-11
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Bus Skew Report
+
+No bus skew constraints
+

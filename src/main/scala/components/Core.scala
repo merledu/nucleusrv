@@ -139,13 +139,13 @@ class Core(implicit val config:Configs) extends Module{
 
   val instruction = Wire(UInt(32.W))
   val is_comp     = dontTouch(WireInit(false.B))
-  val halt = EX.stall || ID.stall || io.imemReq.valid || MEM.io.stall
+  val halt = EX.stall || ID.stall || io.imemReq.valid || MEM.io.stall || IF.waiting
 
   val RA = if (C) Some(Module(new Realigner).io) else None
   if (C) {
     RA.get.ral_address_i     := pc.io.out.asUInt
-    RA.get.ral_instruction_i := Mux(io.imemRsp.valid, IF.instruction, 0.U)
-    RA.get.ral_jmp           := ID.pcSrc
+    RA.get.ral_instruction_i := Mux(IF.inst_valid, IF.instruction, 0.U)
+    RA.get.ral_jmp           := ID.pcSrc && !MEM.io.stall
     RA.get.stall             := halt
     RA.get.is_comp           := is_comp
     val instruction_cd    = RA.get.ral_instruction_o
@@ -176,12 +176,13 @@ class Core(implicit val config:Configs) extends Module{
   ) || ((func7 === "b0001100".U) || (func7 === "b0101100".U))
 
   IF.stall := io.stall || EX.stall || ID.stall || /*IF_stall ||*/ ID.pcSrc || MEM.io.stall
+  IF.redirect := ID.pcSrc && !MEM.io.stall
   
   pc.io.halt := dontTouch(halt)
   val npc = Mux(
     ID.hdu_pcWrite,
     Mux(
-      ID.pcSrc,
+      ID.pcSrc && !MEM.io.stall,
       ID.pcPlusOffset.asSInt,
       Mux(
         is_comp || pc.io.out(1) || (if (C) RA.get.misaligned_word else 0.B),
@@ -206,7 +207,7 @@ class Core(implicit val config:Configs) extends Module{
       if_reg_is_comp.get := is_comp
     }
   }
-  when(ID.ifid_flush) {
+  when(ID.ifid_flush && !MEM.io.stall) {
     if_reg_ins := 0.U
     if (C) {
       if_reg_is_comp.get := 0.B
@@ -309,7 +310,9 @@ class Core(implicit val config:Configs) extends Module{
     ex_reg_wra := id_reg_wra
     ex_reg_ins := id_reg_ins
     ex_reg_ctl_memToReg := id_reg_ctl_memToReg
-    ex_reg_ctl_regWrite <> id_reg_ctl_regWrite
+    // While a divide iterates in EX, send a bubble down the pipe instead of copies of it
+    // carrying a partial result; the finished result goes through when the stall drops
+    ex_reg_ctl_regWrite.zip(id_reg_ctl_regWrite).foreach { case (e, i) => e := i && !EX.stall }
     if (Zicsr) {
       ex_reg_is_csr.get := id_reg_is_csr.get
       ex_reg_csr_data.get := id_reg_csr_data.get
@@ -335,7 +338,8 @@ class Core(implicit val config:Configs) extends Module{
   
   ID.dmem_data := MEM.io.readData
   // ID.ex_result := EX.ALUresult // assigned below
-  ID.ex_mem_result := ex_reg_result
+  // A load in MEM carries its address in ex_reg_result; ID-stage branches/jalr need the loaded data
+  ID.ex_mem_result := Mux(ex_reg_ctl_memRead, MEM.io.readData, ex_reg_result)
   ID.mem_wb_result := mem_reg_result
   
   EX.wb_result := mem_reg_result
